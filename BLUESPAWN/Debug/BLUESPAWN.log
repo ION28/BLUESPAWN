@@ -1,0 +1,3 @@
+﻿  BLUESPAWN.cpp
+C:\Users\jtsmi\Documents\git\BLUESPAWN\BLUESPAWN\BLUESPAWN.cpp(35,1): warning C4326:  return type of 'main' should be 'int' instead of 'void'
+  BLUESPAWN.vcxproj -> C:\Users\jtsmi\Documents\git\BLUESPAWN\BLUESPAWN\Debug\BLUESPAWN.exe
