@@ -155,6 +155,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BLUESPAWN.cpp" />
+    <ClCompile Include="CollectInfo.cpp" />
+    <ClCompile Include="Output.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CollectInfo.h" />
+    <ClInclude Include="Output.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
