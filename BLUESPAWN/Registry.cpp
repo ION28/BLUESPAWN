@@ -1,14 +1,28 @@
 #include "Registry.h"
 
+//base registry info: https://stackoverflow.com/a/35717/3302799
 
-HKEY hKey;
-LONG lRes = RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Perl", 0, KEY_READ, &hKey);
-bool bExistsAndSuccess(lRes == ERROR_SUCCESS);
-bool bDoesNotExistsSpecifically(lRes == ERROR_FILE_NOT_FOUND);
-std::wstring strValueOfBinDir;
-std::wstring strKeyDefaultValue;
-GetStringRegKey(hKey, L"BinDir", strValueOfBinDir, L"bad");
-GetStringRegKey(hKey, L"", strKeyDefaultValue, L"bad");
+std::string ws2s(const std::wstring& wstr)
+{
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+	return converterX.to_bytes(wstr);
+}
+
+void TestQuery() {
+	HKEY hKey;
+	LONG lRes = RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SYSTEM\\Maps", 0, KEY_READ, &hKey);
+	bool bExistsAndSuccess(lRes == ERROR_SUCCESS);
+	bool bDoesNotExistsSpecifically(lRes == ERROR_FILE_NOT_FOUND);
+
+	std::wstring strValueOfBinDir;
+	std::wstring strKeyDefaultValue;
+	GetStringRegKey(hKey, L"ApprovedPFNList", strValueOfBinDir, L"en-UK");
+	cout << ws2s(strValueOfBinDir)<< endl;
+	//GetStringRegKey(hKey, L"", strKeyDefaultValue, L"bad");
+}
+
 
 LONG GetDWORDRegKey(HKEY hKey, const std::wstring& strValueName, DWORD& nValue, DWORD nDefaultValue)
 {

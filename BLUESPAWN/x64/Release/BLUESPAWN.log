@@ -1,8 +1,7 @@
-﻿  BLUESPAWN.cpp
-  Output.cpp
+﻿  Registry.cpp
   Generating code
-  168 of 308 functions (54.5%) were compiled, the rest were copied from previous compilation.
-    11 functions were new in current compilation
-    33 functions had inline decision re-evaluated but remain unchanged
+  1 of 380 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   BLUESPAWN.vcxproj -> C:\Users\jtsmi\Documents\git\BLUESPAWN\BLUESPAWN\x64\Release\BLUESPAWN.exe

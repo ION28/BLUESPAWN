@@ -13,5 +13,8 @@ int main()
 	PrintInfoStatus("Active Directory Domain: " + GetDomain());
 	PrintInfoStatus("Operating System: " + GetOsVersion());
 	PrintInfoStatus("Current User: " + GetCurrentUser());
+	cout << endl;
+	PrintInfoHeader("Analyzing Reigstry");
+	TestQuery();
 }
 
