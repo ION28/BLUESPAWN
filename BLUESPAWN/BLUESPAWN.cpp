@@ -7,14 +7,8 @@ using namespace std;
 
 int main()
 {
-	PrintInfoHeader("Computer Information");
-	PrintInfoStatus("DNS FQDN: " + GetFQDN());
-	PrintInfoStatus("Computer DNS Name: " + GetComputerDNSName());
-	PrintInfoStatus("Active Directory Domain: " + GetDomain());
-	PrintInfoStatus("Operating System: " + GetOsVersion());
-	PrintInfoStatus("Current User: " + GetCurrentUser());
+	OutputComputerInformation();
 	cout << endl;
-	PrintInfoHeader("Analyzing Reigstry");
-	TestQuery();
+	ExamineRegistry();
 }
 

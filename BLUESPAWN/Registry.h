@@ -4,17 +4,23 @@
 #include "windows.h"
 #include "string"
 #include <iostream>
-#include <locale>
-#include <codecvt>
+#include "Output.h"
 
 using namespace std;
 
 #pragma comment(lib, "advapi32.lib")
 
-void TestQuery();
+struct key {
+	HKEY hive;
+	LPCWSTR path;
+	LPCWSTR key;
+	wstring value;
+};
+
+void ExamineRegistry();
 LONG GetDWORDRegKey(HKEY, const std::wstring&, DWORD&, DWORD);
 LONG GetBoolRegKey(HKEY, const std::wstring&, bool&, bool);
-LONG GetStringRegKey(HKEY, const std::wstring&, std::wstring&, const std::wstring&);
-
+LONG GetStringRegKey(HKEY, const std::wstring&, std::wstring&);
+bool CheckKeyIsDefaultValue(key& k);
 
 #endif

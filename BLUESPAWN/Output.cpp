@@ -42,3 +42,34 @@ void PrintInfoStatus(string out) {
 	SetConsoleColor("white");
 	cout << out << endl;
 }
+
+void PrintBadStatus(string out) {
+	SetConsoleColor("red");
+	cout << "[-] ";
+	SetConsoleColor("white");
+	cout << out << endl;
+}
+
+void PrintGoodStatus(string out) {
+	SetConsoleColor("green");
+	cout << "[+] ";
+	SetConsoleColor("white");
+	cout << out << endl;
+}
+
+//https://stackoverflow.com/questions/4804298/how-to-convert-wstring-into-string
+std::wstring s2ws(const std::string& str)
+{
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+	return converterX.from_bytes(str);
+}
+
+std::string ws2s(const std::wstring& wstr)
+{
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+	return converterX.to_bytes(wstr);
+}

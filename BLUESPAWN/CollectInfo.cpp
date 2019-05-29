@@ -1,5 +1,13 @@
 #include "CollectInfo.h"
 
+void OutputComputerInformation() {
+	PrintInfoHeader("Computer Information");
+	PrintInfoStatus("DNS FQDN: " + GetFQDN());
+	PrintInfoStatus("Computer DNS Name: " + GetComputerDNSName());
+	PrintInfoStatus("Active Directory Domain: " + GetDomain());
+	PrintInfoStatus("Operating System: " + GetOsVersion());
+	PrintInfoStatus("Current User: " + GetCurrentUser());
+}
 
 string GetOsVersion() {
 	//future proofed get OS version: https://stackoverflow.com/questions/25986331/how-to-determine-windows-version-in-future-proof-way
