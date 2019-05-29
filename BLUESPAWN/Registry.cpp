@@ -12,22 +12,24 @@ key keys[number_of_keys] =
 void ExamineRegistry() {
 	PrintInfoHeader("Analyzing Reigstry");
 	for (int i = 0; i < number_of_keys; i++) {
-		if (!CheckKeyIsDefaultValue(keys[i])) {
-			PrintBadStatus("Found non-default key: " + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
+		wstring current_key_val;
+		if (!CheckKeyIsDefaultValue(keys[i], current_key_val)) {
+			PrintBadStatus("Key is non-default: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
+			PrintBadStatus("Value was: " + ws2s(current_key_val));
+			PrintBadStatus("Value should be: " + ws2s(keys[i].value));
 		}
 		else {
-			PrintGoodStatus("Key is okay: " + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
+			PrintGoodStatus("Key is okay: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
 		}
 	}
 }
 
-bool CheckKeyIsDefaultValue(key&  k) {
+bool CheckKeyIsDefaultValue(key& k, wstring& key_value) {
 	HKEY hKey;
 	LONG lRes = RegOpenKeyEx(k.hive, k.path, 0, KEY_READ, &hKey);
 	bool bExistsAndSuccess(lRes == ERROR_SUCCESS);
 
 	if (bExistsAndSuccess) {
-		wstring key_value;
 		GetStringRegKey(hKey, k.key, key_value);
 		RegCloseKey(hKey);
 		if (key_value.compare(k.value) == 0) {

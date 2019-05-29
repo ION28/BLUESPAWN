@@ -31,7 +31,7 @@ void SetConsoleColor(string color) {
 
 void PrintInfoHeader(string out) {
 	SetConsoleColor("yellow");
-	cout << "[+] ";
+	cout << "[#] ";
 	SetConsoleColor("white");
 	cout << out << endl;
 }
@@ -58,7 +58,7 @@ void PrintGoodStatus(string out) {
 }
 
 //https://stackoverflow.com/questions/4804298/how-to-convert-wstring-into-string
-std::wstring s2ws(const std::string& str)
+wstring s2ws(const string& str)
 {
 	using convert_typeX = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<convert_typeX, wchar_t> converterX;
@@ -66,10 +66,26 @@ std::wstring s2ws(const std::string& str)
 	return converterX.from_bytes(str);
 }
 
-std::string ws2s(const std::wstring& wstr)
+string ws2s(const wstring& wstr)
 {
 	using convert_typeX = std::codecvt_utf8<wchar_t>;
 	std::wstring_convert<convert_typeX, wchar_t> converterX;
 
 	return converterX.to_bytes(wstr);
+}
+
+string hive2s(HKEY k) {
+	//http://www.rensselaer.org/dept/cis/software/g77-mingw32/include/winreg.h
+	switch ((long)k) {
+		case 0x80000000:
+			return "HKEY_CLASSES_ROOT";
+		case 0x80000001:
+			return "HKCU";
+		case 0x80000002:
+			return "HKLM";
+		case 0x80000003:
+			return "HKEY_USERS";
+		default:
+			return "Unknown Hive";
+	}
 }

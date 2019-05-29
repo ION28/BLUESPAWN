@@ -21,6 +21,6 @@ void ExamineRegistry();
 LONG GetDWORDRegKey(HKEY, const std::wstring&, DWORD&, DWORD);
 LONG GetBoolRegKey(HKEY, const std::wstring&, bool&, bool);
 LONG GetStringRegKey(HKEY, const std::wstring&, std::wstring&);
-bool CheckKeyIsDefaultValue(key& k);
+bool CheckKeyIsDefaultValue(key&, wstring&);
 
 #endif
