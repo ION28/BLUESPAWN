@@ -2,8 +2,9 @@
 #define REGISTRY_H
 
 #include "windows.h"
-#include "string"
+#include <string>
 #include <iostream>
+#include <sstream>
 #include "Output.h"
 
 using namespace std;
@@ -15,10 +16,12 @@ struct key {
 	LPCWSTR path;
 	LPCWSTR key;
 	wstring value;
+	int type;
 };
 
-void ExamineRegistry();
-LONG GetDWORDRegKey(HKEY, const std::wstring&, DWORD&, DWORD);
+void ExamineRegistryPersistence();
+void ExamineRegistryOtherBad();
+LONG GetDWORDRegKey(HKEY, const std::wstring&, DWORD&);
 LONG GetBoolRegKey(HKEY, const std::wstring&, bool&, bool);
 LONG GetStringRegKey(HKEY, const std::wstring&, std::wstring&);
 bool CheckKeyIsDefaultValue(key&, wstring&);

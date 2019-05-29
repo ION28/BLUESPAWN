@@ -9,6 +9,8 @@ int main()
 {
 	OutputComputerInformation();
 	cout << endl;
-	ExamineRegistry();
+	ExamineRegistryPersistence();
+	cout << endl;
+	ExamineRegistryOtherBad();
 }
 
