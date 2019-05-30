@@ -4,14 +4,37 @@
 	USE ay "*" to check and report any subkey for a given path
 */
 
-const int number_of_persist_keys = 5;
+const int number_of_persist_keys = 21;
 key persist_keys[number_of_persist_keys] =
 {
 	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Shell", s2ws("explorer.exe"), REG_SZ},
-	{HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", L"Startup", s2ws("%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"), REG_SZ},
+
+	//T1037
+	{HKEY_CURRENT_USER,L"Environment",L"UserInitMprLogonScript", s2ws(""), REG_SZ},
+
+	//T1103
+	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", L"AppInit_DLLs", s2ws(""), REG_SZ}, 
+	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", L"LoadAppInit_DLLs", s2ws("0"), REG_DWORD},
+	{HKEY_LOCAL_MACHINE,L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows", L"AppInit_DLLs", s2ws(""), REG_SZ}, 
+	{HKEY_LOCAL_MACHINE,L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows", L"LoadAppInit_DLLs", s2ws("0"), REG_DWORD},
+
+	//T1060
 	{HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", L"*", s2ws("*"), REG_SZ},
 	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", L"*", s2ws("*"), REG_SZ},
-	{HKEY_CURRENT_USER,L"Environment",L"UserInitMprLogonScript", s2ws(""), REG_SZ}, //T1037
+	{HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce", L"*", s2ws("*"), REG_SZ},
+	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce", L"*", s2ws("*"), REG_SZ},
+	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx", L"*", s2ws("*"), REG_SZ},
+	{HKEY_CURRENT_USER,L"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Run", L"*", s2ws("*"), REG_SZ},
+	{HKEY_LOCAL_MACHINE,L"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Run", L"*", s2ws("*"), REG_SZ},
+	{HKEY_CURRENT_USER,L"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\RunOnce", L"*", s2ws("*"), REG_SZ},
+	{HKEY_LOCAL_MACHINE,L"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\RunOnce", L"*", s2ws("*"), REG_SZ},
+	{HKEY_LOCAL_MACHINE,L"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx", L"*", s2ws("*"), REG_SZ},
+	{HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run", L"*", s2ws("*"), REG_SZ},
+	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run", L"*", s2ws("*"), REG_SZ},
+	{HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", L"Startup", s2ws("%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"), REG_SZ},
+	{HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", L"Common Startup", s2ws("%ProgramData%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"), REG_SZ},
+	{HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", L"Common Startup", s2ws("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"), REG_SZ},
+
 };
 
 const int number_of_other_keys = 1;

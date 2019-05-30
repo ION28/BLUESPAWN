@@ -16,12 +16,26 @@
             "color": "#1184F2",
 	    "comment": "Covered by registry checking HKCU\\Environment\\UserInitMprLogonScript",
             "techniqueID": "T1037"
-        }
+        },
+        {
+            "color": "#1184F2",
+	    "comment": "Covered by registry checking AppInit_DLLs and LoadAppInit_DLLs keys",
+            "techniqueID": "T1103"
+        },
+        {
+            "color": "#FF9E3C",
+	    "comment": "(In Progress) Currently checks most Run* keys, needs to check actual files in Startup folders",
+            "techniqueID": "T1060"
+        }		
     ],
     "legendItems": [
         {
             "label": "BLUESPAWN Coverage",
             "color": "#1184F2"
+        },
+		{
+            "label": "(In Progress) BLUESPAWN Coverage",
+            "color": "#FF9E3C"
         }
     ]
 }
