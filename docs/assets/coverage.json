@@ -1,12 +1,12 @@
 {
     "description": "Current Coverage of BLUESPAWN",
-    "version": "0.1",
+    "version": "2.1",
     "name": "BLUESPAWN",
     "domain": "mitre-enterprise",
     "techniques": [
         {
             "color": "#1184F2",
-	    "comment": "Covered by registry checking HKCU\Environment\UserInitMprLogonScript",
+	    "comment": "Covered by registry checking HKCU\\Environment\\UserInitMprLogonScript",
             "techniqueID": "T1037"
         }
     ],
