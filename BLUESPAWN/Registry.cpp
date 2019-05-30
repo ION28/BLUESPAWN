@@ -1,10 +1,16 @@
 #include "Registry.h"
 
-const int number_of_persist_keys = 2;
+/*	FORMAT: {HIVE, PATH, KEY, EXPECTED/DEFAULT VALUE, TYPE} 
+	USE ay "*" to check and report any subkey for a given path
+*/
+
+const int number_of_persist_keys = 4;
 key persist_keys[number_of_persist_keys] =
 {
 	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Shell", s2ws("explorer.exe"), REG_SZ},
 	{HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", L"Startup", s2ws("%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"), REG_SZ},
+	{HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", L"*", s2ws("*"), REG_SZ},
+	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", L"*", s2ws("*"), REG_SZ},
 };
 
 const int number_of_other_keys = 1;
@@ -18,14 +24,8 @@ void ExamineRegistryPersistence() {
 	for (int i = 0; i < number_of_persist_keys; i++) {
 		key& k = persist_keys[i];
 		wstring current_key_val;
-		if (!CheckKeyIsDefaultValue(k, current_key_val)) {
-			PrintBadStatus("Key is non-default: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
-			PrintBadStatus("Value was: " + ws2s(current_key_val));
-			PrintBadStatus("Value should be: " + ws2s(k.value));
-		}
-		else {
-			PrintGoodStatus("Key is okay: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
-		}
+		bool b = CheckKeyIsDefaultValue(k, current_key_val);
+		PrintRegistryKeyResult(b, k, current_key_val);
 	}
 }
 
@@ -34,14 +34,21 @@ void ExamineRegistryOtherBad() {
 	for (int i = 0; i < number_of_other_keys; i++) {
 		key& k = other_keys[i];
 		wstring current_key_val;
-		if (!CheckKeyIsDefaultValue(k, current_key_val)) {
+		bool b = CheckKeyIsDefaultValue(k, current_key_val);
+		PrintRegistryKeyResult(b, k, current_key_val);
+	}
+}
+
+void PrintRegistryKeyResult(bool b, key& k, wstring current_key_val) {
+	if (!b) {
+		if (ws2s(k.key).compare("*") != 0) {
 			PrintBadStatus("Key is non-default: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
-			PrintBadStatus("Value was: " + ws2s(current_key_val));
-			PrintBadStatus("Value should be: " + ws2s(k.value));
+			PrintInfoStatus("Value was: " + ws2s(current_key_val));
+			PrintInfoStatus("Value should be: " + ws2s(k.value));
 		}
-		else {
-			PrintGoodStatus("Key is okay: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
-		}
+	}
+	else {
+		PrintGoodStatus("Key is okay: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
 	}
 }
 
@@ -51,30 +58,20 @@ bool CheckKeyIsDefaultValue(key& k, wstring& key_value) {
 	bool bExistsAndSuccess(lRes == ERROR_SUCCESS);
 
 	if (bExistsAndSuccess) {
-		//required for DWORD/BINARY
-		ostringstream stream;
-		DWORD x = 0;
-		DWORD& n_val = x;
-
-		switch (k.type) {
-		case REG_SZ:
-			GetStringRegKey(hKey, k.key, key_value);
-			break;
-		case REG_DWORD:
-			GetDWORDRegKey(hKey, k.key, n_val);
-			stream << n_val;
-			key_value = s2ws(stream.str());
-			break;
-		case REG_BINARY:
-			break;
-		};
-		
-		RegCloseKey(hKey);
-		if (key_value.compare(k.value) == 0) {
-			return true;
+		if (ws2s(k.key).compare("*") == 0) {
+			QueryKey(hKey, key_value, k);
+			RegCloseKey(hKey);
 		}
 		else {
-			return false;
+			wstring key_name = k.key;
+			GetRegistryKey(hKey, k.type, key_value, key_name);
+			RegCloseKey(hKey);
+			if (key_value.compare(k.value) == 0) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 	}
 	else {
@@ -82,6 +79,31 @@ bool CheckKeyIsDefaultValue(key& k, wstring& key_value) {
 	} 
 }
 
+void GetRegistryKey(HKEY hKey, ULONG type, wstring& key_value, wstring key_name) {
+	//required for DWORD/BINARY
+	ostringstream stream;
+	DWORD x = 0;
+	DWORD& n_val = x;
+
+	switch (type) {
+	case REG_SZ:
+		GetStringRegKey(hKey, key_name, key_value);
+		break;
+	case REG_EXPAND_SZ:
+		GetStringRegKey(hKey, key_name, key_value);
+		break;
+	case REG_MULTI_SZ:
+		GetStringRegKey(hKey, key_name, key_value);
+		break;
+	case REG_DWORD:
+		GetDWORDRegKey(hKey, key_name, n_val);
+		stream << n_val;
+		key_value = s2ws(stream.str());
+		break;
+	case REG_BINARY:
+		break;
+	};
+}
 
 LONG GetDWORDRegKey(HKEY hKey, const std::wstring& strValueName, DWORD& nValue)
 {
@@ -119,4 +141,65 @@ LONG GetStringRegKey(HKEY hKey, const wstring& strValueName, wstring& strValue)
 		strValue = szBuffer;
 	}
 	return nError;
+}
+
+//enumerate all subkeys: https://docs.microsoft.com/en-us/windows/desktop/sysinfo/enumerating-registry-subkeys
+void QueryKey(HKEY hKey, wstring& key_value, key& k) {
+	TCHAR    achKey[MAX_KEY_LENGTH];   // buffer for subkey name
+	DWORD    cbName;                   // size of name string 
+	TCHAR    achClass[MAX_PATH] = TEXT("");  // buffer for class name 
+	DWORD    cchClassName = MAX_PATH;  // size of class string 
+	DWORD    cSubKeys = 0;               // number of subkeys 
+	DWORD    cbMaxSubKey;              // longest subkey size 
+	DWORD    cchMaxClass;              // longest class string 
+	DWORD    cValues;              // number of values for key 
+	DWORD    cchMaxValue;          // longest value name 
+	DWORD    cbMaxValueData;       // longest value data 
+	DWORD    cbSecurityDescriptor; // size of security descriptor 
+	FILETIME ftLastWriteTime;      // last write time 
+
+	DWORD i, retCode;
+
+	TCHAR  achValue[MAX_VALUE_NAME];
+	DWORD cchValue = MAX_VALUE_NAME;
+
+	// Get the class name and the value count. 
+	retCode = RegQueryInfoKey(
+		hKey,                    // key handle 
+		achClass,                // buffer for class name 
+		&cchClassName,           // size of class string 
+		NULL,                    // reserved 
+		&cSubKeys,               // number of subkeys 
+		&cbMaxSubKey,            // longest subkey size 
+		&cchMaxClass,            // longest class string 
+		&cValues,                // number of values for this key 
+		&cchMaxValue,            // longest value name 
+		&cbMaxValueData,         // longest value data 
+		&cbSecurityDescriptor,   // security descriptor 
+		&ftLastWriteTime);       // last write time 
+
+	// Enumerate the key values. 
+
+	if (cValues) {
+		PrintBadStatus("Key is non-default and contains following entries: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
+		for (i = 0, retCode = ERROR_SUCCESS; i < cValues; i++) {
+			cchValue = MAX_VALUE_NAME;
+			achValue[0] = '\0';
+			DWORD type = REG_DWORD;
+			retCode = RegEnumValue(hKey, i,
+				achValue,
+				&cchValue,
+				NULL,
+				&type,
+				NULL,
+				NULL);
+
+			if (retCode == ERROR_SUCCESS) {
+				wstring key_name(achValue);
+				GetRegistryKey(hKey, (ULONG)type, key_value, key_name);
+				PrintInfoStatus("SubKey name: " + ws2s(key_name));
+				PrintInfoStatus("Subkey value: " + ws2s(key_value));
+			}
+		}
+	}
 }
