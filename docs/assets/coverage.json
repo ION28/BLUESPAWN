@@ -1,0 +1,19 @@
+{
+    "description": "Current Coverage of BLUESPAWN",
+    "version": "0.1",
+    "name": "BLUESPAWN",
+    "domain": "uva-cyber-defense",
+    "techniques": [
+        {
+            "color": "#1184F2",
+	    "comment": "Covered by registry checking HKCU\Environment\UserInitMprLogonScript",
+            "techniqueID": "T1037"
+        }
+    ],
+    "legendItems": [
+        {
+            "label": "BLUESPAWN Coverage",
+            "color": "#1184F2"
+        }
+    ]
+}
