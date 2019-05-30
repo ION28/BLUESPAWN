@@ -4,13 +4,14 @@
 	USE ay "*" to check and report any subkey for a given path
 */
 
-const int number_of_persist_keys = 4;
+const int number_of_persist_keys = 5;
 key persist_keys[number_of_persist_keys] =
 {
 	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Shell", s2ws("explorer.exe"), REG_SZ},
 	{HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", L"Startup", s2ws("%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"), REG_SZ},
 	{HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", L"*", s2ws("*"), REG_SZ},
 	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", L"*", s2ws("*"), REG_SZ},
+	{HKEY_CURRENT_USER,L"Environment",L"UserInitMprLogonScript", s2ws(""), REG_SZ}, //T1037
 };
 
 const int number_of_other_keys = 1;
@@ -81,6 +82,7 @@ bool CheckKeyIsDefaultValue(key& k, wstring& key_value) {
 
 void GetRegistryKey(HKEY hKey, ULONG type, wstring& key_value, wstring key_name) {
 	//required for DWORD/BINARY
+	//reg types: https://docs.microsoft.com/en-us/windows/desktop/SysInfo/registry-value-types
 	ostringstream stream;
 	DWORD x = 0;
 	DWORD& n_val = x;
