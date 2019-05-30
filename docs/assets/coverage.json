@@ -1,5 +1,13 @@
 {
     "description": "Current Coverage of BLUESPAWN",
+	"filters": {
+		"stages": [
+			"act"
+		],
+		"platforms": [
+			"windows"
+		]
+	},
     "version": "2.1",
     "name": "BLUESPAWN",
     "domain": "mitre-enterprise",
