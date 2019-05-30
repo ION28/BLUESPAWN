@@ -2,7 +2,7 @@
     "description": "Current Coverage of BLUESPAWN",
     "version": "0.1",
     "name": "BLUESPAWN",
-    "domain": "uva-cyber-defense",
+    "domain": "mitre-enterprise",
     "techniques": [
         {
             "color": "#1184F2",
