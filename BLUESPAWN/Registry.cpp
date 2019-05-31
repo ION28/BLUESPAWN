@@ -4,7 +4,7 @@
 	USE ay "*" to check and report any subkey for a given path
 */
 
-const int number_of_persist_keys = 21;
+const int number_of_persist_keys = 24;
 key persist_keys[number_of_persist_keys] =
 {
 	{HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Shell", s2ws("explorer.exe"), REG_SZ},
@@ -34,6 +34,14 @@ key persist_keys[number_of_persist_keys] =
 	{HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", L"Startup", s2ws("%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"), REG_SZ},
 	{HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", L"Common Startup", s2ws("%ProgramData%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"), REG_SZ},
 	{HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", L"Common Startup", s2ws("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"), REG_SZ},
+
+	//T1182
+	//https://b3n7s.github.io/2018/10/27/AppCert-Dlls.html
+	{HKEY_LOCAL_MACHINE,L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls", L"*", s2ws("*"), REG_SZ},
+
+	//T1138
+	{HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", L"InstalledSDB", s2ws(""), REG_SZ},
+	{HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", L"Custom", s2ws(""), REG_SZ},
 
 };
 
@@ -99,7 +107,7 @@ bool CheckKeyIsDefaultValue(key& k, wstring& key_value) {
 		}
 	}
 	else {
-		return false;
+		return true;
 	} 
 }
 
@@ -226,5 +234,8 @@ void QueryKey(HKEY hKey, wstring& key_value, key& k) {
 				PrintInfoStatus("Subkey value: " + ws2s(key_value));
 			}
 		}
+	}
+	else {
+		PrintGoodStatus("Key is okay: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
 	}
 }

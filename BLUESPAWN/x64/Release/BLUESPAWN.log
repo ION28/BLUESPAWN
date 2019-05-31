@@ -1,9 +1,9 @@
 ﻿  Registry.cpp
-C:\Users\jtsmi\Documents\git\BLUESPAWN\BLUESPAWN\Registry.cpp(173,11): warning C4101:  'achKey': unreferenced local variable
-C:\Users\jtsmi\Documents\git\BLUESPAWN\BLUESPAWN\Registry.cpp(174,11): warning C4101:  'cbName': unreferenced local variable
+C:\Users\jtsmi\Documents\git\BLUESPAWN\BLUESPAWN\Registry.cpp(181,11): warning C4101:  'achKey': unreferenced local variable
+C:\Users\jtsmi\Documents\git\BLUESPAWN\BLUESPAWN\Registry.cpp(182,11): warning C4101:  'cbName': unreferenced local variable
   Generating code
   8 of 581 functions ( 1.4%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+    28 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   BLUESPAWN.vcxproj -> C:\Users\jtsmi\Documents\git\BLUESPAWN\BLUESPAWN\x64\Release\BLUESPAWN.exe
