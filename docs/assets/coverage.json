@@ -26,6 +26,16 @@
             "color": "#FF9E3C",
 	    "comment": "(In Progress) Currently checks most Run* keys, needs to check actual files in Startup folders",
             "techniqueID": "T1060"
+        },
+        {
+            "color": "#1184F2",
+	    "comment": "Covered by registry checking AppCert DLLs",
+            "techniqueID": "T1182"
+        },
+        {
+            "color": "#1184F2",
+	    "comment": "Covered by registry checking for Application Shimming and Custom DBs",
+            "techniqueID": "T1138"
         }		
     ],
     "legendItems": [
