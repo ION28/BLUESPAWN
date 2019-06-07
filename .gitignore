@@ -1,1 +1,4 @@
 BLUESPAWN/.vs
+BLUESPAWN/x64/*
+BLUESPAWN/Release/*
+BLUESPAWN/Debug/*
