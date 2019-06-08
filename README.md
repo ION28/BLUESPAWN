@@ -14,5 +14,13 @@ Visit [this map](https://ion28.github.io/BLUESPAWN/#layerURL=https%3A%2F%2Fion28
 - [ ] Network
 - [ ] File System
 
+## Project Authors
+Made with love by the UVA Cyber Defense Team Windows Group
+* Jake Smith ([Github](https://github.com/ION28), [Twitter](https://twitter.com/jtsmith282))
+* Calvin Krist ([Github](https://github.com/CalvinKrist), [Twitter](https://twitter.com/CalvinKrist))
+
 ## Contributors
-Made with love by the UVA Cyber Defense Team Windows Group (Jake, ?????)
+Thanks to all of the folks listed below for their contributions to BLUESPAWN!
+* Your name here!
+
+Want to help? Take a look at the current issues, add ideas for new features, write some code, and create a pull request!
