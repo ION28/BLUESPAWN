@@ -1,6 +1,7 @@
 #include "CollectInfo.h"
 #include "Output.h"
 #include "Registry.h"
+#include "Hunts.h"
 
 using namespace std;
 
@@ -8,12 +9,7 @@ using namespace std;
 int main()
 {
 	OutputComputerInformation();
-	cout << endl;
-	ExamineRegistryPersistence();
-	cout << endl;
-	ExamineRegistryOtherBad();
-	cout << endl;
-	HuntT1101SecuritySupportProvider();
-	HuntT1131AuthenticationPackage();
+	GoHuntingATTACK();
+	GoHuntingWeakSecuritySettings();
 }
 

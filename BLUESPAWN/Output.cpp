@@ -57,6 +57,16 @@ void PrintGoodStatus(string out) {
 	cout << out << endl;
 }
 
+void PrintSectionDivider() {
+	cout << endl;
+	cout << endl;
+	SetConsoleColor("yellow");
+	cout << "======================================================================= ";
+	SetConsoleColor("white");
+	cout << endl;
+	cout << endl;
+}
+
 //https://stackoverflow.com/questions/4804298/how-to-convert-wstring-into-string
 wstring s2ws(const string& str)
 {

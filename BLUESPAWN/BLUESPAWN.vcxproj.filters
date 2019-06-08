@@ -27,6 +27,9 @@
     <ClCompile Include="Registry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Hunts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollectInfo.h">
@@ -36,6 +39,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Registry.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hunts.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

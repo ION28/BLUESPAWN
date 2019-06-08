@@ -2,11 +2,14 @@
 
 void OutputComputerInformation() {
 	PrintInfoHeader("Computer Information");
+	cout << endl;
 	PrintInfoStatus("DNS FQDN: " + GetFQDN());
 	PrintInfoStatus("Computer DNS Name: " + GetComputerDNSName());
 	PrintInfoStatus("Active Directory Domain: " + GetDomain());
 	PrintInfoStatus("Operating System: " + GetOsVersion());
 	PrintInfoStatus("Current User: " + GetCurrentUser());
+
+	PrintSectionDivider();
 }
 
 string GetOsVersion() {

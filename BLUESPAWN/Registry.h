@@ -18,6 +18,10 @@ using namespace std;
 #define MAX_KEY_LENGTH 255
 #define MAX_VALUE_NAME 16383
 
+/*	
+	FORMAT: {HIVE, PATH, KEY, EXPECTED/DEFAULT VALUE, TYPE}
+	USE ay "*" to check and report any subkey for a given path
+*/
 struct key {
 	HKEY hive;
 	LPCWSTR path;
@@ -26,8 +30,7 @@ struct key {
 	ULONG type;
 };
 
-void ExamineRegistryPersistence();
-void ExamineRegistryOtherBad();
+void ExamineRegistryKeySet(key[], int);
 void PrintRegistryKeyResult(bool, key&, wstring);
 void GetRegistryKeyWrapper(HKEY, ULONG, wstring&, wstring);
 void GetRegistryKey(HKEY, ULONG, wstring&, wstring, vector<wstring>&);
@@ -37,7 +40,5 @@ LONG GetStringRegKey(HKEY, const std::wstring&, std::wstring&);
 LONG GetMultiStringRegKey(HKEY, const std::wstring&, std::wstring&, vector<wstring>&);
 bool CheckKeyIsDefaultValue(key&, wstring&);
 void QueryKey(HKEY, wstring&, key&);
-void HuntT1101SecuritySupportProvider();
-void HuntT1131AuthenticationPackage();
 
 #endif
