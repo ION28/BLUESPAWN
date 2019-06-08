@@ -2,6 +2,7 @@
 #include "Output.h"
 #include "Registry.h"
 #include "Hunts.h"
+#include "FileSystem.h"
 
 using namespace std;
 
