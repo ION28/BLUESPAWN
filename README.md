@@ -12,7 +12,8 @@ Visit [this map](https://ion28.github.io/BLUESPAWN/#layerURL=https%3A%2F%2Fion28
 - [ ] Network Connections
 - [ ] Services
 - [ ] Network
-- [ ] File System
+- [ ] File System (pending)
+- [ ] Logging
 
 ## Project Authors
 Made with love by the UVA Cyber Defense Team Windows Group

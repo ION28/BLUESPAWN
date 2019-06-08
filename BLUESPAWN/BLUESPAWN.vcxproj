@@ -156,12 +156,14 @@
   <ItemGroup>
     <ClCompile Include="BLUESPAWN.cpp" />
     <ClCompile Include="CollectInfo.cpp" />
+    <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="Hunts.cpp" />
     <ClCompile Include="Output.cpp" />
     <ClCompile Include="Registry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollectInfo.h" />
+    <ClInclude Include="FileSystem.h" />
     <ClInclude Include="Hunts.h" />
     <ClInclude Include="Output.h" />
     <ClInclude Include="Registry.h" />
