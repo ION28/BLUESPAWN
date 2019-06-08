@@ -36,7 +36,17 @@
             "color": "#1184F2",
 	    "comment": "Covered by registry checking for Application Shimming and Custom DBs",
             "techniqueID": "T1138"
-        }		
+        },
+        {
+            "color": "#1184F2",
+	    "comment": "Covered by registry checking for any additional SSPs",
+            "techniqueID": "T1101"
+        }		,
+        {
+            "color": "#1184F2",
+	    "comment": "Covered by registry checking for any additional Auth/Notif Packages",
+            "techniqueID": "T1131"
+        }				
     ],
     "legendItems": [
         {

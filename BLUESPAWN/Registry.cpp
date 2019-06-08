@@ -45,10 +45,11 @@ key persist_keys[number_of_persist_keys] =
 
 };
 
-const int number_of_other_keys = 1;
+const int number_of_other_keys = 2;
 key other_keys[number_of_other_keys] =
 {
 	{HKEY_LOCAL_MACHINE,L"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp", L"UserAuthentication", s2ws("1"), REG_DWORD},
+	{HKEY_LOCAL_MACHINE,L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"RunAsPPL", s2ws("1"), REG_DWORD},
 };
 
 void ExamineRegistryPersistence() {
@@ -96,7 +97,7 @@ bool CheckKeyIsDefaultValue(key& k, wstring& key_value) {
 		}
 		else {
 			wstring key_name = k.key;
-			GetRegistryKey(hKey, k.type, key_value, key_name);
+			GetRegistryKeyWrapper(hKey, k.type, key_value, key_name);
 			RegCloseKey(hKey);
 			if (key_value.compare(k.value) == 0) {
 				return true;
@@ -111,7 +112,12 @@ bool CheckKeyIsDefaultValue(key& k, wstring& key_value) {
 	} 
 }
 
-void GetRegistryKey(HKEY hKey, ULONG type, wstring& key_value, wstring key_name) {
+void GetRegistryKeyWrapper(HKEY hKey, ULONG type, wstring& key_value, wstring key_name) {
+	vector<wstring> s;
+	GetRegistryKey(hKey, type, key_value, key_name, s);
+}
+
+void GetRegistryKey(HKEY hKey, ULONG type, wstring& key_value, wstring key_name, vector<wstring>& target) {
 	//required for DWORD/BINARY
 	//reg types: https://docs.microsoft.com/en-us/windows/desktop/SysInfo/registry-value-types
 	ostringstream stream;
@@ -126,7 +132,7 @@ void GetRegistryKey(HKEY hKey, ULONG type, wstring& key_value, wstring key_name)
 		GetStringRegKey(hKey, key_name, key_value);
 		break;
 	case REG_MULTI_SZ:
-		GetStringRegKey(hKey, key_name, key_value);
+		GetMultiStringRegKey(hKey, key_name, key_value, target);
 		break;
 	case REG_DWORD:
 		GetDWORDRegKey(hKey, key_name, n_val);
@@ -172,6 +178,31 @@ LONG GetStringRegKey(HKEY hKey, const wstring& strValueName, wstring& strValue)
 	if (ERROR_SUCCESS == nError)
 	{
 		strValue = szBuffer;
+	}
+	return nError;
+}
+
+LONG GetMultiStringRegKey(HKEY hKey, const wstring& strValueName, wstring& strValue, vector<wstring>& target)
+{
+	DWORD dwBufferSize;
+	ULONG nError, nError2;
+	nError = RegQueryValueExW(hKey, strValueName.c_str(), NULL, 0, NULL, &dwBufferSize);
+	if (ERROR_SUCCESS == nError) {
+		vector<wchar_t> temp(dwBufferSize / sizeof(wchar_t));
+		nError2 = RegQueryValueExW(hKey, strValueName.c_str(), NULL, NULL, reinterpret_cast<LPBYTE>(&temp[0]), &dwBufferSize);
+		if (ERROR_SUCCESS == nError2) {
+			size_t index = 0;
+			size_t len = wcslen(&temp[0]);
+			while (len > 0)
+			{
+				target.push_back(&temp[index]);
+				index += len + 1;
+				len = wcslen(&temp[index]);
+			}
+		}
+		else {
+			return nError2;
+		}
 	}
 	return nError;
 }
@@ -229,7 +260,7 @@ void QueryKey(HKEY hKey, wstring& key_value, key& k) {
 
 			if (retCode == ERROR_SUCCESS) {
 				wstring key_name(achValue);
-				GetRegistryKey(hKey, (ULONG)type, key_value, key_name);
+				GetRegistryKeyWrapper(hKey, (ULONG)type, key_value, key_name);
 				PrintInfoStatus("SubKey name: " + ws2s(key_name));
 				PrintInfoStatus("Subkey value: " + ws2s(key_value));
 			}
@@ -237,5 +268,95 @@ void QueryKey(HKEY hKey, wstring& key_value, key& k) {
 	}
 	else {
 		PrintGoodStatus("Key is okay: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
+	}
+}
+
+void HuntT1101SecuritySupportProvider() {
+	PrintInfoHeader("Hunting for T1101 - Security Support Provider");
+
+	key keys[2] = {
+		{HKEY_LOCAL_MACHINE,L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"Security Packages", s2ws("*"), REG_MULTI_SZ},
+		{HKEY_LOCAL_MACHINE,L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", L"Security Packages", s2ws("*"), REG_MULTI_SZ},
+	};
+
+	vector<wstring> okSecPackages = { L"\"\"", L"wsauth", L"kerberos", L"msv1_0", L"schannel", L"wdigest", L"tspkg", L"pku2u" };
+
+	for (int i = 0; i < 2; i++) {
+		HKEY hKey;
+		LONG lRes = RegOpenKeyEx(keys[i].hive, keys[i].path, 0, KEY_READ, &hKey);
+		bool bExistsAndSuccess(lRes == ERROR_SUCCESS);
+
+		if (bExistsAndSuccess) {
+			wstring key_name = keys[i].key;
+			wstring result;
+			vector<wstring> target;
+			GetRegistryKey(hKey, keys[i].type, result, key_name, target);
+			RegCloseKey(hKey);
+
+			bool foundBad = false;
+			for (auto& val : target) {
+				if (find(okSecPackages.begin(), okSecPackages.end(), val) == okSecPackages.end()) {
+					PrintBadStatus("Key is non-default: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
+					PrintInfoStatus("Found potentially bad package: " + ws2s(val));
+					foundBad = true;
+				}
+			}
+			if (!foundBad) {
+				PrintGoodStatus("Key is okay: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
+			}
+		}
+		else {
+			PrintGoodStatus("Key is okay: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
+		}
+	}
+}
+
+void HuntT1131AuthenticationPackage() {
+	PrintInfoHeader("Hunting for T1131 - Authentication Package");
+
+	key keys[2] = {
+		{HKEY_LOCAL_MACHINE,L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"Authentication Packages", s2ws("*"), REG_MULTI_SZ},
+		{HKEY_LOCAL_MACHINE,L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"Notification Packages", s2ws("*"), REG_MULTI_SZ},
+	};
+
+	vector<wstring> okAuthPackages = { L"msv1_0", L"SshdPinAuthLsa" };
+	vector<wstring> okNotifPackages = { L"scecli" };
+
+	for (int i = 0; i < 2; i++) {
+		HKEY hKey;
+		LONG lRes = RegOpenKeyEx(keys[i].hive, keys[i].path, 0, KEY_READ, &hKey);
+		bool bExistsAndSuccess(lRes == ERROR_SUCCESS);
+
+		if (bExistsAndSuccess) {
+			wstring key_name = keys[i].key;
+			wstring result;
+			vector<wstring> target;
+			GetRegistryKey(hKey, keys[i].type, result, key_name, target);
+			RegCloseKey(hKey);
+
+			bool foundBad = false;
+			for (auto& val : target) {
+				if (i == 0) {
+					if (find(okAuthPackages.begin(), okAuthPackages.end(), val) == okAuthPackages.end()) {
+						PrintBadStatus("Key is non-default: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
+						PrintInfoStatus("Found potentially bad package: " + ws2s(val));
+						foundBad = true;
+					}
+				}
+				else if (i == 1) {
+					if (find(okNotifPackages.begin(), okNotifPackages.end(), val) == okNotifPackages.end()) {
+						PrintBadStatus("Key is non-default: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
+						PrintInfoStatus("Found potentially bad package: " + ws2s(val));
+						foundBad = true;
+					}
+				}
+			}
+			if (!foundBad) {
+				PrintGoodStatus("Key is okay: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
+			}
+		}
+		else {
+			PrintGoodStatus("Key is okay: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
+		}
 	}
 }

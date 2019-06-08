@@ -12,5 +12,8 @@ int main()
 	ExamineRegistryPersistence();
 	cout << endl;
 	ExamineRegistryOtherBad();
+	cout << endl;
+	HuntT1101SecuritySupportProvider();
+	HuntT1131AuthenticationPackage();
 }
 

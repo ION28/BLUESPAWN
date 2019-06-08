@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <tchar.h>
 #include "Output.h"
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -27,11 +29,15 @@ struct key {
 void ExamineRegistryPersistence();
 void ExamineRegistryOtherBad();
 void PrintRegistryKeyResult(bool, key&, wstring);
-void GetRegistryKey(HKEY, ULONG, wstring&, wstring);
+void GetRegistryKeyWrapper(HKEY, ULONG, wstring&, wstring);
+void GetRegistryKey(HKEY, ULONG, wstring&, wstring, vector<wstring>&);
 LONG GetDWORDRegKey(HKEY, const std::wstring&, DWORD&);
 LONG GetBoolRegKey(HKEY, const std::wstring&, bool&, bool);
 LONG GetStringRegKey(HKEY, const std::wstring&, std::wstring&);
+LONG GetMultiStringRegKey(HKEY, const std::wstring&, std::wstring&, vector<wstring>&);
 bool CheckKeyIsDefaultValue(key&, wstring&);
 void QueryKey(HKEY, wstring&, key&);
+void HuntT1101SecuritySupportProvider();
+void HuntT1131AuthenticationPackage();
 
 #endif
