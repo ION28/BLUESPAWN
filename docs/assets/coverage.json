@@ -13,12 +13,12 @@
     "domain": "mitre-enterprise",
     "techniques": [
         {
-            "color": "#1184F2",
+            "color": "#5AADFF",
 	    "comment": "Covered by registry checking HKCU\\Environment\\UserInitMprLogonScript",
             "techniqueID": "T1037"
         },
         {
-            "color": "#1184F2",
+            "color": "#5AADFF",
 	    "comment": "Covered by registry checking AppInit_DLLs and LoadAppInit_DLLs keys",
             "techniqueID": "T1103"
         },
@@ -28,39 +28,88 @@
             "techniqueID": "T1060"
         },
         {
-            "color": "#1184F2",
+            "color": "#5AADFF",
 	    "comment": "Covered by registry checking AppCert DLLs",
             "techniqueID": "T1182"
         },
         {
-            "color": "#1184F2",
+            "color": "#5AADFF",
 	    "comment": "Covered by registry checking for Application Shimming and Custom DBs",
             "techniqueID": "T1138"
         },
         {
-            "color": "#1184F2",
+            "color": "#5AADFF",
 	    "comment": "Covered by registry checking for any additional SSPs",
             "techniqueID": "T1101"
         },
         {
-            "color": "#1184F2",
+            "color": "#5AADFF",
 	    "comment": "Covered by registry checking for any additional Auth/Notif Packages",
             "techniqueID": "T1131"
         },
         {
-            "color": "#1184F2",
+            "color": "#5AADFF",
 	    "comment": "Covered by registry checking the Notify, Userinit, and Shell values",
             "techniqueID": "T1004"
+        },
+        {
+            "color": "#fcf26b",
+	    "comment": "Planned coverage",
+            "techniqueID": "T1035"
+        },
+        {
+            "color": "#fcf26b",
+	    "comment": "Planned coverage",
+            "techniqueID": "T1031"
+        },
+        {
+            "color": "#fcf26b",
+	    "comment": "Planned coverage",
+            "techniqueID": "T1050"
+        },
+        {
+            "color": "#fcf26b",
+	    "comment": "Planned coverage",
+            "techniqueID": "T1100"
+        },
+        {
+            "color": "#fcf26b",
+	    "comment": "Planned coverage",
+            "techniqueID": "T1084"
+        },
+        {
+            "color": "#fcf26b",
+	    "comment": "Planned coverage",
+            "techniqueID": "T1015"
+        },
+        {
+            "color": "#fcf26b",
+	    "comment": "Planned coverage",
+            "techniqueID": "T1128"
+        },
+        {
+            "color": "#fcf26b",
+	    "comment": "Planned coverage",
+            "techniqueID": "T1077"
+        },
+        {
+            "color": "#fcf26b",
+	    "comment": "Planned coverage",
+            "techniqueID": "T1053"
         }
     ],
     "legendItems": [
         {
             "label": "BLUESPAWN Coverage",
-            "color": "#1184F2"
+            "color": "#5AADFF"
         },
 		{
             "label": "(In Progress) BLUESPAWN Coverage",
             "color": "#FF9E3C"
+        },
+		{
+            "label": "Planned BLUESPAWN Coverage",
+            "color": "#fcf26b"
         }
     ]
 }
