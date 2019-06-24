@@ -10,6 +10,7 @@
 #include <experimental/filesystem>
 #include <filesystem>
 #include <regex> 
+#include <algorithm>
 
 #define BUFSIZE 1024
 #define MD5LEN  16
@@ -17,8 +18,6 @@
 using namespace std;
 namespace fs = std::experimental::filesystem::v1;
 
-void SearchForWebShell();
-void TestCheckFiles();
 bool CheckFileExists(LPCWSTR);
 string GetFileContents(LPCWSTR);
 bool HashFileMD5(LPCWSTR, string&);

@@ -1,25 +1,5 @@
 #include "FileSystem.h"
 
-void TestCheckFiles() {
-	SearchForWebShell();
-}
-
-void SearchForWebShell() {
-	vector<std::string> web_exts{ ".php", ".vbs" };
-	//Regex credit to: https://github.com/emposha/PHP-Shell-Detector
-	regex vuln_functions(R"(preg_replace.*\/e|`.*?\$.*?`|\bcreate_function\b|\bpassthru\b|\bshell_exec\b|\bexec\b|\bbase64_decode\b|\bedoced_46esab\b|\beval\b|\bsystem\b|\bproc_open\b|\bpopen\b|\bcurl_exec\b|\bcurl_multi_exec\b|\bparse_ini_file\b|\bshow_source\b)");
-	
-	std::string path = "C:\\temp";
-	for (const auto& entry : fs::directory_iterator(path)) {
-		if(find(web_exts.begin(), web_exts.end(), entry.path().extension().string()) != web_exts.end()) {
-			string sus_file = GetFileContents(entry.path().wstring().c_str());
-			if(regex_search(sus_file.begin(), sus_file.end(), vuln_functions)) {
-				cout << entry.path() << " is probably a webshell" << endl;
-			}
-		}
-	}
-}
-
 bool CheckFileExists(LPCWSTR filename) {
 	//Function from https://stackoverflow.com/a/4404259/3302799
 	GetFileAttributesW(filename); 
@@ -42,7 +22,6 @@ string GetFileContents(LPCWSTR filename) {
 		return "";
 	}
 }
-
 
 bool HashFileMD5(LPCWSTR filename, string& out) {
 	//Function from Microsoft
