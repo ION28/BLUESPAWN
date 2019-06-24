@@ -12,6 +12,5 @@ int main()
 	OutputComputerInformation();
 	GoHuntingATTACK();
 	GoHuntingWeakSecuritySettings();
-	TestCheckFiles();
 }
 

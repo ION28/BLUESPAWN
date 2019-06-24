@@ -7,6 +7,7 @@ void GoHuntingATTACK() {
 	HuntT1004WinlogonHelperDll();
 	HuntT1037LogonScripts();
 	HuntT1060RegistryRunKeysStartUpFolder();
+	HuntT1100WebShell();
 	HuntT1101SecuritySupportProvider();
 	HuntT1103AppInitDlls();
 	HuntT1131AuthenticationPackage();
@@ -96,6 +97,44 @@ void HuntT1060RegistryRunKeysStartUpFolder() {
 	};
 
 	ExamineRegistryKeySet(keys, num_of_keys_to_inspect);
+
+	cout << endl;
+}
+
+void HuntT1100WebShell() {
+	PrintInfoHeader("Hunting for T1100 - Web Shells");
+
+	vector<string> web_directories{ "C:\\inetpub\\wwwroot", "C:\\xampp\\htdocs\\", "C:\\temp" };
+	vector<string> web_exts{ ".php", ".jsp", ".asp", ".aspx", ".asmx", ".ashx", ".ascx" };
+	//Regex credit to: https://github.com/emposha/PHP-Shell-Detector
+	regex php_vuln_functions(R"(preg_replace.*\/e|`.*?\$.*?`|\bcreate_function\b|\bpassthru\b|\bshell_exec\b|\bexec\b|\bbase64_decode\b|\bedoced_46esab\b|\beval\b|\bsystem\b|\bproc_open\b|\bpopen\b|\bcurl_exec\b|\bcurl_multi_exec\b|\bparse_ini_file\b|\bshow_source\b)");
+
+	for (string path : web_directories) {
+		bool found_bad = false;
+		for (const auto& entry : fs::recursive_directory_iterator(path)) {
+			string file_ext = entry.path().extension().string();
+			transform(file_ext.begin(), file_ext.end(), file_ext.begin(), ::tolower);
+			if (find(web_exts.begin(), web_exts.end(), file_ext) != web_exts.end()) {
+				string sus_file = GetFileContents(entry.path().wstring().c_str());
+
+				if (file_ext.compare(".php") == 0) {
+					if (regex_search(sus_file.begin(), sus_file.end(), php_vuln_functions)) {
+						PrintBadStatus("Located likely web shell: " + entry.path().string());
+						found_bad = true;
+					}
+				}
+				else if (file_ext.compare(".jsp") == 0) {
+
+				}
+				else if (file_ext.substr(0, file_ext.size()-1).compare(".as") == 0) {
+
+				}
+			}
+		}
+		if (!found_bad) {
+			PrintGoodStatus("No web shells detected in " + path);
+		}
+	}
 
 	cout << endl;
 }
