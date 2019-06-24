@@ -15,12 +15,12 @@ We've created and open-sourced this for a number of reasons which include the fo
 Visit [this map](https://ion28.github.io/BLUESPAWN/#layerURL=https%3A%2F%2Fion28.github.io%2FBLUESPAWN%2Fassets%2Fcoverage.json) to see current coverage capabilities
 
 ## Lines of Effort
-- [ ] Registry (in progress)
+- [ ] Registry (mostly complete, minus a few bugs/enhancements in traversing reg keys)
 - [ ] Processes
 - [ ] Network Connections
 - [ ] Services
 - [ ] Network
-- [ ] File System (pending)
+- [ ] File System (in progress)
 - [ ] Logging
 
 ## Project Authors
@@ -33,3 +33,8 @@ Thanks to all of the folks listed below for their contributions to BLUESPAWN!
 * Your name here!
 
 Want to help? Take a look at the current issues, add ideas for new features, write some code, and create a pull request!
+
+## Special Thanks
+We would like to provide a special thank you to the following projects that have helped us to build BLUESPAWN:
+* The [MITRE's ATT&CK Project](https://attack.mitre.org/) which has put together an amazing framework for which to consider, document, and categorize attacker tradercraft. 
+* 
