@@ -16,12 +16,15 @@ Visit [this map](https://ion28.github.io/BLUESPAWN/#layerURL=https%3A%2F%2Fion28
 
 ## Lines of Effort
 - [ ] Registry (mostly complete, minus a few bugs/enhancements in traversing reg keys)
-- [ ] Processes
+- [ ] Processes (Jack)
 - [ ] Network Connections
-- [ ] Services
+- [ ] Services (Jake)
 - [ ] Network
-- [ ] File System (in progress)
-- [ ] Logging
+- [ ] File System (Jake, in progress)
+- [ ] Logging (Jake)
+- [ ] ETW (Calvin)
+- [ ] File System Minifilter
+- [ ] SDDT Hooking
 
 ## Project Authors
 Made with love by the UVA Cyber Defense Team Windows Group
