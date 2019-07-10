@@ -50,7 +50,7 @@ int Analyzer::ValidateProcess(HANDLE hProcess){
 }
 
 int Analyzer::ValidateThread(HANDLE hThread, HANDLE hProcess){
-	// TODO: iterate call stack, pass address to ValidateAddress
+
 }
 
 int Analyzer::ValidateAddress(HANDLE hProcess, LPVOID lpAddress){
@@ -181,7 +181,7 @@ int Analyzer::ValidateMatchesFile(HANDLE hProcess, HANDLE hFile, LPVOID lpBaseAd
 
 int Analyzer::ValidateFile(HANDLE hFile){
 	WCHAR strFileName[256];
-	GetFinalPathNameByHandleW(hFile, strFileName, 256, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
+	FAIL_IF_FALSE(GetFinalPathNameByHandleW(hFile, strFileName, 256, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS));
 
 	WINTRUST_FILE_INFO FileData;
 	memset(&FileData, 0, sizeof(FileData));
@@ -212,5 +212,26 @@ int Analyzer::ValidateFile(HANDLE hFile){
 	return result == 0;
 }
 
-int Analyzer::ValidateLoader(HANDLE process, LPVOID BaseAddress, HANDLE file){
+int Analyzer::ValidateLoader(HANDLE hProcess, LPVOID lpBaseAddress, HANDLE hFile){
+	PROCESS_BASIC_INFORMATION pbi;
+	FAIL_IF_FALSE(!NtQueryInformationProcess(hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), nullptr));
+
+	PEB peb;
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, pbi.PebBaseAddress, &peb, sizeof(peb), nullptr));
+
+	PLDR_DATA loader = (PLDR_DATA) peb.Ldr;
+	LDR_ENTRY image;
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, loader, &image, sizeof(image), nullptr));
+
+
+	WCHAR strFileName[256];
+	FAIL_IF_FALSE(GetFinalPathNameByHandleW(hFile, strFileName, 256, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS));
+
+	do {
+		if(lpBaseAddress == image.DllBase){
+			return !wcscmp(image.FullDllName.Buffer, strFileName);
+		}
+	} while(ReadProcessMemory(hProcess, image.InLoadOrderModuleList.Flink, &image, sizeof(image), nullptr));
+
+	return FALSE;
 }

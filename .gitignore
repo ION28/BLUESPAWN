@@ -1,6 +1,9 @@
 .vs
 */x64
 */debug
+*.pdb
+*.obj
+*.tlog
 BLUESPAWN/.vs
 BLUESPAWN/x64/*
 BLUESPAWN/Release/*
