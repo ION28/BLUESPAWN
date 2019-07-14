@@ -1,4 +1,0 @@
-﻿  Analyzer.cpp
-  C:\Users\student\source\repos\BLUESPAWN\ProcessAnalyze\Analyzer.cpp(46) : error C4716: 'Analyzer::ValidateThread': must return a value
-  C:\Users\student\source\repos\BLUESPAWN\ProcessAnalyze\Analyzer.cpp(160) : warning C4715: 'Analyzer::ValidateMatchesFile': not all control paths return a value
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(429,5): error MSB6006: "CL.exe" exited with code 2.

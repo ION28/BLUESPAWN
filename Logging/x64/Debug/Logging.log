@@ -1,4 +1,0 @@
-﻿  Output.cpp
-C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN\Output.cpp(89,17): warning C4311:  'type cast': pointer truncation from 'HKEY' to 'long'
-C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN\Output.cpp(89,17): warning C4302:  'type cast': truncation from 'HKEY' to 'long'
-  Logging.vcxproj -> C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN\x64\Debug\Logging.lib
