@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include "Scope.h"
+#include "Reaction.h"
 
 class HuntRegister;
 
@@ -58,17 +59,22 @@ namespace Aggressiveness {
 };
 
 class Hunt {
-private:
-	DWORD TacticsUsed;
+protected:
+	DWORD dwTacticsUsed;
 	DWORD dwSourcesInvolved;
 	DWORD dwStuffAffected;
-	Aggressiveness::Aggressiveness SupportedScans;
+	DWORD dwSupportedScans;
 
 public:
 	Hunt(HuntRegister& hr);
 
-	int ScanCursory(Scope& scope);
-	int ScanModerate(Scope& scope);
-	int ScanCareful(Scope& scope);
-	int ScanAggressive(Scope& scope);
+	bool UsesTactics(DWORD tactics);
+	bool UsesSources(DWORD sources);
+	bool AffectsStuff(DWORD stuff);
+	bool SupportsScan(Aggressiveness::Aggressiveness scan);
+
+	virtual int ScanCursory(Scope& scope, Reaction* reaction = nullptr);
+	virtual int ScanModerate(Scope& scope, Reaction* reaction = nullptr);
+	virtual int ScanCareful(Scope& scope, Reaction* reaction = nullptr);
+	virtual int ScanAggressive(Scope& scope, Reaction* reaction = nullptr);
 };
