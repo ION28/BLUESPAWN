@@ -25,6 +25,7 @@ Made with love by the UVA Cyber Defense Team Windows Group
 * Jake Smith ([Github](https://github.com/ION28), [Twitter](https://twitter.com/jtsmith282))
 * Calvin Krist ([Github](https://github.com/CalvinKrist), [Twitter](https://twitter.com/CalvinKrist))
 * Jack McDowell ([Github](https://github.com/jnmcd/))
+* Will Mayes ([Github](https://github.com/wtm99), [Twitter](https://twitter.com/will_mayes99))
 
 ## Contributors
 Thanks to all of the folks listed below for their contributions to BLUESPAWN!
