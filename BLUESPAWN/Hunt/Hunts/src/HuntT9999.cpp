@@ -16,6 +16,10 @@ namespace Hunts {
 		int identified = 0;
 
 		for(std::string sFileName : vFileNames){
+			if(!scope.FileIsInScope(sFileName.c_str())){
+				continue;
+			}
+
 			DWORD dwFileAttributes = GetFileAttributesA(sFileName.c_str());
 
 			if(dwFileAttributes != 0xFFFFFFFF){
