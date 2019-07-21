@@ -9,7 +9,6 @@
 #include <fstream>
 #include <experimental/filesystem>
 #include <filesystem>
-#include <regex> 
 #include <algorithm>
 
 #define BUFSIZE 1024
