@@ -1,9 +1,12 @@
 #pragma once
-#include <string>
-#include <vector>
 #include "Hunt.h"
 #include "Reaction.h"
 #include "Log.h"
+
+#include "../../../Logging/headers/Output.h"
+
+#include <string>
+#include <vector>
 
 namespace Hunts {
 

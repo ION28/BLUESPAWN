@@ -21,12 +21,14 @@
   <ItemGroup>
     <ClInclude Include="headers\Hunt.h" />
     <ClInclude Include="headers\HuntRegister.h" />
+    <ClInclude Include="headers\HuntT1100.h" />
     <ClInclude Include="headers\HuntT9999.h" />
     <ClInclude Include="headers\Scope.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hunt.cpp" />
     <ClCompile Include="src\HuntRegister.cpp" />
+    <ClCompile Include="src\HuntT1100.cpp" />
     <ClCompile Include="src\HuntT9999.cpp" />
     <ClCompile Include="src\Scope.cpp" />
   </ItemGroup>
