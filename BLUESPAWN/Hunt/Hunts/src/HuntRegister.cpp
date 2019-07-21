@@ -20,6 +20,7 @@ void HuntRegister::RegisterHunt(Hunt* hunt){
 
 
 void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness::Aggressiveness aggressiveness, Reaction* reaction){
+<<<<<<< HEAD
 	for (Hunt * hRegisteredHunt : vRegisteredHunts) {
 		Hunt& name = *hRegisteredHunt;
 		switch (aggressiveness) {
@@ -37,6 +38,9 @@ void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffecte
 			break;
 		}
 	}
+=======
+	//Iterate hunts, run those selected
+>>>>>>> parent of e2aa140... clear out master branch for major restructure
 }
 
 void HuntRegister::RunHunt(Hunt& name, Scope& scope, Aggressiveness::Aggressiveness aggressiveness, Reaction* reaction){

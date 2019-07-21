@@ -9,6 +9,10 @@
 #include <fstream>
 #include <experimental/filesystem>
 #include <filesystem>
+<<<<<<< HEAD
+=======
+#include <regex> 
+>>>>>>> parent of e2aa140... clear out master branch for major restructure
 #include <algorithm>
 
 #define BUFSIZE 1024

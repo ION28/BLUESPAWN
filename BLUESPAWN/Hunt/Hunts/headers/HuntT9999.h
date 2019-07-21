@@ -1,13 +1,21 @@
 #pragma once
+<<<<<<< HEAD
+=======
+#include <string>
+#include <vector>
+>>>>>>> parent of e2aa140... clear out master branch for major restructure
 #include "Hunt.h"
 #include "Reaction.h"
 #include "Log.h"
 
+<<<<<<< HEAD
 #include "../../../Logging/headers/Output.h"
 
 #include <string>
 #include <vector>
 
+=======
+>>>>>>> parent of e2aa140... clear out master branch for major restructure
 namespace Hunts {
 
 	/**

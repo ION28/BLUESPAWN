@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
@@ -182,6 +183,17 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 }
 
 void dispatch_example_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
+=======
+#include "Hunt.h"
+#include "HuntT9999.h"
+#include "HuntRegister.h"
+#include "Output.h"
+
+using namespace std;
+
+
+int main(){
+>>>>>>> parent of e2aa140... clear out master branch for major restructure
 	HuntRegister record{};
 	Hunts::HuntT9999 hTestHunt(record);
 
@@ -189,6 +201,7 @@ void dispatch_example_hunt(cxxopts::ParseResult result, cxxopts::Options options
 	hTestHunt.AddFileToSearch("C:\\Windows\\SysWOW64\\svchost.exe");
 
 	// Sample scope to exclude SysWOW
+<<<<<<< HEAD
 	class LimitedScope : public Scope {
 	public:
 		LimitedScope() : Scope() {};
@@ -197,11 +210,28 @@ void dispatch_example_hunt(cxxopts::ParseResult result, cxxopts::Options options
 		}
 	};
 
+=======
+	class LimitedScope : public Scope { 
+	public: 
+		LimitedScope() : Scope(){};
+		virtual bool FileIsInScope(LPCSTR path){
+			return !strstr(path, "SysWOW64");
+		}
+	};
+	
+>>>>>>> parent of e2aa140... clear out master branch for major restructure
 	PrintInfoHeader("Running Hunt T9999 with an open scope.");
 	Scope scope{};
 	hTestHunt.ScanCursory(scope);
 
 	PrintInfoHeader("Running Hunt T9999 with a limited scope.");
 	LimitedScope limitedScope{};
+<<<<<<< HEAD
 	hTestHunt.ScanCursory(limitedScope);
 }
+=======
+	hTestHunt.ScanCursory(limitedScope);
+
+}
+
+>>>>>>> parent of e2aa140... clear out master branch for major restructure

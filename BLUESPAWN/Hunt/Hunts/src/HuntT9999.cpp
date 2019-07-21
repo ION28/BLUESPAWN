@@ -13,8 +13,11 @@ namespace Hunts {
 	}
 
 	int HuntT9999::ScanCursory(Scope& scope, Reaction* reaction){
+<<<<<<< HEAD
 		PrintInfoHeader("Hunting for T9999 - Example Hunt at level Cursory");
 
+=======
+>>>>>>> parent of e2aa140... clear out master branch for major restructure
 		int identified = 0;
 
 		for(std::string sFileName : vFileNames){

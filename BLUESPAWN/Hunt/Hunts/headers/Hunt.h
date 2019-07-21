@@ -51,10 +51,17 @@ namespace AffectedThing {
 
 namespace Aggressiveness {
 	enum Aggressiveness {
+<<<<<<< HEAD
 		Cursory = 0x1, // Most obvious indicators (least false positives)
 		Moderate = 0x2, // Examine more things
 		Careful = 0x4, // Examine even more things
 		Aggressive = 0x8 // Check everything imaginable (most false positives)
+=======
+		Cursory = 0x1,
+		Moderate = 0x2,
+		Careful = 0x4,
+		Aggressive = 0x8
+>>>>>>> parent of e2aa140... clear out master branch for major restructure
 	};
 };
 
