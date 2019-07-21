@@ -16,10 +16,10 @@ namespace Hunts {
 	 * HuntT1100 scans the locations of web roots, looking for files that are likely to be
 	 * webshells.
 	 * 
-	 * @scans Cursory XXXXXXXXXXXXXXXXXXXXXXXXXX
-	 * @scans Moderate XXXXXXXXXXXXXXXXXXXXXXXXXX
-	 * @scans Careful XXXXXXXXXXXXXXXXXXXXXXXXXX
-	 * @scans Aggressive XXXXXXXXXXXXXXXXXXXXXXXXXX
+	 * @scans Cursory Checks for obvious bad functions that indicate a webshell
+	 * @scans Moderate Adds more suspicious indicators in the regex to look for
+	 * @scans Careful Scan not supported.
+	 * @scans Aggressive Scan not supported.
 	 */
 	class HuntT1100 : public Hunt {
 	private:
