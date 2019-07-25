@@ -146,8 +146,6 @@ LONG GetMultiStringRegKey(HKEY hKey, const wstring& strValueName, wstring& strVa
 
 //enumerate all subkeys: https://docs.microsoft.com/en-us/windows/desktop/sysinfo/enumerating-registry-subkeys
 void QueryKey(HKEY hKey, wstring& key_value, key& k) {
-	TCHAR    achKey[MAX_KEY_LENGTH];   // buffer for subkey name
-	DWORD    cbName;                   // size of name string 
 	TCHAR    achClass[MAX_PATH] = TEXT("");  // buffer for class name 
 	DWORD    cchClassName = MAX_PATH;  // size of class string 
 	DWORD    cSubKeys = 0;               // number of subkeys 
@@ -161,7 +159,7 @@ void QueryKey(HKEY hKey, wstring& key_value, key& k) {
 
 	DWORD i, retCode;
 
-	TCHAR  achValue[MAX_VALUE_NAME];
+	TCHAR*  achValue = new TCHAR[MAX_VALUE_NAME];
 	DWORD cchValue = MAX_VALUE_NAME;
 
 	// Get the class name and the value count. 
