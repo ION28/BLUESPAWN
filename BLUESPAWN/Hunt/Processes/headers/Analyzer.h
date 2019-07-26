@@ -1,5 +1,8 @@
 #include <Windows.h>
 
+#include <memory>
+#include <functional>
+
 typedef struct _LDR_ENTRY {
 	LIST_ENTRY InLoadOrderModuleList;
 	LIST_ENTRY InMemoryOrderModuleList;
@@ -28,15 +31,15 @@ typedef struct _LDR_DATA {
 } LDR_DATA, *PLDR_DATA;
 
 class Analyzer {
+	int ValidateThread(HANDLE hThread, HANDLE hProcess);
+	int ValidateProcess(HANDLE hProcess);
 	int ValidateAddress(HANDLE hProcess, LPVOID lpAddress);
+
 	int ValidateAddressInImage(HANDLE hProcess, LPVOID lpAddress, LPVOID* lpBaseAddress);
 	int ValidateFile(HANDLE hFile);
 	int ValidateTextExecution(HANDLE hProcess, LPVOID lpAddress, LPVOID lpBaseAddress);
-	int ValidateChecksum(HANDLE hProcess, LPVOID BaseAddress);
 	int ValidateLoader(HANDLE process, LPVOID BaseAddress, HANDLE file);
 	int ValidateMatchesFile(HANDLE hProcess, HANDLE hFile, LPVOID lpBaseAddress);
-	int ValidateImageSection(HANDLE hProcess, LPVOID lpAddress, PHANDLE phFile);
-	int ValidateThread(HANDLE hThread, HANDLE hProcess);
-	int ValidateProcess(HANDLE hProcess);
+	std::unique_ptr<VOID, std::function<VOID(HANDLE)>> ValidateImageSection(HANDLE hProcess, LPVOID lpAddress);
 };
 
