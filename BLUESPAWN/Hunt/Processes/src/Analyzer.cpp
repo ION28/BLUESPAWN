@@ -4,12 +4,19 @@
 #include <DbgHelp.h>
 #include <Psapi.h>
 #include <SoftPub.h>
+
 #include "Analyzer.h"
 
-#define FAIL_IF_INVALID_HANDLE(name, ...) \
-    HANDLE name = __VA_ARGS__;            \
-    if(name == INVALID_HANDLE_VALUE){     \
-        return FALSE;                     \
+#define ALLOCATE(name, size) \
+    std::unique_ptr<VOID, std::function<void(LPVOID)>> name{ LocalAlloc(MEM_RESERVE | MEM_COMMIT, size), [](LPVOID ptr){ LocalFree(ptr); } };
+
+#define CREATE_HANDLE(name, ...) \
+    std::unique_ptr<VOID, std::function<void(HANDLE)>> name{ __VA_ARGS__, [](HANDLE ptr){ CloseHandle(ptr); } };
+
+#define FAIL_IF_INVALID_HANDLE(name, ...)                      \
+    CREATE_HANDLE(name, __VA_ARGS__);                          \
+    if(name.get() == INVALID_HANDLE_VALUE || name.get() == 0){ \
+        return FALSE;                                          \
     }
 
 #define FAIL_IF_FALSE(...) \
@@ -17,52 +24,74 @@
         return FALSE;      \
 	}
 
-#define LEAVE_IF_FALSE(...) \
-    if(!(__VA_ARGS__)){     \
-        ret = FALSE;        \
-        __leave;            \
-	}
-
 int Analyzer::ValidateProcess(HANDLE hProcess){
 	FAIL_IF_INVALID_HANDLE(hThreadSnapshot, CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0));
 	
 	int PID = GetProcessId(hProcess);
 
-	int ret = TRUE;
+	THREADENTRY32 ThreadEntry = { sizeof(THREADENTRY32), 0 };
 
-	__try {
-		THREADENTRY32 ThreadEntry = { sizeof(THREADENTRY32), 0 };
+	FAIL_IF_FALSE(Thread32First(hThreadSnapshot.get(), &ThreadEntry));
 
-		LEAVE_IF_FALSE(Thread32First(hThreadSnapshot, &ThreadEntry));
+	do if(ThreadEntry.th32OwnerProcessID == PID){
+		FAIL_IF_INVALID_HANDLE(hThread, OpenThread(THREAD_ALL_ACCESS, FALSE, ThreadEntry.th32ThreadID));
+		FAIL_IF_FALSE(ValidateThread(hThread.get(), hProcess));
+	} while(Thread32Next(hThreadSnapshot.get(), &ThreadEntry));
 
-		do if(ThreadEntry.th32OwnerProcessID == PID){
-			HANDLE hThread;
-			LEAVE_IF_FALSE(hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, ThreadEntry.th32ThreadID));
-			LEAVE_IF_FALSE(ValidateThread(hThread, hProcess));
-		} while(Thread32Next(hThreadSnapshot, &ThreadEntry));
-
-	} __finally {
-		CloseHandle(hThreadSnapshot);
-	}
-	return ret;
+	return true;
 }
 
 int Analyzer::ValidateThread(HANDLE hThread, HANDLE hProcess){
-	// TODO: iterate call stack, pass address to ValidateAddress
-	return 0;
+	CONTEXT context{};
+	context.ContextFlags = CONTEXT_CONTROL;
+	GetThreadContext(hThread, &context);
+
+	STACKFRAME64 stack{};
+	stack.AddrPC.Mode = AddrModeFlat;
+	stack.AddrStack.Mode = AddrModeFlat;
+	stack.AddrFrame.Mode = AddrModeFlat;
+
+#ifdef _WIN64
+	stack.AddrPC.Offset = context.Rip;
+	stack.AddrStack.Offset = context.Rsp;
+	stack.AddrFrame.Offset = context.Rbp;
+
+	FAIL_IF_FALSE(ValidateAddress(hProcess, (LPVOID) context.Rip))
+
+	DWORD dwMachineType = IMAGE_FILE_MACHINE_AMD64;
+	BOOL wow64 = false;
+	IsWow64Process(hProcess, &wow64);
+	if(wow64){
+		dwMachineType = IMAGE_FILE_MACHINE_I386;
+	}
+#else
+	stack.AddrPC.Offset = context.Eip;
+	stack.AddrStack.Offset = context.Esp;
+	stack.AddrFrame.Offset = context.Ebp;
+
+	FAIL_IF_FALSE(ValidateAddress(hProcess, (LPVOID) context.Eip))
+
+	DWORD dwMachineType = IMAGE_FILE_MACHINE_I386;
+#endif
+
+	while(StackWalk64(dwMachineType, hProcess, hThread, &stack, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr)){
+		FAIL_IF_FALSE(ValidateAddress(hProcess, (LPVOID) stack.AddrPC.Offset));
+	}
+
+	return true;
 }
 
 int Analyzer::ValidateAddress(HANDLE hProcess, LPVOID lpAddress){
-	HANDLE hFile;
 	LPVOID lpBaseAddress;
 
 	FAIL_IF_FALSE(ValidateAddressInImage(hProcess, lpAddress, &lpBaseAddress));
 	FAIL_IF_FALSE(ValidateTextExecution(hProcess, lpAddress, lpBaseAddress));
-	FAIL_IF_FALSE(ValidateChecksum(hProcess, lpBaseAddress));
-	FAIL_IF_FALSE(ValidateImageSection(hProcess, lpBaseAddress, &hFile));
-	FAIL_IF_FALSE(ValidateMatchesFile(hProcess, hFile, lpBaseAddress));
-	FAIL_IF_FALSE(ValidateFile(hFile));
-	FAIL_IF_FALSE(ValidateLoader(hProcess, lpBaseAddress, hFile));
+
+	auto file = ValidateImageSection(hProcess, lpBaseAddress);
+	FAIL_IF_FALSE(file.get());
+	FAIL_IF_FALSE(ValidateMatchesFile(hProcess, file.get(), lpBaseAddress));
+	FAIL_IF_FALSE(ValidateFile(file.get()));
+	FAIL_IF_FALSE(ValidateLoader(hProcess, lpBaseAddress, file.get()));
 
 	return TRUE;
 }
@@ -113,69 +142,56 @@ int Analyzer::ValidateTextExecution(HANDLE hProcess, LPVOID lpAddress, LPVOID lp
 	return FALSE;
 }
 
-int Analyzer::ValidateImageSection(HANDLE hProcess, LPVOID lpBaseAddress, PHANDLE hFile){
+std::unique_ptr<VOID, std::function<VOID(HANDLE)>> Analyzer::ValidateImageSection(HANDLE hProcess, LPVOID lpBaseAddress){
 	char lpFileName[256];
 	FAIL_IF_FALSE(GetMappedFileNameA(hProcess, lpBaseAddress, lpFileName, 256));
 
 	FAIL_IF_INVALID_HANDLE(file, CreateFileA(lpFileName, GENERIC_READ, FILE_SHARE_READ, nullptr, 
 		                   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
-	FAIL_IF_FALSE(file);
-	
-	*hFile = file;
-
-	return TRUE;
+	return file;
 }
 
 int Analyzer::ValidateMatchesFile(HANDLE hProcess, HANDLE hFile, LPVOID lpBaseAddress){
 	//For now, just do the text section and headers. In the future, roll back the relocations
 	//and imports, then compare everything to the file
 
-	int ret = FALSE;//Think of this as rax
-
 	DWORD dwFileSize = GetFileSize(hFile, nullptr);
 	FAIL_IF_FALSE(dwFileSize);
 
-	LPVOID lpFileContents = LocalAlloc(MEM_RESERVE | MEM_COMMIT, dwFileSize);
+	ALLOCATE(lpFileContents, dwFileSize);
+
 	FAIL_IF_FALSE(lpFileContents);
 
-	__try {
-		LEAVE_IF_FALSE(ReadFile(hFile, lpFileContents, dwFileSize, nullptr, nullptr));
+	FAIL_IF_FALSE(ReadFile(hFile, lpFileContents.get(), dwFileSize, nullptr, nullptr));
 
-		PIMAGE_DOS_HEADER pFileDOSHeader = (PIMAGE_DOS_HEADER) lpFileContents;
-		PIMAGE_NT_HEADERS pFileNtHeader = (PIMAGE_NT_HEADERS) ((SIZE_T) lpFileContents + pFileDOSHeader->e_lfanew);
+	PIMAGE_DOS_HEADER pFileDOSHeader = (PIMAGE_DOS_HEADER) lpFileContents.get();
+	PIMAGE_NT_HEADERS pFileNtHeader = (PIMAGE_NT_HEADERS) ((SIZE_T) lpFileContents.get() + pFileDOSHeader->e_lfanew);
 
-		IMAGE_DOS_HEADER RemoteDOSHeader;
-		LEAVE_IF_FALSE(ReadProcessMemory(hProcess, lpBaseAddress, &RemoteDOSHeader, sizeof(RemoteDOSHeader), nullptr));
+	IMAGE_DOS_HEADER RemoteDOSHeader;
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, lpBaseAddress, &RemoteDOSHeader, sizeof(RemoteDOSHeader), nullptr));
 
-		IMAGE_NT_HEADERS RemoteNTHeaders;
-		LEAVE_IF_FALSE(ReadProcessMemory(hProcess, (LPVOID) ((SIZE_T) lpBaseAddress + RemoteDOSHeader.e_lfanew),
-			&RemoteNTHeaders, sizeof(RemoteNTHeaders), nullptr));
+	IMAGE_NT_HEADERS RemoteNTHeaders;
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, (LPVOID) ((SIZE_T) lpBaseAddress + RemoteDOSHeader.e_lfanew),
+		&RemoteNTHeaders, sizeof(RemoteNTHeaders), nullptr));
 
-		LPVOID lpRemoteImage = LocalAlloc(MEM_RESERVE | MEM_COMMIT, RemoteNTHeaders.OptionalHeader.SizeOfImage);
-		LEAVE_IF_FALSE(lpRemoteImage);
+	ALLOCATE(lpRemoteImage, RemoteNTHeaders.OptionalHeader.SizeOfImage);
 
-		__try {
-			LEAVE_IF_FALSE(ReadProcessMemory(hProcess, lpBaseAddress, lpRemoteImage, RemoteNTHeaders.OptionalHeader.SizeOfImage, nullptr));
-			LEAVE_IF_FALSE(!memcmp(lpFileContents, lpRemoteImage, pFileNtHeader->OptionalHeader.SizeOfHeaders));
+	FAIL_IF_FALSE(lpRemoteImage.get());
 
-			PIMAGE_SECTION_HEADER sections = (PIMAGE_SECTION_HEADER)(pFileDOSHeader->e_lfanew + sizeof(PIMAGE_NT_HEADERS));
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, lpBaseAddress, lpRemoteImage.get(), RemoteNTHeaders.OptionalHeader.SizeOfImage, nullptr));
+	FAIL_IF_FALSE(!memcmp(lpFileContents.get(), lpRemoteImage.get(), pFileNtHeader->OptionalHeader.SizeOfHeaders));
 
-			for(int i = 0; i < pFileNtHeader->FileHeader.NumberOfSections; i++){
-				if(!strcmp((char*) sections[i].Name, ".text")){
-					LPVOID lpFileTextSection = (LPVOID) ((SIZE_T) lpFileContents + sections[i].PointerToRawData);
-					LPVOID lpRemoteTextSection = (LPVOID) ((SIZE_T) lpRemoteImage + sections[i].VirtualAddress);
-					ret = !memcmp(lpFileTextSection, lpRemoteTextSection, sections[i].SizeOfRawData);
-					__leave;
-				}
-			}
-		} __finally {
-			LocalFree(lpRemoteImage);
+	PIMAGE_SECTION_HEADER sections = (PIMAGE_SECTION_HEADER) (pFileDOSHeader->e_lfanew + sizeof(PIMAGE_NT_HEADERS));
+
+	for(int i = 0; i < pFileNtHeader->FileHeader.NumberOfSections; i++){
+		if(!strcmp(( char*) sections[i].Name, ".text")){
+			LPVOID lpFileTextSection = (LPVOID) ((SIZE_T) lpFileContents.get() + sections[i].PointerToRawData);
+			LPVOID lpRemoteTextSection = (LPVOID) ((SIZE_T) lpRemoteImage.get() + sections[i].VirtualAddress);
+			return !memcmp(lpFileTextSection, lpRemoteTextSection, sections[i].SizeOfRawData);
 		}
-	} __finally {
-		LocalFree(lpFileContents);
 	}
 
-	return ret;
+	return 0;
 }
 
 int Analyzer::ValidateFile(HANDLE hFile){
