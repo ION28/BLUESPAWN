@@ -1,4 +1,4 @@
-#include "CollectInfo.h"
+#include "configuration/CollectInfo.h"
 
 void OutputComputerInformation() {
 	PrintInfoHeader("Computer Information");

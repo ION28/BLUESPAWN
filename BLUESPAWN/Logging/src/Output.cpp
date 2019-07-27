@@ -1,4 +1,4 @@
-#include "Output.h"
+#include "logging/Output.h"
 
 void SetConsoleColor(string color) {
 	//color documentation: https://stackoverflow.com/a/4053879/3302799
