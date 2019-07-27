@@ -1,4 +1,4 @@
-#include "HuntRegister.h"
+#include "hunts/HuntRegister.h"
 
 void HuntRegister::RegisterHunt(Hunt* hunt){
 	vRegisteredHunts.emplace_back(hunt);

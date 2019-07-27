@@ -1,6 +1,6 @@
-#include "Hunt.h"
-#include "HuntRegister.h"
-#include "Reaction.h"
+#include "hunts/Hunt.h"
+#include "hunts/HuntRegister.h"
+#include "reactions/Reaction.h"
 
 Hunt::Hunt(HuntRegister& record){
 	record.RegisterHunt(this);

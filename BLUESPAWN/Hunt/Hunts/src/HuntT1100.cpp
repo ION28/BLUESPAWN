@@ -1,7 +1,6 @@
-#include "HuntT1100.h"
+#include "hunts/HuntT1100.h"
 
 namespace Hunts {
-
 	HuntT1100::HuntT1100(HuntRegister& record) : Hunt(record) {
 		smatch match_index;
 

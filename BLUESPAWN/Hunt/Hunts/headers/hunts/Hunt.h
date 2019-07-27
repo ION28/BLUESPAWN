@@ -1,7 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include "Scope.h"
-#include "Reaction.h"
+#include "reactions/Reaction.h"
 
 class HuntRegister;
 

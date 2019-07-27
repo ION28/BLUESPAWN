@@ -1,4 +1,4 @@
-#include "Registry.h"
+#include "configuration/Registry.h"
 
 void ExamineRegistryKeySet(key keys[], int key_cnt) {
 	for (int i = 0; i < key_cnt; i++) {

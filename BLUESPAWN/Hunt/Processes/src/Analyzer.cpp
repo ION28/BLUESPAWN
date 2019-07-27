@@ -5,43 +5,33 @@
 #include <Psapi.h>
 #include <SoftPub.h>
 
-#include "Analyzer.h"
+#include "processes/Analyzer.h"
 
-#define ALLOCATE(name, size) \
-    std::unique_ptr<VOID, std::function<void(LPVOID)>> name{ LocalAlloc(MEM_RESERVE | MEM_COMMIT, size), [](LPVOID ptr){ LocalFree(ptr); } };
+#include <iostream>
 
-#define CREATE_HANDLE(name, ...) \
-    std::unique_ptr<VOID, std::function<void(HANDLE)>> name{ __VA_ARGS__, [](HANDLE ptr){ CloseHandle(ptr); } };
+auto _NtQueryInformationProcess = (NTSTATUS(NTAPI*)(HANDLE, PROCESSINFOCLASS, LPVOID, ULONG, PULONG)) GetProcAddress(LoadLibraryA("ntdll.dll"), "NtQueryInformationProcess");
 
-#define FAIL_IF_INVALID_HANDLE(name, ...)                      \
-    CREATE_HANDLE(name, __VA_ARGS__);                          \
-    if(name.get() == INVALID_HANDLE_VALUE || name.get() == 0){ \
-        return FALSE;                                          \
-    }
+STATUS Analyzer::ValidateProcess(HANDLE hProcess){
+	//std::cout << "Validating process with PID " << GetProcessId(hProcess) << std::endl;
 
-#define FAIL_IF_FALSE(...) \
-    if(!(__VA_ARGS__)){    \
-        return FALSE;      \
-	}
-
-int Analyzer::ValidateProcess(HANDLE hProcess){
 	FAIL_IF_INVALID_HANDLE(hThreadSnapshot, CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0));
 	
 	int PID = GetProcessId(hProcess);
 
 	THREADENTRY32 ThreadEntry = { sizeof(THREADENTRY32), 0 };
 
-	FAIL_IF_FALSE(Thread32First(hThreadSnapshot.get(), &ThreadEntry));
+	FAIL_IF_FALSE(Thread32First(hThreadSnapshot, &ThreadEntry));
 
 	do if(ThreadEntry.th32OwnerProcessID == PID){
-		FAIL_IF_INVALID_HANDLE(hThread, OpenThread(THREAD_ALL_ACCESS, FALSE, ThreadEntry.th32ThreadID));
-		FAIL_IF_FALSE(ValidateThread(hThread.get(), hProcess));
-	} while(Thread32Next(hThreadSnapshot.get(), &ThreadEntry));
+		FAIL_IF_INVALID_HANDLE(hThread, OpenThread(THREAD_ALL_ACCESS, false, ThreadEntry.th32ThreadID));
+		FAIL_IF_NOT_SUCCESS(ValidateThread(hThread, hProcess));
+	} while(Thread32Next(hThreadSnapshot, &ThreadEntry));
 
-	return true;
+	return ERROR_SUCCESS;
 }
 
-int Analyzer::ValidateThread(HANDLE hThread, HANDLE hProcess){
+STATUS Analyzer::ValidateThread(HANDLE hThread, HANDLE hProcess){
+	//std::cout << "Validating thread " << GetThreadId(hThread) << " in process with PID " << GetProcessId(hProcess) << std::endl;
 	CONTEXT context{};
 	context.ContextFlags = CONTEXT_CONTROL;
 	GetThreadContext(hThread, &context);
@@ -56,7 +46,7 @@ int Analyzer::ValidateThread(HANDLE hThread, HANDLE hProcess){
 	stack.AddrStack.Offset = context.Rsp;
 	stack.AddrFrame.Offset = context.Rbp;
 
-	FAIL_IF_FALSE(ValidateAddress(hProcess, (LPVOID) context.Rip))
+	FAIL_IF_NOT_SUCCESS(ValidateAddress(hProcess, (LPVOID) context.Rip))
 
 	DWORD dwMachineType = IMAGE_FILE_MACHINE_AMD64;
 	BOOL wow64 = false;
@@ -75,53 +65,74 @@ int Analyzer::ValidateThread(HANDLE hThread, HANDLE hProcess){
 #endif
 
 	while(StackWalk64(dwMachineType, hProcess, hThread, &stack, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr)){
-		FAIL_IF_FALSE(ValidateAddress(hProcess, (LPVOID) stack.AddrPC.Offset));
+		FAIL_IF_NOT_SUCCESS(ValidateAddress(hProcess, (LPVOID) stack.AddrPC.Offset));
 	}
 
-	return true;
+	return ERROR_SUCCESS;
 }
 
-int Analyzer::ValidateAddress(HANDLE hProcess, LPVOID lpAddress){
-	LPVOID lpBaseAddress;
+STATUS Analyzer::ValidateAddress(HANDLE hProcess, LPVOID lpAddress){
+	//std::cout << "Validating address " << lpAddress << std::endl;
 
-	FAIL_IF_FALSE(ValidateAddressInImage(hProcess, lpAddress, &lpBaseAddress));
-	FAIL_IF_FALSE(ValidateTextExecution(hProcess, lpAddress, lpBaseAddress));
+	LPVOID lpBaseAddress{};
+	FAIL_IF_NOT_SUCCESS(ValidateAddressInImage(hProcess, lpAddress, &lpBaseAddress));
+	//std::cout << "Address is in image" << std::endl;
 
-	auto file = ValidateImageSection(hProcess, lpBaseAddress);
-	FAIL_IF_FALSE(file.get());
-	FAIL_IF_FALSE(ValidateMatchesFile(hProcess, file.get(), lpBaseAddress));
-	FAIL_IF_FALSE(ValidateFile(file.get()));
-	FAIL_IF_FALSE(ValidateLoader(hProcess, lpBaseAddress, file.get()));
+	FAIL_IF_NOT_SUCCESS(ValidateTextExecution(hProcess, lpAddress, lpBaseAddress));
+	//std::cout << "Address is in .text section" << std::endl;
 
-	return TRUE;
+	HANDLE hFile{};
+	FAIL_IF_NOT_SUCCESS(ValidateImageSection(hProcess, lpBaseAddress, &hFile));
+	std::unique_ptr<VOID, std::function<void(HANDLE)>> hFileScopeGuard{ hFile, [](HANDLE ptr){ CloseHandle(ptr); } };
+	//std::cout << "Address is in a valid memory-mapped file" << std::endl;
+
+	FAIL_IF_NOT_SUCCESS(ValidateMatchesFile(hProcess, hFile, lpBaseAddress));
+	//std::cout << "In-memory image matches file" << std::endl;
+
+	FAIL_IF_NOT_SUCCESS(ValidateFile(hFile));
+	//std::cout << "File is signed" << std::endl;
+
+	FAIL_IF_NOT_SUCCESS(ValidateLoader(hProcess, lpBaseAddress, hFile));
+	//std::cout << "Loader and image match" << std::endl;
+
+	//std::cout << "Address has passed all checks" << std::endl << std::endl;
+
+	return ERROR_SUCCESS;
 }
 
-int Analyzer::ValidateAddressInImage(HANDLE hProcess, LPVOID lpAddress, LPVOID* lpBaseAddress){
-	PROCESS_BASIC_INFORMATION pbi;
-	FAIL_IF_FALSE(!NtQueryInformationProcess(hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), nullptr));
+STATUS Analyzer::ValidateAddressInImage(HANDLE hProcess, LPVOID lpAddress, LPVOID* lpBaseAddress){
+	PROCESS_BASIC_INFORMATION pbi{};
 
-	PEB peb;
+	FAIL_IF_NOT_SUCCESS(_NtQueryInformationProcess(hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), nullptr));
+
+	PEB peb{};
 	FAIL_IF_FALSE(ReadProcessMemory(hProcess, pbi.PebBaseAddress, &peb, sizeof(peb), nullptr));
 
-	PLDR_DATA loader = (PLDR_DATA) peb.Ldr;
-	LDR_ENTRY image;
-	FAIL_IF_FALSE(ReadProcessMemory(hProcess, loader, &image, sizeof(image), nullptr));
+	LDR_DATA loader{};
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, peb.Ldr, &loader, sizeof(loader), nullptr));
+
+	LDR_ENTRY image{};
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, loader.InLoadOrderModuleList.Flink, &image, sizeof(image), nullptr));
 
 	do {
+		if(!image.DllBase){
+			break;
+		}
 		if((SIZE_T) lpAddress >= (SIZE_T) image.DllBase && (SIZE_T) lpAddress < (SIZE_T) image.DllBase + image.SizeOfImage){
 			*lpBaseAddress = image.DllBase;
-			return TRUE;
+			return ERROR_SUCCESS;
 		}
 	} while(ReadProcessMemory(hProcess, image.InLoadOrderModuleList.Flink, &image, sizeof(image), nullptr));
 
-	return FALSE;
+	std::cout << "Invalid address: " << lpAddress << std::endl;
+	return ADDRESS_NOT_IN_IMAGE_SECTION;
 }
 
-int Analyzer::ValidateTextExecution(HANDLE hProcess, LPVOID lpAddress, LPVOID lpBaseAddress){
-	IMAGE_DOS_HEADER DOSHeader;
+STATUS Analyzer::ValidateTextExecution(HANDLE hProcess, LPVOID lpAddress, LPVOID lpBaseAddress){
+	IMAGE_DOS_HEADER DOSHeader{};
 	FAIL_IF_FALSE(ReadProcessMemory(hProcess, lpBaseAddress, &DOSHeader, sizeof(DOSHeader), nullptr));
 
-	IMAGE_NT_HEADERS NTHeaders;
+	IMAGE_NT_HEADERS NTHeaders{};
 	FAIL_IF_FALSE(ReadProcessMemory(hProcess, (LPVOID)((SIZE_T) lpBaseAddress + DOSHeader.e_lfanew),
 		                            &NTHeaders, sizeof(NTHeaders), nullptr));
 
@@ -129,29 +140,44 @@ int Analyzer::ValidateTextExecution(HANDLE hProcess, LPVOID lpAddress, LPVOID lp
 		                                                     sizeof(NTHeaders));
 
 	for(int i = 0; i < NTHeaders.FileHeader.NumberOfSections; i++){
-		IMAGE_SECTION_HEADER section;
+		IMAGE_SECTION_HEADER section{};
 		FAIL_IF_FALSE(ReadProcessMemory(hProcess, &sections[i], &section, sizeof(section), nullptr));
 
 		if(!strcmp((char*) section.Name, ".text")){
 			SIZE_T rva = section.VirtualAddress;
 			SIZE_T va = rva + (SIZE_T) lpBaseAddress;
-			return (SIZE_T) lpAddress >= va && (SIZE_T) lpAddress < va + section.SizeOfRawData;
+			bool in_text = (SIZE_T) lpAddress >= va && (SIZE_T) lpAddress < va + section.SizeOfRawData;
+			if(!in_text){
+				return EXECUTION_NOT_IN_TEXT_SECTION;
+			}
+			
+			return ERROR_SUCCESS;
 		}
 	}
 	
-	return FALSE;
+	return ERROR_NOT_FOUND;
 }
 
-std::unique_ptr<VOID, std::function<VOID(HANDLE)>> Analyzer::ValidateImageSection(HANDLE hProcess, LPVOID lpBaseAddress){
-	char lpFileName[256];
-	FAIL_IF_FALSE(GetMappedFileNameA(hProcess, lpBaseAddress, lpFileName, 256));
+STATUS Analyzer::ValidateImageSection(HANDLE hProcess, LPVOID lpBaseAddress, PHANDLE hFile){
+	char lpFileName[256]{};
+	if(!GetMappedFileNameA(hProcess, lpBaseAddress, lpFileName, 256)){
+		return ADDRESS_NOT_IN_IMAGE_SECTION;
+	}
 
-	FAIL_IF_INVALID_HANDLE(file, CreateFileA(lpFileName, GENERIC_READ, FILE_SHARE_READ, nullptr, 
-		                   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
-	return file;
+	char* sFileName = PCHAR(lpFileName) + 21;
+	sFileName[0] = 'C';
+	sFileName[1] = ':';
+
+	*hFile = CreateFileA(sFileName, GENERIC_READ, FILE_SHARE_READ, nullptr,
+		                   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if(!*hFile || *hFile == INVALID_HANDLE_VALUE){
+		return IMAGE_FILE_NOT_FOUND;
+	}
+
+	return ERROR_SUCCESS;
 }
 
-int Analyzer::ValidateMatchesFile(HANDLE hProcess, HANDLE hFile, LPVOID lpBaseAddress){
+STATUS Analyzer::ValidateMatchesFile(HANDLE hProcess, HANDLE hFile, LPVOID lpBaseAddress){
 	//For now, just do the text section and headers. In the future, roll back the relocations
 	//and imports, then compare everything to the file
 
@@ -162,10 +188,11 @@ int Analyzer::ValidateMatchesFile(HANDLE hProcess, HANDLE hFile, LPVOID lpBaseAd
 
 	FAIL_IF_FALSE(lpFileContents);
 
-	FAIL_IF_FALSE(ReadFile(hFile, lpFileContents.get(), dwFileSize, nullptr, nullptr));
+	FAIL_IF_FALSE(ReadFile(hFile, lpFileContents, dwFileSize, nullptr, nullptr));
 
-	PIMAGE_DOS_HEADER pFileDOSHeader = (PIMAGE_DOS_HEADER) lpFileContents.get();
-	PIMAGE_NT_HEADERS pFileNtHeader = (PIMAGE_NT_HEADERS) ((SIZE_T) lpFileContents.get() + pFileDOSHeader->e_lfanew);
+	PIMAGE_DOS_HEADER pFileDOSHeader = (PIMAGE_DOS_HEADER) lpFileContents;
+	PIMAGE_NT_HEADERS pFileNtHeader = (PIMAGE_NT_HEADERS) ((SIZE_T) lpFileContents + pFileDOSHeader->e_lfanew);
+	pFileNtHeader->OptionalHeader.ImageBase = ULONG_PTR(lpBaseAddress);
 
 	IMAGE_DOS_HEADER RemoteDOSHeader;
 	FAIL_IF_FALSE(ReadProcessMemory(hProcess, lpBaseAddress, &RemoteDOSHeader, sizeof(RemoteDOSHeader), nullptr));
@@ -176,30 +203,36 @@ int Analyzer::ValidateMatchesFile(HANDLE hProcess, HANDLE hFile, LPVOID lpBaseAd
 
 	ALLOCATE(lpRemoteImage, RemoteNTHeaders.OptionalHeader.SizeOfImage);
 
-	FAIL_IF_FALSE(lpRemoteImage.get());
+	FAIL_IF_FALSE(lpRemoteImage);
 
-	FAIL_IF_FALSE(ReadProcessMemory(hProcess, lpBaseAddress, lpRemoteImage.get(), RemoteNTHeaders.OptionalHeader.SizeOfImage, nullptr));
-	FAIL_IF_FALSE(!memcmp(lpFileContents.get(), lpRemoteImage.get(), pFileNtHeader->OptionalHeader.SizeOfHeaders));
-
-	PIMAGE_SECTION_HEADER sections = (PIMAGE_SECTION_HEADER) (pFileDOSHeader->e_lfanew + sizeof(PIMAGE_NT_HEADERS));
-
-	for(int i = 0; i < pFileNtHeader->FileHeader.NumberOfSections; i++){
-		if(!strcmp(( char*) sections[i].Name, ".text")){
-			LPVOID lpFileTextSection = (LPVOID) ((SIZE_T) lpFileContents.get() + sections[i].PointerToRawData);
-			LPVOID lpRemoteTextSection = (LPVOID) ((SIZE_T) lpRemoteImage.get() + sections[i].VirtualAddress);
-			return !memcmp(lpFileTextSection, lpRemoteTextSection, sections[i].SizeOfRawData);
-		}
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, lpBaseAddress, lpRemoteImage, RemoteNTHeaders.OptionalHeader.SizeOfImage, nullptr));
+	if(memcmp(lpFileContents, lpRemoteImage, pFileNtHeader->OptionalHeader.SizeOfHeaders)){
+		return IMAGE_HEADERS_MISMATCH;
 	}
 
-	return 0;
+	/*PIMAGE_SECTION_HEADER sections = (PIMAGE_SECTION_HEADER) (ULONG_PTR(lpFileContents) + pFileDOSHeader->e_lfanew + sizeof(PIMAGE_NT_HEADERS));
+
+	for(int i = 0; i < pFileNtHeader->FileHeader.NumberOfSections; i++){
+		std::cout << "Reading section " << (char*) sections[i].Name << std::endl;
+		if(!strcmp((char*) sections[i].Name, ".text")){
+			LPVOID lpFileTextSection = (LPVOID) ((SIZE_T) lpFileContents + sections[i].PointerToRawData);
+			LPVOID lpRemoteTextSection = (LPVOID) ((SIZE_T) lpRemoteImage + sections[i].VirtualAddress);
+			if(memcmp(lpFileTextSection, lpRemoteTextSection, sections[i].SizeOfRawData)){
+				return IMAGE_DOES_NOT_MATCH_FILE;
+			}
+
+			return ERROR_SUCCESS;
+		}
+	}*/
+
+	return ERROR_SUCCESS;
 }
 
-int Analyzer::ValidateFile(HANDLE hFile){
-	WCHAR strFileName[256];
+STATUS Analyzer::ValidateFile(HANDLE hFile){
+	WCHAR strFileName[256]{};
 	FAIL_IF_FALSE(GetFinalPathNameByHandleW(hFile, strFileName, 256, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS));
 
-	WINTRUST_FILE_INFO FileData;
-	memset(&FileData, 0, sizeof(FileData));
+	WINTRUST_FILE_INFO FileData{};
 	FileData.cbStruct = sizeof(WINTRUST_FILE_INFO);
 	FileData.pcwszFilePath = strFileName;
 	FileData.hFile = hFile;
@@ -207,8 +240,7 @@ int Analyzer::ValidateFile(HANDLE hFile){
 
 	GUID verification = WINTRUST_ACTION_GENERIC_VERIFY_V2;
 
-	WINTRUST_DATA WinTrustData;
-	memset(&WinTrustData, 0, sizeof(WinTrustData));
+	WINTRUST_DATA WinTrustData{};
 
 	WinTrustData.cbStruct = sizeof(WinTrustData);
 	WinTrustData.pPolicyCallbackData = NULL;
@@ -223,30 +255,57 @@ int Analyzer::ValidateFile(HANDLE hFile){
 	WinTrustData.pFile = &FileData;
 
 	LONG result = WinVerifyTrust((HWND) INVALID_HANDLE_VALUE, &verification, &WinTrustData);
+	if(result){
+		return IMAGE_FILE_NOT_SIGNED;
+	}
 
-	return result == 0;
+	return ERROR_SUCCESS;
 }
 
-int Analyzer::ValidateLoader(HANDLE hProcess, LPVOID lpBaseAddress, HANDLE hFile){
+STATUS Analyzer::ValidateLoader(HANDLE hProcess, LPVOID lpBaseAddress, HANDLE hFile){
 	PROCESS_BASIC_INFORMATION pbi;
-	FAIL_IF_FALSE(!NtQueryInformationProcess(hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), nullptr));
 
-	PEB peb;
+	FAIL_IF_NOT_SUCCESS(_NtQueryInformationProcess(hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), nullptr));
+
+	PEB peb{};
 	FAIL_IF_FALSE(ReadProcessMemory(hProcess, pbi.PebBaseAddress, &peb, sizeof(peb), nullptr));
 
-	PLDR_DATA loader = (PLDR_DATA) peb.Ldr;
-	LDR_ENTRY image;
-	FAIL_IF_FALSE(ReadProcessMemory(hProcess, loader, &image, sizeof(image), nullptr));
+	LDR_DATA loader{};
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, peb.Ldr, &loader, sizeof(loader), nullptr));
 
+	LDR_ENTRY image{};
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, loader.InLoadOrderModuleList.Flink, &image, sizeof(image), nullptr));
 
-	WCHAR strFileName[256];
+	WCHAR strFileName[256]{};
 	FAIL_IF_FALSE(GetFinalPathNameByHandleW(hFile, strFileName, 256, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS));
 
 	do {
+		if(!image.DllBase){
+			break;
+		}
 		if(lpBaseAddress == image.DllBase){
-			return !wcscmp(image.FullDllName.Buffer, strFileName);
+			WCHAR wstrLoaderImageName[256]{};
+			FAIL_IF_FALSE(ReadProcessMemory(hProcess, image.FullDllName.Buffer, wstrLoaderImageName, image.FullDllName.Length, nullptr));
+
+			bool bNameMismatch = _wcsicmp(wstrLoaderImageName, strFileName + 4);
+			if(bNameMismatch){
+				return IMAGE_LOADER_NAME_MISMATCH;
+			}
+
+			IMAGE_DOS_HEADER DOSHeader{};
+			FAIL_IF_FALSE(ReadProcessMemory(hProcess, lpBaseAddress, &DOSHeader, sizeof(IMAGE_DOS_HEADER), nullptr));
+
+			IMAGE_NT_HEADERS NTHeaders{};
+			FAIL_IF_FALSE(ReadProcessMemory(hProcess, DOSHeader.e_lfanew + PCHAR(lpBaseAddress), &NTHeaders, sizeof(IMAGE_NT_HEADERS), nullptr));
+
+			bool bSizeMismatch = image.SizeOfImage != NTHeaders.OptionalHeader.SizeOfImage;
+			if(bSizeMismatch){
+				return IMAGE_LOADER_SIZE_MISMATCH;
+			}
+
+			return ERROR_SUCCESS;
 		}
 	} while(ReadProcessMemory(hProcess, image.InLoadOrderModuleList.Flink, &image, sizeof(image), nullptr));
 
-	return FALSE;
+	return ERROR_NOT_FOUND;
 }

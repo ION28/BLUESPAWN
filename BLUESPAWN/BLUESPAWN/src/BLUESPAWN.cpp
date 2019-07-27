@@ -15,12 +15,12 @@
 
 #pragma warning(pop)
 
-#include "Hunt.h"
-#include "HuntRegister.h"
-#include "Output.h"
+#include "hunts/Hunt.h"
+#include "hunts/HuntRegister.h"
+#include "logging/Output.h"
 
-#include "HuntT1100.h"
-#include "HuntT9999.h"
+#include "hunts/HuntT1100.h"
+#include "hunts/HuntT9999.h"
 
 using namespace std;
 

@@ -17,7 +17,7 @@ using namespace std;
 #include <strsafe.h>
 #include <tchar.h>
 #include <VersionHelpers.h>
-#include "Output.h"
+#include "logging/Output.h"
 
 #define SECURITY_WIN32
 #include <Security.h>

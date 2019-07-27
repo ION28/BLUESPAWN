@@ -1,4 +1,4 @@
-#include "HuntT9999.h"
+#include "hunts/HuntT9999.h"
 
 namespace Hunts {
 	HuntT9999::HuntT9999(HuntRegister& record) : Hunt(record) {

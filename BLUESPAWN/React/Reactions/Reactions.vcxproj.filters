@@ -23,10 +23,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Reaction.h">
+    <ClInclude Include="headers\reactions\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\Log.h">
+    <ClInclude Include="headers\reactions\Reaction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
-#include "Log.h"
-#include "Output.h"
+#include "reactions/Log.h"
+#include "logging/Output.h"
 
 namespace Reactions {
 	Log::Log(){
