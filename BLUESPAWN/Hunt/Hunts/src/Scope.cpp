@@ -1,4 +1,4 @@
-#include "Scope.h"
+#include "hunts/Scope.h"
 
 bool Scope::FileIsInScope(LPCSTR sFileName){
 	return true;

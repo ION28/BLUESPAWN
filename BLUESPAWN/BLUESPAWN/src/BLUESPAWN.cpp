@@ -4,14 +4,23 @@
 
 #include <Windows.h>
 
+// The developer of this library is a bad developer who left warnings in his code.
+// Since we enforce no warnings, this will cause a compiler error.
+#pragma warning(push)
+
+#pragma warning(disable : 26451)
+#pragma warning(disable : 26444)
+
 #include <cxxopts.hpp>
 
-#include "Hunt.h"
-#include "HuntRegister.h"
-#include "Output.h"
+#pragma warning(pop)
 
-#include "HuntT1100.h"
-#include "HuntT9999.h"
+#include "hunts/Hunt.h"
+#include "hunts/HuntRegister.h"
+#include "logging/Output.h"
+
+#include "hunts/HuntT1100.h"
+#include "hunts/HuntT9999.h"
 
 using namespace std;
 
@@ -118,7 +127,7 @@ BEEEEEC BEEEEEEC BEEEEEC BEEEEEECBEEEEEECBEC     BEC  BEC BEECBEEC BEC  BEEEC
 	std::replace(banners.at(4).begin(), banners.at(4).end(), 'F', (char)219u);
 	std::replace(banners.at(4).begin(), banners.at(4).end(), 'G', (char)186u);
 
-	srand(time(NULL));
+	srand(static_cast<unsigned int>(time(nullptr)));
 
 	SetConsoleColor("cyan");
 	std::cout << banners.at(std::rand() % banners.size()) << std::endl;
@@ -150,8 +159,8 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 		try {
 			sHuntLevelFlag = result["level"].as < std::string >();
 		}
-		catch (int e) {
-			std::cerr << "Unknown hunt level. Please specify either Cursory, Moderate, Careful, or Aggressive" << std::endl;
+		catch(int e){
+			std::cerr << "Error " << e << " - Unknown hunt level. Please specify either Cursory, Moderate, Careful, or Aggressive" << std::endl;
 		}
 	}
 	if (sHuntLevelFlag == "Cursory") {

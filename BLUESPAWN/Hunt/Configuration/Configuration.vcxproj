@@ -19,10 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\CollectInfo.h" />
-    <ClInclude Include="headers\Registry.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\CollectInfo.cpp" />
     <ClCompile Include="src\Registry.cpp" />
   </ItemGroup>
@@ -30,6 +26,10 @@
     <ProjectReference Include="..\..\Logging\Logging.vcxproj">
       <Project>{efb79df3-1891-4a0d-869c-76f7fa4ad239}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\configuration\CollectInfo.h" />
+    <ClInclude Include="headers\configuration\Registry.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

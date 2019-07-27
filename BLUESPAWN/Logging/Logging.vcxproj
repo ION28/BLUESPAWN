@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Output.h" />
+    <ClCompile Include="src\Output.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Output.cpp" />
+    <ClInclude Include="headers\logging\Output.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

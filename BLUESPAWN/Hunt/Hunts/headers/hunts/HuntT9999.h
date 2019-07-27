@@ -1,9 +1,9 @@
 #pragma once
 #include "Hunt.h"
-#include "Reaction.h"
-#include "Log.h"
+#include "reactions/Reaction.h"
+#include "reactions/Log.h"
 
-#include "../../../Logging/headers/Output.h"
+#include "logging/Output.h"
 
 #include <string>
 #include <vector>

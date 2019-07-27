@@ -135,8 +135,8 @@
     <ClCompile Include="src\Reaction.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Log.h" />
-    <ClInclude Include="headers\Reaction.h" />
+    <ClInclude Include="headers\reactions\Log.h" />
+    <ClInclude Include="headers\reactions\Reaction.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
