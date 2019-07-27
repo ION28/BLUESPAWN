@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Output.h"
-#include "Registry.h"
-#include "FileSystem.h"
+#include "logging/Output.h"
+#include "configuration/Registry.h"
+#include "filesystem/FileSystem.h"
 
 void GoHuntingATTACK();
 void GoHuntingWeakSecuritySettings();

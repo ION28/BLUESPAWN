@@ -7,7 +7,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <tchar.h>
-#include "Output.h"
+#include "logging/Output.h"
 #include <vector>
 #include <algorithm>
 
