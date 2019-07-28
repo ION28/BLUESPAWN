@@ -28,21 +28,21 @@ string GetOsVersion() {
 	n = GetSystemDirectory(path, MAX_PATH);
 	if (n >= MAX_PATH || n == 0 ||
 		n > MAX_PATH - sizeof(kernel32) / sizeof(*kernel32))
-		abort();
+		LOG_ERROR("Error retrieving OS version");
 	memcpy(path + n, kernel32, sizeof(kernel32));
 
 	versz = GetFileVersionInfoSize(path, NULL);
 	if (versz == 0)
-		abort();
+		LOG_ERROR("Error retrieving OS version");
 	ver = malloc(versz);
 	if (!ver)
-		abort();
+		LOG_ERROR("Error retrieving OS version");
 	r = GetFileVersionInfo(path, 0, versz, ver);
 	if (!r)
-		abort();
+		LOG_ERROR("Error retrieving OS version");
 	r = VerQueryValue(ver, L"\\", &block, &uLen);
 	if (!r || uLen < sizeof(VS_FIXEDFILEINFO))
-		abort();
+		LOG_ERROR("Error retrieving OS version");
 	vinfo = (VS_FIXEDFILEINFO*)block;
 
 	int major_version = (int)HIWORD(vinfo->dwProductVersionMS);
@@ -178,4 +178,3 @@ string GetCurrentUser() {
 
 	return sam_name;
 }
-
