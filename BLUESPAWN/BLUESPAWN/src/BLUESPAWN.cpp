@@ -5,7 +5,7 @@
 #include <Windows.h>
 
 // The developer of this library is a bad developer who left warnings in his code.
-// Since we enforce no warnings, this will cause a compiler error.
+// Since we enforce no warnings, this is bad.
 #pragma warning(push)
 
 #pragma warning(disable : 26451)
@@ -18,12 +18,15 @@
 #include "hunts/Hunt.h"
 #include "hunts/HuntRegister.h"
 #include "logging/Output.h"
+#include "logging/Log.h"
+#include "logging/CLISink.h"
 
 #include "hunts/HuntT1100.h"
 #include "hunts/HuntT9999.h"
 
 using namespace std;
 
+// Move definitions to a .h
 void print_help(cxxopts::ParseResult result, cxxopts::Options options);
 void print_banner();
 void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options);
@@ -31,6 +34,14 @@ void dispatch_example_hunt(cxxopts::ParseResult result, cxxopts::Options options
 
 int main(int argc, char* argv[])
 {
+	auto sink = Log::CLISink();
+	Log::AddSink(sink);
+
+	LOG_ERROR("This is stupid" << ". Really stupid");
+	LOG_WARNING("Here is a string in hex - " << std::hex << 421);
+	LOG_INFO("And " << std::wstring(L"here") << " is some " << L"wide" << " text!");
+
+	return 0;
 	print_banner();
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
@@ -65,6 +76,7 @@ int main(int argc, char* argv[])
 }
 
 void print_banner() {
+	// Put these in a file, then include that file in the resources for the exe
 	vector<std::string> banners = {
 		R"(
 
