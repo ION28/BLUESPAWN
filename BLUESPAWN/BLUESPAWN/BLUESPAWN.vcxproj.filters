@@ -18,5 +18,16 @@
     <ClCompile Include="src\BLUESPAWN.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\banners.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\bluespawn\banners.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\bluespawn\bluespawn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

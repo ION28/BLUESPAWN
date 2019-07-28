@@ -1,5 +1,4 @@
-#ifndef COLLECTINFO_H   
-#define COLLECTINFO_H
+#pragma once
 
 #include <iostream>
 #include <windows.h>
@@ -18,6 +17,7 @@ using namespace std;
 #include <tchar.h>
 #include <VersionHelpers.h>
 #include "logging/Output.h"
+#include <logging\Log.h>
 
 #define SECURITY_WIN32
 #include <Security.h>
@@ -31,5 +31,3 @@ string GetComputerDNSName();
 string GetDomain();
 string GetFQDN();
 string GetCurrentUser();
-
-#endif
