@@ -21,7 +21,15 @@
 #include "logging/Log.h"
 #include "logging/CLISink.h"
 
+#include "hunts/HuntT1004.h"
+#include "hunts/HuntT1037.h"
+#include "hunts/HuntT1060.h"
 #include "hunts/HuntT1100.h"
+#include "hunts/HuntT1101.h"
+#include "hunts/HuntT1103.h"
+#include "hunts/HuntT1131.h"
+#include "hunts/HuntT1138.h"
+#include "hunts/HuntT1182.h"
 #include "hunts/HuntT9999.h"
 
 using namespace std;
@@ -41,7 +49,7 @@ int main(int argc, char* argv[])
 	LOG_WARNING("Here is a string in hex - " << std::hex << 421);
 	LOG_INFO("And " << std::wstring(L"here") << " is some " << L"wide" << " text!");
 
-	return 0;
+	//return 0;
 	print_banner();
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
@@ -189,8 +197,15 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	}
 
 	HuntRegister record{};
+	Hunts::HuntT1004 t1004(record);
+	Hunts::HuntT1037 t1037(record);
+	Hunts::HuntT1060 t1060(record);
 	Hunts::HuntT1100 t1100(record);
-	Hunts::HuntT9999 t9999(record);
+	Hunts::HuntT1101 t1101(record);
+	Hunts::HuntT1103 t1103(record);
+	Hunts::HuntT1131 t1131(record);
+	Hunts::HuntT1138 t1138(record);
+	Hunts::HuntT1182 t1182(record);
 
 	DWORD tactics = UINT_MAX;
 	DWORD dataSources = UINT_MAX;
@@ -198,8 +213,6 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	Scope scope{};
 	Reaction* reaction = nullptr;
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
-
-	//std::cout << "Doing a hunt at level " << hunt_level << std::endl;
 }
 
 void dispatch_example_hunt(cxxopts::ParseResult result, cxxopts::Options options) {

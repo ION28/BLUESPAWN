@@ -27,7 +27,6 @@ void SetConsoleColor(string color) {
 	}
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hConsole, set_color);
-	//Close this handle, fool!
 }
 
 void PrintInfoHeader(string out) {

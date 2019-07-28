@@ -25,7 +25,7 @@ namespace Log {
 			WHITE     = 0xF
 		};
 		std::string MessagePrepends[4] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]" };
-		MessageColor PrependColors[4] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, MessageColor::GREEN };
+		MessageColor PrependColors[4] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::LIGHTBLUE, MessageColor::GREEN };
 		
 		Mode CurrentMode = INFO_LOG;
 

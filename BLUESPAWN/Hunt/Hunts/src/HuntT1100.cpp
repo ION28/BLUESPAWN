@@ -4,7 +4,7 @@ namespace Hunts {
 	HuntT1100::HuntT1100(HuntRegister& record) : Hunt(record) {
 		smatch match_index;
 
-		dwSupportedScans = Aggressiveness::Cursory;
+		dwSupportedScans = Aggressiveness::Cursory | Aggressiveness::Moderate;
 		dwStuffAffected = AffectedThing::Files;
 		dwSourcesInvolved = DataSource::FileSystem;
 		dwTacticsUsed = Tactic::Persistence | Tactic::PrivilegeEscalation;

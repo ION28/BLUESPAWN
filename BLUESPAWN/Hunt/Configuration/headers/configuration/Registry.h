@@ -1,5 +1,4 @@
-#ifndef REGISTRY_H   
-#define REGISTRY_H
+#pragma once
 
 #include "windows.h"
 #include <string>
@@ -30,8 +29,8 @@ struct key {
 	ULONG type;
 };
 
-void ExamineRegistryKeySet(key[], int);
-void PrintRegistryKeyResult(bool, key&, wstring);
+int ExamineRegistryKeySet(key[], int);
+int PrintRegistryKeyResult(bool, key&, wstring);
 void GetRegistryKeyWrapper(HKEY, ULONG, wstring&, wstring);
 void GetRegistryKey(HKEY, ULONG, wstring&, wstring, vector<wstring>&);
 LONG GetDWORDRegKey(HKEY, const std::wstring&, DWORD&);
@@ -40,5 +39,3 @@ LONG GetStringRegKey(HKEY, const std::wstring&, std::wstring&);
 LONG GetMultiStringRegKey(HKEY, const std::wstring&, std::wstring&, vector<wstring>&);
 bool CheckKeyIsDefaultValue(key&, wstring&);
 void QueryKey(HKEY, wstring&, key&);
-
-#endif
