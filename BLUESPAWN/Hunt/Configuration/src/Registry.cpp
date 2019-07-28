@@ -1,25 +1,34 @@
 #include "configuration/Registry.h"
 
-void ExamineRegistryKeySet(key keys[], int key_cnt) {
+int ExamineRegistryKeySet(key keys[], int key_cnt) {
+	int identified = 0;
+
 	for (int i = 0; i < key_cnt; i++) {
 		key& k = keys[i];
 		wstring current_key_val;
 		bool b = CheckKeyIsDefaultValue(k, current_key_val);
-		PrintRegistryKeyResult(b, k, current_key_val);
+		identified += PrintRegistryKeyResult(b, k, current_key_val);
 	}
+
+	return identified;
 }
 
-void PrintRegistryKeyResult(bool b, key& k, wstring current_key_val) {
+int PrintRegistryKeyResult(bool b, key& k, wstring current_key_val) {
+	int identified = 0;
+
 	if (!b) {
 		if (ws2s(k.key).compare("*") != 0) {
 			PrintBadStatus("Key is non-default: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
 			PrintInfoStatus("Value was: " + ws2s(current_key_val));
 			PrintInfoStatus("Value should be: " + ws2s(k.value));
+			identified++;
 		}
 	}
 	else {
 		PrintGoodStatus("Key is okay: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
 	}
+
+	return identified;
 }
 
 bool CheckKeyIsDefaultValue(key& k, wstring& key_value) {
@@ -85,7 +94,7 @@ LONG GetDWORDRegKey(HKEY hKey, const std::wstring& strValueName, DWORD& nValue)
 {
 	DWORD dwBufferSize(sizeof(DWORD));
 	DWORD nResult(0);
-	LONG nError = RegQueryValueExW(hKey, strValueName.c_str(), 0, NULL, reinterpret_cast<LPBYTE>(&nResult), &dwBufferSize);
+	LONG nError = RegQueryValueEx(hKey, strValueName.c_str(), 0, NULL, reinterpret_cast<LPBYTE>(&nResult), &dwBufferSize);
 	if (ERROR_SUCCESS == nError)
 	{
 		nValue = nResult;
@@ -111,7 +120,7 @@ LONG GetStringRegKey(HKEY hKey, const wstring& strValueName, wstring& strValue)
 	WCHAR szBuffer[512];
 	DWORD dwBufferSize = sizeof(szBuffer);
 	ULONG nError;
-	nError = RegQueryValueExW(hKey, strValueName.c_str(), 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
+	nError = RegQueryValueEx(hKey, strValueName.c_str(), 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
 	if (ERROR_SUCCESS == nError)
 	{
 		strValue = szBuffer;
@@ -123,10 +132,10 @@ LONG GetMultiStringRegKey(HKEY hKey, const wstring& strValueName, wstring& strVa
 {
 	DWORD dwBufferSize;
 	ULONG nError, nError2;
-	nError = RegQueryValueExW(hKey, strValueName.c_str(), NULL, 0, NULL, &dwBufferSize);
+	nError = RegQueryValueEx(hKey, strValueName.c_str(), NULL, 0, NULL, &dwBufferSize);
 	if (ERROR_SUCCESS == nError) {
 		vector<wchar_t> temp(dwBufferSize / sizeof(wchar_t));
-		nError2 = RegQueryValueExW(hKey, strValueName.c_str(), NULL, NULL, reinterpret_cast<LPBYTE>(&temp[0]), &dwBufferSize);
+		nError2 = RegQueryValueEx(hKey, strValueName.c_str(), NULL, NULL, reinterpret_cast<LPBYTE>(&temp[0]), &dwBufferSize);
 		if (ERROR_SUCCESS == nError2) {
 			size_t index = 0;
 			size_t len = wcslen(&temp[0]);

@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\FileSystem.h" />
+    <ClCompile Include="src\FileSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\FileSystem.cpp" />
+    <ClInclude Include="headers\filesystem\FileSystem.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
