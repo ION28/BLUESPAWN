@@ -3,6 +3,7 @@
 #include <map>
 
 #include "LogSink.h"
+#include "LogLevel.h"
 
 namespace Log {
 	class CLISink : public LogSink {
@@ -25,14 +26,11 @@ namespace Log {
 			WHITE     = 0xF
 		};
 		std::string MessagePrepends[4] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]" };
-		MessageColor PrependColors[4] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::LIGHTBLUE, MessageColor::GREEN };
-		
-		Mode CurrentMode = INFO_LOG;
+		MessageColor PrependColors[4] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, MessageColor::GREEN };
 
 		void SetConsoleColor(MessageColor color);
 
-		virtual void SetMode(Mode m);
-		virtual void LogMessage(std::string& message);
+		virtual void LogMessage(LogLevel& level, std::string& message);
 		virtual bool operator==(LogSink& sink);
 	};
 }

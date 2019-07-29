@@ -1,33 +1,24 @@
 #include "logging/LogLevel.h"
 
-namespace Log{
-	LogLevel::LogLevel(std::function<void(LogSink& sink, std::string)> logger) : logger{ logger }{}
+namespace Log {
 
-	void LogLevel::Log(LogSink& sink, std::string& message){
-		logger(sink, message);
-	}
+	LogLevel::LogLevel(Severity severity) : enabled{ true }, severity{ severity } {}
+	LogLevel::LogLevel(Severity severity, bool enabled) : enabled{ enabled }, severity{ severity } {}
 
-	const LogLevel LogLevel::LogError{ [](LogSink& sink, std::string message) {
-		sink.SetMode(LogSink::ERROR_LOG);
+	const LogLevel LogLevel::LogError{Severity::LogError, true };
 
-		sink.LogMessage(message);
-	} };
+	const LogLevel LogLevel::LogWarn{Severity::LogWarn, true };
 
-	const LogLevel LogLevel::LogWarn{ [](LogSink& sink, std::string message) {
-		sink.SetMode(LogSink::WARNING_LOG);
+	const LogLevel LogLevel::LogInfo{ Severity::LogInfo, true };
 
-		sink.LogMessage(message);
-	} };
+	const LogLevel LogLevel::LogVerbose1{ Severity::LogInfo, false };
 
-	const LogLevel LogLevel::LogInfo{ [](LogSink& sink, std::string message) {
-		sink.SetMode(LogSink::INFO_LOG);
+	const LogLevel LogLevel::LogVerbose2{ Severity::LogInfo, false };
 
-		sink.LogMessage(message);
-	} };
+	const LogLevel LogLevel::LogVerbose3{ Severity::LogInfo, false };
 
-	const LogLevel LogLevel::LogVerbose1{ LogInfo };
-
-	const LogLevel LogLevel::LogVerbose2{ LogInfo };
-
-	const LogLevel LogLevel::LogVerbose3{ LogInfo };
+	void LogLevel::Enable(){ enabled = true; }
+	void LogLevel::Disable(){ enabled = true; }
+	bool LogLevel::Toggle(){ return enabled = !enabled; }
+	bool LogLevel::Enabled(){ return enabled; }
 }

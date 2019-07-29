@@ -1,15 +1,19 @@
-#include <string>
-#include <functional>
-
-#include "LogSink.h"
-
-
+#pragma once
 namespace Log {
+	enum class Severity {
+		LogError = 0,
+		LogWarn = 1,
+		LogInfo = 2,
+		LogOther = 3
+	};
+
 	class LogLevel {
 	private:
-		std::function<void(LogSink& sink, std::string)> logger;
-		LogLevel(std::function<void(LogSink& sink, std::string)> LogMethod);
+		bool enabled;
+
 	public:
+		const Severity severity;
+
 		static const LogLevel
 			LogError,
 			LogWarn,
@@ -18,6 +22,13 @@ namespace Log {
 			LogVerbose2,
 			LogVerbose3;
 
-		void Log(LogSink& sink, std::string& message);
+		LogLevel(Severity severity);
+		LogLevel(Severity severity, bool DefaultState);
+
+		void Enable();
+		void Disable();
+		bool Toggle();
+
+		bool Enabled();
 	};
 }
