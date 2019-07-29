@@ -12,7 +12,7 @@
     </BuildLog>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <WarningLevel>Level2</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

@@ -5,11 +5,6 @@ int main(int argc, char* argv[])
 	auto sink = Log::CLISink();
 	Log::AddSink(sink);
 
-	LOG_ERROR("This is stupid" << ". Really stupid");
-	LOG_WARNING("Here is a string in hex - " << std::hex << 421);
-	LOG_INFO("And " << std::wstring(L"here") << " is some " << L"wide" << " text!");
-
-	//return 0;
 	print_banner();
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");

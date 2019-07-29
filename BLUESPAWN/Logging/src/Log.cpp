@@ -25,7 +25,7 @@ namespace Log {
 
 		InternalStream = std::stringstream();
 		for(int idx = 0; idx < Sinks.size(); idx++){
-			Level.Log(Sinks[idx], message);
+			Sinks[idx].get().LogMessage(Level, message);
 		}
 		return *this;
 	}
