@@ -9,9 +9,9 @@
 
 namespace Registry {
 	extern std::map<std::wstring, HKEY> vHiveNames;
-	extern std::map<std::wstring, HKEY> vHives;
+	extern std::map<HKEY, std::wstring> vHives;
 	
-	HKEY RemoveHive(std::wstring& path){}
+	HKEY RemoveHive(std::wstring& path);
 
 	class RegistryKey {
 		HKEY hive;
@@ -39,7 +39,7 @@ namespace Registry {
 		bool Set(LPVOID value, DWORD dwSize, DWORD dwType = REG_BINARY);
 
 		template<class T>
-		bool Set(T value) {
+		inline bool Set(T value) {
 			LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << value);
 
 			Set(&value, sizeof(value)); 
@@ -48,11 +48,11 @@ namespace Registry {
 		LPVOID GetRaw();
 
 		template<class T>
-		T Get(){ *reinterpret_cast<T*>(Get()); }
+		inline T Get(){ return *reinterpret_cast<T*>(GetRaw()); }
 
 		template<class T>
-		bool CompareValue(T value){
-			return Get() == value;
+		inline bool CompareValue(T value){
+			return GetRaw() == value;
 		}
 	};
 }

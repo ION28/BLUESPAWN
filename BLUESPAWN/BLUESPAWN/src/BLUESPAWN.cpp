@@ -119,11 +119,11 @@ void dispatch_example_hunt(cxxopts::ParseResult result, cxxopts::Options options
 		}
 	};
 
-	PrintInfoHeader("Running Hunt T9999 with an open scope.");
+	LOG_INFO("Running Hunt T9999 with an open scope.");
 	Scope scope{};
 	hTestHunt.ScanCursory(scope);
 
-	PrintInfoHeader("Running Hunt T9999 with a limited scope.");
+	LOG_INFO("Running Hunt T9999 with a limited scope.");
 	LimitedScope limitedScope{};
 	hTestHunt.ScanCursory(limitedScope);
 }
