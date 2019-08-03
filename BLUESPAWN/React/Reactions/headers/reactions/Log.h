@@ -7,7 +7,7 @@ namespace Reactions {
 		LogReaction();
 
 		virtual void FileIdentified(HANDLE hFile);
-		virtual void RegistryKeyIdentified(HKEY hkRegistryKey);
+		virtual void RegistryKeyIdentified(Registry::RegistryKey hkRegistryKey);
 		virtual void ProcessIdentified(HANDLE hProcess);
 		virtual void ServiceIdentified(SC_HANDLE schService);
 	};
