@@ -1,216 +1,198 @@
+#include <Windows.h>
+
+#include <algorithm>
+
 #include "configuration/Registry.h"
+#include "logging/Log.h"
 
-int ExamineRegistryKeySet(key keys[], int key_cnt) {
-	int identified = 0;
 
-	for (int i = 0; i < key_cnt; i++) {
-		key& k = keys[i];
-		wstring current_key_val;
-		bool b = CheckKeyIsDefaultValue(k, current_key_val);
-		identified += PrintRegistryKeyResult(b, k, current_key_val);
-	}
+namespace Registry {
+	std::map<std::wstring, HKEY> vHiveNames{
+		{L"HKLM", HKEY_LOCAL_MACHINE},
+		{L"HKEY_LOCAL_MACHINE", HKEY_LOCAL_MACHINE},
 
-	return identified;
-}
+		{L"HKCR", HKEY_CLASSES_ROOT},
+		{L"HKEY_CLASSES_ROOT", HKEY_CLASSES_ROOT},
 
-int PrintRegistryKeyResult(bool b, key& k, wstring current_key_val) {
-	int identified = 0;
+		{L"HKCU", HKEY_CURRENT_USER},
+		{L"HKEY_CURRENT_USER", HKEY_CURRENT_USER},
 
-	if (!b) {
-		if (ws2s(k.key).compare("*") != 0) {
-			PrintBadStatus("Key is non-default: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
-			PrintInfoStatus("Value was: " + ws2s(current_key_val));
-			PrintInfoStatus("Value should be: " + ws2s(k.value));
-			identified++;
+		{L"HKU", HKEY_USERS},
+		{L"HKEY_USERS", HKEY_USERS},
+
+		{L"HKCC", HKEY_CURRENT_CONFIG},
+		{L"HKEY_CURRENT_CONFIG", HKEY_CURRENT_CONFIG},
+	};
+
+	std::map<HKEY, std::wstring> vHives{
+		{HKEY_LOCAL_MACHINE, L"HKEY_LOCAL_MACHINE"},
+		{HKEY_CLASSES_ROOT, L"HKEY_CLASSES_ROOT"},
+		{HKEY_CURRENT_USER, L"HKEY_CURRENT_USER"},
+		{HKEY_USERS, L"HKEY_USERS"},
+		{HKEY_CURRENT_CONFIG, L"HKEY_CURRENT_CONFIG"},
+	};
+
+	HKEY RemoveHive(std::wstring& path){
+		UINT fslashIdx = path.find(L"/");
+		UINT bslashIdx = path.find(L"\\");
+		if(fslashIdx == ( UINT) -1 && bslashIdx == ( UINT) -1){
+			LOG_ERROR("Registry hive not found!");
+			return nullptr;
 		}
-	}
-	else {
-		PrintGoodStatus("Key is okay: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
-	}
 
-	return identified;
-}
-
-bool CheckKeyIsDefaultValue(key& k, wstring& key_value) {
-	HKEY hKey;
-	LONG lRes = RegOpenKeyEx(k.hive, k.path, 0, KEY_READ, &hKey);
-	bool bExistsAndSuccess(lRes == ERROR_SUCCESS);
-
-	if (bExistsAndSuccess) {
-		if (ws2s(k.key).compare("*") == 0) {
-			QueryKey(hKey, key_value, k);
-			RegCloseKey(hKey);
+		std::wstring sHiveName = path.substr(0, fslashIdx > bslashIdx ? bslashIdx : fslashIdx);
+		transform(sHiveName.begin(), sHiveName.end(), sHiveName.begin(), ::toupper);
+		if(vHiveNames.find(sHiveName) == vHiveNames.end()){
+			LOG_ERROR("Unknown registry hive " << sHiveName);
+			return nullptr;
 		}
-		else {
-			wstring key_name = k.key;
-			GetRegistryKeyWrapper(hKey, k.type, key_value, key_name);
-			RegCloseKey(hKey);
-			if (key_value.compare(k.value) == 0) {
-				return true;
-			}
-			else {
+
+		HKEY hive = vHiveNames[sHiveName];
+		path = path.substr((fslashIdx > bslashIdx ? bslashIdx : fslashIdx) + 1);
+
+		return hive;
+	}
+
+	RegistryKey::RegistryKey(HKEY hive, std::wstring& path, std::wstring& name, bool Create = false) : hive{ hive }, name{ name }, path{ path } {
+		LSTATUS status = Create ? RegOpenKeyEx(hive, path.c_str(), 0, KEY_ALL_ACCESS, &key)
+			: RegCreateKeyEx(hive, path.c_str(), 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &key, nullptr);
+
+		if(status != ERROR_SUCCESS){
+			LOG_ERROR("Error " << status << " << occured when attempting to read registry key " << GetName());
+			SetLastError(status);
+		}
+		
+		LOG_VERBOSE(1, "Searching for value " << GetName());
+		status = RegQueryValueEx(key, name.c_str(), 0, &dwDataType, nullptr, &dwDataSize);
+		if(status != ERROR_SUCCESS && status != ERROR_MORE_DATA){
+			LOG_ERROR("Unable to query value " << GetName());
+			SetLastError(status);
+		}
+
+		LOG_VERBOSE(3, "Value is of type " << dwDataType << " and size " << dwDataSize);
+		status = RegQueryValueEx(key, name.c_str(), 0, &dwDataType, lpbValue, &dwDataSize);
+		if(status != ERROR_SUCCESS){
+			LOG_ERROR("Unable to read value " << GetName());
+			SetLastError(status);
+		}
+
+		valid = true;
+	}
+
+	RegistryKey::RegistryKey(std::wstring path, std::wstring& name) : RegistryKey(RemoveHive(path), path, name){};
+
+	RegistryKey::~RegistryKey() { RegCloseKey(key); }
+
+	bool RegistryKey::Exists() { return valid; }
+
+	std::wstring RegistryKey::GetName(){
+		return vHives[hive] + L"\\" + path + L":" + name;
+	}
+
+	bool RegistryKey::Set(LPVOID value, DWORD dwSize, DWORD dwType = REG_BINARY) {
+		if(dwType == -1) dwType = dwDataType;
+
+		LOG_VERBOSE(3, "Setting registry key " << GetName());
+		if(!Exists()){
+			LOG_VERBOSE(2, "Registry key " << GetName() << " did not exist; creating key now");
+			LSTATUS status = RegCreateKeyEx(hive, name.c_str(), 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &key, nullptr);
+			
+			if(status != ERROR_SUCCESS){
+				LOG_ERROR("Error " << status << " occurred when attempting to create key " << GetName());
+				SetLastError(status);
+				
 				return false;
 			}
 		}
-	}
-	else {
+
+		LSTATUS status = RegSetValueEx(key, name.c_str(), 0, dwType, reinterpret_cast<BYTE*>(value), dwSize);
+		if(status != ERROR_SUCCESS){
+			LOG_ERROR("Error " << status << " occurred when attempting to set key " << GetName());
+			SetLastError(status);
+
+			return false;
+		}
+
+		lpbValue = reinterpret_cast<BYTE*>(value);
+
 		return true;
-	} 
-}
-
-void GetRegistryKeyWrapper(HKEY hKey, ULONG type, wstring& key_value, wstring key_name) {
-	vector<wstring> s;
-	GetRegistryKey(hKey, type, key_value, key_name, s);
-}
-
-void GetRegistryKey(HKEY hKey, ULONG type, wstring& key_value, wstring key_name, vector<wstring>& target) {
-	//required for DWORD/BINARY
-	//reg types: https://docs.microsoft.com/en-us/windows/desktop/SysInfo/registry-value-types
-	ostringstream stream;
-	DWORD x = 0;
-	DWORD& n_val = x;
-
-	switch (type) {
-	case REG_SZ:
-		GetStringRegKey(hKey, key_name, key_value);
-		break;
-	case REG_EXPAND_SZ:
-		GetStringRegKey(hKey, key_name, key_value);
-		break;
-	case REG_MULTI_SZ:
-		GetMultiStringRegKey(hKey, key_name, key_value, target);
-		break;
-	case REG_DWORD:
-		GetDWORDRegKey(hKey, key_name, n_val);
-		stream << n_val;
-		key_value = s2ws(stream.str());
-		break;
-	case REG_BINARY:
-		break;
 	};
-}
 
-LONG GetDWORDRegKey(HKEY hKey, const std::wstring& strValueName, DWORD& nValue)
-{
-	DWORD dwBufferSize(sizeof(DWORD));
-	DWORD nResult(0);
-	LONG nError = RegQueryValueEx(hKey, strValueName.c_str(), 0, NULL, reinterpret_cast<LPBYTE>(&nResult), &dwBufferSize);
-	if (ERROR_SUCCESS == nError)
-	{
-		nValue = nResult;
+	template<>
+	bool RegistryKey::Set<DWORD>(DWORD value) {
+		LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << value);
+
+		return Set(&value, sizeof(DWORD), REG_DWORD);
 	}
-	return nError;
-}
 
+	template<>
+	bool RegistryKey::Set<std::wstring>(std::wstring value) {
+		LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << value);
 
-LONG GetBoolRegKey(HKEY hKey, const std::wstring& strValueName, bool& bValue, bool bDefaultValue)
-{
-	DWORD nResult(0);
-	LONG nError = GetDWORDRegKey(hKey, strValueName.c_str(), nResult);
-	if (ERROR_SUCCESS == nError)
-	{
-		bValue = (nResult != 0) ? true : false;
+		return Set(const_cast<wchar_t*>(value.c_str()), sizeof(WCHAR) * static_cast<DWORD>(value.length() + 1), REG_SZ); 
 	}
-	return nError;
-}
 
+	template<>
+	bool RegistryKey::Set<std::vector<std::wstring>>(std::vector<std::wstring> value) {
+		SIZE_T size = 1;
+		for(auto string : value){
+			size += (string.length() + 1);
+		}
 
-LONG GetStringRegKey(HKEY hKey, const wstring& strValueName, wstring& strValue)
-{
-	WCHAR szBuffer[512];
-	DWORD dwBufferSize = sizeof(szBuffer);
-	ULONG nError;
-	nError = RegQueryValueEx(hKey, strValueName.c_str(), 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
-	if (ERROR_SUCCESS == nError)
-	{
-		strValue = szBuffer;
-	}
-	return nError;
-}
+		WCHAR* data = new WCHAR[size];
+		int ptr = 0;
 
-LONG GetMultiStringRegKey(HKEY hKey, const wstring& strValueName, wstring& strValue, vector<wstring>& target)
-{
-	DWORD dwBufferSize;
-	ULONG nError, nError2;
-	nError = RegQueryValueEx(hKey, strValueName.c_str(), NULL, 0, NULL, &dwBufferSize);
-	if (ERROR_SUCCESS == nError) {
-		vector<wchar_t> temp(dwBufferSize / sizeof(wchar_t));
-		nError2 = RegQueryValueEx(hKey, strValueName.c_str(), NULL, NULL, reinterpret_cast<LPBYTE>(&temp[0]), &dwBufferSize);
-		if (ERROR_SUCCESS == nError2) {
-			size_t index = 0;
-			size_t len = wcslen(&temp[0]);
-			while (len > 0)
-			{
-				target.push_back(&temp[index]);
-				index += len + 1;
-				len = wcslen(&temp[index]);
+		std::wstring wsLogStatement{};
+		for(auto string : value){
+			wsLogStatement += string + L"; ";
+			LPCWSTR lpRawString = string.c_str();
+			for(int i = 0; i < string.length() + 1; i++){
+				data[ptr++] = lpRawString[i];
 			}
 		}
-		else {
-			return nError2;
-		}
+		data[ptr] = 0;
+
+		LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << wsLogStatement);
+
+		return Set(data, size * sizeof(WCHAR), REG_MULTI_SZ);
 	}
-	return nError;
-}
 
-//enumerate all subkeys: https://docs.microsoft.com/en-us/windows/desktop/sysinfo/enumerating-registry-subkeys
-void QueryKey(HKEY hKey, wstring& key_value, key& k) {
-	TCHAR    achClass[MAX_PATH] = TEXT("");  // buffer for class name 
-	DWORD    cchClassName = MAX_PATH;  // size of class string 
-	DWORD    cSubKeys = 0;               // number of subkeys 
-	DWORD    cbMaxSubKey;              // longest subkey size 
-	DWORD    cchMaxClass;              // longest class string 
-	DWORD    cValues;              // number of values for key 
-	DWORD    cchMaxValue;          // longest value name 
-	DWORD    cbMaxValueData;       // longest value data 
-	DWORD    cbSecurityDescriptor; // size of security descriptor 
-	FILETIME ftLastWriteTime;      // last write time 
-
-	DWORD i, retCode;
-
-	TCHAR*  achValue = new TCHAR[MAX_VALUE_NAME];
-	DWORD cchValue = MAX_VALUE_NAME;
-
-	// Get the class name and the value count. 
-	retCode = RegQueryInfoKey(
-		hKey,                    // key handle 
-		achClass,                // buffer for class name 
-		&cchClassName,           // size of class string 
-		NULL,                    // reserved 
-		&cSubKeys,               // number of subkeys 
-		&cbMaxSubKey,            // longest subkey size 
-		&cchMaxClass,            // longest class string 
-		&cValues,                // number of values for this key 
-		&cchMaxValue,            // longest value name 
-		&cbMaxValueData,         // longest value data 
-		&cbSecurityDescriptor,   // security descriptor 
-		&ftLastWriteTime);       // last write time 
-
-	// Enumerate the key values. 
-
-	if (cValues) {
-		PrintBadStatus("Key is non-default and contains following entries: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
-		for (i = 0, retCode = ERROR_SUCCESS; i < cValues; i++) {
-			cchValue = MAX_VALUE_NAME;
-			achValue[0] = '\0';
-			DWORD type = REG_DWORD;
-			retCode = RegEnumValue(hKey, i,
-				achValue,
-				&cchValue,
-				NULL,
-				&type,
-				NULL,
-				NULL);
-
-			if (retCode == ERROR_SUCCESS) {
-				wstring key_name(achValue);
-				GetRegistryKeyWrapper(hKey, (ULONG)type, key_value, key_name);
-				PrintInfoStatus("SubKey name: " + ws2s(key_name));
-				PrintInfoStatus("Subkey value: " + ws2s(key_value));
-			}
-		}
+	LPVOID RegistryKey::GetRaw(){
+		return lpbValue;
 	}
-	else {
-		PrintGoodStatus("Key is okay: " + hive2s(k.hive) + (string)"\\" + ws2s(k.path) + (string)"\\" + ws2s(k.key));
+
+	template<>
+	DWORD RegistryKey::Get(){ 
+		DWORD value = *reinterpret_cast<DWORD*>(GetRaw());
+		LOG_VERBOSE(2, "Read value " << value << " from key " << GetName());
+
+		return value;
+	}
+
+	template<>
+	std::wstring RegistryKey::Get() {
+		std::wstring value = reinterpret_cast<LPWSTR>(GetRaw());
+		LOG_VERBOSE(2, "Read value " << value << " from key " << GetName());
+
+		return value;
+	}
+
+	template<>
+	std::vector<std::wstring> RegistryKey::Get(){
+		std::vector<std::wstring> strings{};
+		std::wstring wsLogString{};
+
+		LPCWSTR data = reinterpret_cast<LPCWSTR>(GetRaw());
+		while(*data){
+			std::wstring str = data;
+			strings.emplace_back(data);
+			wsLogString += str;
+
+			data += str.length() + 1;
+		}
+
+		LOG_VERBOSE(2, "Read value " << wsLogString << " from key " << GetName());
+
+		return strings;
 	}
 }

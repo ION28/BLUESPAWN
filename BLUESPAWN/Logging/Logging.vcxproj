@@ -22,7 +22,6 @@
     <ClCompile Include="src\CLISink.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\LogLevel.cpp" />
-    <ClCompile Include="src\Output.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\logging\CLISink.h" />
@@ -30,7 +29,6 @@
     <ClInclude Include="headers\logging\Loggable.h" />
     <ClInclude Include="headers\logging\LogLevel.h" />
     <ClInclude Include="headers\logging\LogSink.h" />
-    <ClInclude Include="headers\logging\Output.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

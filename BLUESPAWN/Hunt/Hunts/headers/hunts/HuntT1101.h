@@ -23,6 +23,6 @@ namespace Hunts {
 	public:
 		HuntT1101(HuntRegister& record);
 
-		int ScanCursory(Scope& scope, Reaction* reaction = new Reactions::Log());
+		int ScanCursory(Scope& scope, Reaction* reaction = new Reactions::LogReaction());
 	};
 }

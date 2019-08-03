@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Output.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -29,9 +26,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\logging\Output.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="headers\logging\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>

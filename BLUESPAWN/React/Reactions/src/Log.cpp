@@ -1,31 +1,31 @@
 #include <string>
 #include <iostream>
 #include "reactions/Log.h"
-#include "logging/Output.h"
+#include "logging/log.h"
 
 namespace Reactions {
-	Log::Log(){
+	LogReaction::LogReaction(){
 		dwSupportedReactions = IdentifyFile | IdentifyProcess | IdentifyRegistryKey | IdentifyService;
 	}
 
-	void Log::FileIdentified(HANDLE hFile){
+	void LogReaction::FileIdentified(HANDLE hFile){
 		char cFileName[256];
 		bool success = GetFinalPathNameByHandleA(hFile, cFileName, 256, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
 		if(success){
 			std::string sFileName(cFileName);
-			PrintBadStatus(std::string("File Identified: ") + sFileName);
+			LOG_ERROR(std::string("File Identified: ") << sFileName);
 		}
 	}
-	void Log::RegistryKeyIdentified(HKEY hkRegistryKey){
-		PrintBadStatus("A bad registry key was identified, but support for identifying which hasn't been added");
+	void LogReaction::RegistryKeyIdentified(HKEY hkRegistryKey){
+		LOG_ERROR("A bad registry key was identified, but support for identifying which hasn't been added");
 	}
-	void Log::ProcessIdentified(HANDLE hProcess){
+	void LogReaction::ProcessIdentified(HANDLE hProcess){
 		int pid = GetProcessId(hProcess);
 		if(pid){
-			PrintBadStatus(std::string("Process Identified: ") + to_string(pid));
+			LOG_ERROR(std::string("Process Identified: ") << pid);
 		}
 	}
-	void Log::ServiceIdentified(SC_HANDLE schService){
-		PrintBadStatus("A bad service was identified, but support for identifying which hasn't been added");
+	void LogReaction::ServiceIdentified(SC_HANDLE schService){
+		LOG_ERROR("A bad service was identified, but support for identifying which hasn't been added");
 	}
 }

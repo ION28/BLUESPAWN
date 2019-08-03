@@ -2,9 +2,9 @@
 #include "Reaction.h"
 
 namespace Reactions {
-	class Log : public Reaction {
+	class LogReaction : public Reaction {
 	public:
-		Log();
+		LogReaction();
 
 		virtual void FileIdentified(HANDLE hFile);
 		virtual void RegistryKeyIdentified(HKEY hkRegistryKey);
