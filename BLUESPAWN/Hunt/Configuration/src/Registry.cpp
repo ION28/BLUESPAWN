@@ -1,6 +1,7 @@
 #include <Windows.h>
 
 #include <algorithm>
+#include <set>
 
 #include "configuration/Registry.h"
 #include "logging/Log.h"
@@ -53,7 +54,7 @@ namespace Registry {
 		return hive;
 	}
 
-	RegistryKey::RegistryKey(HKEY hive, std::wstring& path, std::wstring& name, bool Create) : hive{ hive }, name{ name }, path{ path } {
+	RegistryKey::RegistryKey(HKEY hive, std::wstring path, std::wstring name, bool Create) : hive{ hive }, name{ name }, path{ path } {
 		LSTATUS status = Create ? RegOpenKeyEx(hive, path.c_str(), 0, KEY_ALL_ACCESS, &key)
 			: RegCreateKeyEx(hive, path.c_str(), 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &key, nullptr);
 
@@ -119,21 +120,21 @@ namespace Registry {
 	};
 
 	template<>
-	inline bool RegistryKey::Set<DWORD>(DWORD value) {
+	inline bool RegistryKey::Set<REG_DWORD_T>(REG_DWORD_T value) {
 		LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << value);
 
 		return Set(&value, sizeof(DWORD), REG_DWORD);
 	}
 
 	template<>
-	inline bool RegistryKey::Set<std::wstring>(std::wstring value) {
+	inline bool RegistryKey::Set<REG_SZ_T>(REG_SZ_T value) {
 		LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << value);
 
 		return Set(const_cast<wchar_t*>(value.c_str()), sizeof(WCHAR) * static_cast<DWORD>(value.length() + 1), REG_SZ); 
 	}
 
 	template<>
-	inline bool RegistryKey::Set<std::vector<std::wstring>>(std::vector<std::wstring> value) {
+	inline bool RegistryKey::Set<REG_MULTI_SZ_T>(REG_MULTI_SZ_T value) {
 		SIZE_T size = 1;
 		for(auto string : value){
 			size += (string.length() + 1);
@@ -167,7 +168,7 @@ namespace Registry {
 	}
 
 	template<>
-	inline DWORD RegistryKey::Get(){ 
+	inline REG_DWORD_T RegistryKey::Get<REG_DWORD_T>(){ 
 		DWORD value = *reinterpret_cast<DWORD*>(GetRaw());
 		LOG_VERBOSE(2, "Read value " << value << " from key " << GetName());
 
@@ -175,7 +176,7 @@ namespace Registry {
 	}
 
 	template<>
-	inline std::wstring RegistryKey::Get<std::wstring>() {
+	inline REG_SZ_T RegistryKey::Get<REG_SZ_T>() {
 		std::wstring value = reinterpret_cast<LPWSTR>(GetRaw());
 		LOG_VERBOSE(2, "Read value " << value << " from key " << GetName());
 
@@ -183,7 +184,7 @@ namespace Registry {
 	}
 
 	template<>
-	inline std::vector<std::wstring> RegistryKey::Get<std::vector<std::wstring>>(){
+	inline REG_MULTI_SZ_T RegistryKey::Get<REG_MULTI_SZ_T>(){
 		std::vector<std::wstring> strings{};
 		std::wstring wsLogString{};
 
@@ -199,5 +200,43 @@ namespace Registry {
 		LOG_VERBOSE(2, "Read value " << wsLogString << " from key " << GetName());
 
 		return strings;
+	}
+
+	template<>
+	inline bool RegistryKey::operator==<const wchar_t*>(const wchar_t* wcsKnownGood){
+		return operator==<std::wstring>(std::wstring(wcsKnownGood));
+	}
+
+	template<>
+	inline bool RegistryKey::operator==<REG_MULTI_SZ_T>(REG_MULTI_SZ_T vKnownGood){
+		auto data = Get<std::vector<std::wstring>>();
+
+		std::set<std::wstring> GoodContents{};
+		for(auto string : vKnownGood){
+			GoodContents.insert(string);
+		}
+
+		std::set<std::wstring> ActualContents{};
+		for(auto string : data){
+			ActualContents.insert(string);
+		}
+
+		for(auto string : GoodContents){
+			if(ActualContents.find(string) == ActualContents.end()){
+				return false;
+			}
+		}
+
+		for(auto string : ActualContents){
+			if(GoodContents.find(string) == GoodContents.end()){
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	std::wstring RegistryKey::ToString(){
+		return GetName();
 	}
 }

@@ -8,17 +8,20 @@
 #include "logging/Log.h"
 
 namespace Registry {
+	typedef std::wstring REG_SZ_T;
+	typedef std::vector<std::wstring> REG_MULTI_SZ_T;
+	typedef DWORD REG_DWORD_T;
+
 	extern std::map<std::wstring, HKEY> vHiveNames;
 	extern std::map<HKEY, std::wstring> vHives;
 	
 	HKEY RemoveHive(std::wstring& path);
 
-	class RegistryKey {
+	class RegistryKey : Loggable {
 		HKEY hive;
 		std::wstring path;
 		std::wstring name;
 
-		HKEY key = nullptr;
 		BYTE* lpbValue = nullptr;
 		DWORD dwDataSize{};
 		DWORD dwDataType{};
@@ -26,7 +29,9 @@ namespace Registry {
 		bool valid = false;
 
 	public:
-		RegistryKey(HKEY hive, std::wstring& path, std::wstring& name, bool Create = false);
+		HKEY key = nullptr;
+
+		RegistryKey(HKEY hive, std::wstring path, std::wstring name, bool Create = false);
 
 		RegistryKey(std::wstring path, std::wstring name);
 
@@ -51,8 +56,10 @@ namespace Registry {
 		inline T Get(){ return *reinterpret_cast<T*>(GetRaw()); }
 
 		template<class T>
-		inline bool CompareValue(T value){
-			return GetRaw() == value;
+		inline bool operator==(T value){
+			return Get<T>() == value;
 		}
+
+		virtual std::wstring ToString();
 	};
 }

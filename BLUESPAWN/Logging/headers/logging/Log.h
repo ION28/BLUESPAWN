@@ -101,7 +101,7 @@ namespace Log {
 		 *
 		 * @return a reference to this log message.
 		 */
-		LogMessage& operator<<(const std::wstring& string);
+		LogMessage& operator<<(const std::wstring string);
 
 		/**
 		 * StringStreams don't support wide strings, so this serves as a handler for
