@@ -31,6 +31,6 @@ namespace Hunts {
 
 		void AddFileToSearch(std::string sFileName);
 
-		int ScanCursory(Scope& scope, Reaction* reaction = new Reactions::Log());
+		int ScanCursory(Scope& scope, Reaction* reaction = new Reactions::LogReaction());
 	};
 }

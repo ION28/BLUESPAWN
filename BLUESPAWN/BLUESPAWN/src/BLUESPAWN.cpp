@@ -5,6 +5,10 @@ int main(int argc, char* argv[])
 	auto sink = Log::CLISink();
 	Log::AddSink(sink);
 
+	auto OSVersion = Registry::RegistryKey(std::wstring(L"HKLM\\SOFTWARE\\Microsoft\\WIndows NT\\CurrentVersion"), std::wstring(L"ProductName"));
+
+	LOG_INFO("Computer version is " << OSVersion.Get<std::wstring>());
+
 	print_banner();
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
