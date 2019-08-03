@@ -1,5 +1,8 @@
 #include <windows.h>
 
+#define SECURITY_WIN32
+#include <Security.h>
+
 #include "configuration/CollectInfo.h"
 #include "configuration/Registry.h"
 
@@ -15,8 +18,8 @@ void OutputComputerInformation() {
 }
 
 std::wstring GetOSVersion() {
-	LPVOID name = Registry::GetRegistryKey(L"HKLM\\SOFTWARE\\Microsoft\\WIndows NT\\CurrentVersion", L"ProductName");
-	return std::wstring(reinterpret_cast<LPWSTR>(name));
+	auto key = Registry::RegistryKey(L"HKLM\\SOFTWARE\\Microsoft\\WIndows NT\\CurrentVersion", L"ProductName");
+	return key.Get<std::wstring>();
 }
 
 std::wstring GetComputerDNSName() {

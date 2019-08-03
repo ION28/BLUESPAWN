@@ -33,9 +33,9 @@ namespace Registry {
 	};
 
 	HKEY RemoveHive(std::wstring& path){
-		UINT fslashIdx = path.find(L"/");
-		UINT bslashIdx = path.find(L"\\");
-		if(fslashIdx == ( UINT) -1 && bslashIdx == ( UINT) -1){
+		SIZE_T fslashIdx = path.find(L"/");
+		SIZE_T bslashIdx = path.find(L"\\");
+		if(fslashIdx == (SIZE_T) -1 && bslashIdx == (SIZE_T) -1){
 			LOG_ERROR("Registry hive not found!");
 			return nullptr;
 		}
@@ -53,7 +53,7 @@ namespace Registry {
 		return hive;
 	}
 
-	RegistryKey::RegistryKey(HKEY hive, std::wstring& path, std::wstring& name, bool Create = false) : hive{ hive }, name{ name }, path{ path } {
+	RegistryKey::RegistryKey(HKEY hive, std::wstring& path, std::wstring& name, bool Create) : hive{ hive }, name{ name }, path{ path } {
 		LSTATUS status = Create ? RegOpenKeyEx(hive, path.c_str(), 0, KEY_ALL_ACCESS, &key)
 			: RegCreateKeyEx(hive, path.c_str(), 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &key, nullptr);
 
@@ -79,7 +79,7 @@ namespace Registry {
 		valid = true;
 	}
 
-	RegistryKey::RegistryKey(std::wstring path, std::wstring& name) : RegistryKey(RemoveHive(path), path, name){};
+	RegistryKey::RegistryKey(std::wstring path, std::wstring name) : RegistryKey(RemoveHive(path), path, name){};
 
 	RegistryKey::~RegistryKey() { RegCloseKey(key); }
 
@@ -89,7 +89,7 @@ namespace Registry {
 		return vHives[hive] + L"\\" + path + L":" + name;
 	}
 
-	bool RegistryKey::Set(LPVOID value, DWORD dwSize, DWORD dwType = REG_BINARY) {
+	bool RegistryKey::Set(LPVOID value, DWORD dwSize, DWORD dwType) {
 		if(dwType == -1) dwType = dwDataType;
 
 		LOG_VERBOSE(3, "Setting registry key " << GetName());
@@ -119,21 +119,21 @@ namespace Registry {
 	};
 
 	template<>
-	bool RegistryKey::Set<DWORD>(DWORD value) {
+	inline bool RegistryKey::Set<DWORD>(DWORD value) {
 		LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << value);
 
 		return Set(&value, sizeof(DWORD), REG_DWORD);
 	}
 
 	template<>
-	bool RegistryKey::Set<std::wstring>(std::wstring value) {
+	inline bool RegistryKey::Set<std::wstring>(std::wstring value) {
 		LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << value);
 
 		return Set(const_cast<wchar_t*>(value.c_str()), sizeof(WCHAR) * static_cast<DWORD>(value.length() + 1), REG_SZ); 
 	}
 
 	template<>
-	bool RegistryKey::Set<std::vector<std::wstring>>(std::vector<std::wstring> value) {
+	inline bool RegistryKey::Set<std::vector<std::wstring>>(std::vector<std::wstring> value) {
 		SIZE_T size = 1;
 		for(auto string : value){
 			size += (string.length() + 1);
@@ -147,14 +147,19 @@ namespace Registry {
 			wsLogStatement += string + L"; ";
 			LPCWSTR lpRawString = string.c_str();
 			for(int i = 0; i < string.length() + 1; i++){
-				data[ptr++] = lpRawString[i];
+				if(ptr < size){
+					data[ptr++] = lpRawString[i];
+				}
 			}
 		}
-		data[ptr] = 0;
+		
+		if(ptr < size){
+			data[ptr] = { static_cast<WCHAR>(0) };
+		}
 
 		LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << wsLogStatement);
 
-		return Set(data, size * sizeof(WCHAR), REG_MULTI_SZ);
+		return Set(data, static_cast<DWORD>(size * sizeof(WCHAR)), REG_MULTI_SZ);
 	}
 
 	LPVOID RegistryKey::GetRaw(){
@@ -162,7 +167,7 @@ namespace Registry {
 	}
 
 	template<>
-	DWORD RegistryKey::Get(){ 
+	inline DWORD RegistryKey::Get(){ 
 		DWORD value = *reinterpret_cast<DWORD*>(GetRaw());
 		LOG_VERBOSE(2, "Read value " << value << " from key " << GetName());
 
@@ -170,7 +175,7 @@ namespace Registry {
 	}
 
 	template<>
-	std::wstring RegistryKey::Get() {
+	inline std::wstring RegistryKey::Get<std::wstring>() {
 		std::wstring value = reinterpret_cast<LPWSTR>(GetRaw());
 		LOG_VERBOSE(2, "Read value " << value << " from key " << GetName());
 
@@ -178,7 +183,7 @@ namespace Registry {
 	}
 
 	template<>
-	std::vector<std::wstring> RegistryKey::Get(){
+	inline std::vector<std::wstring> RegistryKey::Get<std::vector<std::wstring>>(){
 		std::vector<std::wstring> strings{};
 		std::wstring wsLogString{};
 
