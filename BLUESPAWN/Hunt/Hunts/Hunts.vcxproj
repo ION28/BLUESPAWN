@@ -51,6 +51,7 @@
     <ClInclude Include="headers\hunts\HuntT1138.h" />
     <ClInclude Include="headers\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunts\HuntT9999.h" />
+    <ClInclude Include="headers\hunts\RegistryHunt.hpp" />
     <ClInclude Include="headers\hunts\Scope.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
