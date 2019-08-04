@@ -1,9 +1,9 @@
 #pragma once
+#include <Windows.h>
+
 #include "Hunt.h"
 #include "reactions/Reaction.h"
 #include "reactions/Log.h"
-
-#include "configuration/Registry.h"
 
 namespace Hunts {
 
