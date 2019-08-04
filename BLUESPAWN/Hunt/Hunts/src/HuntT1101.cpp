@@ -1,4 +1,5 @@
 #include "hunts/HuntT1101.h"
+#include "logging/Log.h"
 
 namespace Hunts {
 	HuntT1101::HuntT1101(HuntRegister& record) : Hunt(record) {
@@ -9,7 +10,7 @@ namespace Hunts {
 	}
 
 	int HuntT1101::ScanCursory(Scope& scope, Reaction* reaction){
-		PrintInfoHeader("Hunting for T1101 - Security Support Provider at level Cursory");
+		LOG_INFO("Hunting for T1101 - Security Support Provider at level Cursory");
 
 		int identified = 0;
 

@@ -1,4 +1,5 @@
 #include "hunts/HuntT9999.h"
+#include "logging/Log.h"
 
 namespace Hunts {
 	HuntT9999::HuntT9999(HuntRegister& record) : Hunt(record) {
@@ -13,7 +14,7 @@ namespace Hunts {
 	}
 
 	int HuntT9999::ScanCursory(Scope& scope, Reaction* reaction){
-		PrintInfoHeader("Hunting for T9999 - Example Hunt at level Cursory");
+		LOG_INFO("Hunting for T9999 - Example Hunt at level Cursory");
 
 		int identified = 0;
 

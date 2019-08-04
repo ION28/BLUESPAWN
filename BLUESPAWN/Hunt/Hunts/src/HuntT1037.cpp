@@ -1,4 +1,7 @@
 #include "hunts/HuntT1037.h"
+#include "logging/Log.h"
+
+using namespace Registry;
 
 namespace Hunts {
 	HuntT1037::HuntT1037(HuntRegister& record) : Hunt(record) {
@@ -9,19 +12,23 @@ namespace Hunts {
 	}
 
 	int HuntT1037::ScanCursory(Scope& scope, Reaction* reaction){
-		PrintInfoHeader("Hunting for T1037 - Logon Scripts at level Cursory");
+		LOG_INFO("Hunting for T1037 - Logon Scripts at level Cursory");
+
+		typedef struct _KeyValuePairing {
+			RegistryKey key;
+			std::wstring value;
+		} KeyValuePairing;
+
+		KeyValuePairing pKeyValuePair = { 
+			{HKEY_CURRENT_USER,L"Environment",L"UserInitMprLogonScript"}, L"" };
 
 		int identified = 0;
+		if (!(pKeyValuePair.key == pKeyValuePair.value)) {
+			identified++;
 
-		const int num_of_keys_to_inspect = 1;
-		key keys[num_of_keys_to_inspect] = {
-			{HKEY_CURRENT_USER,L"Environment",L"UserInitMprLogonScript", s2ws(""), REG_SZ},
-		};
+			reaction->RegistryKeyIdentified(pKeyValuePair.key);
+		}
 
-		identified = ExamineRegistryKeySet(keys, num_of_keys_to_inspect);
-
-		std::cout << std::endl;
-		
 		return identified;
 	}
 
