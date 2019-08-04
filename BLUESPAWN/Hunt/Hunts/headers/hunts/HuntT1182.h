@@ -3,7 +3,6 @@
 #include "reactions/Reaction.h"
 #include "reactions/Log.h"
 
-#include "logging/Output.h"
 #include "configuration/Registry.h"
 
 namespace Hunts {

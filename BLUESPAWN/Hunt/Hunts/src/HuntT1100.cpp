@@ -1,4 +1,5 @@
 #include "hunts/HuntT1100.h"
+#include "logging/Log.h"
 
 namespace Hunts {
 	HuntT1100::HuntT1100(HuntRegister& record) : Hunt(record) {
@@ -33,7 +34,7 @@ namespace Hunts {
 	}
 
 	int HuntT1100::ScanCursory(Scope& scope, Reaction* reaction){
-		PrintInfoHeader("Hunting for T1100 - Web Shells at level Cursory");
+		LOG_INFO("Hunting for T1100 - Web Shells at level Cursory");
 		SetRegexAggressivenessLevel(Aggressiveness::Cursory);
 
 		int identified = 0;

@@ -3,8 +3,6 @@
 #include "reactions/Reaction.h"
 #include "reactions/Log.h"
 
-#include "logging/Output.h"
-
 #include <string>
 #include <vector>
 

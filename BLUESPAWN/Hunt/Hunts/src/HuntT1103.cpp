@@ -1,4 +1,5 @@
 #include "hunts/HuntT1103.h"
+#include "logging/Log.h"
 
 namespace Hunts {
 	HuntT1103::HuntT1103(HuntRegister& record) : Hunt(record) {
@@ -9,7 +10,7 @@ namespace Hunts {
 	}
 
 	int HuntT1103::ScanCursory(Scope& scope, Reaction* reaction){
-		PrintInfoHeader("Hunting for T1103 - AppInit DLLs at level Cursory");
+		LOG_INFO("Hunting for T1103 - AppInit DLLs at level Cursory");
 
 		int identified = 0;
 

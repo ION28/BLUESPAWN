@@ -2,8 +2,6 @@
 
 #include <vector>
 #include <string>
-#include <algorithm>
-#include <logging\Output.h>
 
 static std::vector<std::string> banners = {
 	R"(

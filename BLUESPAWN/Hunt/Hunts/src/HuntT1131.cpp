@@ -1,4 +1,5 @@
 #include "hunts/HuntT1131.h"
+#include "logging/Log.h"
 
 namespace Hunts {
 	HuntT1131::HuntT1131(HuntRegister& record) : Hunt(record) {
@@ -9,7 +10,7 @@ namespace Hunts {
 	}
 
 	int HuntT1131::ScanCursory(Scope& scope, Reaction* reaction){
-		PrintInfoHeader("Hunting for T1131 - Authentication Package at level Cursory");
+		LOG_INFO("Hunting for T1131 - Authentication Package at level Cursory");
 
 		int identified = 0;
 
