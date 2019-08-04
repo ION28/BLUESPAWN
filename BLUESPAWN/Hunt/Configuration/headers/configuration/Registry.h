@@ -62,4 +62,9 @@ namespace Registry {
 
 		virtual std::wstring ToString();
 	};
+
+	typedef struct _KeyValuePairing {
+		RegistryKey key;
+		LPVOID value;
+	} KeyValuePairing;
 }

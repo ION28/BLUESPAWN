@@ -1,5 +1,9 @@
 #include "hunts/HuntT1101.h"
+
 #include "logging/Log.h"
+#include "configuration/Registry.h"
+
+using namespace Registry;
 
 namespace Hunts {
 	HuntT1101::HuntT1101(HuntRegister& record) : Hunt(record) {
@@ -14,42 +18,29 @@ namespace Hunts {
 
 		int identified = 0;
 
-		key keys[2] = {
-		{HKEY_LOCAL_MACHINE,L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"Security Packages", s2ws("*"), REG_MULTI_SZ},
-		{HKEY_LOCAL_MACHINE,L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", L"Security Packages", s2ws("*"), REG_MULTI_SZ},
+		std::vector<RegistryKey> keys = {
+		    {HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"Security Packages"},
+		    {HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", L"Security Packages"},
 		};
 
-		for (int i = 0; i < 2; i++) {
-			HKEY hKey;
-			LONG lRes = RegOpenKeyEx(keys[i].hive, keys[i].path, 0, KEY_READ, &hKey);
-			bool bExistsAndSuccess(lRes == ERROR_SUCCESS);
+		for(auto key : keys){
+			for(auto value : key.Get<REG_MULTI_SZ_T>()){
 
-			if (bExistsAndSuccess) {
-				wstring key_name = keys[i].key;
-				wstring result;
-				vector<wstring> target;
-				GetRegistryKey(hKey, keys[i].type, result, key_name, target);
-				RegCloseKey(hKey);
-
-				bool foundBad = false;
-				for (auto& val : target) {
-					if (find(okSecPackages.begin(), okSecPackages.end(), val) == okSecPackages.end()) {
-						PrintBadStatus("Key is non-default: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
-						PrintInfoStatus("Found potentially bad package: " + ws2s(val));
-						foundBad = true;
-						identified++;
-					}
+				bool good = true;
+				if(find(okSecPackages.begin(), okSecPackages.end(), value) == okSecPackages.end()) {
+					LOG_WARNING("Potentially malicious LSA security package discovered - " << value << "\n"
+						<< "Registry key is " << key);
+					good = false;
+					identified++;
 				}
-				if (!foundBad) {
-					PrintGoodStatus("Key is okay: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
+				
+				if(good){
+					LOG_VERBOSE(1, "Registry key " << key.GetName() << " is okay");
+				} else {
+					reaction->RegistryKeyIdentified(key);
 				}
-			}
-			else {
-				PrintGoodStatus("Key is okay: " + hive2s(keys[i].hive) + (string)"\\" + ws2s(keys[i].path) + (string)"\\" + ws2s(keys[i].key));
 			}
 		}
-
-		std::cout << std::endl;
 		
 		return identified;
 	}
