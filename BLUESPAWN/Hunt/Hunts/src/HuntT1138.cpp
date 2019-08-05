@@ -14,6 +14,8 @@ namespace Hunts {
 
 		int identified = 0;
 
+		/*
+
 		const int num_of_keys_to_inspect = 2;
 		key keys[num_of_keys_to_inspect] = {
 			{HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", L"InstalledSDB", s2ws(""), REG_SZ},
@@ -23,6 +25,8 @@ namespace Hunts {
 		identified = ExamineRegistryKeySet(keys, num_of_keys_to_inspect);
 
 		std::cout << std::endl;
+
+		*/
 		
 		return identified;
 	}

@@ -39,6 +39,8 @@ namespace Hunts {
 
 		int identified = 0;
 
+		/*
+
 		for (string path : web_directories) {
 			bool found_bad = false;
 			for (const auto& entry : fs::recursive_directory_iterator(path)) {
@@ -102,15 +104,19 @@ namespace Hunts {
 		}
 
 		std::cout << std::endl;
+
+		*/
 		
 		return identified;
 	}
 
 	int HuntT1100::ScanModerate(Scope& scope, Reaction* reaction) {
-		PrintInfoHeader("Hunting for T1100 - Web Shells at level Moderate");
+		LOG_INFO("Hunting for T1100 - Web Shells at level Moderate");
 		SetRegexAggressivenessLevel(Aggressiveness::Moderate);
 
 		int identified = 0;
+
+		/*
 
 		for (string path : web_directories) {
 			bool found_bad = false;
@@ -175,6 +181,8 @@ namespace Hunts {
 		}
 
 		std::cout << std::endl;
+
+		*/
 
 		return identified;
 	}

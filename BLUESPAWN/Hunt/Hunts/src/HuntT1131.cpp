@@ -14,6 +14,8 @@ namespace Hunts {
 
 		int identified = 0;
 
+		/*
+
 		key keys[2] = {
 		{HKEY_LOCAL_MACHINE,L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"Authentication Packages", s2ws("*"), REG_MULTI_SZ},
 		{HKEY_LOCAL_MACHINE,L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"Notification Packages", s2ws("*"), REG_MULTI_SZ},
@@ -60,6 +62,8 @@ namespace Hunts {
 		}
 
 		std::cout << std::endl;
+
+		*/
 		
 		return identified;
 	}

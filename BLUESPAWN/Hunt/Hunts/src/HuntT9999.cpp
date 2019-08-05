@@ -18,6 +18,8 @@ namespace Hunts {
 
 		int identified = 0;
 
+		/*
+
 		for(std::string sFileName : vFileNames){
 			if(!scope.FileIsInScope(sFileName.c_str())){
 				continue;
@@ -34,6 +36,8 @@ namespace Hunts {
 				identified++;
 			}
 		}
+
+		*/
 
 		return identified;
 	}

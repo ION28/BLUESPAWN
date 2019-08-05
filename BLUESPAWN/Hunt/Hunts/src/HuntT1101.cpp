@@ -18,6 +18,8 @@ namespace Hunts {
 
 		int identified = 0;
 
+		/*
+
 		std::vector<RegistryKey> keys = {
 		    {HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"Security Packages"},
 		    {HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", L"Security Packages"},
@@ -41,6 +43,8 @@ namespace Hunts {
 				}
 			}
 		}
+
+		*/
 		
 		return identified;
 	}

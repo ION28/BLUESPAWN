@@ -14,6 +14,8 @@ namespace Hunts {
 
 		int identified = 0;
 
+		/*
+
 		//https://b3n7s.github.io/2018/10/27/AppCert-Dlls.html
 
 		const int num_of_keys_to_inspect = 1;
@@ -24,6 +26,8 @@ namespace Hunts {
 		identified = ExamineRegistryKeySet(keys, num_of_keys_to_inspect);
 
 		std::cout << std::endl;
+
+		*/
 		
 		return identified;
 	}
