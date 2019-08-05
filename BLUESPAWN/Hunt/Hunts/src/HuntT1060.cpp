@@ -14,10 +14,9 @@ namespace Hunts {
 	int HuntT1060::ScanCursory(Scope& scope, Reaction* reaction){
 		LOG_INFO("Hunting for T1060 - Registry Run Keys / Startup Folder at level Cursory");
 
-		typedef struct _KeyValuePairing {
-			RegistryKey key;
-			std::wstring value;
-		} KeyValuePairing;
+		int identified = 0;
+
+		/*
 
 		std::vector<KeyValuePairing> vKeyValuePairs{
 			{{HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", L"*", s2ws("*"), REG_SZ},
@@ -37,7 +36,6 @@ namespace Hunts {
 			{{HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", L"Common Startup"}, L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"},
 		};
 
-		int identified = 0;
 		for (auto pair : vKeyValuePairs) {
 			if (!(pair.key == pair.value)) {
 				identified++;
@@ -45,6 +43,8 @@ namespace Hunts {
 				reaction->RegistryKeyIdentified(pair.key);
 			}
 		}
+
+		*/
 
 		return identified;
 	}

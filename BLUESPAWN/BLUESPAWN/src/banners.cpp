@@ -16,7 +16,9 @@ void print_banner() {
 
 	srand(static_cast<unsigned int>(time(nullptr)));
 
+	/*
 	SetConsoleColor("cyan");
 	std::cout << banners.at(std::rand() % banners.size()) << std::endl;
 	SetConsoleColor("white");
+	*/
 }

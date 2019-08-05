@@ -23,11 +23,15 @@ namespace Hunts {
 			{HKEY_CURRENT_USER,L"Environment",L"UserInitMprLogonScript"}, L"" };
 
 		int identified = 0;
+
+		/*
 		if (!(pKeyValuePair.key == pKeyValuePair.value)) {
 			identified++;
 
 			reaction->RegistryKeyIdentified(pKeyValuePair.key);
 		}
+
+		*/
 
 		return identified;
 	}
