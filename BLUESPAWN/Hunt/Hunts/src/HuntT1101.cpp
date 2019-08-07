@@ -1,4 +1,5 @@
 #include "hunts/HuntT1101.h"
+#include "hunts/RegistryHunt.hpp"
 
 #include "logging/Log.h"
 #include "configuration/Registry.h"
@@ -18,33 +19,18 @@ namespace Hunts {
 
 		int identified = 0;
 
-		/*
-
 		std::vector<RegistryKey> keys = {
 		    {HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"Security Packages"},
 		    {HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", L"Security Packages"},
 		};
 
 		for(auto key : keys){
-			for(auto value : key.Get<REG_MULTI_SZ_T>()){
-
-				bool good = true;
-				if(find(okSecPackages.begin(), okSecPackages.end(), value) == okSecPackages.end()) {
-					LOG_WARNING("Potentially malicious LSA security package discovered - " << value << "\n"
-						<< "Registry key is " << key);
-					good = false;
-					identified++;
-				}
-				
-				if(good){
-					LOG_VERBOSE(1, "Registry key " << key.GetName() << " is okay");
-				} else {
-					reaction->RegistryKeyIdentified(key);
-				}
+			if(CheckKey(key, okSecPackages, reaction)){
+				LOG_VERBOSE(1, "Registry key " << key.GetName() << " is okay");
+			} else {
+				identified++;
 			}
 		}
-
-		*/
 		
 		return identified;
 	}

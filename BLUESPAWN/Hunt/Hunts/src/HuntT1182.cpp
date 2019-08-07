@@ -1,6 +1,8 @@
 #include "hunts/HuntT1182.h"
 #include "logging/Log.h"
 
+using namespace Registry;
+
 namespace Hunts {
 	HuntT1182::HuntT1182(HuntRegister& record) : Hunt(record) {
 		dwSupportedScans = Aggressiveness::Cursory;
@@ -14,20 +16,9 @@ namespace Hunts {
 
 		int identified = 0;
 
-		/*
-
-		//https://b3n7s.github.io/2018/10/27/AppCert-Dlls.html
-
-		const int num_of_keys_to_inspect = 1;
-		key keys[num_of_keys_to_inspect] = {
-			{HKEY_LOCAL_MACHINE,L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls", L"*", s2ws("*"), REG_SZ},
-		};
-
-		identified = ExamineRegistryKeySet(keys, num_of_keys_to_inspect);
-
-		std::cout << std::endl;
-
-		*/
+		for(auto key : RegistryKey(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls").Subkeys()){
+			reaction->RegistryKeyIdentified(key);
+		}
 		
 		return identified;
 	}

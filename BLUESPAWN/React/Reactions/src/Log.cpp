@@ -18,12 +18,12 @@ namespace Reactions {
 		}
 	}
 	void LogReaction::RegistryKeyIdentified(Registry::RegistryKey hkRegistryKey){
-		LOG_ERROR("Registry Key Identified " << (Loggable&) hkRegistryKey);
+		LOG_ERROR("Registry Key Identified " << hkRegistryKey);
 	}
 	void LogReaction::ProcessIdentified(HANDLE hProcess){
 		int pid = GetProcessId(hProcess);
 		if(pid){
-			LOG_ERROR(std::string("Process Identified: ") << pid);
+			LOG_ERROR(std::string("Process Identified - PID ") << pid);
 		}
 	}
 	void LogReaction::ServiceIdentified(SC_HANDLE schService){
