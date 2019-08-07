@@ -12,7 +12,7 @@
 
 // A generic macro to log a message with a given set of sinks at a given level
 #define LOG(SINK, LEVEL, ...) \
-    Log::LogMessage(SINK, LEVEL) << __VA_ARGS__ << Log::endlog
+    Log::LogMessage(SINK, LEVEL) << __VA_ARGS__
 
 // A macro to log an error in the set of sinks specified by AddSink and RemoveSink
 #define LOG_ERROR(...) \
@@ -111,14 +111,9 @@ namespace Log {
 		 *
 		 * @return a reference to this log message.
 		 */
-		LogMessage& operator<<(PCWSTR pointer);
+		LogMessage& operator<<(LPCWSTR pointer);
 
-		/**
-		 * At some point, it may become beneficial to log the current state of a component.
-		 * This is meant to serve as a handler for components implementing the Loggable
-		 * interface.
-		 */
-		LogMessage& operator<<(Loggable& loggable);
+	private:
 
 		/**
 		 * StringStream does most of the work needed to handle a stream of values being logged
@@ -130,10 +125,29 @@ namespace Log {
 		 * @return a reference to this log message.
 		 */
 		template<class T>
-		LogMessage& operator<<(const T LogItem){
+		LogMessage& InnerLog(T LogItem, std::false_type){
 			InternalStream << LogItem;
 			return *this;
-		};
+		}
+
+		/**
+		 * At some point, it may become beneficial to log the current state of a component.
+		 * This is meant to serve as a handler for components implementing the Loggable
+		 * interface.
+		 */
+		LogMessage& InnerLog(Loggable& loggable, std::true_type){
+			return operator<<(loggable.ToString());
+		}
+
+	public: 
+
+		/**
+		 * Tag dispatcher for the InnerLog functions
+		 */
+		template<class T>
+		LogMessage& operator<<(T LogItem){
+			return InnerLog(LogItem, std::is_base_of<Loggable, T>{});
+		}
 	};
 
 	/**

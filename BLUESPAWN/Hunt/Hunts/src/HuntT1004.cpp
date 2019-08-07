@@ -23,11 +23,14 @@ namespace Hunts {
 		identified += CheckKey<REG_SZ_T>({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Shell" }, L"explorer.exe", reaction);
 		identified += CheckKey<REG_SZ_T>({ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Shell" }, L"explorer.exe", reaction);
 		identified += CheckKey<REG_SZ_T>({ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Shell"}, L"", reaction);
-		identified += CheckKey<REG_SZ_T>({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Userinit"}, L"C:\\Windows\\system32\\userinit.exe", reaction);
+		identified += CheckKey<REG_SZ_T>({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Userinit"}, L"C:\\Windows\\System32\\userinit.exe", reaction);
 		identified += CheckKey<REG_SZ_T>({ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Userinit"}, L"", reaction);
 		identified += CheckKey<REG_SZ_T>({ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Userinit"}, L"", reaction);
-		identified += CheckKey<REG_SZ_T>({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify", L"*"}, L"*", reaction);
-		
+
+		for(auto key : RegistryKey(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify").Subkeys()){
+			reaction->RegistryKeyIdentified(key);
+		}
+
 		return identified;
 	}
 
