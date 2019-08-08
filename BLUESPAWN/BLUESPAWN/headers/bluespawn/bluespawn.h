@@ -18,9 +18,9 @@
 #pragma warning(pop)
 
 #include "bluespawn/banners.h"
-#include "logging/Output.h"
 #include "logging/Log.h"
 #include "logging/CLISink.h"
+#include "configuration/Registry.h"
 
 #include "hunts/Hunt.h"
 #include "hunts/HuntRegister.h"
@@ -34,8 +34,6 @@
 #include "hunts/HuntT1138.h"
 #include "hunts/HuntT1182.h"
 #include "hunts/HuntT9999.h"
-
-using namespace std;
 
 void print_help(cxxopts::ParseResult result, cxxopts::Options options);
 void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options);

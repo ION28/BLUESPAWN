@@ -1,5 +1,8 @@
 #include "bluespawn/banners.h"
 
+#include <algorithm>
+#include <time.h>
+
 void print_banner() {
 	// Put these in a file, then include that file in the resources for the exe
 
@@ -13,7 +16,9 @@ void print_banner() {
 
 	srand(static_cast<unsigned int>(time(nullptr)));
 
+	/*
 	SetConsoleColor("cyan");
 	std::cout << banners.at(std::rand() % banners.size()) << std::endl;
 	SetConsoleColor("white");
+	*/
 }

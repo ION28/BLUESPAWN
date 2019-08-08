@@ -3,9 +3,6 @@
 #include "reactions/Reaction.h"
 #include "reactions/Log.h"
 
-#include "logging/Output.h"
-#include "configuration/Registry.h"
-
 namespace Hunts {
 
 	/**
@@ -21,6 +18,6 @@ namespace Hunts {
 	public:
 		HuntT1004(HuntRegister& record);
 
-		int ScanCursory(Scope& scope, Reaction* reaction = new Reactions::Log());
+		int ScanCursory(Scope& scope, Reaction* reaction = new Reactions::LogReaction());
 	};
 }
