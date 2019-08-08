@@ -19,10 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Output.cpp" />
+    <ClCompile Include="src\CLISink.cpp" />
+    <ClCompile Include="src\Log.cpp" />
+    <ClCompile Include="src\LogLevel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\logging\Output.h" />
+    <ClInclude Include="headers\logging\CLISink.h" />
+    <ClInclude Include="headers\logging\Log.h" />
+    <ClInclude Include="headers\logging\Loggable.h" />
+    <ClInclude Include="headers\logging\LogLevel.h" />
+    <ClInclude Include="headers\logging\LogSink.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

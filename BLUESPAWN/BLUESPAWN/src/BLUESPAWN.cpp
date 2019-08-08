@@ -1,37 +1,30 @@
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-#include <Windows.h>
-
-// The developer of this library is a bad developer who left warnings in his code.
-// Since we enforce no warnings, this will cause a compiler error.
-#pragma warning(push)
-
-#pragma warning(disable : 26451)
-#pragma warning(disable : 26444)
-
-#include <cxxopts.hpp>
-
-#pragma warning(pop)
-
-#include "hunts/Hunt.h"
-#include "hunts/HuntRegister.h"
-#include "logging/Output.h"
-
-#include "hunts/HuntT1100.h"
-#include "hunts/HuntT9999.h"
-
-using namespace std;
-
-void print_help(cxxopts::ParseResult result, cxxopts::Options options);
-void print_banner();
-void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options);
-void dispatch_example_hunt(cxxopts::ParseResult result, cxxopts::Options options);
+#include "bluespawn/bluespawn.h"
 
 int main(int argc, char* argv[])
 {
+	auto sink = Log::CLISink();
+	Log::AddSink(sink);
+
 	print_banner();
+
+	HuntRegister record{};
+	Hunts::HuntT1004 t1004(record);
+	Hunts::HuntT1037 t1037(record);
+	Hunts::HuntT1060 t1060(record);
+	Hunts::HuntT1100 t1100(record);
+	Hunts::HuntT1101 t1101(record);
+	Hunts::HuntT1103 t1103(record);
+	Hunts::HuntT1131 t1131(record);
+	Hunts::HuntT1138 t1138(record);
+	Hunts::HuntT1182 t1182(record);
+
+	DWORD tactics = UINT_MAX;
+	DWORD dataSources = UINT_MAX;
+	DWORD affectedThings = UINT_MAX;
+	Scope scope{};
+	Reaction* reaction = new Reactions::LogReaction();
+	record.RunHunts(tactics, dataSources, affectedThings, scope, Aggressiveness::Cursory, reaction);
+
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
@@ -62,76 +55,6 @@ int main(int argc, char* argv[])
 	else {
 		std::cout << "Nothing to do. Use the -h or --hunt flags to launch a hunt" << std::endl;
 	}
-}
-
-void print_banner() {
-	vector<std::string> banners = {
-		R"(
-
-    _/_/_/    _/        _/    _/  _/_/_/_/    _/_/_/  _/_/_/      _/_/    _/          _/  _/      _/   
-   _/    _/  _/        _/    _/  _/        _/        _/    _/  _/    _/  _/          _/  _/_/    _/    
-  _/_/_/    _/        _/    _/  _/_/_/      _/_/    _/_/_/    _/_/_/_/  _/    _/    _/  _/  _/  _/     
- _/    _/  _/        _/    _/  _/              _/  _/        _/    _/    _/  _/  _/    _/    _/_/      
-_/_/_/    _/_/_/_/    _/_/    _/_/_/_/  _/_/_/    _/        _/    _/      _/  _/      _/      _/       
-
-
-)",
-		R"(
-
- ____  ____  ____  ____  ____  ____  ____  ____  ____ 
-||B ||||L ||||U ||||E ||||S ||||P ||||A ||||W ||||N ||
-||__||||__||||__||||__||||__||||__||||__||||__||||__||
-|/__\||/__\||/__\||/__\||/__\||/__\||/__\||/__\||/__\|
-
-
-
-)",
-		R"(
-
-________ ______ _____  ____________________________ _______ ___       _______   __
-___  __ )___  / __  / / /___  ____/__  ___/___  __ \___    |__ |     / /___  | / /
-__  __  |__  /  _  / / / __  __/   _____ \ __  /_/ /__  /| |__ | /| / / __   |/ / 
-_  /_/ / _  /___/ /_/ /  _  /___   ____/ / _  ____/ _  ___ |__ |/ |/ /  _  /|  /  
-/_____/  /_____/\____/   /_____/   /____/  /_/      /_/  |_|____/|__/   /_/ |_/   
-
-
-)",
-		R"(
- /$$$$$$$  /$$       /$$   /$$ /$$$$$$$$  /$$$$$$  /$$$$$$$   /$$$$$$  /$$      /$$ /$$   /$$
-| $$__  $$| $$      | $$  | $$| $$_____/ /$$__  $$| $$__  $$ /$$__  $$| $$  /$ | $$| $$$ | $$
-| $$  \ $$| $$      | $$  | $$| $$      | $$  \__/| $$  \ $$| $$  \ $$| $$ /$$$| $$| $$$$| $$
-| $$$$$$$ | $$      | $$  | $$| $$$$$   |  $$$$$$ | $$$$$$$/| $$$$$$$$| $$/$$ $$ $$| $$ $$ $$
-| $$__  $$| $$      | $$  | $$| $$__/    \____  $$| $$____/ | $$__  $$| $$$$_  $$$$| $$  $$$$
-| $$  \ $$| $$      | $$  | $$| $$       /$$  \ $$| $$      | $$  | $$| $$$/ \  $$$| $$\  $$$
-| $$$$$$$/| $$$$$$$$|  $$$$$$/| $$$$$$$$|  $$$$$$/| $$      | $$  | $$| $$/   \  $$| $$ \  $$
-|_______/ |________/ \______/ |________/ \______/ |__/      |__/  |__/|__/     \__/|__/  \__/
-)",
-
-		R"(
-
-FFFFFFD FFD     FFD   FFDFFFFFFFDFFFFFFFDFFFFFFD  FFFFFD FFD    FFDFFFD   FFD
-FFAEEFFDFFG     FFG   FFGFFAEEEECFFAEEEECFFAEEFFDFFAEEFFDFFG    FFGFFFFD  FFG
-FFFFFFACFFG     FFG   FFGFFFFFD  FFFFFFFDFFFFFFACFFFFFFFGFFG FD FFGFFAFFD FFG
-FFAEEFFDFFG     FFG   FFGFFAEEC  BEEEEFFGFFAEEEC FFAEEFFGFFGFFFDFFGFFGBFFDFFG
-FFFFFFACFFFFFFFDBFFFFFFACFFFFFFFDFFFFFFFGFFG     FFG  FFGBFFFAFFFACFFG BFFFFG
-BEEEEEC BEEEEEEC BEEEEEC BEEEEEECBEEEEEECBEC     BEC  BEC BEECBEEC BEC  BEEEC
-
-)"
-	};
-
-	std::replace(banners.at(4).begin(), banners.at(4).end(), 'A', (char)201u);
-	std::replace(banners.at(4).begin(), banners.at(4).end(), 'B', (char)200u);
-	std::replace(banners.at(4).begin(), banners.at(4).end(), 'C', (char)188u);
-	std::replace(banners.at(4).begin(), banners.at(4).end(), 'D', (char)187u);
-	std::replace(banners.at(4).begin(), banners.at(4).end(), 'E', (char)205u);
-	std::replace(banners.at(4).begin(), banners.at(4).end(), 'F', (char)219u);
-	std::replace(banners.at(4).begin(), banners.at(4).end(), 'G', (char)186u);
-
-	srand(static_cast<unsigned int>(time(nullptr)));
-
-	SetConsoleColor("cyan");
-	std::cout << banners.at(std::rand() % banners.size()) << std::endl;
-	SetConsoleColor("white");
 }
 
 void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
@@ -177,8 +100,15 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	}
 
 	HuntRegister record{};
+	Hunts::HuntT1004 t1004(record);
+	Hunts::HuntT1037 t1037(record);
+	Hunts::HuntT1060 t1060(record);
 	Hunts::HuntT1100 t1100(record);
-	Hunts::HuntT9999 t9999(record);
+	Hunts::HuntT1101 t1101(record);
+	Hunts::HuntT1103 t1103(record);
+	Hunts::HuntT1131 t1131(record);
+	Hunts::HuntT1138 t1138(record);
+	Hunts::HuntT1182 t1182(record);
 
 	DWORD tactics = UINT_MAX;
 	DWORD dataSources = UINT_MAX;
@@ -186,8 +116,6 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	Scope scope{};
 	Reaction* reaction = nullptr;
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
-
-	//std::cout << "Doing a hunt at level " << hunt_level << std::endl;
 }
 
 void dispatch_example_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
@@ -206,11 +134,11 @@ void dispatch_example_hunt(cxxopts::ParseResult result, cxxopts::Options options
 		}
 	};
 
-	PrintInfoHeader("Running Hunt T9999 with an open scope.");
+	LOG_INFO("Running Hunt T9999 with an open scope.");
 	Scope scope{};
 	hTestHunt.ScanCursory(scope);
 
-	PrintInfoHeader("Running Hunt T9999 with a limited scope.");
+	LOG_INFO("Running Hunt T9999 with a limited scope.");
 	LimitedScope limitedScope{};
 	hTestHunt.ScanCursory(limitedScope);
 }

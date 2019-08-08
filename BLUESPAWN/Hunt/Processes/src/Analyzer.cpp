@@ -104,6 +104,7 @@ STATUS Analyzer::ValidateAddressInImage(HANDLE hProcess, LPVOID lpAddress, LPVOI
 	PROCESS_BASIC_INFORMATION pbi{};
 
 	FAIL_IF_NOT_SUCCESS(_NtQueryInformationProcess(hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), nullptr));
+	FAIL_IF_FALSE(pbi.PebBaseAddress);
 
 	PEB peb{};
 	FAIL_IF_FALSE(ReadProcessMemory(hProcess, pbi.PebBaseAddress, &peb, sizeof(peb), nullptr));
