@@ -1,4 +1,10 @@
 #include "hunts/HuntT1138.h"
+#include "hunts/RegistryHunt.hpp"
+
+#include "logging/Log.h"
+#include "configuration/Registry.h"
+
+using namespace Registry;
 
 namespace Hunts {
 	HuntT1138::HuntT1138(HuntRegister& record) : Hunt(record) {
@@ -9,19 +15,12 @@ namespace Hunts {
 	}
 
 	int HuntT1138::ScanCursory(Scope& scope, Reaction* reaction){
-		PrintInfoHeader("Hunting for T1138 - Application Shimming at level Cursory");
+		LOG_INFO("Hunting for T1138 - Application Shimming at level Cursory");
 
 		int identified = 0;
 
-		const int num_of_keys_to_inspect = 2;
-		key keys[num_of_keys_to_inspect] = {
-			{HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", L"InstalledSDB", s2ws(""), REG_SZ},
-			{HKEY_LOCAL_MACHINE,L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", L"Custom", s2ws(""), REG_SZ },
-		};
-
-		identified = ExamineRegistryKeySet(keys, num_of_keys_to_inspect);
-
-		std::cout << std::endl;
+		identified += CheckKey({ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", L"InstalledSDB" }, L"", reaction);
+		identified += CheckKey({ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", L"Custom" }, L"", reaction);
 		
 		return identified;
 	}

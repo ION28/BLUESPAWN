@@ -1,10 +1,8 @@
 #pragma once
 #include "Hunt.h"
+
 #include "reactions/Reaction.h"
 #include "reactions/Log.h"
-
-#include "logging/Output.h"
-#include "configuration/Registry.h"
 
 namespace Hunts {
 
@@ -20,11 +18,11 @@ namespace Hunts {
 	 */
 	class HuntT1131 : public Hunt {
 	private:
-		vector<wstring> okAuthPackages = { L"msv1_0", L"SshdPinAuthLsa" };
-		vector<wstring> okNotifPackages = { L"scecli" };
+		std::vector<std::wstring> okAuthPackages = { L"msv1_0", L"SshdPinAuthLsa" };
+		std::vector<std::wstring> okNotifPackages = { L"scecli" };
 	public:
 		HuntT1131(HuntRegister& record);
 
-		int ScanCursory(Scope& scope, Reaction* reaction = new Reactions::Log());
+		int ScanCursory(Scope& scope, Reaction* reaction = new Reactions::LogReaction());
 	};
 }

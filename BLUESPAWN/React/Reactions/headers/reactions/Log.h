@@ -2,12 +2,12 @@
 #include "Reaction.h"
 
 namespace Reactions {
-	class Log : public Reaction {
+	class LogReaction : public Reaction {
 	public:
-		Log();
+		LogReaction();
 
 		virtual void FileIdentified(HANDLE hFile);
-		virtual void RegistryKeyIdentified(HKEY hkRegistryKey);
+		virtual void RegistryKeyIdentified(Registry::RegistryKey hkRegistryKey);
 		virtual void ProcessIdentified(HANDLE hProcess);
 		virtual void ServiceIdentified(SC_HANDLE schService);
 	};

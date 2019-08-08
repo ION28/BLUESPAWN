@@ -1,10 +1,11 @@
 #pragma once
+#include <Windows.h>
+
+#include <vector>
+
 #include "Hunt.h"
 #include "reactions/Reaction.h"
 #include "reactions/Log.h"
-
-#include "logging/Output.h"
-#include "configuration/Registry.h"
 
 namespace Hunts {
 
@@ -18,11 +19,11 @@ namespace Hunts {
 	 */
 	class HuntT1101 : public Hunt {
 	private:
-		vector<wstring> okSecPackages = { L"\"\"", L"wsauth", L"kerberos", L"msv1_0", L"schannel", L"wdigest", L"tspkg", L"pku2u" };
+		std::vector<std::wstring> okSecPackages = { L"\"\"", L"wsauth", L"kerberos", L"msv1_0", L"schannel", L"wdigest", L"tspkg", L"pku2u" };
 
 	public:
 		HuntT1101(HuntRegister& record);
 
-		int ScanCursory(Scope& scope, Reaction* reaction = new Reactions::Log());
+		int ScanCursory(Scope& scope, Reaction* reaction = new Reactions::LogReaction());
 	};
 }

@@ -5,7 +5,7 @@ namespace Log {
 	std::vector<std::reference_wrapper<Log::LogSink>> _LogCurrentSinks; 
 	LogTerminator endlog{};
 
-	LogMessage& LogMessage::operator<<(const std::wstring& message){
+	LogMessage& LogMessage::operator<<(const std::wstring message){
 		LPCWSTR lpwMessage = message.c_str();
 		LPSTR lpMessage = new CHAR[message.length() + 1]{};
 		WideCharToMultiByte(CP_ACP, 0, lpwMessage, static_cast<int>(message.length()), lpMessage, static_cast<int>(message.length()), 0, nullptr);
@@ -15,10 +15,6 @@ namespace Log {
 	}
 	LogMessage& LogMessage::operator<<(PCWSTR pointer){
 		return operator<<(std::wstring(pointer));
-	}
-	LogMessage& LogMessage::operator<<(Loggable& loggable){
-		InternalStream << loggable.ToString();
-		return *this;
 	}
 	LogMessage& LogMessage::operator<<(const LogTerminator& terminator){		
 		std::string message = InternalStream.str();
