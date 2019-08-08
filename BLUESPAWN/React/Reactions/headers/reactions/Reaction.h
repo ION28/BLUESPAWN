@@ -1,14 +1,15 @@
 #pragma once
 #include <Windows.h>
 
-class Reaction
-{
+#include "configuration/Registry.h"
+
+class Reaction {
 protected: 
 	DWORD dwSupportedReactions = 0;
 
 public: 
 	virtual void FileIdentified(HANDLE hFile) = 0;
-	virtual void RegistryKeyIdentified(HKEY hkRegistryKey) = 0;
+	virtual void RegistryKeyIdentified(Registry::RegistryKey hkRegistryKey) = 0;
 	virtual void ProcessIdentified(HANDLE hProcess) = 0;
 	virtual void ServiceIdentified(SC_HANDLE schService) = 0;
 

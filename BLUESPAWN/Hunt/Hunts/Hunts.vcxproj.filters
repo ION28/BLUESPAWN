@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Hunts">
+      <UniqueIdentifier>{a8326de1-a206-4470-9bbd-1b0c2920b1bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Hunts">
+      <UniqueIdentifier>{72955de6-06a6-4ef9-993d-8e4f1e0e5857}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Scope.cpp">
@@ -25,26 +31,77 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\HuntT9999.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Hunts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HuntT1004.cpp">
+      <Filter>Source Files\Hunts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HuntT1037.cpp">
+      <Filter>Source Files\Hunts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HuntT1060.cpp">
+      <Filter>Source Files\Hunts</Filter>
     </ClCompile>
     <ClCompile Include="src\HuntT1100.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Hunts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HuntT1101.cpp">
+      <Filter>Source Files\Hunts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HuntT1103.cpp">
+      <Filter>Source Files\Hunts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HuntT1131.cpp">
+      <Filter>Source Files\Hunts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HuntT1138.cpp">
+      <Filter>Source Files\Hunts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HuntT1182.cpp">
+      <Filter>Source Files\Hunts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\hunts\Hunt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\hunts\Scope.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunts\HuntT1004.h">
+      <Filter>Header Files\Hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunts\HuntT1037.h">
+      <Filter>Header Files\Hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunts\HuntT1060.h">
+      <Filter>Header Files\Hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunts\HuntT1100.h">
+      <Filter>Header Files\Hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunts\HuntT1101.h">
+      <Filter>Header Files\Hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunts\HuntT1103.h">
+      <Filter>Header Files\Hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunts\HuntT1131.h">
+      <Filter>Header Files\Hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunts\HuntT1138.h">
+      <Filter>Header Files\Hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunts\HuntT1182.h">
+      <Filter>Header Files\Hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunts\HuntT9999.h">
+      <Filter>Header Files\Hunts</Filter>
+    </ClInclude>
     <ClInclude Include="headers\hunts\HuntRegister.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\hunts\HuntT1100.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\hunts\HuntT9999.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\hunts\Scope.h">
+    <ClInclude Include="headers\hunts\RegistryHunt.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
