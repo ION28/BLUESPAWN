@@ -3,8 +3,6 @@
 #include "reactions/Reaction.h"
 #include "reactions/Log.h"
 
-#include "filesystem/FileSystem.h"
-
 #include <string>
 #include <vector>
 #include <regex>
@@ -22,12 +20,12 @@ namespace Hunts {
 	 */
 	class HuntT1100 : public Hunt {
 	private:
-		std::vector<std::string> web_directories{ "C:\\inetpub\\wwwroot", "C:\\xampp\\htdocs" };
-		std::vector<std::string> web_exts{ ".php", ".jsp", ".jspx", ".asp", ".aspx", ".asmx", ".ashx", ".ascx" };
-		regex php_vuln_functions;
-		regex asp_indicators;
-		regex jsp_indicators;
-		smatch match_index;
+		std::vector<std::string> web_directories = { "C:\\inetpub\\wwwroot", "C:\\xampp\\htdocs" };
+		std::vector<std::string> web_exts = { ".php", ".jsp", ".jspx", ".asp", ".aspx", ".asmx", ".ashx", ".ascx" };
+		std::regex php_vuln_functions{};
+		std::regex asp_indicators{};
+		std::regex jsp_indicators{};
+		std::smatch match_index{};
 
 		void SetRegexAggressivenessLevel(Aggressiveness::Aggressiveness aLevel);
 

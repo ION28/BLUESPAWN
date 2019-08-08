@@ -5,15 +5,17 @@
 #include <algorithm>
 
 namespace Registry {
-	constexpr bool MATCH_BAD = false;
-	constexpr bool NO_MATCH_BAD = true;
+	enum MatchAction {
+		MATCH_BAD,
+		NO_MATCH_BAD
+	};
 
 	template<class T>
-	inline bool CheckKey(RegistryKey key, T value, Reaction* reaction, bool bOnMatch = NO_MATCH_BAD){
+	inline bool CheckKey(RegistryKey key, T value, Reaction* reaction, MatchAction bOnMatch = NO_MATCH_BAD){
 		bool equal = key.Get<T>() == value;
 
 		if(!equal && bOnMatch == NO_MATCH_BAD || equal && bOnMatch == MATCH_BAD){
-			LOG_WARNING("Potentially bad registry key " << key << " with value \"" << key.Get<T>() << "\". Value should " << (bOnMatch ? "" : "not ") << "be \"" << value << "\"");
+			LOG_WARNING("Potentially bad registry key " << key << " with value \"" << key.Get<T>() << "\". Value should " << (bOnMatch == NO_MATCH_BAD ? "" : "not ") << "be \"" << value << "\"");
 
 			reaction->RegistryKeyIdentified(key);
 		} else {
@@ -23,12 +25,13 @@ namespace Registry {
 		return equal;
 	}
 
-	/**
-	 * Returns true if the values contained in the given registry are a proper subset of those in the
-	 * given value
-	 */
 	template<>
-	inline bool CheckKey(RegistryKey key, REG_MULTI_SZ_T values, Reaction* reaction, bool bOnMatch){
+	inline bool CheckKey(RegistryKey key, LPCWSTR value, Reaction* reaction, MatchAction bOnMatch){
+		return CheckKey(key, std::wstring(value), reaction, bOnMatch);
+	}
+
+	template<>
+	inline bool CheckKey(RegistryKey key, REG_MULTI_SZ_T values, Reaction* reaction, MatchAction bOnMatch){
 		bool good = true;
 
 		for(auto value : key.Get<REG_MULTI_SZ_T>()){
@@ -47,5 +50,25 @@ namespace Registry {
 		}
 
 		return good;
+	}
+
+	inline int CheckForSubkeys(RegistryKey key, Reaction* reaction){
+		int IDd = 0;
+		for(auto subkey : key.Subkeys()){
+			IDd++;
+			reaction->RegistryKeyIdentified(subkey);
+		}
+
+		return IDd;
+	}
+
+	inline int CheckForValues(RegistryKey key, Reaction* reaction){
+		int IDd = 0;
+		for(auto subkey : key.KeyValues()){
+			IDd++;
+			reaction->RegistryKeyIdentified(subkey);
+		}
+
+		return IDd;
 	}
 }

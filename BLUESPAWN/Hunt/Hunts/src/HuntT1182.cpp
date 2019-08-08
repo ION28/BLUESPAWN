@@ -1,5 +1,8 @@
 #include "hunts/HuntT1182.h"
+#include "hunts/RegistryHunt.hpp"
+
 #include "logging/Log.h"
+#include "configuration/Registry.h"
 
 using namespace Registry;
 
@@ -16,9 +19,7 @@ namespace Hunts {
 
 		int identified = 0;
 
-		for(auto key : RegistryKey(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls").Subkeys()){
-			reaction->RegistryKeyIdentified(key);
-		}
+		identified += CheckForSubkeys(RegistryKey(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls"), reaction);
 		
 		return identified;
 	}

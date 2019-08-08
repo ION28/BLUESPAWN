@@ -19,18 +19,8 @@ namespace Hunts {
 
 		int identified = 0;
 
-		std::vector<RegistryKey> keys = {
-		    {HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"Security Packages"},
-		    {HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", L"Security Packages"},
-		};
-
-		for(auto key : keys){
-			if(CheckKey(key, okSecPackages, reaction)){
-				LOG_VERBOSE(1, "Registry key " << key.GetName() << " is okay");
-			} else {
-				identified++;
-			}
-		}
+		identified += CheckKey({ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", L"Security Packages" }, okSecPackages, reaction);
+		identified += CheckKey({ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", L"Security Packages" }, okSecPackages, reaction);
 		
 		return identified;
 	}

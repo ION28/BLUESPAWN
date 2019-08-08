@@ -18,8 +18,6 @@ namespace Hunts {
 
 		int identified = 0;
 
-		/*
-
 		for(std::string sFileName : vFileNames){
 			if(!scope.FileIsInScope(sFileName.c_str())){
 				continue;
@@ -32,12 +30,10 @@ namespace Hunts {
 					WIN32_FIND_DATAA data{};
 					reaction->FileIdentified(CreateFileA(sFileName.c_str(), SYNCHRONIZE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING, 0, nullptr));
 				}
-
+				 
 				identified++;
 			}
 		}
-
-		*/
 
 		return identified;
 	}
