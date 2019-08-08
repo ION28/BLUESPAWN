@@ -1,4 +1,6 @@
 #include "hunts/HuntT1100.h"
+
+#include "filesystem/FileSystem.h"
 #include "logging/Log.h"
 
 namespace Hunts {
@@ -39,10 +41,7 @@ namespace Hunts {
 
 		int identified = 0;
 
-		/*
-
 		for (string path : web_directories) {
-			bool found_bad = false;
 			for (const auto& entry : fs::recursive_directory_iterator(path)) {
 				string file_ext = entry.path().extension().string();
 				transform(file_ext.begin(), file_ext.end(), file_ext.begin(), ::tolower);
@@ -52,61 +51,22 @@ namespace Hunts {
 
 					if (file_ext.compare(".php") == 0) {
 						if (regex_search(sus_file, match_index, php_vuln_functions)) {
-							identified++;
-
-							PrintBadStatus("Located likely web shell: " + entry.path().string());
-							PrintInfoStatus("Detected on:");
-							cout << sus_file.substr(match_index.position() - 50, 50);
-							SetConsoleColor("yellow");
-							cout << sus_file.substr(match_index.position(), match_index.length());
-							SetConsoleColor("white");
-							cout << sus_file.substr(match_index.position() + match_index.length(), 50) << endl;
-							found_bad = true;
-							std::cout << std::endl;
+							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
-					}
-					else if (file_ext.substr(0, 4).compare(".jsp") == 0) {
+					} else if (file_ext.substr(0, 4).compare(".jsp") == 0) {
 						if (regex_search(sus_file, match_index, jsp_indicators)) {
-							identified++;
-
-							PrintBadStatus("Located likely web shell: " + entry.path().string());
-							PrintInfoStatus("Detected on:");
-							cout << sus_file.substr(match_index.position() - 50, 50);
-							SetConsoleColor("yellow");
-							cout << sus_file.substr(match_index.position(), match_index.length());
-							SetConsoleColor("white");
-							cout << sus_file.substr(match_index.position() + match_index.length(), 50) << endl;
-							found_bad = true;
-							std::cout << std::endl;
+							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
-					}
-
-					else if (file_ext.substr(0, 3).compare(".as") == 0) {
+					} else if (file_ext.substr(0, 3).compare(".as") == 0) {
 						if (regex_search(sus_file, match_index, asp_indicators)) {
 							identified++;
-
-							PrintBadStatus("Located likely web shell: " + entry.path().string());
-							PrintInfoStatus("Detected on:");
-							cout << sus_file.substr(match_index.position() - 50, 50);
-							SetConsoleColor("yellow");
-							cout << sus_file.substr(match_index.position(), match_index.length());
-							SetConsoleColor("white");
-							cout << sus_file.substr(match_index.position() + match_index.length(), 50) << endl;
-							found_bad = true;
-							std::cout << std::endl;
+							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 				}
 			}
-			if (!found_bad) {
-				PrintGoodStatus("No web shells detected in " + path);
-			}
 		}
 
-		std::cout << std::endl;
-
-		*/
-		
 		return identified;
 	}
 
@@ -116,10 +76,7 @@ namespace Hunts {
 
 		int identified = 0;
 
-		/*
-
 		for (string path : web_directories) {
-			bool found_bad = false;
 			for (const auto& entry : fs::recursive_directory_iterator(path)) {
 				string file_ext = entry.path().extension().string();
 				transform(file_ext.begin(), file_ext.end(), file_ext.begin(), ::tolower);
@@ -130,59 +87,25 @@ namespace Hunts {
 					if (file_ext.compare(".php") == 0) {
 						if (regex_search(sus_file, match_index, php_vuln_functions)) {
 							identified++;
-
-							PrintBadStatus("Located likely web shell: " + entry.path().string());
-							PrintInfoStatus("Detected on:");
-							cout << sus_file.substr(match_index.position() - 50, 50);
-							SetConsoleColor("yellow");
-							cout << sus_file.substr(match_index.position(), match_index.length());
-							SetConsoleColor("white");
-							cout << sus_file.substr(match_index.position() + match_index.length(), 50) << endl;
-							found_bad = true;
-							std::cout << std::endl;
+							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					else if (file_ext.substr(0, 4).compare(".jsp") == 0) {
 						if (regex_search(sus_file, match_index, jsp_indicators)) {
 							identified++;
-
-							PrintBadStatus("Located likely web shell: " + entry.path().string());
-							PrintInfoStatus("Detected on:");
-							cout << sus_file.substr(match_index.position() - 50, 50);
-							SetConsoleColor("yellow");
-							cout << sus_file.substr(match_index.position(), match_index.length());
-							SetConsoleColor("white");
-							cout << sus_file.substr(match_index.position() + match_index.length(), 50) << endl;
-							found_bad = true;
-							std::cout << std::endl;
+							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 
 					else if (file_ext.substr(0, 3).compare(".as") == 0) {
 						if (regex_search(sus_file, match_index, asp_indicators)) {
 							identified++;
-
-							PrintBadStatus("Located likely web shell: " + entry.path().string());
-							PrintInfoStatus("Detected on:");
-							cout << sus_file.substr(match_index.position() - 50, 50);
-							SetConsoleColor("yellow");
-							cout << sus_file.substr(match_index.position(), match_index.length());
-							SetConsoleColor("white");
-							cout << sus_file.substr(match_index.position() + match_index.length(), 50) << endl;
-							found_bad = true;
-							std::cout << std::endl;
+							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 				}
 			}
-			if (!found_bad) {
-				PrintGoodStatus("No web shells detected in " + path);
-			}
-		}
-
-		std::cout << std::endl;
-
-		*/
+		}		
 
 		return identified;
 	}

@@ -201,14 +201,14 @@ namespace Registry {
 		DWORD dwLongestValue{};
 		LSTATUS status = RegQueryInfoKey(key, nullptr, nullptr, 0, nullptr, nullptr, nullptr, &dwValueCount, &dwLongestValue, nullptr, nullptr, nullptr);
 
-		LOG_INFO(dwValueCount << " subkeys detected under " << vHives[hive] << "\\" << path);
+		LOG_VERBOSE(1, dwValueCount << " subkeys detected under " << vHives[hive] << "\\" << path);
 
 		std::vector<RegistryKey> vSubKeys{};
 
 		if(status == ERROR_SUCCESS && dwValueCount) {
 			for(unsigned i = 0; i < dwValueCount; i++) {
 				LPWSTR lpwName = new WCHAR[dwLongestValue];
-				DWORD length = dwLongestValue;
+				DWORD length = dwLongestValue * 2;
 				status = RegEnumValueW(key, i, lpwName, &length, nullptr, nullptr, nullptr, nullptr);
 
 				if(status == ERROR_SUCCESS) {
@@ -231,14 +231,14 @@ namespace Registry {
 		DWORD dwLongestSubkey{};
 		LSTATUS status = RegQueryInfoKey(key, nullptr, nullptr, 0, &dwSubkeyCount, &dwLongestSubkey, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 
-		LOG_INFO(dwSubkeyCount << " subkeys detected under " << vHives[hive] << "\\" << path);
+		LOG_VERBOSE(1, dwSubkeyCount << " subkeys detected under " << vHives[hive] << "\\" << path);
 
 		std::vector<RegistryKey> vSubKeys{};
 
 		if(status == ERROR_SUCCESS && dwSubkeyCount) {
 			for(unsigned i = 0; i < dwSubkeyCount; i++) {
 				LPWSTR lpwName = new WCHAR[dwLongestSubkey];
-				DWORD length = dwLongestSubkey;
+				DWORD length = dwLongestSubkey * 2;
 				status = RegEnumKey(key, i, lpwName, length);
 
 				if(status == ERROR_SUCCESS) {

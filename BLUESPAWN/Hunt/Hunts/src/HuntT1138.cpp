@@ -19,8 +19,8 @@ namespace Hunts {
 
 		int identified = 0;
 
-		identified += CheckKey({ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", L"InstalledSDB" }, L"", reaction, MATCH_BAD);
-		identified += CheckKey({ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", L"Custom" }, L"", reaction, MATCH_BAD);
+		identified += CheckKey({ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", L"InstalledSDB" }, L"", reaction);
+		identified += CheckKey({ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags", L"Custom" }, L"", reaction);
 		
 		return identified;
 	}
