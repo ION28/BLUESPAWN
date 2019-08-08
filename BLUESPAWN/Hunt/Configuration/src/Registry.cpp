@@ -34,15 +34,15 @@ namespace Registry {
 
 	std::map<HKEY, DWORD> _globalOpenKeys{};
 
-	HKEY RemoveHive(std::wstring& path){
-		SIZE_T fslashIdx = path.find(L"/");
-		SIZE_T bslashIdx = path.find(L"\\");
+	HKEY RemoveHive(std::wstring* path){
+		SIZE_T fslashIdx = path->find(L"/");
+		SIZE_T bslashIdx = path->find(L"\\");
 		if(fslashIdx == (SIZE_T) -1 && bslashIdx == (SIZE_T) -1){
 			LOG_ERROR("Registry hive not found!");
 			return nullptr;
 		}
 
-		std::wstring sHiveName = path.substr(0, fslashIdx > bslashIdx ? bslashIdx : fslashIdx);
+		std::wstring sHiveName = path->substr(0, fslashIdx > bslashIdx ? bslashIdx : fslashIdx);
 		transform(sHiveName.begin(), sHiveName.end(), sHiveName.begin(), ::toupper);
 		if(vHiveNames.find(sHiveName) == vHiveNames.end()){
 			LOG_ERROR("Unknown registry hive " << sHiveName);
@@ -50,7 +50,7 @@ namespace Registry {
 		}
 
 		HKEY hive = vHiveNames[sHiveName];
-		path = path.substr((fslashIdx > bslashIdx ? bslashIdx : fslashIdx) + 1);
+		*path = path->substr((fslashIdx > bslashIdx ? bslashIdx : fslashIdx) + 1);
 
 		return hive;
 	}
@@ -70,7 +70,7 @@ namespace Registry {
 		else {
 			status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_READ, &key);
 			if(status != ERROR_SUCCESS){
-				LOG_WARNING("Error " << status << " occured when attempting to read registry key " << GetName());
+				LOG_VERBOSE(1, "Error " << status << " occured when attempting to read registry key " << GetName() << ". Probably means key was not found");
 				SetLastError(status);
 				return;
 			}
@@ -87,7 +87,7 @@ namespace Registry {
 
 		status = RegQueryValueEx(key, name.length() == 0 ? nullptr : name.c_str(), 0, &dwDataType, nullptr, &dwDataSize);
 		if(status != ERROR_SUCCESS && status != ERROR_MORE_DATA){
-			LOG_WARNING("Unable to query value " << GetName());
+			LOG_VERBOSE(1, "Unable to query value " << GetName() << ". Probably means value was not found");
 			SetLastError(status);
 
 			return;
@@ -108,7 +108,7 @@ namespace Registry {
 		LOG_VERBOSE(1, "Created new registry key object - " << GetName());
 	}
 
-	RegistryKey::RegistryKey(std::wstring path, std::wstring name) : RegistryKey(RemoveHive(path), path, name){};
+	RegistryKey::RegistryKey(std::wstring path, std::wstring name) : RegistryKey(RemoveHive(&path), path, name){};
 
 	RegistryKey::~RegistryKey() { 
 		if(!--_globalOpenKeys[key]){
@@ -193,7 +193,7 @@ namespace Registry {
 
 	std::vector<RegistryKey> RegistryKey::KeyValues(){
 		if(!KeyExists()){
-			LOG_WARNING("Attempting to enumerate values of nonexistent key " << GetName());
+			LOG_VERBOSE(1, "Attempting to enumerate values of nonexistent key " << GetName());
 			return {};
 		}
 
@@ -223,7 +223,7 @@ namespace Registry {
 
 	std::vector<RegistryKey> RegistryKey::Subkeys(){
 		if(!KeyExists()){
-			LOG_WARNING("Attempting to enumerate values of nonexistent key " << GetName());
+			LOG_VERBOSE(1, "Attempting to enumerate values of nonexistent key " << GetName());
 			return {};
 		}
 
