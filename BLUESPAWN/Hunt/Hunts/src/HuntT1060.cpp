@@ -31,6 +31,20 @@ namespace Hunts {
 		identified += CheckForValues({ HKEY_LOCAL_MACHINE, L"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx" }, reaction);
 		identified += CheckForValues({ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run" }, reaction);
 		identified += CheckForValues({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run" }, reaction);
+
+		identified += CheckForSubkeys({ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run" }, reaction);
+		identified += CheckForSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run" }, reaction);
+		identified += CheckForSubkeys({ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" }, reaction);
+		identified += CheckForSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" }, reaction);
+		identified += CheckForSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx" }, reaction);
+		identified += CheckForSubkeys({ HKEY_CURRENT_USER, L"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Run" }, reaction);
+		identified += CheckForSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Run" }, reaction);
+		identified += CheckForSubkeys({ HKEY_CURRENT_USER, L"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\RunOnce" }, reaction);
+		identified += CheckForSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\RunOnce" }, reaction);
+		identified += CheckForSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\RunOnceEx" }, reaction);
+		identified += CheckForSubkeys({ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run" }, reaction);
+		identified += CheckForSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer\\Run" }, reaction);
+
 		identified += CheckKey({ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", L"Startup" }, 
 			                   L"%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", reaction);
 		identified += CheckKey({ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", L"Common Startup"}, 
