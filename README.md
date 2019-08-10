@@ -49,4 +49,5 @@ Want to help? Take a look at the current issues, add ideas for new features, wri
 We would like to provide a special thank you to the following projects that have helped us to build BLUESPAWN:
 * The [MITRE's ATT&CK Project](https://attack.mitre.org/) which has put together an amazing framework for which to consider, document, and categorize attacker tradercraft.
 * Microsoft's documentation and examples on the Windows API
+* Red Canary's [Atomic Red Team Project](https://github.com/redcanaryco/atomic-red-team) which has been incredibly useful for testing our detections against various MITRE ATT&CK Techniques.
 * The Japan Computer Emergency Response Team (JPCERT)'s [Tool Analysis Result Sheet](https://jpcertcc.github.io/ToolAnalysisResultSheet/) for its documentation of attacker behavior and correlation with detection opportunities.
