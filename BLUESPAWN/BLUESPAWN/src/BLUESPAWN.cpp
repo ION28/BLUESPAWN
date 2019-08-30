@@ -5,6 +5,24 @@ int main(int argc, char* argv[])
 	auto sink = Log::CLISink();
 	Log::AddSink(sink);
 
+	HuntRegister record{};
+	Hunts::HuntT1004 t1004(record);
+	Hunts::HuntT1037 t1037(record);
+	Hunts::HuntT1060 t1060(record);
+	Hunts::HuntT1100 t1100(record);
+	Hunts::HuntT1101 t1101(record);
+	Hunts::HuntT1103 t1103(record);
+	Hunts::HuntT1131 t1131(record);
+	Hunts::HuntT1138 t1138(record);
+	Hunts::HuntT1182 t1182(record);
+
+	DWORD tactics = UINT_MAX;
+	DWORD dataSources = UINT_MAX;
+	DWORD affectedThings = UINT_MAX;
+	Scope scope{};
+	Reaction* reaction = new Reactions::LogReaction();
+	record.RunHunts(tactics, dataSources, affectedThings, scope, Aggressiveness::Cursory, reaction);
+
 	print_banner();
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
