@@ -2,8 +2,10 @@
 
 int main(int argc, char* argv[])
 {
-	auto sink = Log::CLISink();
-	Log::AddSink(sink);
+	auto cli_sink = Log::CLISink();
+	Log::AddSink(cli_sink);
+	auto net_sink = Log::NetworkSink();
+	Log::AddSink(net_sink);
 
 	HuntRegister record{};
 	Hunts::HuntT1004 t1004(record);
