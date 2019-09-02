@@ -137,10 +137,12 @@
   <ItemGroup>
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\Reaction.cpp" />
+    <ClCompile Include="src\Server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\reactions\Log.h" />
     <ClInclude Include="headers\reactions\Reaction.h" />
+    <ClInclude Include="headers\reactions\Server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

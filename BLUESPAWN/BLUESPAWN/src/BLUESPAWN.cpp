@@ -2,8 +2,10 @@
 
 int main(int argc, char* argv[])
 {
-	auto sink = Log::CLISink();
-	Log::AddSink(sink);
+	auto cli_sink = Log::CLISink();
+	Log::AddSink(cli_sink);
+	auto net_sink = Log::NetworkSink();
+	Log::AddSink(net_sink);
 
 	HuntRegister record{};
 	Hunts::HuntT1004 t1004(record);
@@ -20,7 +22,7 @@ int main(int argc, char* argv[])
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
-	Reaction* reaction = new Reactions::LogReaction();
+	Reaction* reaction = new Reactions::ServerReaction();
 	record.RunHunts(tactics, dataSources, affectedThings, scope, Aggressiveness::Cursory, reaction);
 
 	print_banner();
