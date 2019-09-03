@@ -20,13 +20,18 @@ namespace Log {
 	public:
 
 		/**
-		 * Outputs a message to the console if its logging level is enabled. The log message
+		 * Outputs a string message to the network if its logging level is enabled. The log message
 		 * is prepended with its severity level.
 		 *
 		 * @param level The level at which the message is being logged
-		 * @param message The message to log
+		 * @param message The string message to log to the network
 		 */
 		virtual void LogMessage(LogLevel& level, std::string& message);
+
+		virtual void SendFileReaction(LogLevel& level, std::string& message);
+		virtual void SendRegistryReaction(LogLevel& level, std::string& message);
+		virtual void SendProcessReaction(LogLevel& level, std::string& message);
+		virtual void SendServiceReaction(LogLevel& level, std::string& message);
 
 		/**
 		 * Compares this NetworkSink to another LogSink. Currently, as only one console is supported,

@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
-	Reaction* reaction = new Reactions::LogReaction();
+	Reaction* reaction = new Reactions::ServerReaction();
 	record.RunHunts(tactics, dataSources, affectedThings, scope, Aggressiveness::Cursory, reaction);
 
 	print_banner();

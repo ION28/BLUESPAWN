@@ -14,6 +14,30 @@ namespace Log {
 		}
 	}
 
+	void SendFileReaction(LogLevel& level, std::string& message) {
+		if (level.Enabled()) {
+
+		}
+	}
+
+	void SendRegistryReaction(LogLevel& level, std::string& message) {
+		if (level.Enabled()) {
+
+		}
+	}
+
+	void SendProcessReaction(LogLevel& level, std::string& message) {
+		if (level.Enabled()) {
+
+		}
+	}
+
+	void SendServiceReaction(LogLevel& level, std::string& message) {
+		if (level.Enabled()) {
+
+		}
+	}
+
 	bool NetworkSink::operator==(LogSink& sink) {
 		return (bool) dynamic_cast<NetworkSink*>(&sink);
 	}

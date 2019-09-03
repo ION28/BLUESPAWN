@@ -22,6 +22,7 @@
 #include "logging/CLISink.h"
 #include "logging/NetworkSink.h"
 #include "configuration/Registry.h"
+#include "reactions/Server.h"
 
 #include "hunts/Hunt.h"
 #include "hunts/HuntRegister.h"
