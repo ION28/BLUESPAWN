@@ -1,9 +1,20 @@
 #include "bluespawn/bluespawn.h"
+#include "common/wrappers.hpp"
 
 int main(int argc, char* argv[])
 {
 	auto sink = Log::CLISink();
 	Log::AddSink(sink);
+
+	typedef struct Foo { DWORD a; DWORD b; } Bar;
+
+	HandleWrapper process = OpenProcess(PROCESS_ALL_ACCESS, false, 14024);
+
+	MemoryWrapper<Bar> memory = { VirtualAllocEx(process, nullptr, sizeof(Bar), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE), sizeof(Bar), process };
+
+	memory.Write(new Bar{ 100, 200 }, sizeof(Bar));
+
+	LOG_INFO(memory->b);
 
 	HuntRegister record{};
 	Hunts::HuntT1004 t1004(record);
