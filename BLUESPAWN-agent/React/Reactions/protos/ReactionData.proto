@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+message ACLEntry {
+		string user = 1;
+		string group = 2;
+		uint32 securityAttributes = 3;
+}
+
+message FileReactionData {
+	uint32 mitreID = 1;
+	enum Action {
+		ALERT = 0;
+		REMOVE = 1;
+	}
+	Action action = 2;
+
+	string fileName = 3;
+	string description = 4;
+	stirng owner = 5;
+	uint32 size = 6;
+	uint32 timeCreated = 7;
+	uint32 timeModified = 8;
+	uint32 timeAccessed = 9;
+	bytes fileContents = 10;
+
+	message Signature {
+		string signerName = 1;
+		string digestAlgorithm = 2;
+		uint32 timestamp = 3;
+	}
+	repeated Signature signatures = 11;
+
+	repeated ACLEntry ACL = 12;
+}
+
+message RegistryReactionData {
+	uint32 mitreID = 1;
+	enum Action {
+		ALERT = 0;
+		REMOVE = 1;
+		FIX = 2;
+	}
+	Action action = 2;
+
+	string key = 3;
+	bytes data = 4;
+	bytes newData = 5;
+
+	enum Type {
+		REG_SZ = 0;
+		REG_MULTI_SZ = 1;
+		REG_EXPAND_SZ = 2;
+		REG_BINARY = 3;
+		REG_DWORD = 4;
+		REG_QWORD = 5;
+	}
+	Type type = 6;
+
+	repeated ACLEntry ACL = 7;
+}
+
+message ProcessReactionData {
+	uint32 mitreID = 1;
+	enum Action {
+		ALERT = 0;
+		CANCEL = 1;
+		REMOVE =2;
+	}
+	Action action = 2;
+	
+	uint32 pid = 3;
+	string name = 4;
+	string description = 5;
+	string commandLine = 6;
+	string path = 7;
+	string currentDirectory = 8;
+	string autostartLocation = 9;
+	string parent = 10;
+	string user = 11;
+	uint32 timeStarted = 12;
+	uint32 recievedBytes = 13;
+	uint32 sentBytes = 14;
+	uint32 privateBytes = 15;
+	uint32 workingSet = 16;
+	bytes binaryContents = 17;
+}
+
+message ServiceReactionData {
+	uint32 mitreID = 1;
+	enum Action {
+		ALERT = 0;
+		REMOVE = 1;
+	}
+	Action action = 2;
+	
+	uint32 pid = 3;
+	string name = 4;
+	string description = 5;
+	string logOnAs = 6;
+	string startupType = 7;
+	string startParameters = 8;
+	bool allowDesktopInteract = 9;
+	string runProgramPath = 10;
+	string binaryPath = 11;
+	bytes binaryContents = 12;
+}
