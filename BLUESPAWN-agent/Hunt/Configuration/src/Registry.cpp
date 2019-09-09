@@ -120,6 +120,10 @@ namespace Registry {
 		return vHives[hive] + L"\\" + path + (name.length() ? L":" + name : L"");
 	}
 
+	std::wstring RegistryKey::GetPath(){
+		return vHives[hive] + L"\\" + path;
+	}
+
 	bool RegistryKey::Set(LPVOID value, DWORD dwSize, DWORD dwType) {
 		if(dwType == -1) dwType = dwDataType;
 
