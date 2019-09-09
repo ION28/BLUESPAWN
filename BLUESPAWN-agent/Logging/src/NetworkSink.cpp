@@ -14,25 +14,25 @@ namespace Log {
 		}
 	}
 
-	void SendFileReaction(LogLevel& level, std::string& message) {
+	void NetworkSink::SendFileReaction(LogLevel& level, std::string& message) {
 		if (level.Enabled()) {
 
 		}
 	}
 
-	void SendRegistryReaction(LogLevel& level, std::string& message) {
+	void NetworkSink::SendRegistryReaction(LogLevel& level, std::string& message) {
 		if (level.Enabled()) {
 
 		}
 	}
 
-	void SendProcessReaction(LogLevel& level, std::string& message) {
+	void NetworkSink::SendProcessReaction(LogLevel& level, std::string& message) {
 		if (level.Enabled()) {
 
 		}
 	}
 
-	void SendServiceReaction(LogLevel& level, std::string& message) {
+	void NetworkSink::SendServiceReaction(LogLevel& level, std::string& message) {
 		if (level.Enabled()) {
 
 		}

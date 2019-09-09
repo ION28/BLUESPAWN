@@ -191,6 +191,8 @@ namespace Registry {
 		std::vector<RegistryKey> KeyValues();
 		std::vector<RegistryKey> Subkeys();
 
+		std::wstring GetPath();
+
 		virtual std::wstring ToString();
 	};
 }

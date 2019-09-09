@@ -21,9 +21,6 @@
     <ClCompile Include="src\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\reactions\Log.h">
@@ -32,8 +29,9 @@
     <ClInclude Include="headers\reactions\Reaction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\reactions\Server.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="protos\ReactionData.proto" />
+    <None Include="protos\ServerServices.proto" />
   </ItemGroup>
 </Project>

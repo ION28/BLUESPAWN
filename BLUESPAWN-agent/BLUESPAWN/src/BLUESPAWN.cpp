@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
-	Reaction* reaction = new Reactions::ServerReaction();
+	Reaction* reaction = new Reactions::LogReaction();
 	record.RunHunts(tactics, dataSources, affectedThings, scope, Aggressiveness::Cursory, reaction);
 
 	print_banner();
@@ -46,9 +46,6 @@ int main(int argc, char* argv[])
 
 	if (result.count("help")) {
 		print_help(result, options);
-	}
-	else if (result.count("example")) {
-		dispatch_example_hunt(result, options);
 	}
 	else if (result.count("hunt")) {
 		dispatch_hunt(result, options);
@@ -116,29 +113,4 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	Scope scope{};
 	Reaction* reaction = new Reactions::LogReaction();
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
-}
-
-void dispatch_example_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
-	HuntRegister record{};
-	Hunts::HuntT9999 hTestHunt(record);
-
-	hTestHunt.AddFileToSearch("C:\\Windows\\System32\\svchost.exe");
-	hTestHunt.AddFileToSearch("C:\\Windows\\SysWOW64\\svchost.exe");
-
-	// Sample scope to exclude SysWOW
-	class LimitedScope : public Scope {
-	public:
-		LimitedScope() : Scope() {};
-		virtual bool FileIsInScope(LPCSTR path) {
-			return !strstr(path, "SysWOW64");
-		}
-	};
-
-	LOG_INFO("Running Hunt T9999 with an open scope.");
-	Scope scope{};
-	hTestHunt.ScanCursory(scope);
-
-	LOG_INFO("Running Hunt T9999 with a limited scope.");
-	LimitedScope limitedScope{};
-	hTestHunt.ScanCursory(limitedScope);
 }
