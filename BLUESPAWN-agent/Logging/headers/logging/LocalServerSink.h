@@ -4,18 +4,22 @@
 
 #include "LogSink.h"
 #include "LogLevel.h"
+#include "../../React/Reactions/headers/reactions/Reaction.h"
+# include <random>
 
 namespace Log {
 
 	/**
-	 * NetworkSink provides a sink for the logger that directs output to the console.
+	 * LocalServerSink provides a sink for the logger that directs output to the console.
 	 *
 	 * Each log message is prepended with the severity of the log, as defined in
 	 * MessagePrepends.
 	 */
-	class NetworkSink : public LogSink {
+	class LocalServerSink : public LogSink {
 	private:
 		std::string MessagePrepends[4] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]" };
+		bool hunting = false;
+		std::string huntName;
 
 	public:
 
@@ -28,18 +32,18 @@ namespace Log {
 		 */
 		virtual void LogMessage(LogLevel& level, std::string& message);
 
-		virtual void SendFileReaction(LogLevel& level, std::string& message);
-		virtual void SendRegistryReaction(LogLevel& level, std::string& message);
-		virtual void SendProcessReaction(LogLevel& level, std::string& message);
-		virtual void SendServiceReaction(LogLevel& level, std::string& message);
+		void LogFileReaction(LogLevel& level, FILE_DETECTION* fileData, std::string& message);
+		void LogRegistryReaction(LogLevel& level, REGISTRY_DETECTION* registryData, std::string& message);
+		void LogProcessReaction(LogLevel& level, SERVICE_DETECTION* serviceData, std::string& message);
+		void LogServiceReaction(LogLevel& level, PROCESS_DETECTION* processData, std::string& message);
+
+		void StartHunt(std::string& huntName);
+		void EndHunt();
 
 		/**
-		 * Compares this NetworkSink to another LogSink. Currently, as only one console is supported,
-		 * any other NetworkSink is considered to be equal. This is subject to change in the event that
-		 * support for more consoles is added.
+		 * Compares this LocalServerSink to another LogSink.
 		 *
 		 * @param sink The LogSink to compare
-		 *
 		 * @return Whether or not the argument and this sink are considered equal.
 		 */
 		virtual bool operator==(LogSink& sink);
