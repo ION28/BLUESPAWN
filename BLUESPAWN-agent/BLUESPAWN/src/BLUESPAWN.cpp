@@ -1,9 +1,12 @@
 #include "bluespawn/bluespawn.h"
+#include "common/wrappers.hpp"
+
+#include <iostream>
 
 int main(int argc, char* argv[])
 {
-	auto sink = Log::CLISink();
-	Log::AddSink(sink);
+	Log::CLISink output{};
+	Log::AddSink(output);
 
 	print_banner();
 
