@@ -76,15 +76,15 @@ public:
 		GenericWrapper(handle, (void(*)(HANDLE)) CloseHandle, INVALID_HANDLE_VALUE){};
 };
 
-template<class T = void>
+template<class T = VOID>
 class MemoryWrapper {
+	T LocalCopy{};
+
+public:
 	T* address;
 	HandleWrapper process;
 	SIZE_T MemorySize;
 
-	T LocalCopy{};
-
-public:
 	MemoryWrapper(LPVOID lpMemoryBase, SIZE_T size = sizeof(T), HANDLE process = GetCurrentProcess()) 
 		: address{ reinterpret_cast<T*>(lpMemoryBase) }, process{ process }, MemorySize{ size } {}
 
@@ -145,6 +145,13 @@ public:
 			}
 		}
 	}
+
+	bool CompareMemory(MemoryWrapper<T> memory){
+		return !memcmp(&(this->operator T*()), memory, min(memory.MemorySize, MemorySize));
+	}
+
+	operator bool(){ return address; }
+	bool operator !(){ return !address; }
 };
 
 template<class T>
@@ -155,12 +162,14 @@ public:
 	MemoryAllocationWrapper(T* lpAddress, SIZE_T nSize = sizeof(T)) :
 		GenericWrapper<T*>(reinterpret_cast<T*>(lpAddress), [](T* memory){
 			VirtualFree(memory, 0, MEM_RELEASE);
-		}),
+		}, nullptr),
 		MemoryWrapper<T>(reinterpret_cast<T*>(lpAddress), nSize, GetCurrentProcess()) {};
 
 	using MemoryWrapper<T>::operator*;
 	using MemoryWrapper<T>::operator&;
+	using MemoryWrapper<T>::operator!;
+	using MemoryWrapper<T>::operator bool;
 };
 
 #define WRAP(type, name, value, function) \
-    GenericWrapper<type> name = {value, function}
+    GenericWrapper<type> name = {value, [](type data){ function; }}
