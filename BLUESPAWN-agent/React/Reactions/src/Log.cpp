@@ -5,28 +5,28 @@
 #include "logging/log.h"
 
 namespace Reactions {
-	LogReaction::LogReaction(){
-		dwSupportedReactions = IdentifyFile | IdentifyProcess | IdentifyRegistryKey | IdentifyService;
+	void FileIdentified(FILE_DETECTION* detection){
+		LOG_ERROR("File Identified: " << detection->wsFileName);
+	}
+	void RegistryKeyIdentified(REGISTRY_DETECTION* detection){
+		LOG_ERROR("Registry Key Identified " << detection->wsRegistryKeyPath << ": " << detection->wsRegistryKeyValue);
+	}
+	void ProcessIdentified(PROCESS_DETECTION* detection){
+		LOG_ERROR("Process " << detection->wsImageName << " Identified as malicious - PID " << detection->PID);
+	}
+	void ServiceIdentified(SERVICE_DETECTION* detection){
+		LOG_ERROR(detection->wsServiceName << " was detected to be a malicious service!");
 	}
 
-	void LogReaction::FileIdentified(HANDLE hFile){
-		char cFileName[256];
-		bool success = GetFinalPathNameByHandleA(hFile, cFileName, 256, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
-		if(success){
-			std::string sFileName(cFileName);
-			LOG_ERROR("File Identified: " << sFileName);
-		}
-	}
-	void LogReaction::RegistryKeyIdentified(Registry::RegistryKey hkRegistryKey){
-		LOG_ERROR("Registry Key Identified " << hkRegistryKey);
-	}
-	void LogReaction::ProcessIdentified(HANDLE hProcess){
-		int pid = GetProcessId(hProcess);
-		if(pid){
-			LOG_ERROR(std::string("Process Identified - PID ") << pid);
-		}
-	}
-	void LogReaction::ServiceIdentified(SC_HANDLE schService){
-		LOG_ERROR("A bad service was identified, but support for identifying which hasn't been added");
+	DetectFile FileHandler = &FileIdentified;
+	DetectRegistry RegistryHandler = &RegistryKeyIdentified;
+	DetectProcess ProcessHandler = &ProcessIdentified;
+	DetectService ServiceHandler = &ServiceIdentified;
+
+	Reactions::LogReaction::LogReaction(){
+		vFileReactions.emplace_back(FileHandler);
+		vRegistryReactions.emplace_back(RegistryHandler);
+		vProcessReactions.emplace_back(ProcessHandler);
+		vServiceReactions.emplace_back(ServiceHandler);
 	}
 }

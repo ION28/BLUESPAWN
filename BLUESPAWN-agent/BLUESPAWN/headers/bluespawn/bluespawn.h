@@ -22,7 +22,6 @@
 #include "logging/CLISink.h"
 #include "logging/NetworkSink.h"
 #include "configuration/Registry.h"
-#include "reactions/Server.h"
 
 #include "hunts/Hunt.h"
 #include "hunts/HuntRegister.h"
@@ -35,8 +34,6 @@
 #include "hunts/HuntT1131.h"
 #include "hunts/HuntT1138.h"
 #include "hunts/HuntT1182.h"
-#include "hunts/HuntT9999.h"
 
 void print_help(cxxopts::ParseResult result, cxxopts::Options options);
 void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options);
-void dispatch_example_hunt(cxxopts::ParseResult result, cxxopts::Options options);
