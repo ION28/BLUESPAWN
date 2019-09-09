@@ -30,9 +30,6 @@
     <ClCompile Include="src\Hunt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\HuntT9999.cpp">
-      <Filter>Source Files\Hunts</Filter>
-    </ClCompile>
     <ClCompile Include="src\HuntT1004.cpp">
       <Filter>Source Files\Hunts</Filter>
     </ClCompile>
@@ -93,9 +90,6 @@
       <Filter>Header Files\Hunts</Filter>
     </ClInclude>
     <ClInclude Include="headers\hunts\HuntT1182.h">
-      <Filter>Header Files\Hunts</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\hunts\HuntT9999.h">
       <Filter>Header Files\Hunts</Filter>
     </ClInclude>
     <ClInclude Include="headers\hunts\HuntRegister.h">
