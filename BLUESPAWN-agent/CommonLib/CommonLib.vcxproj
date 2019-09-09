@@ -20,6 +20,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\common\wrappers.hpp" />
+    <ClInclude Include="headers\pe\Export_Section.h" />
+    <ClInclude Include="headers\pe\Import_Section.h" />
+    <ClInclude Include="headers\pe\PE_Image.h" />
+    <ClInclude Include="headers\pe\PE_Section.h" />
+    <ClInclude Include="headers\pe\Relocation_Section.h" />
+    <ClInclude Include="headers\pe\Resource_Section.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Export_Section.cpp" />
+    <ClCompile Include="src\Import_Section.cpp" />
+    <ClCompile Include="src\PE_Image.cpp" />
+    <ClCompile Include="src\PE_Section.cpp" />
+    <ClCompile Include="src\Relocation_Section.cpp" />
+    <ClCompile Include="src\Resource_Section.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
