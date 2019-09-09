@@ -22,7 +22,7 @@
     <ClCompile Include="src\CLISink.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\LogLevel.cpp" />
-    <ClCompile Include="src\NetworkSink.cpp" />
+    <ClCompile Include="src\LocalServerSink.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\logging\CLISink.h" />
@@ -30,7 +30,11 @@
     <ClInclude Include="headers\logging\Loggable.h" />
     <ClInclude Include="headers\logging\LogLevel.h" />
     <ClInclude Include="headers\logging\LogSink.h" />
-    <ClInclude Include="headers\logging\NetworkSink.h" />
+    <ClInclude Include="headers\logging\LocalServerSink.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="protos\ReactionData.proto" />
+    <None Include="protos\ServerServices.proto" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

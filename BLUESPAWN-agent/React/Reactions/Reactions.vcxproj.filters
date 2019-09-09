@@ -30,8 +30,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="protos\ReactionData.proto" />
-    <None Include="protos\ServerServices.proto" />
-  </ItemGroup>
 </Project>

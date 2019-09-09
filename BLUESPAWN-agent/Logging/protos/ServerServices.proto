@@ -1,0 +1,11 @@
+syntax = "proto3";
+import "ReactionData.proto";
+
+message Empty {}
+
+service Server {
+	rpc SendFileReaction (FileReaction) returns (Empty) {}
+	rpc SendRegistryReaction (RegistryReaction) returns (Empty) {}
+	rpc SendProcessReaction (ProcessReaction) returns (Empty) {}
+	rpc SendServiceReaction (ServiceReaction) returns (Empty) {}
+}
