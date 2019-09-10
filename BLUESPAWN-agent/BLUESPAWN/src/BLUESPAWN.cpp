@@ -4,7 +4,7 @@ int main(int argc, char* argv[])
 {
 	auto cli_sink = Log::CLISink();
 	Log::AddSink(cli_sink);
-	auto net_sink = Log::NetworkSink();
+	auto net_sink = Log::LocalServerSink();
 	Log::AddSink(net_sink);
 
 	HuntRegister record{};
