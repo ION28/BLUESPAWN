@@ -5,28 +5,39 @@
 
 #include <vector>
 
+enum class DetectionType {
+	File,
+	Registry,
+	Service,
+	Process
+};
+
+struct DETECTION {
+	DetectionType DetectionType;
+};
+
 /// A struct containing information about a file identified in a hunt
-typedef struct _FILE_DETECTION {
+struct FILE_DETECTION : public DETECTION {
 	std::wstring wsFileName;
 	BYTE hash[256];
-} FILE_DETECTION;
+};
 typedef void(*DetectFile)(FILE_DETECTION*);
 
 /// A struct containing information about a registry key value identified in a hunt
-typedef struct _REGISTRY_DETECTION {
+typedef struct REGISTRY_DETECTION : public DETECTION {
 	std::wstring wsRegistryKeyPath;
 	std::wstring wsRegistryKeyValue;
 	BYTE* contents;
-} REGISTRY_DETECTION;
+};
 typedef void(*DetectRegistry)(REGISTRY_DETECTION*);
 
 /// A struct containing information about a service identified in a hunt
-typedef struct _SERVICE_DETECTION {
+typedef struct SERVICE_DETECTION : public DETECTION {
 	std::wstring wsServiceName;
 	std::wstring wsServiceExecutablePath;
 	std::wstring wsServiceDll;
 	int ServicePID;
-} SERVICE_DETECTION;
+};
 typedef void(*DetectService)(SERVICE_DETECTION*);
 
 enum ProcessDetectionMethod {
@@ -37,7 +48,7 @@ enum ProcessDetectionMethod {
 };
 
 /// A struct containing information about a process identified in a hunt
-typedef struct _PROCESS_DETECTION {
+typedef struct PROCESS_DETECTION : public DETECTION {
 	std::wstring wsImageName;
 	std::wstring wsImagePath;
 	std::wstring wsCmdline;
@@ -45,7 +56,7 @@ typedef struct _PROCESS_DETECTION {
 	int TID;
 	ProcessDetectionMethod method;
 	BYTE AllocationStart[512];
-} PROCESS_DETECTION;
+};
 typedef void(*DetectProcess)(PROCESS_DETECTION*);
 
 /**
