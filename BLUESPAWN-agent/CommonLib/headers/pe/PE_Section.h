@@ -14,7 +14,7 @@ public:
 
 	std::wstring Signature;
 
-	PE_Section(PIMAGE_SECTION_HEADER SectionHeader, MemoryWrapper<> lpImageBase, bool expanded);
+	PE_Section(PIMAGE_SECTION_HEADER SectionHeader = nullptr, MemoryWrapper<> lpImageBase = { nullptr }, bool expanded = false);
 	PE_Section(const PE_Section& copy);
 
 	bool ContainsRVA(DWORD rva);
