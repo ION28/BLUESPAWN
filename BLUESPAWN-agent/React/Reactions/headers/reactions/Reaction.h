@@ -1,9 +1,8 @@
 #pragma once
 #include <Windows.h>
 
-#include "configuration/Registry.h"
-
 #include <vector>
+#include <string>
 
 enum class DetectionType {
 	File,
@@ -17,14 +16,16 @@ struct DETECTION {
 };
 
 /// A struct containing information about a file identified in a hunt
-struct FILE_DETECTION : public DETECTION {
+struct FILE_DETECTION {
+	DetectionType DetectionType;
 	std::wstring wsFileName;
 	BYTE hash[256];
 };
 typedef void(*DetectFile)(FILE_DETECTION*);
 
 /// A struct containing information about a registry key value identified in a hunt
-typedef struct REGISTRY_DETECTION : public DETECTION {
+struct REGISTRY_DETECTION {
+	DetectionType DetectionType;
 	std::wstring wsRegistryKeyPath;
 	std::wstring wsRegistryKeyValue;
 	BYTE* contents;
@@ -32,7 +33,8 @@ typedef struct REGISTRY_DETECTION : public DETECTION {
 typedef void(*DetectRegistry)(REGISTRY_DETECTION*);
 
 /// A struct containing information about a service identified in a hunt
-typedef struct SERVICE_DETECTION : public DETECTION {
+struct SERVICE_DETECTION {
+	DetectionType DetectionType;
 	std::wstring wsServiceName;
 	std::wstring wsServiceExecutablePath;
 	std::wstring wsServiceDll;
@@ -48,7 +50,8 @@ enum ProcessDetectionMethod {
 };
 
 /// A struct containing information about a process identified in a hunt
-typedef struct PROCESS_DETECTION : public DETECTION {
+struct PROCESS_DETECTION {
+	DetectionType DetectionType;
 	std::wstring wsImageName;
 	std::wstring wsImagePath;
 	std::wstring wsCmdline;

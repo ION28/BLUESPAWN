@@ -24,9 +24,9 @@
     <ClCompile Include="grpc\generated\ServerServices.grpc.pb.cc" />
     <ClCompile Include="grpc\generated\ServerServices.pb.cc" />
     <ClCompile Include="src\CLISink.cpp" />
+    <ClCompile Include="src\HuntLogMessage.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\LogLevel.cpp" />
-    <ClCompile Include="src\LocalServerSink.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="grpc\generated\grpc++\alarm.h" />
@@ -304,11 +304,11 @@
     <ClInclude Include="grpc\generated\ServerServices.grpc.pb.h" />
     <ClInclude Include="grpc\generated\ServerServices.pb.h" />
     <ClInclude Include="headers\logging\CLISink.h" />
+    <ClInclude Include="headers\logging\HuntLogMessage.h" />
     <ClInclude Include="headers\logging\Log.h" />
     <ClInclude Include="headers\logging\Loggable.h" />
     <ClInclude Include="headers\logging\LogLevel.h" />
     <ClInclude Include="headers\logging\LogSink.h" />
-    <ClInclude Include="headers\logging\LocalServerSink.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="protos\ReactionData.proto" />
@@ -355,18 +355,26 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\Project Configurations\buildsettings.props" />
+    <Import Project="..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\Project Configurations\buildsettings.props" />
+    <Import Project="..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\Project Configurations\buildsettings.props" />
+    <Import Project="..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\Project Configurations\buildsettings.props" />
+    <Import Project="..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -376,7 +384,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_WIN32_WINNT=0x600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>D:\CCDC\BLUESPAWN\BLUESPAWN-agent\Hunt\Configuration\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
