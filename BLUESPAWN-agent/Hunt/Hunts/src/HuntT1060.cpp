@@ -7,14 +7,14 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1060::HuntT1060(HuntRegister& record) : Hunt(record) {
-		dwSupportedScans = Aggressiveness::Cursory;
-		dwStuffAffected = AffectedThing::Configurations;
-		dwSourcesInvolved = DataSource::Registry;
-		dwTacticsUsed = Tactic::Persistence;
+	HuntT1060::HuntT1060(HuntRegister& record) : Hunt(record, L"T1060 - Registry Run Keys / Startup Folder") {
+		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
+		dwCategoriesAffected = (DWORD) Category::Configurations;
+		dwSourcesInvolved = (DWORD) DataSource::Registry;
+		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1060::ScanCursory(Scope& scope, Reaction* reaction){
+	int HuntT1060::ScanCursory(const Scope& scope, Reaction* reaction) const {
 		LOG_INFO("Hunting for T1060 - Registry Run Keys / Startup Folder at level Cursory");
 
 		int identified = 0;

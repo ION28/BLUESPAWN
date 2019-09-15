@@ -1,6 +1,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
+#include "reactions/Reaction.h"
+#include "hunts/Hunt.h"
 
 #include "LogLevel.h"
 
@@ -24,7 +28,7 @@ namespace Log {
 		 * @param level The level at which to log
 		 * @param message The message to be logged
 		 */
-		virtual void LogMessage(LogLevel& level, std::string& message) = 0;
+		virtual void LogMessage(const LogLevel& level, const std::string& message, const HuntInfo& info = {}, const std::vector<DETECTION*> & detections = {}) = 0;
 
 		/**
 		 * This function should be implemented to determine whether two log sinks are equal.
@@ -35,6 +39,6 @@ namespace Log {
 		 *
 		 * @return Whether or not the argument and this sink are considered equal.
 		 */
-		virtual bool operator==(LogSink& sink) = 0;
+		virtual bool operator==(const LogSink& sink) const = 0;
 	};
 }

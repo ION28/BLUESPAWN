@@ -7,14 +7,14 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1101::HuntT1101(HuntRegister& record) : Hunt(record) {
-		dwSupportedScans = Aggressiveness::Cursory;
-		dwStuffAffected = AffectedThing::Configurations;
-		dwSourcesInvolved = DataSource::Registry;
-		dwTacticsUsed = Tactic::Persistence;
+	HuntT1101::HuntT1101(HuntRegister& record) : Hunt(record, L"T1101 - Security Support Provider") {
+		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
+		dwCategoriesAffected = (DWORD) Category::Configurations;
+		dwSourcesInvolved = (DWORD) DataSource::Registry;
+		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1101::ScanCursory(Scope& scope, Reaction* reaction){
+	int HuntT1101::ScanCursory(const Scope& scope, Reaction* reaction) const {
 		LOG_INFO("Hunting for T1101 - Security Support Provider at level Cursory");
 
 		int identified = 0;

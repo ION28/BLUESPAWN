@@ -74,24 +74,32 @@
     <Import Project="..\..\Project Configurations\buildsettings.props" />
     <Import Project="..\..\Logging\Logging.props" />
     <Import Project="Configuration.props" />
+    <Import Project="..\..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Project Configurations\buildsettings.props" />
     <Import Project="..\..\Logging\Logging.props" />
     <Import Project="Configuration.props" />
+    <Import Project="..\..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Project Configurations\buildsettings.props" />
     <Import Project="..\..\Logging\Logging.props" />
     <Import Project="Configuration.props" />
+    <Import Project="..\..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Project Configurations\buildsettings.props" />
     <Import Project="..\..\Logging\Logging.props" />
     <Import Project="Configuration.props" />
+    <Import Project="..\..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunts\Hunts.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />

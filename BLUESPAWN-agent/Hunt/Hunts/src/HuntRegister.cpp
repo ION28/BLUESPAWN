@@ -19,8 +19,8 @@ void HuntRegister::RegisterHunt(Hunt* hunt){
 }
 
 
-void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness::Aggressiveness aggressiveness, Reaction* reaction){
-	for (Hunt * hRegisteredHunt : vRegisteredHunts) {
+void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness aggressiveness, Reaction* reaction){
+	for (Hunt* hRegisteredHunt : vRegisteredHunts) {
 		Hunt& name = *hRegisteredHunt;
 		switch (aggressiveness) {
 		case Aggressiveness::Cursory:
@@ -39,7 +39,7 @@ void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffecte
 	}
 }
 
-void HuntRegister::RunHunt(Hunt& name, Scope& scope, Aggressiveness::Aggressiveness aggressiveness, Reaction* reaction){
+void HuntRegister::RunHunt(const Hunt& name, const Scope& scope, Aggressiveness aggressiveness, Reaction* reaction){
 	switch(aggressiveness){
 	case Aggressiveness::Cursory:
 		if(reaction) name.ScanCursory(scope, reaction); else name.ScanCursory(scope);
