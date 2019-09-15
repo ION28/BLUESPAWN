@@ -8,14 +8,14 @@ using namespace Registry;
 
 namespace Hunts {
 
-	HuntT1004::HuntT1004(HuntRegister& record) : Hunt(record) {
-		dwSupportedScans = Aggressiveness::Cursory;
-		dwStuffAffected = AffectedThing::Configurations;
-		dwSourcesInvolved = DataSource::Registry;
-		dwTacticsUsed = Tactic::Persistence;
+	HuntT1004::HuntT1004(HuntRegister& record) : Hunt(record, L"T1004 - Winlogon Helper DLL") {
+		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
+		dwCategoriesAffected = (DWORD) Category::Configurations;
+		dwSourcesInvolved = (DWORD) DataSource::Registry;
+		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1004::ScanCursory(Scope& scope, Reaction* reaction){
+	int HuntT1004::ScanCursory(const Scope& scope, Reaction* reaction) const {
 		LOG_INFO("Hunting for T1004 - Winlogon Helper DLL at level Cursory");
 
 		int identified = 0;

@@ -6,14 +6,14 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1103::HuntT1103(HuntRegister& record) : Hunt(record) {
-		dwSupportedScans = Aggressiveness::Cursory;
-		dwStuffAffected = AffectedThing::Configurations | AffectedThing::Processes;
-		dwSourcesInvolved = DataSource::Registry;
-		dwTacticsUsed = Tactic::Persistence | Tactic::PrivilegeEscalation;
+	HuntT1103::HuntT1103(HuntRegister& record) : Hunt(record, L"T1103 - AppInit DLLs") {
+		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
+		dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Processes;
+		dwSourcesInvolved = (DWORD) DataSource::Registry;
+		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	int HuntT1103::ScanCursory(Scope& scope, Reaction* reaction){
+	int HuntT1103::ScanCursory(const Scope& scope, Reaction* reaction) const {
 		LOG_INFO("Hunting for T1103 - AppInit DLLs at level Cursory");
 
 		int identified = 0;
