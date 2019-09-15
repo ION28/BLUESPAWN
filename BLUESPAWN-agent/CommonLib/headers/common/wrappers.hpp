@@ -6,9 +6,10 @@
 template<class T>
 class GenericWrapper {
 protected:
-	static map<T, DWORD> mReferenceCounts{};
+	static inline map<T, DWORD> mReferenceCounts{};
 
 	T WrappedObject;
+	T BadValue;
 	bool bFreeOnDestruction = true;
 
 	void (*freeResource)(T);
@@ -16,8 +17,8 @@ protected:
 	void DestroyReference(){
 		mReferenceCounts[WrappedObject]--;
 		if(mReferenceCounts[WrappedObject] == 0){
-			mReferenceCounts.remove(WrappedObject);
-			if(bFreeOnDestruction){
+			mReferenceCounts.erase(WrappedObject);
+			if(bFreeOnDestruction && operator bool()){
 				freeResource(WrappedObject);
 			}
 		}
@@ -33,8 +34,8 @@ protected:
 
 public:
 
-	GenericWrapper(T object, void(*freeFunction)(T) = [](T object){ delete object })
-		: freeResource { freeFunction } { SetReference(object); }
+	GenericWrapper(T object, void(*freeFunction)(T) = [](T object){ delete object; }, T BadValue = nullptr)
+		: WrappedObject{ object }, freeResource{ freeFunction }, BadValue{ BadValue } { SetReference(object); }
 
 	GenericWrapper(const GenericWrapper& copy)
 		: freeResource{ copy.freeResource } { SetReference(copy); }
@@ -59,70 +60,76 @@ public:
 	operator T(){ return WrappedObject; }
 	T* operator *(){ return *WrappedObject; }
 	T& operator &(){ return &WrappedObject; }
+	bool operator ==(T object){ return WrappedObject == object; }
+	bool operator !(){ return !WrappedObject || WrappedObject == BadValue; }
+	operator bool(){ return !operator!(); }
 
+	T Get(){ return WrappedObject; }
 	bool Release(){ return bFreeOnDestruction != (bFreeOnDestruction = false); }
 	bool Lock(){ return bFreeOnDestruction != (bFreeOnDestruction = true);  }
-	DWORD GetReferenceCount(){ return mRefernceCounts[WrappedObject]; }
+	DWORD GetReferenceCount(){ return mReferenceCounts[WrappedObject]; }
 };
 
 class HandleWrapper : public GenericWrapper<HANDLE> {
 public:
-	HandleWrapper(HANDLE handle) : GenericWrapper(handle, [](HANDLE handle){ CloseHandle(handle); }){};
+	HandleWrapper(HANDLE handle) : 
+		GenericWrapper(handle, (void(*)(HANDLE)) CloseHandle, INVALID_HANDLE_VALUE){};
 };
 
-template<class T>
-struct GenericMemoryType { T* memory; HANDLE process; };
-
-template<class T = void>
+template<class T = VOID>
 class MemoryWrapper {
-	GenericMemoryType memory;
-	SIZE_T MemorySize;
-
 	T LocalCopy{};
 
 public:
-	MemoryWrapper(T data) : memory{ &data, GetCurrentProcess() }, size{ sizeof(data) } {}
-	MemoryWrapper(T* lpMemoryBase, SIZE_T size = sizeof(T), HANDLE process = GetCurrentProcess()) 
-		: memory{ lpMemoryBase, process }, MemorySize{ size } {}
+	T* address;
+	HandleWrapper process;
+	SIZE_T MemorySize;
+
+	MemoryWrapper(LPVOID lpMemoryBase, SIZE_T size = sizeof(T), HANDLE process = GetCurrentProcess()) 
+		: address{ reinterpret_cast<T*>(lpMemoryBase) }, process{ process }, MemorySize{ size } {}
+
 	T operator *(){
-		if(memory.process == GetCurrentProcess()){
-			return *(memory.memory);
+		if(!process){
+			return *address;
 		} else {
 			LocalCopy = {};
-			ReadProcessMemory(memory.process, memory.memory, &data, MemorySize, nullptr);
+			ReadProcessMemory(process, address, &LocalCopy, MemorySize, nullptr);
 			return LocalCopy;
 		}
 	}
 	T** operator &(){
-		return &(memory.memory);
+		return &(address);
 	}
 	operator T* (){
-		return (memory.memory);
+		return (address);
 	}
 	T* operator->(){
-		if(memory.process == GetCurrentProcess()){
-			return *memory.memory;
+		if(!process){
+			return address;
 		} else {
 			LocalCopy = {};
-			ReadProcessMemory(memory.process, memory.memory, &data, MemorySize, nullptr);
-			return &LocalCopy;
+			if(ReadProcessMemory(process, address, &LocalCopy, MemorySize, nullptr)){
+				return &LocalCopy;
+			} else {
+				return nullptr;
+			}
 		}
 	}
 
 	template<class V>
 	MemoryWrapper<V> Convert(){
-		return { reinterpret_cast<V*>(memory.memory), MemorySize, memory.process };
+		return { reinterpret_cast<V*>(address), MemorySize, process };
 	}
 
 	MemoryWrapper<T> GetOffset(SIZE_T offset){
 		if(offset > MemorySize){
-			return { nullptr, 0, memory.process };
+			return { nullptr, 0, process };
 		} else {
-			return { reinterpret_cast<V*>(PCHAR(memory.memory) + offset, MemorySize - offset, memory.process); }
+			return { reinterpret_cast<T*>(PCHAR(address) + offset), MemorySize - offset, process };
 		}
 	}
-
-	bool Write(T* lpToWrite, SIZE_T nWriteSize, SIZE_T offset = 0){
+	
+	bool Write(T* lpToWrite, SIZE_T nWriteSize = sizeof(T), SIZE_T offset = 0){
 		if(offset != 0){
 			return GetOffset(offset).Write(lpToWrite, nWriteSize);
 		}
@@ -130,44 +137,39 @@ public:
 		if(nWriteSize > MemorySize){
 			return false;
 		} else {
-			if(memory.process == GetCurrentProcess()){
-				CopyMemory(memory.memory, lpToWrite, nWriteSize);
+			if(!process){
+				CopyMemory(address, lpToWrite, nWriteSize);
 				return true;
 			} else {
-				return WriteProcessMemory(memory.process, memory.memory, lpToWrite, nWriteSize, nullptr);
+				return WriteProcessMemory(process, address, lpToWrite, nWriteSize, nullptr);
 			}
 		}
 	}
-};
 
-class AllocationWrapper : public GenericWrapper<LPVOID> {
-public:
-	AllocationWrapper(LPVOID allocation) :
-		GenericWrapper(allocation, [](LPVOID memory){ VirtualFree(memory, 0, MEM_RELEASE); }){};
+	bool CompareMemory(MemoryWrapper<T> memory){
+		return !memcmp(&(this->operator T*()), memory, min(memory.MemorySize, MemorySize));
+	}
+
+	operator bool(){ return address; }
+	bool operator !(){ return !address; }
 };
 
 template<class T>
 class MemoryAllocationWrapper : 
-	public GenericWrapper<GenericAllocationType<T>>, 
+	public GenericWrapper<T*>, 
 	public MemoryWrapper<T> {
 public:
-	GenericAllocationWrapper(GenericAllocationType allocation) :
-		GenericWrapper(allocation, [](GenericAllocationType memory){ 
-		    if(memory.process != GetCurrentProcess && memory.process != nullptr){
-				VirtualFreeEx(memory.process, memory.memory, 0, MEM_RELEASE);
-			} else {
-				VirtualFree(memory.memory, 0, MEM_RELEASE);
-			}
-		}), 
-		MemoryWrapper(allocation.memory, sizeof(T), allocation.process) {};
+	MemoryAllocationWrapper(T* lpAddress, SIZE_T nSize = sizeof(T)) :
+		GenericWrapper<T*>(reinterpret_cast<T*>(lpAddress), [](T* memory){
+			VirtualFree(memory, 0, MEM_RELEASE);
+		}, nullptr),
+		MemoryWrapper<T>(reinterpret_cast<T*>(lpAddress), nSize, GetCurrentProcess()) {};
 
-	GenericAllocationWrapper(LPVOID lpAddress, HANDLE process = GetCurrentProcess()) : 
-		GenericAllocationWrapper(GenericAllocationType{ lpAddress, process }),
-		MemoryWrapper(lpAddress, sizeof(T), process) {};
-
-	LPVOID operator *() = delete;
-	LPVOID& operator &() = delete;
+	using MemoryWrapper<T>::operator*;
+	using MemoryWrapper<T>::operator&;
+	using MemoryWrapper<T>::operator!;
+	using MemoryWrapper<T>::operator bool;
 };
 
 #define WRAP(type, name, value, function) \
-    GenericWrapper<type> name = {value, function}
+    GenericWrapper<type> name = {value, [](type data){ function; }}

@@ -1,29 +1,14 @@
 #include "bluespawn/bluespawn.h"
+#include "common/wrappers.hpp"
+
+#include <iostream>
 
 int main(int argc, char* argv[])
 {
-	auto cli_sink = Log::CLISink();
-	Log::AddSink(cli_sink);
-	auto net_sink = Log::LocalServerSink();
-	Log::AddSink(net_sink);
-
-	HuntRegister record{};
-	Hunts::HuntT1004 t1004(record);
-	Hunts::HuntT1037 t1037(record);
-	Hunts::HuntT1060 t1060(record);
-	Hunts::HuntT1100 t1100(record);
-	Hunts::HuntT1101 t1101(record);
-	Hunts::HuntT1103 t1103(record);
-	Hunts::HuntT1131 t1131(record);
-	Hunts::HuntT1138 t1138(record);
-	Hunts::HuntT1182 t1182(record);
-
-	DWORD tactics = UINT_MAX;
-	DWORD dataSources = UINT_MAX;
-	DWORD affectedThings = UINT_MAX;
-	Scope scope{};
-	Reaction* reaction = new Reactions::LogReaction();
-	record.RunHunts(tactics, dataSources, affectedThings, scope, Aggressiveness::Cursory, reaction);
+	Log::CLISink output{};
+	Log::AddSink(output);
+    Log::LocalServerSink network{};
+	Log::AddSink(network);
 
 	print_banner();
 
