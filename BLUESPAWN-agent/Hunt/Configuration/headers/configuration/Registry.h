@@ -132,7 +132,10 @@ namespace Registry {
 				std::wstring wsLogString{};
 
 				LPCWSTR data = reinterpret_cast<LPCWSTR>(GetRaw());
-				while(*data){
+
+				LPCVOID base = data;
+
+				while(reinterpret_cast<ULONG_PTR>(data) - reinterpret_cast<ULONG_PTR>(base) < dwDataSize && *data){
 					std::wstring str = data;
 					strings.emplace_back(data);
 					wsLogString += str;
