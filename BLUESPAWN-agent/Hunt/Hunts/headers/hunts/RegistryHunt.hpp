@@ -37,7 +37,7 @@ namespace Registry {
 		if(!equal && bOnMatch == NO_MATCH_BAD || equal && bOnMatch == MATCH_BAD){
 			LOG_WARNING("Potentially bad registry key " << key << " with value \"" << key.Get<T>() << "\". Value should " << (bOnMatch == NO_MATCH_BAD ? "" : "not ") << "be \"" << value << "\"");
 
-			REGISTRY_DETECTION detection{ key.GetPath(), key.GetName(), reinterpret_cast<BYTE*>(key.GetRaw()) };
+			REGISTRY_DETECTION detection{ DetectionType::Registry, key.GetPath(), key.GetName(), reinterpret_cast<BYTE*>(key.GetRaw()) };
 			reaction->RegistryKeyIdentified(&detection);
 
 			return true;
@@ -120,7 +120,7 @@ namespace Registry {
 		}
 
 		if(!good){
-			REGISTRY_DETECTION detection{ key.GetPath(), key.GetName(), reinterpret_cast<BYTE*>(key.GetRaw()) };
+			REGISTRY_DETECTION detection{ DetectionType::Registry, key.GetPath(), key.GetName(), reinterpret_cast<BYTE*>(key.GetRaw()) };
 			reaction->RegistryKeyIdentified(&detection);
 
 		} else {
@@ -142,7 +142,7 @@ namespace Registry {
 		int IDd = 0;
 		for(auto subkey : key.Subkeys()){
 			IDd++;
-			REGISTRY_DETECTION detection{ subkey.GetPath(), subkey.GetName(), reinterpret_cast<BYTE*>(subkey.GetRaw()) };
+			REGISTRY_DETECTION detection{ DetectionType::Registry, subkey.GetPath(), subkey.GetName(), reinterpret_cast<BYTE*>(subkey.GetRaw()) };
 			reaction->RegistryKeyIdentified(&detection);
 		}
 
@@ -162,7 +162,7 @@ namespace Registry {
 		int IDd = 0;
 		for(auto subkey : key.KeyValues()){
 			IDd++;
-			REGISTRY_DETECTION detection{ subkey.GetPath(), subkey.GetName(), reinterpret_cast<BYTE*>(subkey.GetRaw()) };
+			REGISTRY_DETECTION detection{ DetectionType::Registry, subkey.GetPath(), subkey.GetName(), reinterpret_cast<BYTE*>(subkey.GetRaw()) };
 			reaction->RegistryKeyIdentified(&detection);
 		}
 

@@ -4,16 +4,16 @@
 #include "logging/Log.h"
 
 namespace Hunts {
-	HuntT1100::HuntT1100(HuntRegister& record) : Hunt(record) {
+	HuntT1100::HuntT1100(HuntRegister& record) : Hunt(record, L"T1100 - Web Shells") {
 		smatch match_index;
 
-		dwSupportedScans = Aggressiveness::Cursory | Aggressiveness::Moderate;
-		dwStuffAffected = AffectedThing::Files;
-		dwSourcesInvolved = DataSource::FileSystem;
-		dwTacticsUsed = Tactic::Persistence | Tactic::PrivilegeEscalation;
+		dwSupportedScans = (DWORD) Aggressiveness::Cursory | (DWORD) Aggressiveness::Moderate;
+		dwCategoriesAffected = (DWORD) Category::Files;
+		dwSourcesInvolved = (DWORD) DataSource::FileSystem;
+		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	void HuntT1100::SetRegexAggressivenessLevel(Aggressiveness::Aggressiveness aLevel) {
+	void HuntT1100::SetRegexAggressivenessLevel(Aggressiveness aLevel) {
 		//PHP regex credit to: https://github.com/emposha/PHP-Shell-Detector
 		php_vuln_functions.assign(R"(preg_replace.*\/e|`.*?\$.*?`|\bcreate_function\b|\bpassthru\b|\bshell_exec\b|\bexec\b|\bbase64_decode\b|\bedoced_46esab\b|\beval\b|\bsystem\b|\bproc_open\b|\bpopen\b|\bcurl_exec\b|\bcurl_multi_exec\b|\bparse_ini_file\b|\bshow_source\b)");
 
@@ -27,15 +27,15 @@ namespace Hunts {
 		}
 	}
 
-	void HuntT1100::AddDirectoryToSearch(std::string sFileName){
+	void HuntT1100::AddDirectoryToSearch(const std::string& sFileName){
 		web_directories.emplace_back(sFileName);
 	}
 
-	void HuntT1100::AddFileExtensionToSearch(std::string sFileExtension) {
+	void HuntT1100::AddFileExtensionToSearch(const std::string& sFileExtension) {
 		web_exts.emplace_back(sFileExtension);
 	}
 
-	int HuntT1100::ScanCursory(Scope& scope, Reaction* reaction){
+	int HuntT1100::ScanCursory(const Scope& scope, Reaction* reaction){
 		LOG_INFO("Hunting for T1100 - Web Shells at level Cursory");
 		SetRegexAggressivenessLevel(Aggressiveness::Cursory);
 
@@ -70,7 +70,7 @@ namespace Hunts {
 		return identified;
 	}
 
-	int HuntT1100::ScanModerate(Scope& scope, Reaction* reaction) {
+	int HuntT1100::ScanModerate(const Scope& scope, Reaction* reaction){
 		LOG_INFO("Hunting for T1100 - Web Shells at level Moderate");
 		SetRegexAggressivenessLevel(Aggressiveness::Moderate);
 

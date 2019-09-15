@@ -48,6 +48,7 @@ namespace Log {
 	 * preferred method of interracting with this class.
 	 */
 	class LogMessage {
+	protected:
 		// The internal stream used to keep track of the log message
 		std::stringstream InternalStream{};
 		
@@ -79,7 +80,7 @@ namespace Log {
 		 * @param sink The sink that this message will log itself to.
 		 * @param level The log level at which this message is logged.
 		 */
-		LogMessage(LogSink& sink, LogLevel level);
+		LogMessage(const LogSink& sink, LogLevel level);
 
 		/**
 		 * When the LogTerminator is supplied to the stream, the stream is terminated and forwarded to
@@ -91,7 +92,7 @@ namespace Log {
 		 *
 		 * @return a reference to this log message.
 		 */
-		LogMessage& operator<<(const LogTerminator& termiantor);
+		virtual LogMessage& operator<<(const LogTerminator& termiantor);
 
 		/**
 		 * StringStreams don't support wide strings, so this serves as a handler for
@@ -101,7 +102,7 @@ namespace Log {
 		 *
 		 * @return a reference to this log message.
 		 */
-		LogMessage& operator<<(const std::wstring string);
+		LogMessage& operator<<(const std::wstring& string);
 
 		/**
 		 * StringStreams don't support wide strings, so this serves as a handler for
@@ -113,7 +114,7 @@ namespace Log {
 		 */
 		LogMessage& operator<<(LPCWSTR pointer);
 
-	private:
+	protected:
 
 		/**
 		 * StringStream does most of the work needed to handle a stream of values being logged
@@ -159,7 +160,7 @@ namespace Log {
 	 *
 	 * @return A boolean indicating whether or not the sink was added
 	 */
-	bool AddSink(LogSink& sink);
+	bool AddSink(const LogSink& sink);
 
 	/**
 	 * Removes a sink from the vector of default sinks to be used in LOG_ERROR, LOG_WARNING, etc.
@@ -170,5 +171,5 @@ namespace Log {
 	 *
 	 * @return A boolean indicating whether or not the sink was removed
 	 */
-	bool RemoveSink(LogSink& sink);
+	bool RemoveSink(const LogSink& sink);
 }

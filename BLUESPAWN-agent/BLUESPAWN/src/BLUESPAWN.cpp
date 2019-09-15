@@ -1,5 +1,6 @@
 #include "bluespawn/bluespawn.h"
 #include "common/wrappers.hpp"
+#include "logging/HuntLogMessage.h"
 
 #include <iostream>
 
@@ -7,8 +8,31 @@ int main(int argc, char* argv[])
 {
 	Log::CLISink output{};
 	Log::AddSink(output);
-    Log::LocalServerSink network{};
-	Log::AddSink(network);
+	Log::AddHuntSink(output);
+
+	auto info = HuntInfo{
+		std::wstring{L"T0000 - Test"},
+		Aggressiveness::Moderate,
+		(DWORD) Tactic::Execution,
+		(DWORD) DataSource::Processes,
+		(DWORD) Category::Processes,
+		0
+	};
+
+	Log::HuntLogMessage hunt_test = { info, Log::_LogHuntSinks };
+
+	hunt_test.AddDetection(reinterpret_cast<DETECTION*>(new PROCESS_DETECTION{
+		DetectionType::Process,
+		L"test.exe",
+		L"C:\\test.exe",
+		L"test.exe",
+		0,
+		0,
+		NotInLoader,
+		NULL
+	}));
+
+	hunt_test << "THIS IS A TEST OF THE DETECTION LOGGING CAPABILITEIS OF BLUESPAWN" << Log::endlog;
 
 	print_banner();
 
@@ -59,7 +83,7 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 
 void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	std::string sHuntLevelFlag = "Moderate";
-	Aggressiveness::Aggressiveness aHuntLevel;
+	Aggressiveness aHuntLevel;
 	if (result.count("level")) {
 		try {
 			sHuntLevelFlag = result["level"].as < std::string >();
