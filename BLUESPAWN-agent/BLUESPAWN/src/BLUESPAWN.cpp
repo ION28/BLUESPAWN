@@ -7,7 +7,7 @@
 int main(int argc, char* argv[])
 {
 	Log::CLISink output{};
-	Log::AddSink(output);
+	//Log::AddSink(output);
 	Log::AddHuntSink(output);
 
 	print_banner();
@@ -47,13 +47,13 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 		help_category.begin(), [](unsigned char c) { return std::tolower(c); });
 
 	if (help_category.compare("hunt") == 0) {
-		LOG_INFO(options.help({ "hunt" }));
+		std::cout << (options.help({ "hunt" })) << std::endl;
 	}
 	else if (help_category.compare("general") == 0) {
-		LOG_INFO(options.help());
+		std::cout << (options.help()) << std::endl;
 	}
 	else {
-		LOG_ERROR("Unknown help category");
+		std::cerr << ("Unknown help category") << std::endl;
 	}
 }
 
@@ -65,7 +65,7 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 			sHuntLevelFlag = result["level"].as < std::string >();
 		}
 		catch (int e) {
-			LOG_ERROR("Error " << e << " - Unknown hunt level. Please specify either Cursory, Moderate, Careful, or Aggressive");
+			std::cerr << "Error " << e << " - Unknown hunt level. Please specify either Cursory, Moderate, Careful, or Aggressive" << std::endl;
 		}
 	}
 	if (sHuntLevelFlag == "Cursory") {

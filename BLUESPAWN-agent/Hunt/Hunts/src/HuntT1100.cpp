@@ -37,6 +37,7 @@ namespace Hunts {
 
 	int HuntT1100::ScanCursory(const Scope& scope, Reaction reaction){
 		LOG_INFO("Hunting for T1100 - Web Shells at level Cursory");
+		reaction.BeginHunt(GET_INFO());
 		SetRegexAggressivenessLevel(Aggressiveness::Cursory);
 
 		int identified = 0;
@@ -67,11 +68,13 @@ namespace Hunts {
 			}
 		}
 
+		reaction.EndHunt();
 		return identified;
 	}
 
 	int HuntT1100::ScanModerate(const Scope& scope, Reaction reaction){
 		LOG_INFO("Hunting for T1100 - Web Shells at level Moderate");
+		reaction.BeginHunt(GET_INFO());
 		SetRegexAggressivenessLevel(Aggressiveness::Moderate);
 
 		int identified = 0;
@@ -107,6 +110,7 @@ namespace Hunts {
 			}
 		}		
 
+		reaction.EndHunt();
 		return identified;
 	}
 }
