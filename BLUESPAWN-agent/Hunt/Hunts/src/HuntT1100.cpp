@@ -35,7 +35,7 @@ namespace Hunts {
 		web_exts.emplace_back(sFileExtension);
 	}
 
-	int HuntT1100::ScanCursory(const Scope& scope, Reaction* reaction){
+	int HuntT1100::ScanCursory(const Scope& scope, Reaction reaction){
 		LOG_INFO("Hunting for T1100 - Web Shells at level Cursory");
 		SetRegexAggressivenessLevel(Aggressiveness::Cursory);
 
@@ -70,7 +70,7 @@ namespace Hunts {
 		return identified;
 	}
 
-	int HuntT1100::ScanModerate(const Scope& scope, Reaction* reaction){
+	int HuntT1100::ScanModerate(const Scope& scope, Reaction reaction){
 		LOG_INFO("Hunting for T1100 - Web Shells at level Moderate");
 		SetRegexAggressivenessLevel(Aggressiveness::Moderate);
 

@@ -14,7 +14,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1060::ScanCursory(const Scope& scope, Reaction* reaction) const {
+	int HuntT1060::ScanCursory(const Scope& scope, Reaction reaction) const {
 		LOG_INFO("Hunting for T1060 - Registry Run Keys / Startup Folder at level Cursory");
 
 		int identified = 0;

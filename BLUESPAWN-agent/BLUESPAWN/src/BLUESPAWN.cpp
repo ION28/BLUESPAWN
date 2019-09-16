@@ -10,30 +10,6 @@ int main(int argc, char* argv[])
 	Log::AddSink(output);
 	Log::AddHuntSink(output);
 
-	auto info = HuntInfo{
-		std::wstring{L"T0000 - Test"},
-		Aggressiveness::Moderate,
-		(DWORD) Tactic::Execution,
-		(DWORD) DataSource::Processes,
-		(DWORD) Category::Processes,
-		0
-	};
-
-	Log::HuntLogMessage hunt_test = { info, Log::_LogHuntSinks };
-
-	hunt_test.AddDetection(reinterpret_cast<DETECTION*>(new PROCESS_DETECTION{
-		DetectionType::Process,
-		L"test.exe",
-		L"C:\\test.exe",
-		L"test.exe",
-		0,
-		0,
-		NotInLoader,
-		NULL
-	}));
-
-	hunt_test << "THIS IS A TEST OF THE DETECTION LOGGING CAPABILITEIS OF BLUESPAWN" << Log::endlog;
-
 	print_banner();
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
@@ -120,6 +96,6 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
-	Reaction* reaction = new Reactions::LogReaction();
+	Reaction reaction = Reactions::LogReaction();
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
 }
