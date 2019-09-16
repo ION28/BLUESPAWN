@@ -98,5 +98,8 @@
     <ClInclude Include="headers\hunts\RegistryHunt.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\hunts\HuntInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

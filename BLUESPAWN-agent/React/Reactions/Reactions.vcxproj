@@ -144,6 +144,7 @@
     <ClCompile Include="src\Reaction.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\reactions\Detections.h" />
     <ClInclude Include="headers\reactions\Log.h" />
     <ClInclude Include="headers\reactions\Reaction.h" />
   </ItemGroup>

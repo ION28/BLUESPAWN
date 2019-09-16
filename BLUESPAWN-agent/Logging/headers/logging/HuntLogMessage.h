@@ -3,15 +3,26 @@
 #include "LogLevel.h"
 #include "LogSink.h"
 
-#include "reactions/Reaction.h"
-#include "hunts/hunt.h"
+#include "reactions/detections.h"
+#include "hunts/huntinfo.h"
 
 #include <vector>
 #include <string>
 
-#define LOG_HUNT_BEGIN(...)
-#define LOG_HUNT_DETECTION(...)
-#define LOG_HUNT_END(...)
+// Creates a Hunt log message named _HuntLogMessage. This macro is only to be called inside
+// ScanCursory, ScanModerate, ScanCareful, or ScanAggressive.
+#define LOG_HUNT_BEGIN() \
+    auto _HuntLogMessage = Log::HuntLogMessage(GET_INFO(), Log::_LogHuntSinks)
+
+// Logs a detection to the log message for the current hunt. LOG_HUNT_BEGIN should be called first.
+#define LOG_HUNT_DETECTION(detection) _HuntLogMessage.AddDetection(reinterpret_cast<DETECTION*>(detection))
+
+// Adds a message to the log for this hunt. LOG_HUNT_BEGIN should be called first.
+#define LOG_HUNT_MESSAGE(...) _HuntLogMessage << __VA_ARGS__
+
+// Terminates the current hunt's log message. LOG_HUNT_BEGIN should be called first.
+// Note that this must be called in order for the message to actually be logged.
+#define LOG_HUNT_END() _HuntLogMessage << Log::endlog
 
 namespace Log {
 
@@ -28,7 +39,7 @@ namespace Log {
 	class HuntLogMessage : public LogMessage {
 	protected:
 		std::vector<DETECTION*> Detections;
-		const HuntInfo& HuntName;
+		HuntInfo HuntName;
 
 	public:
 
@@ -69,6 +80,16 @@ namespace Log {
 		virtual LogMessage& operator<<(const LogTerminator& termiantor);
 
 		using LogMessage::operator<<;
+
+		/**
+		 * Copy overload for =. Copies hunt information, sinks, the message, and any detections.
+		 *
+		 * @param message The message to copy from.
+		 *
+		 * @return The new value of *this;
+		 */
+		HuntLogMessage operator =(const HuntLogMessage& message);
+		HuntLogMessage(const HuntLogMessage& message);
 	};
 
 	/**

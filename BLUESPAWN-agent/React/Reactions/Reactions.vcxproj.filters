@@ -29,5 +29,8 @@
     <ClInclude Include="headers\reactions\Reaction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\reactions\Detections.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

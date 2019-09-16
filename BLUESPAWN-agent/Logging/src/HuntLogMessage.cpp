@@ -49,4 +49,21 @@ namespace Log {
 
 		return false;
 	}
+
+	HuntLogMessage HuntLogMessage::operator =(const HuntLogMessage& message){
+		this->HuntName = message.HuntName;
+		this->InternalStream << message.InternalStream.str();
+		this->Sinks = message.Sinks;
+		this->Detections = message.Detections;
+
+		return *this;
+	}
+
+	HuntLogMessage::HuntLogMessage(const HuntLogMessage& message) :
+		LogMessage{ message.Sinks, message.Level }
+	{
+		this->InternalStream << message.InternalStream.str();
+		this->HuntName = message.HuntName;
+		this->Detections = message.Detections;
+	}
 }

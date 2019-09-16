@@ -35,7 +35,7 @@ namespace Hunts {
 		void AddDirectoryToSearch(const std::string& sFileName);
 		void AddFileExtensionToSearch(const std::string& sFileExtension);
 
-		virtual int ScanCursory(const Scope& scope, Reaction* reaction = new Reactions::LogReaction());
-		virtual int ScanModerate(const Scope& scope, Reaction* reaction = new Reactions::LogReaction());
+		virtual int ScanCursory(const Scope& scope, Reaction reaction = Reactions::LogReaction());
+		virtual int ScanModerate(const Scope& scope, Reaction reaction = Reactions::LogReaction());
 	};
 }

@@ -1,27 +1,42 @@
 #include "reactions/Reaction.h"
 
-void Reaction::FileIdentified(FILE_DETECTION* info){
+void Reaction::BeginHunt(const HuntInfo& info) const {
+	for(auto BeginProc : vStartHuntProcs){
+		BeginProc(info);
+	}
+}
+void Reaction::EndHunt() const {
+	for(auto EndProc : vEndHuntProcs){
+		EndProc();
+	}
+}
+
+void Reaction::FileIdentified(FILE_DETECTION* info) const {
 	for(auto reaction : vFileReactions){
 		reaction(info);
 	}
 }
-
-void Reaction::RegistryKeyIdentified(REGISTRY_DETECTION* info){
+void Reaction::RegistryKeyIdentified(REGISTRY_DETECTION* info) const {
 	for(auto reaction : vRegistryReactions){
 		reaction(info);
 	}
 }
-
-void Reaction::ProcessIdentified(PROCESS_DETECTION* info){
+void Reaction::ProcessIdentified(PROCESS_DETECTION* info) const {
 	for(auto reaction : vProcessReactions){
 		reaction(info);
 	}
 }
-
-void Reaction::ServiceIdentified(SERVICE_DETECTION* info){
+void Reaction::ServiceIdentified(SERVICE_DETECTION* info) const {
 	for(auto reaction : vServiceReactions){
 		reaction(info);
 	}
+}
+
+void Reaction::AddHuntBegin(HuntStart start){
+	vStartHuntProcs.emplace_back(start);
+}
+void Reaction::AddHuntEnd(HuntEnd end){
+	vEndHuntProcs.emplace_back(end);
 }
 
 void Reaction::AddFileReaction(DetectFile handler){
@@ -37,8 +52,13 @@ void Reaction::AddServiceReaction(DetectService handler){
 	vServiceReactions.emplace_back(handler);
 }
 
-Reaction Reaction::Combine(const Reaction& reaction){
+Reaction Reaction::Combine(const Reaction& reaction) const {
 	Reaction combined{};
+
+	for(auto function : vStartHuntProcs)
+		combined.vStartHuntProcs.emplace_back(function);
+	for(auto function : vEndHuntProcs)
+		combined.vEndHuntProcs.emplace_back(function);
 
 	for(auto function : vFileReactions)
 		combined.vFileReactions.emplace_back(function);
@@ -48,6 +68,12 @@ Reaction Reaction::Combine(const Reaction& reaction){
 		combined.vProcessReactions.emplace_back(function);
 	for(auto function : vServiceReactions)
 		combined.vServiceReactions.emplace_back(function);
+
+
+	for(auto function : reaction.vStartHuntProcs)
+		combined.vStartHuntProcs.emplace_back(function);
+	for(auto function : reaction.vEndHuntProcs)
+		combined.vEndHuntProcs.emplace_back(function);
 
 	for(auto function : reaction.vFileReactions)
 		combined.vFileReactions.emplace_back(function);
@@ -61,8 +87,13 @@ Reaction Reaction::Combine(const Reaction& reaction){
 	return combined;
 }
 
-Reaction Reaction::Combine(Reaction&& reaction){
+Reaction Reaction::Combine(Reaction&& reaction) const {
 	Reaction combined{};
+
+	for(auto function : vStartHuntProcs)
+		combined.vStartHuntProcs.emplace_back(function);
+	for(auto function : vEndHuntProcs)
+		combined.vEndHuntProcs.emplace_back(function);
 
 	for(auto function : vFileReactions)
 		combined.vFileReactions.emplace_back(function);
@@ -72,6 +103,12 @@ Reaction Reaction::Combine(Reaction&& reaction){
 		combined.vProcessReactions.emplace_back(function);
 	for(auto function : vServiceReactions)
 		combined.vServiceReactions.emplace_back(function);
+
+
+	for(auto function : reaction.vStartHuntProcs)
+		combined.vStartHuntProcs.emplace_back(function);
+	for(auto function : reaction.vEndHuntProcs)
+		combined.vEndHuntProcs.emplace_back(function);
 
 	for(auto function : reaction.vFileReactions)
 		combined.vFileReactions.emplace_back(function);
