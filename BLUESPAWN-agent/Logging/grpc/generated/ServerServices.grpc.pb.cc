@@ -16,12 +16,10 @@
 #include <grpcpp/impl/codegen/server_callback.h>
 #include <grpcpp/impl/codegen/service_type.h>
 #include <grpcpp/impl/codegen/sync_stream.h>
+namespace gpb {
 
 static const char* Server_method_names[] = {
-  "/Server/SendFileReaction",
-  "/Server/SendRegistryReaction",
-  "/Server/SendProcessReaction",
-  "/Server/SendServiceReaction",
+  "/gpb.Server/SendHuntMessage",
 };
 
 std::unique_ptr< Server::Stub> Server::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -31,144 +29,47 @@ std::unique_ptr< Server::Stub> Server::NewStub(const std::shared_ptr< ::grpc::Ch
 }
 
 Server::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
-  : channel_(channel), rpcmethod_SendFileReaction_(Server_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_SendRegistryReaction_(Server_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_SendProcessReaction_(Server_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_SendServiceReaction_(Server_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  : channel_(channel), rpcmethod_SendHuntMessage_(Server_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
-::grpc::Status Server::Stub::SendFileReaction(::grpc::ClientContext* context, const ::FileReaction& request, ::Empty* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_SendFileReaction_, context, request, response);
+::grpc::Status Server::Stub::SendHuntMessage(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::gpb::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_SendHuntMessage_, context, request, response);
 }
 
-void Server::Stub::experimental_async::SendFileReaction(::grpc::ClientContext* context, const ::FileReaction* request, ::Empty* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendFileReaction_, context, request, response, std::move(f));
+void Server::Stub::experimental_async::SendHuntMessage(::grpc::ClientContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response, std::function<void(::grpc::Status)> f) {
+  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendHuntMessage_, context, request, response, std::move(f));
 }
 
-void Server::Stub::experimental_async::SendFileReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendFileReaction_, context, request, response, std::move(f));
+void Server::Stub::experimental_async::SendHuntMessage(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::gpb::Empty* response, std::function<void(::grpc::Status)> f) {
+  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendHuntMessage_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::Empty>* Server::Stub::AsyncSendFileReactionRaw(::grpc::ClientContext* context, const ::FileReaction& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::Empty>::Create(channel_.get(), cq, rpcmethod_SendFileReaction_, context, request, true);
+::grpc::ClientAsyncResponseReader< ::gpb::Empty>* Server::Stub::AsyncSendHuntMessageRaw(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::gpb::Empty>::Create(channel_.get(), cq, rpcmethod_SendHuntMessage_, context, request, true);
 }
 
-::grpc::ClientAsyncResponseReader< ::Empty>* Server::Stub::PrepareAsyncSendFileReactionRaw(::grpc::ClientContext* context, const ::FileReaction& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::Empty>::Create(channel_.get(), cq, rpcmethod_SendFileReaction_, context, request, false);
-}
-
-::grpc::Status Server::Stub::SendRegistryReaction(::grpc::ClientContext* context, const ::RegistryReaction& request, ::Empty* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_SendRegistryReaction_, context, request, response);
-}
-
-void Server::Stub::experimental_async::SendRegistryReaction(::grpc::ClientContext* context, const ::RegistryReaction* request, ::Empty* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendRegistryReaction_, context, request, response, std::move(f));
-}
-
-void Server::Stub::experimental_async::SendRegistryReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendRegistryReaction_, context, request, response, std::move(f));
-}
-
-::grpc::ClientAsyncResponseReader< ::Empty>* Server::Stub::AsyncSendRegistryReactionRaw(::grpc::ClientContext* context, const ::RegistryReaction& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::Empty>::Create(channel_.get(), cq, rpcmethod_SendRegistryReaction_, context, request, true);
-}
-
-::grpc::ClientAsyncResponseReader< ::Empty>* Server::Stub::PrepareAsyncSendRegistryReactionRaw(::grpc::ClientContext* context, const ::RegistryReaction& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::Empty>::Create(channel_.get(), cq, rpcmethod_SendRegistryReaction_, context, request, false);
-}
-
-::grpc::Status Server::Stub::SendProcessReaction(::grpc::ClientContext* context, const ::ProcessReaction& request, ::Empty* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_SendProcessReaction_, context, request, response);
-}
-
-void Server::Stub::experimental_async::SendProcessReaction(::grpc::ClientContext* context, const ::ProcessReaction* request, ::Empty* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendProcessReaction_, context, request, response, std::move(f));
-}
-
-void Server::Stub::experimental_async::SendProcessReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendProcessReaction_, context, request, response, std::move(f));
-}
-
-::grpc::ClientAsyncResponseReader< ::Empty>* Server::Stub::AsyncSendProcessReactionRaw(::grpc::ClientContext* context, const ::ProcessReaction& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::Empty>::Create(channel_.get(), cq, rpcmethod_SendProcessReaction_, context, request, true);
-}
-
-::grpc::ClientAsyncResponseReader< ::Empty>* Server::Stub::PrepareAsyncSendProcessReactionRaw(::grpc::ClientContext* context, const ::ProcessReaction& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::Empty>::Create(channel_.get(), cq, rpcmethod_SendProcessReaction_, context, request, false);
-}
-
-::grpc::Status Server::Stub::SendServiceReaction(::grpc::ClientContext* context, const ::ServiceReaction& request, ::Empty* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_SendServiceReaction_, context, request, response);
-}
-
-void Server::Stub::experimental_async::SendServiceReaction(::grpc::ClientContext* context, const ::ServiceReaction* request, ::Empty* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendServiceReaction_, context, request, response, std::move(f));
-}
-
-void Server::Stub::experimental_async::SendServiceReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendServiceReaction_, context, request, response, std::move(f));
-}
-
-::grpc::ClientAsyncResponseReader< ::Empty>* Server::Stub::AsyncSendServiceReactionRaw(::grpc::ClientContext* context, const ::ServiceReaction& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::Empty>::Create(channel_.get(), cq, rpcmethod_SendServiceReaction_, context, request, true);
-}
-
-::grpc::ClientAsyncResponseReader< ::Empty>* Server::Stub::PrepareAsyncSendServiceReactionRaw(::grpc::ClientContext* context, const ::ServiceReaction& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::Empty>::Create(channel_.get(), cq, rpcmethod_SendServiceReaction_, context, request, false);
+::grpc::ClientAsyncResponseReader< ::gpb::Empty>* Server::Stub::PrepareAsyncSendHuntMessageRaw(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::gpb::Empty>::Create(channel_.get(), cq, rpcmethod_SendHuntMessage_, context, request, false);
 }
 
 Server::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Server_method_names[0],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Server::Service, ::FileReaction, ::Empty>(
-          std::mem_fn(&Server::Service::SendFileReaction), this)));
-  AddMethod(new ::grpc::internal::RpcServiceMethod(
-      Server_method_names[1],
-      ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Server::Service, ::RegistryReaction, ::Empty>(
-          std::mem_fn(&Server::Service::SendRegistryReaction), this)));
-  AddMethod(new ::grpc::internal::RpcServiceMethod(
-      Server_method_names[2],
-      ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Server::Service, ::ProcessReaction, ::Empty>(
-          std::mem_fn(&Server::Service::SendProcessReaction), this)));
-  AddMethod(new ::grpc::internal::RpcServiceMethod(
-      Server_method_names[3],
-      ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Server::Service, ::ServiceReaction, ::Empty>(
-          std::mem_fn(&Server::Service::SendServiceReaction), this)));
+      new ::grpc::internal::RpcMethodHandler< Server::Service, ::gpb::HuntMessage, ::gpb::Empty>(
+          std::mem_fn(&Server::Service::SendHuntMessage), this)));
 }
 
 Server::Service::~Service() {
 }
 
-::grpc::Status Server::Service::SendFileReaction(::grpc::ServerContext* context, const ::FileReaction* request, ::Empty* response) {
+::grpc::Status Server::Service::SendHuntMessage(::grpc::ServerContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status Server::Service::SendRegistryReaction(::grpc::ServerContext* context, const ::RegistryReaction* request, ::Empty* response) {
-  (void) context;
-  (void) request;
-  (void) response;
-  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-}
 
-::grpc::Status Server::Service::SendProcessReaction(::grpc::ServerContext* context, const ::ProcessReaction* request, ::Empty* response) {
-  (void) context;
-  (void) request;
-  (void) response;
-  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-}
-
-::grpc::Status Server::Service::SendServiceReaction(::grpc::ServerContext* context, const ::ServiceReaction* request, ::Empty* response) {
-  (void) context;
-  (void) request;
-  (void) response;
-  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-}
-
+}  // namespace gpb
 

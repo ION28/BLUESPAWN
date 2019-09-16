@@ -9,6 +9,7 @@
     <ClCompile Include="src\HuntLogMessage.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\LogLevel.cpp" />
+    <ClCompile Include="src\ServerSink.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="grpc\generated\grpc++\alarm.h" />
@@ -291,6 +292,7 @@
     <ClInclude Include="headers\logging\Loggable.h" />
     <ClInclude Include="headers\logging\LogLevel.h" />
     <ClInclude Include="headers\logging\LogSink.h" />
+    <ClInclude Include="headers\logging\ServerSink.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="protos\ReactionData.proto" />

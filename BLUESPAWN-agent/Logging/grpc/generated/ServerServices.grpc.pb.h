@@ -27,107 +27,49 @@ class ServerCompletionQueue;
 class ServerContext;
 }  // namespace grpc
 
+namespace gpb {
+
 class Server final {
  public:
   static constexpr char const* service_full_name() {
-    return "Server";
+    return "gpb.Server";
   }
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    virtual ::grpc::Status SendFileReaction(::grpc::ClientContext* context, const ::FileReaction& request, ::Empty* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>> AsyncSendFileReaction(::grpc::ClientContext* context, const ::FileReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>>(AsyncSendFileReactionRaw(context, request, cq));
+    virtual ::grpc::Status SendHuntMessage(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::gpb::Empty* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::gpb::Empty>> AsyncSendHuntMessage(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::gpb::Empty>>(AsyncSendHuntMessageRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>> PrepareAsyncSendFileReaction(::grpc::ClientContext* context, const ::FileReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>>(PrepareAsyncSendFileReactionRaw(context, request, cq));
-    }
-    virtual ::grpc::Status SendRegistryReaction(::grpc::ClientContext* context, const ::RegistryReaction& request, ::Empty* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>> AsyncSendRegistryReaction(::grpc::ClientContext* context, const ::RegistryReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>>(AsyncSendRegistryReactionRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>> PrepareAsyncSendRegistryReaction(::grpc::ClientContext* context, const ::RegistryReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>>(PrepareAsyncSendRegistryReactionRaw(context, request, cq));
-    }
-    virtual ::grpc::Status SendProcessReaction(::grpc::ClientContext* context, const ::ProcessReaction& request, ::Empty* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>> AsyncSendProcessReaction(::grpc::ClientContext* context, const ::ProcessReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>>(AsyncSendProcessReactionRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>> PrepareAsyncSendProcessReaction(::grpc::ClientContext* context, const ::ProcessReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>>(PrepareAsyncSendProcessReactionRaw(context, request, cq));
-    }
-    virtual ::grpc::Status SendServiceReaction(::grpc::ClientContext* context, const ::ServiceReaction& request, ::Empty* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>> AsyncSendServiceReaction(::grpc::ClientContext* context, const ::ServiceReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>>(AsyncSendServiceReactionRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>> PrepareAsyncSendServiceReaction(::grpc::ClientContext* context, const ::ServiceReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::Empty>>(PrepareAsyncSendServiceReactionRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::gpb::Empty>> PrepareAsyncSendHuntMessage(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::gpb::Empty>>(PrepareAsyncSendHuntMessageRaw(context, request, cq));
     }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
-      virtual void SendFileReaction(::grpc::ClientContext* context, const ::FileReaction* request, ::Empty* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void SendFileReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void SendRegistryReaction(::grpc::ClientContext* context, const ::RegistryReaction* request, ::Empty* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void SendRegistryReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void SendProcessReaction(::grpc::ClientContext* context, const ::ProcessReaction* request, ::Empty* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void SendProcessReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void SendServiceReaction(::grpc::ClientContext* context, const ::ServiceReaction* request, ::Empty* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void SendServiceReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SendHuntMessage(::grpc::ClientContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SendHuntMessage(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::gpb::Empty* response, std::function<void(::grpc::Status)>) = 0;
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::Empty>* AsyncSendFileReactionRaw(::grpc::ClientContext* context, const ::FileReaction& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::Empty>* PrepareAsyncSendFileReactionRaw(::grpc::ClientContext* context, const ::FileReaction& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::Empty>* AsyncSendRegistryReactionRaw(::grpc::ClientContext* context, const ::RegistryReaction& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::Empty>* PrepareAsyncSendRegistryReactionRaw(::grpc::ClientContext* context, const ::RegistryReaction& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::Empty>* AsyncSendProcessReactionRaw(::grpc::ClientContext* context, const ::ProcessReaction& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::Empty>* PrepareAsyncSendProcessReactionRaw(::grpc::ClientContext* context, const ::ProcessReaction& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::Empty>* AsyncSendServiceReactionRaw(::grpc::ClientContext* context, const ::ServiceReaction& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::Empty>* PrepareAsyncSendServiceReactionRaw(::grpc::ClientContext* context, const ::ServiceReaction& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::gpb::Empty>* AsyncSendHuntMessageRaw(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::gpb::Empty>* PrepareAsyncSendHuntMessageRaw(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel);
-    ::grpc::Status SendFileReaction(::grpc::ClientContext* context, const ::FileReaction& request, ::Empty* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>> AsyncSendFileReaction(::grpc::ClientContext* context, const ::FileReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>>(AsyncSendFileReactionRaw(context, request, cq));
+    ::grpc::Status SendHuntMessage(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::gpb::Empty* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::gpb::Empty>> AsyncSendHuntMessage(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::gpb::Empty>>(AsyncSendHuntMessageRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>> PrepareAsyncSendFileReaction(::grpc::ClientContext* context, const ::FileReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>>(PrepareAsyncSendFileReactionRaw(context, request, cq));
-    }
-    ::grpc::Status SendRegistryReaction(::grpc::ClientContext* context, const ::RegistryReaction& request, ::Empty* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>> AsyncSendRegistryReaction(::grpc::ClientContext* context, const ::RegistryReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>>(AsyncSendRegistryReactionRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>> PrepareAsyncSendRegistryReaction(::grpc::ClientContext* context, const ::RegistryReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>>(PrepareAsyncSendRegistryReactionRaw(context, request, cq));
-    }
-    ::grpc::Status SendProcessReaction(::grpc::ClientContext* context, const ::ProcessReaction& request, ::Empty* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>> AsyncSendProcessReaction(::grpc::ClientContext* context, const ::ProcessReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>>(AsyncSendProcessReactionRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>> PrepareAsyncSendProcessReaction(::grpc::ClientContext* context, const ::ProcessReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>>(PrepareAsyncSendProcessReactionRaw(context, request, cq));
-    }
-    ::grpc::Status SendServiceReaction(::grpc::ClientContext* context, const ::ServiceReaction& request, ::Empty* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>> AsyncSendServiceReaction(::grpc::ClientContext* context, const ::ServiceReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>>(AsyncSendServiceReactionRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>> PrepareAsyncSendServiceReaction(::grpc::ClientContext* context, const ::ServiceReaction& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::Empty>>(PrepareAsyncSendServiceReactionRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::gpb::Empty>> PrepareAsyncSendHuntMessage(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::gpb::Empty>>(PrepareAsyncSendHuntMessageRaw(context, request, cq));
     }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
-      void SendFileReaction(::grpc::ClientContext* context, const ::FileReaction* request, ::Empty* response, std::function<void(::grpc::Status)>) override;
-      void SendFileReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)>) override;
-      void SendRegistryReaction(::grpc::ClientContext* context, const ::RegistryReaction* request, ::Empty* response, std::function<void(::grpc::Status)>) override;
-      void SendRegistryReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)>) override;
-      void SendProcessReaction(::grpc::ClientContext* context, const ::ProcessReaction* request, ::Empty* response, std::function<void(::grpc::Status)>) override;
-      void SendProcessReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)>) override;
-      void SendServiceReaction(::grpc::ClientContext* context, const ::ServiceReaction* request, ::Empty* response, std::function<void(::grpc::Status)>) override;
-      void SendServiceReaction(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::Empty* response, std::function<void(::grpc::Status)>) override;
+      void SendHuntMessage(::grpc::ClientContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response, std::function<void(::grpc::Status)>) override;
+      void SendHuntMessage(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::gpb::Empty* response, std::function<void(::grpc::Status)>) override;
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -139,18 +81,9 @@ class Server final {
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     class experimental_async async_stub_{this};
-    ::grpc::ClientAsyncResponseReader< ::Empty>* AsyncSendFileReactionRaw(::grpc::ClientContext* context, const ::FileReaction& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::Empty>* PrepareAsyncSendFileReactionRaw(::grpc::ClientContext* context, const ::FileReaction& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::Empty>* AsyncSendRegistryReactionRaw(::grpc::ClientContext* context, const ::RegistryReaction& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::Empty>* PrepareAsyncSendRegistryReactionRaw(::grpc::ClientContext* context, const ::RegistryReaction& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::Empty>* AsyncSendProcessReactionRaw(::grpc::ClientContext* context, const ::ProcessReaction& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::Empty>* PrepareAsyncSendProcessReactionRaw(::grpc::ClientContext* context, const ::ProcessReaction& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::Empty>* AsyncSendServiceReactionRaw(::grpc::ClientContext* context, const ::ServiceReaction& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::Empty>* PrepareAsyncSendServiceReactionRaw(::grpc::ClientContext* context, const ::ServiceReaction& request, ::grpc::CompletionQueue* cq) override;
-    const ::grpc::internal::RpcMethod rpcmethod_SendFileReaction_;
-    const ::grpc::internal::RpcMethod rpcmethod_SendRegistryReaction_;
-    const ::grpc::internal::RpcMethod rpcmethod_SendProcessReaction_;
-    const ::grpc::internal::RpcMethod rpcmethod_SendServiceReaction_;
+    ::grpc::ClientAsyncResponseReader< ::gpb::Empty>* AsyncSendHuntMessageRaw(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::gpb::Empty>* PrepareAsyncSendHuntMessageRaw(::grpc::ClientContext* context, const ::gpb::HuntMessage& request, ::grpc::CompletionQueue* cq) override;
+    const ::grpc::internal::RpcMethod rpcmethod_SendHuntMessage_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -158,525 +91,143 @@ class Server final {
    public:
     Service();
     virtual ~Service();
-    virtual ::grpc::Status SendFileReaction(::grpc::ServerContext* context, const ::FileReaction* request, ::Empty* response);
-    virtual ::grpc::Status SendRegistryReaction(::grpc::ServerContext* context, const ::RegistryReaction* request, ::Empty* response);
-    virtual ::grpc::Status SendProcessReaction(::grpc::ServerContext* context, const ::ProcessReaction* request, ::Empty* response);
-    virtual ::grpc::Status SendServiceReaction(::grpc::ServerContext* context, const ::ServiceReaction* request, ::Empty* response);
+    virtual ::grpc::Status SendHuntMessage(::grpc::ServerContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response);
   };
   template <class BaseClass>
-  class WithAsyncMethod_SendFileReaction : public BaseClass {
+  class WithAsyncMethod_SendHuntMessage : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithAsyncMethod_SendFileReaction() {
+    WithAsyncMethod_SendHuntMessage() {
       ::grpc::Service::MarkMethodAsync(0);
     }
-    ~WithAsyncMethod_SendFileReaction() override {
+    ~WithAsyncMethod_SendHuntMessage() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendFileReaction(::grpc::ServerContext* context, const ::FileReaction* request, ::Empty* response) override {
+    ::grpc::Status SendHuntMessage(::grpc::ServerContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestSendFileReaction(::grpc::ServerContext* context, ::FileReaction* request, ::grpc::ServerAsyncResponseWriter< ::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestSendHuntMessage(::grpc::ServerContext* context, ::gpb::HuntMessage* request, ::grpc::ServerAsyncResponseWriter< ::gpb::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
+  typedef WithAsyncMethod_SendHuntMessage<Service > AsyncService;
   template <class BaseClass>
-  class WithAsyncMethod_SendRegistryReaction : public BaseClass {
+  class ExperimentalWithCallbackMethod_SendHuntMessage : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithAsyncMethod_SendRegistryReaction() {
-      ::grpc::Service::MarkMethodAsync(1);
-    }
-    ~WithAsyncMethod_SendRegistryReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendRegistryReaction(::grpc::ServerContext* context, const ::RegistryReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestSendRegistryReaction(::grpc::ServerContext* context, ::RegistryReaction* request, ::grpc::ServerAsyncResponseWriter< ::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithAsyncMethod_SendProcessReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithAsyncMethod_SendProcessReaction() {
-      ::grpc::Service::MarkMethodAsync(2);
-    }
-    ~WithAsyncMethod_SendProcessReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendProcessReaction(::grpc::ServerContext* context, const ::ProcessReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestSendProcessReaction(::grpc::ServerContext* context, ::ProcessReaction* request, ::grpc::ServerAsyncResponseWriter< ::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithAsyncMethod_SendServiceReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithAsyncMethod_SendServiceReaction() {
-      ::grpc::Service::MarkMethodAsync(3);
-    }
-    ~WithAsyncMethod_SendServiceReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendServiceReaction(::grpc::ServerContext* context, const ::ServiceReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestSendServiceReaction(::grpc::ServerContext* context, ::ServiceReaction* request, ::grpc::ServerAsyncResponseWriter< ::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  typedef WithAsyncMethod_SendFileReaction<WithAsyncMethod_SendRegistryReaction<WithAsyncMethod_SendProcessReaction<WithAsyncMethod_SendServiceReaction<Service > > > > AsyncService;
-  template <class BaseClass>
-  class ExperimentalWithCallbackMethod_SendFileReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithCallbackMethod_SendFileReaction() {
+    ExperimentalWithCallbackMethod_SendHuntMessage() {
       ::grpc::Service::experimental().MarkMethodCallback(0,
-        new ::grpc::internal::CallbackUnaryHandler< ::FileReaction, ::Empty>(
+        new ::grpc::internal::CallbackUnaryHandler< ::gpb::HuntMessage, ::gpb::Empty>(
           [this](::grpc::ServerContext* context,
-                 const ::FileReaction* request,
-                 ::Empty* response,
+                 const ::gpb::HuntMessage* request,
+                 ::gpb::Empty* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   return this->SendFileReaction(context, request, response, controller);
+                   return this->SendHuntMessage(context, request, response, controller);
                  }));
     }
-    ~ExperimentalWithCallbackMethod_SendFileReaction() override {
+    ~ExperimentalWithCallbackMethod_SendHuntMessage() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendFileReaction(::grpc::ServerContext* context, const ::FileReaction* request, ::Empty* response) override {
+    ::grpc::Status SendHuntMessage(::grpc::ServerContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void SendFileReaction(::grpc::ServerContext* context, const ::FileReaction* request, ::Empty* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void SendHuntMessage(::grpc::ServerContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
+  typedef ExperimentalWithCallbackMethod_SendHuntMessage<Service > ExperimentalCallbackService;
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_SendRegistryReaction : public BaseClass {
+  class WithGenericMethod_SendHuntMessage : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    ExperimentalWithCallbackMethod_SendRegistryReaction() {
-      ::grpc::Service::experimental().MarkMethodCallback(1,
-        new ::grpc::internal::CallbackUnaryHandler< ::RegistryReaction, ::Empty>(
-          [this](::grpc::ServerContext* context,
-                 const ::RegistryReaction* request,
-                 ::Empty* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   return this->SendRegistryReaction(context, request, response, controller);
-                 }));
-    }
-    ~ExperimentalWithCallbackMethod_SendRegistryReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendRegistryReaction(::grpc::ServerContext* context, const ::RegistryReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void SendRegistryReaction(::grpc::ServerContext* context, const ::RegistryReaction* request, ::Empty* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  template <class BaseClass>
-  class ExperimentalWithCallbackMethod_SendProcessReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithCallbackMethod_SendProcessReaction() {
-      ::grpc::Service::experimental().MarkMethodCallback(2,
-        new ::grpc::internal::CallbackUnaryHandler< ::ProcessReaction, ::Empty>(
-          [this](::grpc::ServerContext* context,
-                 const ::ProcessReaction* request,
-                 ::Empty* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   return this->SendProcessReaction(context, request, response, controller);
-                 }));
-    }
-    ~ExperimentalWithCallbackMethod_SendProcessReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendProcessReaction(::grpc::ServerContext* context, const ::ProcessReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void SendProcessReaction(::grpc::ServerContext* context, const ::ProcessReaction* request, ::Empty* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  template <class BaseClass>
-  class ExperimentalWithCallbackMethod_SendServiceReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithCallbackMethod_SendServiceReaction() {
-      ::grpc::Service::experimental().MarkMethodCallback(3,
-        new ::grpc::internal::CallbackUnaryHandler< ::ServiceReaction, ::Empty>(
-          [this](::grpc::ServerContext* context,
-                 const ::ServiceReaction* request,
-                 ::Empty* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   return this->SendServiceReaction(context, request, response, controller);
-                 }));
-    }
-    ~ExperimentalWithCallbackMethod_SendServiceReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendServiceReaction(::grpc::ServerContext* context, const ::ServiceReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void SendServiceReaction(::grpc::ServerContext* context, const ::ServiceReaction* request, ::Empty* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  typedef ExperimentalWithCallbackMethod_SendFileReaction<ExperimentalWithCallbackMethod_SendRegistryReaction<ExperimentalWithCallbackMethod_SendProcessReaction<ExperimentalWithCallbackMethod_SendServiceReaction<Service > > > > ExperimentalCallbackService;
-  template <class BaseClass>
-  class WithGenericMethod_SendFileReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithGenericMethod_SendFileReaction() {
+    WithGenericMethod_SendHuntMessage() {
       ::grpc::Service::MarkMethodGeneric(0);
     }
-    ~WithGenericMethod_SendFileReaction() override {
+    ~WithGenericMethod_SendHuntMessage() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendFileReaction(::grpc::ServerContext* context, const ::FileReaction* request, ::Empty* response) override {
+    ::grpc::Status SendHuntMessage(::grpc::ServerContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
   };
   template <class BaseClass>
-  class WithGenericMethod_SendRegistryReaction : public BaseClass {
+  class WithRawMethod_SendHuntMessage : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithGenericMethod_SendRegistryReaction() {
-      ::grpc::Service::MarkMethodGeneric(1);
-    }
-    ~WithGenericMethod_SendRegistryReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendRegistryReaction(::grpc::ServerContext* context, const ::RegistryReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithGenericMethod_SendProcessReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithGenericMethod_SendProcessReaction() {
-      ::grpc::Service::MarkMethodGeneric(2);
-    }
-    ~WithGenericMethod_SendProcessReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendProcessReaction(::grpc::ServerContext* context, const ::ProcessReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithGenericMethod_SendServiceReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithGenericMethod_SendServiceReaction() {
-      ::grpc::Service::MarkMethodGeneric(3);
-    }
-    ~WithGenericMethod_SendServiceReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendServiceReaction(::grpc::ServerContext* context, const ::ServiceReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_SendFileReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithRawMethod_SendFileReaction() {
+    WithRawMethod_SendHuntMessage() {
       ::grpc::Service::MarkMethodRaw(0);
     }
-    ~WithRawMethod_SendFileReaction() override {
+    ~WithRawMethod_SendHuntMessage() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendFileReaction(::grpc::ServerContext* context, const ::FileReaction* request, ::Empty* response) override {
+    ::grpc::Status SendHuntMessage(::grpc::ServerContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestSendFileReaction(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestSendHuntMessage(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
-  class WithRawMethod_SendRegistryReaction : public BaseClass {
+  class ExperimentalWithRawCallbackMethod_SendHuntMessage : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithRawMethod_SendRegistryReaction() {
-      ::grpc::Service::MarkMethodRaw(1);
-    }
-    ~WithRawMethod_SendRegistryReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendRegistryReaction(::grpc::ServerContext* context, const ::RegistryReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestSendRegistryReaction(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_SendProcessReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithRawMethod_SendProcessReaction() {
-      ::grpc::Service::MarkMethodRaw(2);
-    }
-    ~WithRawMethod_SendProcessReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendProcessReaction(::grpc::ServerContext* context, const ::ProcessReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestSendProcessReaction(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_SendServiceReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithRawMethod_SendServiceReaction() {
-      ::grpc::Service::MarkMethodRaw(3);
-    }
-    ~WithRawMethod_SendServiceReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendServiceReaction(::grpc::ServerContext* context, const ::ServiceReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestSendServiceReaction(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_SendFileReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithRawCallbackMethod_SendFileReaction() {
+    ExperimentalWithRawCallbackMethod_SendHuntMessage() {
       ::grpc::Service::experimental().MarkMethodRawCallback(0,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
                  ::grpc::ByteBuffer* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   this->SendFileReaction(context, request, response, controller);
+                   this->SendHuntMessage(context, request, response, controller);
                  }));
     }
-    ~ExperimentalWithRawCallbackMethod_SendFileReaction() override {
+    ~ExperimentalWithRawCallbackMethod_SendHuntMessage() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendFileReaction(::grpc::ServerContext* context, const ::FileReaction* request, ::Empty* response) override {
+    ::grpc::Status SendHuntMessage(::grpc::ServerContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void SendFileReaction(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void SendHuntMessage(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_SendRegistryReaction : public BaseClass {
+  class WithStreamedUnaryMethod_SendHuntMessage : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    ExperimentalWithRawCallbackMethod_SendRegistryReaction() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(1,
-        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-          [this](::grpc::ServerContext* context,
-                 const ::grpc::ByteBuffer* request,
-                 ::grpc::ByteBuffer* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   this->SendRegistryReaction(context, request, response, controller);
-                 }));
-    }
-    ~ExperimentalWithRawCallbackMethod_SendRegistryReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendRegistryReaction(::grpc::ServerContext* context, const ::RegistryReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void SendRegistryReaction(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_SendProcessReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithRawCallbackMethod_SendProcessReaction() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(2,
-        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-          [this](::grpc::ServerContext* context,
-                 const ::grpc::ByteBuffer* request,
-                 ::grpc::ByteBuffer* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   this->SendProcessReaction(context, request, response, controller);
-                 }));
-    }
-    ~ExperimentalWithRawCallbackMethod_SendProcessReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendProcessReaction(::grpc::ServerContext* context, const ::ProcessReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void SendProcessReaction(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_SendServiceReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithRawCallbackMethod_SendServiceReaction() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(3,
-        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-          [this](::grpc::ServerContext* context,
-                 const ::grpc::ByteBuffer* request,
-                 ::grpc::ByteBuffer* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   this->SendServiceReaction(context, request, response, controller);
-                 }));
-    }
-    ~ExperimentalWithRawCallbackMethod_SendServiceReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status SendServiceReaction(::grpc::ServerContext* context, const ::ServiceReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void SendServiceReaction(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  template <class BaseClass>
-  class WithStreamedUnaryMethod_SendFileReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithStreamedUnaryMethod_SendFileReaction() {
+    WithStreamedUnaryMethod_SendHuntMessage() {
       ::grpc::Service::MarkMethodStreamed(0,
-        new ::grpc::internal::StreamedUnaryHandler< ::FileReaction, ::Empty>(std::bind(&WithStreamedUnaryMethod_SendFileReaction<BaseClass>::StreamedSendFileReaction, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::gpb::HuntMessage, ::gpb::Empty>(std::bind(&WithStreamedUnaryMethod_SendHuntMessage<BaseClass>::StreamedSendHuntMessage, this, std::placeholders::_1, std::placeholders::_2)));
     }
-    ~WithStreamedUnaryMethod_SendFileReaction() override {
+    ~WithStreamedUnaryMethod_SendHuntMessage() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status SendFileReaction(::grpc::ServerContext* context, const ::FileReaction* request, ::Empty* response) override {
+    ::grpc::Status SendHuntMessage(::grpc::ServerContext* context, const ::gpb::HuntMessage* request, ::gpb::Empty* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedSendFileReaction(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::FileReaction,::Empty>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedSendHuntMessage(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::gpb::HuntMessage,::gpb::Empty>* server_unary_streamer) = 0;
   };
-  template <class BaseClass>
-  class WithStreamedUnaryMethod_SendRegistryReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithStreamedUnaryMethod_SendRegistryReaction() {
-      ::grpc::Service::MarkMethodStreamed(1,
-        new ::grpc::internal::StreamedUnaryHandler< ::RegistryReaction, ::Empty>(std::bind(&WithStreamedUnaryMethod_SendRegistryReaction<BaseClass>::StreamedSendRegistryReaction, this, std::placeholders::_1, std::placeholders::_2)));
-    }
-    ~WithStreamedUnaryMethod_SendRegistryReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status SendRegistryReaction(::grpc::ServerContext* context, const ::RegistryReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedSendRegistryReaction(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::RegistryReaction,::Empty>* server_unary_streamer) = 0;
-  };
-  template <class BaseClass>
-  class WithStreamedUnaryMethod_SendProcessReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithStreamedUnaryMethod_SendProcessReaction() {
-      ::grpc::Service::MarkMethodStreamed(2,
-        new ::grpc::internal::StreamedUnaryHandler< ::ProcessReaction, ::Empty>(std::bind(&WithStreamedUnaryMethod_SendProcessReaction<BaseClass>::StreamedSendProcessReaction, this, std::placeholders::_1, std::placeholders::_2)));
-    }
-    ~WithStreamedUnaryMethod_SendProcessReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status SendProcessReaction(::grpc::ServerContext* context, const ::ProcessReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedSendProcessReaction(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::ProcessReaction,::Empty>* server_unary_streamer) = 0;
-  };
-  template <class BaseClass>
-  class WithStreamedUnaryMethod_SendServiceReaction : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithStreamedUnaryMethod_SendServiceReaction() {
-      ::grpc::Service::MarkMethodStreamed(3,
-        new ::grpc::internal::StreamedUnaryHandler< ::ServiceReaction, ::Empty>(std::bind(&WithStreamedUnaryMethod_SendServiceReaction<BaseClass>::StreamedSendServiceReaction, this, std::placeholders::_1, std::placeholders::_2)));
-    }
-    ~WithStreamedUnaryMethod_SendServiceReaction() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status SendServiceReaction(::grpc::ServerContext* context, const ::ServiceReaction* request, ::Empty* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedSendServiceReaction(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::ServiceReaction,::Empty>* server_unary_streamer) = 0;
-  };
-  typedef WithStreamedUnaryMethod_SendFileReaction<WithStreamedUnaryMethod_SendRegistryReaction<WithStreamedUnaryMethod_SendProcessReaction<WithStreamedUnaryMethod_SendServiceReaction<Service > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_SendHuntMessage<Service > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_SendFileReaction<WithStreamedUnaryMethod_SendRegistryReaction<WithStreamedUnaryMethod_SendProcessReaction<WithStreamedUnaryMethod_SendServiceReaction<Service > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_SendHuntMessage<Service > StreamedService;
 };
+
+}  // namespace gpb
 
 
 #endif  // GRPC_ServerServices_2eproto__INCLUDED

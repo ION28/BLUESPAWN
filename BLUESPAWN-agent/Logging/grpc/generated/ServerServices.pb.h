@@ -49,19 +49,22 @@ struct TableStruct_ServerServices_2eproto {
   static const ::google::protobuf::uint32 offsets[];
 };
 void AddDescriptors_ServerServices_2eproto();
+namespace gpb {
 class Empty;
 class EmptyDefaultTypeInternal;
 extern EmptyDefaultTypeInternal _Empty_default_instance_;
+}  // namespace gpb
 namespace google {
 namespace protobuf {
-template<> ::Empty* Arena::CreateMaybeMessage<::Empty>(Arena*);
+template<> ::gpb::Empty* Arena::CreateMaybeMessage<::gpb::Empty>(Arena*);
 }  // namespace protobuf
 }  // namespace google
+namespace gpb {
 
 // ===================================================================
 
 class Empty final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:Empty) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:gpb.Empty) */ {
  public:
   Empty();
   virtual ~Empty();
@@ -155,7 +158,7 @@ class Empty final :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:Empty)
+  // @@protoc_insertion_point(class_scope:gpb.Empty)
  private:
   class HasBitSetters;
 
@@ -180,6 +183,7 @@ class Empty final :
 
 // @@protoc_insertion_point(namespace_scope)
 
+}  // namespace gpb
 
 // @@protoc_insertion_point(global_scope)
 

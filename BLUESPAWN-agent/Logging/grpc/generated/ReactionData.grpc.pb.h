@@ -27,5 +27,9 @@ class ServerCompletionQueue;
 class ServerContext;
 }  // namespace grpc
 
+namespace gpb {
+
+}  // namespace gpb
+
 
 #endif  // GRPC_ReactionData_2eproto__INCLUDED

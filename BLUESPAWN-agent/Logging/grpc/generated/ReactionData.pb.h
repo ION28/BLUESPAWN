@@ -42,87 +42,186 @@ struct TableStruct_ReactionData_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[10]
+  static const ::google::protobuf::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
 };
 void AddDescriptors_ReactionData_2eproto();
+namespace gpb {
 class ACLEntry;
 class ACLEntryDefaultTypeInternal;
 extern ACLEntryDefaultTypeInternal _ACLEntry_default_instance_;
-class FileReaction;
-class FileReactionDefaultTypeInternal;
-extern FileReactionDefaultTypeInternal _FileReaction_default_instance_;
 class FileReactionData;
 class FileReactionDataDefaultTypeInternal;
 extern FileReactionDataDefaultTypeInternal _FileReactionData_default_instance_;
 class FileReactionData_Signature;
 class FileReactionData_SignatureDefaultTypeInternal;
 extern FileReactionData_SignatureDefaultTypeInternal _FileReactionData_Signature_default_instance_;
-class ProcessReaction;
-class ProcessReactionDefaultTypeInternal;
-extern ProcessReactionDefaultTypeInternal _ProcessReaction_default_instance_;
+class HuntInfo;
+class HuntInfoDefaultTypeInternal;
+extern HuntInfoDefaultTypeInternal _HuntInfo_default_instance_;
+class HuntMessage;
+class HuntMessageDefaultTypeInternal;
+extern HuntMessageDefaultTypeInternal _HuntMessage_default_instance_;
 class ProcessReactionData;
 class ProcessReactionDataDefaultTypeInternal;
 extern ProcessReactionDataDefaultTypeInternal _ProcessReactionData_default_instance_;
-class RegistryReaction;
-class RegistryReactionDefaultTypeInternal;
-extern RegistryReactionDefaultTypeInternal _RegistryReaction_default_instance_;
 class RegistryReactionData;
 class RegistryReactionDataDefaultTypeInternal;
 extern RegistryReactionDataDefaultTypeInternal _RegistryReactionData_default_instance_;
-class ServiceReaction;
-class ServiceReactionDefaultTypeInternal;
-extern ServiceReactionDefaultTypeInternal _ServiceReaction_default_instance_;
 class ServiceReactionData;
 class ServiceReactionDataDefaultTypeInternal;
 extern ServiceReactionDataDefaultTypeInternal _ServiceReactionData_default_instance_;
+}  // namespace gpb
 namespace google {
 namespace protobuf {
-template<> ::ACLEntry* Arena::CreateMaybeMessage<::ACLEntry>(Arena*);
-template<> ::FileReaction* Arena::CreateMaybeMessage<::FileReaction>(Arena*);
-template<> ::FileReactionData* Arena::CreateMaybeMessage<::FileReactionData>(Arena*);
-template<> ::FileReactionData_Signature* Arena::CreateMaybeMessage<::FileReactionData_Signature>(Arena*);
-template<> ::ProcessReaction* Arena::CreateMaybeMessage<::ProcessReaction>(Arena*);
-template<> ::ProcessReactionData* Arena::CreateMaybeMessage<::ProcessReactionData>(Arena*);
-template<> ::RegistryReaction* Arena::CreateMaybeMessage<::RegistryReaction>(Arena*);
-template<> ::RegistryReactionData* Arena::CreateMaybeMessage<::RegistryReactionData>(Arena*);
-template<> ::ServiceReaction* Arena::CreateMaybeMessage<::ServiceReaction>(Arena*);
-template<> ::ServiceReactionData* Arena::CreateMaybeMessage<::ServiceReactionData>(Arena*);
+template<> ::gpb::ACLEntry* Arena::CreateMaybeMessage<::gpb::ACLEntry>(Arena*);
+template<> ::gpb::FileReactionData* Arena::CreateMaybeMessage<::gpb::FileReactionData>(Arena*);
+template<> ::gpb::FileReactionData_Signature* Arena::CreateMaybeMessage<::gpb::FileReactionData_Signature>(Arena*);
+template<> ::gpb::HuntInfo* Arena::CreateMaybeMessage<::gpb::HuntInfo>(Arena*);
+template<> ::gpb::HuntMessage* Arena::CreateMaybeMessage<::gpb::HuntMessage>(Arena*);
+template<> ::gpb::ProcessReactionData* Arena::CreateMaybeMessage<::gpb::ProcessReactionData>(Arena*);
+template<> ::gpb::RegistryReactionData* Arena::CreateMaybeMessage<::gpb::RegistryReactionData>(Arena*);
+template<> ::gpb::ServiceReactionData* Arena::CreateMaybeMessage<::gpb::ServiceReactionData>(Arena*);
 }  // namespace protobuf
 }  // namespace google
+namespace gpb {
 
-enum RegistryReactionData_Type {
-  RegistryReactionData_Type_REG_SZ = 0,
-  RegistryReactionData_Type_REG_MULTI_SZ = 1,
-  RegistryReactionData_Type_REG_EXPAND_SZ = 2,
-  RegistryReactionData_Type_REG_BINARY = 3,
-  RegistryReactionData_Type_REG_DWORD = 4,
-  RegistryReactionData_Type_REG_QWORD = 5,
-  RegistryReactionData_Type_RegistryReactionData_Type_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
-  RegistryReactionData_Type_RegistryReactionData_Type_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+enum RegistryReactionData_RegType {
+  RegistryReactionData_RegType_SZ = 0,
+  RegistryReactionData_RegType_MULTI_SZ = 1,
+  RegistryReactionData_RegType_EXPAND_SZ = 2,
+  RegistryReactionData_RegType_BINARY = 3,
+  RegistryReactionData_RegType_DWORD = 4,
+  RegistryReactionData_RegType_QWORD = 5,
+  RegistryReactionData_RegType_RegistryReactionData_RegType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  RegistryReactionData_RegType_RegistryReactionData_RegType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
-bool RegistryReactionData_Type_IsValid(int value);
-const RegistryReactionData_Type RegistryReactionData_Type_Type_MIN = RegistryReactionData_Type_REG_SZ;
-const RegistryReactionData_Type RegistryReactionData_Type_Type_MAX = RegistryReactionData_Type_REG_QWORD;
-const int RegistryReactionData_Type_Type_ARRAYSIZE = RegistryReactionData_Type_Type_MAX + 1;
+bool RegistryReactionData_RegType_IsValid(int value);
+const RegistryReactionData_RegType RegistryReactionData_RegType_RegType_MIN = RegistryReactionData_RegType_SZ;
+const RegistryReactionData_RegType RegistryReactionData_RegType_RegType_MAX = RegistryReactionData_RegType_QWORD;
+const int RegistryReactionData_RegType_RegType_ARRAYSIZE = RegistryReactionData_RegType_RegType_MAX + 1;
 
-const ::google::protobuf::EnumDescriptor* RegistryReactionData_Type_descriptor();
-inline const ::std::string& RegistryReactionData_Type_Name(RegistryReactionData_Type value) {
+const ::google::protobuf::EnumDescriptor* RegistryReactionData_RegType_descriptor();
+inline const ::std::string& RegistryReactionData_RegType_Name(RegistryReactionData_RegType value) {
   return ::google::protobuf::internal::NameOfEnum(
-    RegistryReactionData_Type_descriptor(), value);
+    RegistryReactionData_RegType_descriptor(), value);
 }
-inline bool RegistryReactionData_Type_Parse(
-    const ::std::string& name, RegistryReactionData_Type* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<RegistryReactionData_Type>(
-    RegistryReactionData_Type_descriptor(), name, value);
+inline bool RegistryReactionData_RegType_Parse(
+    const ::std::string& name, RegistryReactionData_RegType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<RegistryReactionData_RegType>(
+    RegistryReactionData_RegType_descriptor(), name, value);
+}
+enum Tactic {
+  InitialAccess = 0,
+  Execution = 1,
+  Persistence = 2,
+  PrivilegeEscalation = 3,
+  DefenseEvasion = 4,
+  CredentialAccess = 5,
+  Discovery = 6,
+  LateralMovement = 7,
+  Collection = 8,
+  CommandControl = 9,
+  Exfiltration = 10,
+  Impact = 12,
+  Tactic_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  Tactic_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool Tactic_IsValid(int value);
+const Tactic Tactic_MIN = InitialAccess;
+const Tactic Tactic_MAX = Impact;
+const int Tactic_ARRAYSIZE = Tactic_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Tactic_descriptor();
+inline const ::std::string& Tactic_Name(Tactic value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Tactic_descriptor(), value);
+}
+inline bool Tactic_Parse(
+    const ::std::string& name, Tactic* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Tactic>(
+    Tactic_descriptor(), name, value);
+}
+enum DataSource {
+  ServiceSource = 0,
+  ProcessSource = 1,
+  DriverSource = 2,
+  FileSystemSource = 3,
+  RegistrySource = 4,
+  GPOSource = 5,
+  EventLogsSource = 6,
+  NetworkSource = 7,
+  DataSource_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  DataSource_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool DataSource_IsValid(int value);
+const DataSource DataSource_MIN = ServiceSource;
+const DataSource DataSource_MAX = NetworkSource;
+const int DataSource_ARRAYSIZE = DataSource_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* DataSource_descriptor();
+inline const ::std::string& DataSource_Name(DataSource value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    DataSource_descriptor(), value);
+}
+inline bool DataSource_Parse(
+    const ::std::string& name, DataSource* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<DataSource>(
+    DataSource_descriptor(), name, value);
+}
+enum Category {
+  Configurations = 0,
+  Processes = 1,
+  Files = 2,
+  Network = 3,
+  Category_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  Category_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool Category_IsValid(int value);
+const Category Category_MIN = Configurations;
+const Category Category_MAX = Network;
+const int Category_ARRAYSIZE = Category_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Category_descriptor();
+inline const ::std::string& Category_Name(Category value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Category_descriptor(), value);
+}
+inline bool Category_Parse(
+    const ::std::string& name, Category* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Category>(
+    Category_descriptor(), name, value);
+}
+enum Aggressiveness {
+  Cursory = 0,
+  Moderate = 1,
+  Careful = 2,
+  Aggressive = 3,
+  Aggressiveness_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  Aggressiveness_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool Aggressiveness_IsValid(int value);
+const Aggressiveness Aggressiveness_MIN = Cursory;
+const Aggressiveness Aggressiveness_MAX = Aggressive;
+const int Aggressiveness_ARRAYSIZE = Aggressiveness_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Aggressiveness_descriptor();
+inline const ::std::string& Aggressiveness_Name(Aggressiveness value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Aggressiveness_descriptor(), value);
+}
+inline bool Aggressiveness_Parse(
+    const ::std::string& name, Aggressiveness* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Aggressiveness>(
+    Aggressiveness_descriptor(), name, value);
 }
 // ===================================================================
 
 class ACLEntry final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:ACLEntry) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:gpb.ACLEntry) */ {
  public:
   ACLEntry();
   virtual ~ACLEntry();
@@ -250,7 +349,7 @@ class ACLEntry final :
   ::google::protobuf::uint32 securityattributes() const;
   void set_securityattributes(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:ACLEntry)
+  // @@protoc_insertion_point(class_scope:gpb.ACLEntry)
  private:
   class HasBitSetters;
 
@@ -264,7 +363,7 @@ class ACLEntry final :
 // -------------------------------------------------------------------
 
 class FileReactionData_Signature final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:FileReactionData.Signature) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:gpb.FileReactionData.Signature) */ {
  public:
   FileReactionData_Signature();
   virtual ~FileReactionData_Signature();
@@ -392,7 +491,7 @@ class FileReactionData_Signature final :
   ::google::protobuf::uint32 timestamp() const;
   void set_timestamp(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:FileReactionData.Signature)
+  // @@protoc_insertion_point(class_scope:gpb.FileReactionData.Signature)
  private:
   class HasBitSetters;
 
@@ -406,7 +505,7 @@ class FileReactionData_Signature final :
 // -------------------------------------------------------------------
 
 class FileReactionData final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:FileReactionData) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:gpb.FileReactionData) */ {
  public:
   FileReactionData();
   virtual ~FileReactionData();
@@ -502,28 +601,28 @@ class FileReactionData final :
 
   // accessors -------------------------------------------------------
 
-  // repeated .FileReactionData.Signature signatures = 10;
+  // repeated .gpb.FileReactionData.Signature signatures = 10;
   int signatures_size() const;
   void clear_signatures();
   static const int kSignaturesFieldNumber = 10;
-  ::FileReactionData_Signature* mutable_signatures(int index);
-  ::google::protobuf::RepeatedPtrField< ::FileReactionData_Signature >*
+  ::gpb::FileReactionData_Signature* mutable_signatures(int index);
+  ::google::protobuf::RepeatedPtrField< ::gpb::FileReactionData_Signature >*
       mutable_signatures();
-  const ::FileReactionData_Signature& signatures(int index) const;
-  ::FileReactionData_Signature* add_signatures();
-  const ::google::protobuf::RepeatedPtrField< ::FileReactionData_Signature >&
+  const ::gpb::FileReactionData_Signature& signatures(int index) const;
+  ::gpb::FileReactionData_Signature* add_signatures();
+  const ::google::protobuf::RepeatedPtrField< ::gpb::FileReactionData_Signature >&
       signatures() const;
 
-  // repeated .ACLEntry ACL = 11;
+  // repeated .gpb.ACLEntry ACL = 11;
   int acl_size() const;
   void clear_acl();
   static const int kACLFieldNumber = 11;
-  ::ACLEntry* mutable_acl(int index);
-  ::google::protobuf::RepeatedPtrField< ::ACLEntry >*
+  ::gpb::ACLEntry* mutable_acl(int index);
+  ::google::protobuf::RepeatedPtrField< ::gpb::ACLEntry >*
       mutable_acl();
-  const ::ACLEntry& acl(int index) const;
-  ::ACLEntry* add_acl();
-  const ::google::protobuf::RepeatedPtrField< ::ACLEntry >&
+  const ::gpb::ACLEntry& acl(int index) const;
+  ::gpb::ACLEntry* add_acl();
+  const ::google::protobuf::RepeatedPtrField< ::gpb::ACLEntry >&
       acl() const;
 
   // string fileName = 2;
@@ -612,13 +711,13 @@ class FileReactionData final :
   ::google::protobuf::uint32 timeaccessed() const;
   void set_timeaccessed(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:FileReactionData)
+  // @@protoc_insertion_point(class_scope:gpb.FileReactionData)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::FileReactionData_Signature > signatures_;
-  ::google::protobuf::RepeatedPtrField< ::ACLEntry > acl_;
+  ::google::protobuf::RepeatedPtrField< ::gpb::FileReactionData_Signature > signatures_;
+  ::google::protobuf::RepeatedPtrField< ::gpb::ACLEntry > acl_;
   ::google::protobuf::internal::ArenaStringPtr filename_;
   ::google::protobuf::internal::ArenaStringPtr description_;
   ::google::protobuf::internal::ArenaStringPtr owner_;
@@ -634,7 +733,7 @@ class FileReactionData final :
 // -------------------------------------------------------------------
 
 class RegistryReactionData final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:RegistryReactionData) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:gpb.RegistryReactionData) */ {
  public:
   RegistryReactionData();
   virtual ~RegistryReactionData();
@@ -726,52 +825,52 @@ class RegistryReactionData final :
 
   // nested types ----------------------------------------------------
 
-  typedef RegistryReactionData_Type Type;
-  static const Type REG_SZ =
-    RegistryReactionData_Type_REG_SZ;
-  static const Type REG_MULTI_SZ =
-    RegistryReactionData_Type_REG_MULTI_SZ;
-  static const Type REG_EXPAND_SZ =
-    RegistryReactionData_Type_REG_EXPAND_SZ;
-  static const Type REG_BINARY =
-    RegistryReactionData_Type_REG_BINARY;
-  static const Type REG_DWORD =
-    RegistryReactionData_Type_REG_DWORD;
-  static const Type REG_QWORD =
-    RegistryReactionData_Type_REG_QWORD;
-  static inline bool Type_IsValid(int value) {
-    return RegistryReactionData_Type_IsValid(value);
+  typedef RegistryReactionData_RegType RegType;
+  static const RegType SZ =
+    RegistryReactionData_RegType_SZ;
+  static const RegType MULTI_SZ =
+    RegistryReactionData_RegType_MULTI_SZ;
+  static const RegType EXPAND_SZ =
+    RegistryReactionData_RegType_EXPAND_SZ;
+  static const RegType BINARY =
+    RegistryReactionData_RegType_BINARY;
+  static const RegType DWORD =
+    RegistryReactionData_RegType_DWORD;
+  static const RegType QWORD =
+    RegistryReactionData_RegType_QWORD;
+  static inline bool RegType_IsValid(int value) {
+    return RegistryReactionData_RegType_IsValid(value);
   }
-  static const Type Type_MIN =
-    RegistryReactionData_Type_Type_MIN;
-  static const Type Type_MAX =
-    RegistryReactionData_Type_Type_MAX;
-  static const int Type_ARRAYSIZE =
-    RegistryReactionData_Type_Type_ARRAYSIZE;
+  static const RegType RegType_MIN =
+    RegistryReactionData_RegType_RegType_MIN;
+  static const RegType RegType_MAX =
+    RegistryReactionData_RegType_RegType_MAX;
+  static const int RegType_ARRAYSIZE =
+    RegistryReactionData_RegType_RegType_ARRAYSIZE;
   static inline const ::google::protobuf::EnumDescriptor*
-  Type_descriptor() {
-    return RegistryReactionData_Type_descriptor();
+  RegType_descriptor() {
+    return RegistryReactionData_RegType_descriptor();
   }
-  static inline const ::std::string& Type_Name(Type value) {
-    return RegistryReactionData_Type_Name(value);
+  static inline const ::std::string& RegType_Name(RegType value) {
+    return RegistryReactionData_RegType_Name(value);
   }
-  static inline bool Type_Parse(const ::std::string& name,
-      Type* value) {
-    return RegistryReactionData_Type_Parse(name, value);
+  static inline bool RegType_Parse(const ::std::string& name,
+      RegType* value) {
+    return RegistryReactionData_RegType_Parse(name, value);
   }
 
   // accessors -------------------------------------------------------
 
-  // repeated .ACLEntry ACL = 6;
+  // repeated .gpb.ACLEntry ACL = 6;
   int acl_size() const;
   void clear_acl();
   static const int kACLFieldNumber = 6;
-  ::ACLEntry* mutable_acl(int index);
-  ::google::protobuf::RepeatedPtrField< ::ACLEntry >*
+  ::gpb::ACLEntry* mutable_acl(int index);
+  ::google::protobuf::RepeatedPtrField< ::gpb::ACLEntry >*
       mutable_acl();
-  const ::ACLEntry& acl(int index) const;
-  ::ACLEntry* add_acl();
-  const ::google::protobuf::RepeatedPtrField< ::ACLEntry >&
+  const ::gpb::ACLEntry& acl(int index) const;
+  ::gpb::ACLEntry* add_acl();
+  const ::google::protobuf::RepeatedPtrField< ::gpb::ACLEntry >&
       acl() const;
 
   // string key = 2;
@@ -822,18 +921,18 @@ class RegistryReactionData final :
   ::google::protobuf::uint32 mitreid() const;
   void set_mitreid(::google::protobuf::uint32 value);
 
-  // .RegistryReactionData.Type type = 5;
+  // .gpb.RegistryReactionData.RegType type = 5;
   void clear_type();
   static const int kTypeFieldNumber = 5;
-  ::RegistryReactionData_Type type() const;
-  void set_type(::RegistryReactionData_Type value);
+  ::gpb::RegistryReactionData_RegType type() const;
+  void set_type(::gpb::RegistryReactionData_RegType value);
 
-  // @@protoc_insertion_point(class_scope:RegistryReactionData)
+  // @@protoc_insertion_point(class_scope:gpb.RegistryReactionData)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::ACLEntry > acl_;
+  ::google::protobuf::RepeatedPtrField< ::gpb::ACLEntry > acl_;
   ::google::protobuf::internal::ArenaStringPtr key_;
   ::google::protobuf::internal::ArenaStringPtr data_;
   ::google::protobuf::internal::ArenaStringPtr newdata_;
@@ -845,7 +944,7 @@ class RegistryReactionData final :
 // -------------------------------------------------------------------
 
 class ProcessReactionData final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:ProcessReactionData) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:gpb.ProcessReactionData) */ {
  public:
   ProcessReactionData();
   virtual ~ProcessReactionData();
@@ -1107,7 +1206,7 @@ class ProcessReactionData final :
   ::google::protobuf::uint32 workingset() const;
   void set_workingset(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:ProcessReactionData)
+  // @@protoc_insertion_point(class_scope:gpb.ProcessReactionData)
  private:
   class HasBitSetters;
 
@@ -1134,7 +1233,7 @@ class ProcessReactionData final :
 // -------------------------------------------------------------------
 
 class ServiceReactionData final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:ServiceReactionData) */ {
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:gpb.ServiceReactionData) */ {
  public:
   ServiceReactionData();
   virtual ~ServiceReactionData();
@@ -1358,7 +1457,7 @@ class ServiceReactionData final :
   bool allowdesktopinteract() const;
   void set_allowdesktopinteract(bool value);
 
-  // @@protoc_insertion_point(class_scope:ServiceReactionData)
+  // @@protoc_insertion_point(class_scope:gpb.ServiceReactionData)
  private:
   class HasBitSetters;
 
@@ -1379,25 +1478,25 @@ class ServiceReactionData final :
 };
 // -------------------------------------------------------------------
 
-class FileReaction final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:FileReaction) */ {
+class HuntInfo final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:gpb.HuntInfo) */ {
  public:
-  FileReaction();
-  virtual ~FileReaction();
+  HuntInfo();
+  virtual ~HuntInfo();
 
-  FileReaction(const FileReaction& from);
+  HuntInfo(const HuntInfo& from);
 
-  inline FileReaction& operator=(const FileReaction& from) {
+  inline HuntInfo& operator=(const HuntInfo& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  FileReaction(FileReaction&& from) noexcept
-    : FileReaction() {
+  HuntInfo(HuntInfo&& from) noexcept
+    : HuntInfo() {
     *this = ::std::move(from);
   }
 
-  inline FileReaction& operator=(FileReaction&& from) noexcept {
+  inline HuntInfo& operator=(HuntInfo&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1409,34 +1508,34 @@ class FileReaction final :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const FileReaction& default_instance();
+  static const HuntInfo& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const FileReaction* internal_default_instance() {
-    return reinterpret_cast<const FileReaction*>(
-               &_FileReaction_default_instance_);
+  static inline const HuntInfo* internal_default_instance() {
+    return reinterpret_cast<const HuntInfo*>(
+               &_HuntInfo_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     6;
 
-  void Swap(FileReaction* other);
-  friend void swap(FileReaction& a, FileReaction& b) {
+  void Swap(HuntInfo* other);
+  friend void swap(HuntInfo& a, HuntInfo& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline FileReaction* New() const final {
-    return CreateMaybeMessage<FileReaction>(nullptr);
+  inline HuntInfo* New() const final {
+    return CreateMaybeMessage<HuntInfo>(nullptr);
   }
 
-  FileReaction* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<FileReaction>(arena);
+  HuntInfo* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<HuntInfo>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const FileReaction& from);
-  void MergeFrom(const FileReaction& from);
+  void CopyFrom(const HuntInfo& from);
+  void MergeFrom(const HuntInfo& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1458,7 +1557,7 @@ class FileReaction final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(FileReaction* other);
+  void InternalSwap(HuntInfo* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1474,60 +1573,100 @@ class FileReaction final :
 
   // accessors -------------------------------------------------------
 
-  // string description = 1;
-  void clear_description();
-  static const int kDescriptionFieldNumber = 1;
-  const ::std::string& description() const;
-  void set_description(const ::std::string& value);
+  // repeated .gpb.Tactic huntTactics = 3;
+  int hunttactics_size() const;
+  void clear_hunttactics();
+  static const int kHuntTacticsFieldNumber = 3;
+  ::gpb::Tactic hunttactics(int index) const;
+  void set_hunttactics(int index, ::gpb::Tactic value);
+  void add_hunttactics(::gpb::Tactic value);
+  const ::google::protobuf::RepeatedField<int>& hunttactics() const;
+  ::google::protobuf::RepeatedField<int>* mutable_hunttactics();
+
+  // repeated .gpb.Category huntCategories = 4;
+  int huntcategories_size() const;
+  void clear_huntcategories();
+  static const int kHuntCategoriesFieldNumber = 4;
+  ::gpb::Category huntcategories(int index) const;
+  void set_huntcategories(int index, ::gpb::Category value);
+  void add_huntcategories(::gpb::Category value);
+  const ::google::protobuf::RepeatedField<int>& huntcategories() const;
+  ::google::protobuf::RepeatedField<int>* mutable_huntcategories();
+
+  // repeated .gpb.DataSource huntDatasources = 5;
+  int huntdatasources_size() const;
+  void clear_huntdatasources();
+  static const int kHuntDatasourcesFieldNumber = 5;
+  ::gpb::DataSource huntdatasources(int index) const;
+  void set_huntdatasources(int index, ::gpb::DataSource value);
+  void add_huntdatasources(::gpb::DataSource value);
+  const ::google::protobuf::RepeatedField<int>& huntdatasources() const;
+  ::google::protobuf::RepeatedField<int>* mutable_huntdatasources();
+
+  // string huntName = 1;
+  void clear_huntname();
+  static const int kHuntNameFieldNumber = 1;
+  const ::std::string& huntname() const;
+  void set_huntname(const ::std::string& value);
   #if LANG_CXX11
-  void set_description(::std::string&& value);
+  void set_huntname(::std::string&& value);
   #endif
-  void set_description(const char* value);
-  void set_description(const char* value, size_t size);
-  ::std::string* mutable_description();
-  ::std::string* release_description();
-  void set_allocated_description(::std::string* description);
+  void set_huntname(const char* value);
+  void set_huntname(const char* value, size_t size);
+  ::std::string* mutable_huntname();
+  ::std::string* release_huntname();
+  void set_allocated_huntname(::std::string* huntname);
 
-  // .FileReactionData info = 2;
-  bool has_info() const;
-  void clear_info();
-  static const int kInfoFieldNumber = 2;
-  const ::FileReactionData& info() const;
-  ::FileReactionData* release_info();
-  ::FileReactionData* mutable_info();
-  void set_allocated_info(::FileReactionData* info);
+  // .gpb.Aggressiveness huntAggressiveness = 2;
+  void clear_huntaggressiveness();
+  static const int kHuntAggressivenessFieldNumber = 2;
+  ::gpb::Aggressiveness huntaggressiveness() const;
+  void set_huntaggressiveness(::gpb::Aggressiveness value);
 
-  // @@protoc_insertion_point(class_scope:FileReaction)
+  // uint32 huntStartTime = 6;
+  void clear_huntstarttime();
+  static const int kHuntStartTimeFieldNumber = 6;
+  ::google::protobuf::uint32 huntstarttime() const;
+  void set_huntstarttime(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:gpb.HuntInfo)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr description_;
-  ::FileReactionData* info_;
+  ::google::protobuf::RepeatedField<int> hunttactics_;
+  mutable std::atomic<int> _hunttactics_cached_byte_size_;
+  ::google::protobuf::RepeatedField<int> huntcategories_;
+  mutable std::atomic<int> _huntcategories_cached_byte_size_;
+  ::google::protobuf::RepeatedField<int> huntdatasources_;
+  mutable std::atomic<int> _huntdatasources_cached_byte_size_;
+  ::google::protobuf::internal::ArenaStringPtr huntname_;
+  int huntaggressiveness_;
+  ::google::protobuf::uint32 huntstarttime_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ReactionData_2eproto;
 };
 // -------------------------------------------------------------------
 
-class RegistryReaction final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:RegistryReaction) */ {
+class HuntMessage final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:gpb.HuntMessage) */ {
  public:
-  RegistryReaction();
-  virtual ~RegistryReaction();
+  HuntMessage();
+  virtual ~HuntMessage();
 
-  RegistryReaction(const RegistryReaction& from);
+  HuntMessage(const HuntMessage& from);
 
-  inline RegistryReaction& operator=(const RegistryReaction& from) {
+  inline HuntMessage& operator=(const HuntMessage& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  RegistryReaction(RegistryReaction&& from) noexcept
-    : RegistryReaction() {
+  HuntMessage(HuntMessage&& from) noexcept
+    : HuntMessage() {
     *this = ::std::move(from);
   }
 
-  inline RegistryReaction& operator=(RegistryReaction&& from) noexcept {
+  inline HuntMessage& operator=(HuntMessage&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1539,34 +1678,34 @@ class RegistryReaction final :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const RegistryReaction& default_instance();
+  static const HuntMessage& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const RegistryReaction* internal_default_instance() {
-    return reinterpret_cast<const RegistryReaction*>(
-               &_RegistryReaction_default_instance_);
+  static inline const HuntMessage* internal_default_instance() {
+    return reinterpret_cast<const HuntMessage*>(
+               &_HuntMessage_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     7;
 
-  void Swap(RegistryReaction* other);
-  friend void swap(RegistryReaction& a, RegistryReaction& b) {
+  void Swap(HuntMessage* other);
+  friend void swap(HuntMessage& a, HuntMessage& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline RegistryReaction* New() const final {
-    return CreateMaybeMessage<RegistryReaction>(nullptr);
+  inline HuntMessage* New() const final {
+    return CreateMaybeMessage<HuntMessage>(nullptr);
   }
 
-  RegistryReaction* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<RegistryReaction>(arena);
+  HuntMessage* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<HuntMessage>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const RegistryReaction& from);
-  void MergeFrom(const RegistryReaction& from);
+  void CopyFrom(const HuntMessage& from);
+  void MergeFrom(const HuntMessage& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1588,7 +1727,7 @@ class RegistryReaction final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(RegistryReaction* other);
+  void InternalSwap(HuntMessage* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1604,296 +1743,88 @@ class RegistryReaction final :
 
   // accessors -------------------------------------------------------
 
-  // string description = 1;
-  void clear_description();
-  static const int kDescriptionFieldNumber = 1;
-  const ::std::string& description() const;
-  void set_description(const ::std::string& value);
-  #if LANG_CXX11
-  void set_description(::std::string&& value);
-  #endif
-  void set_description(const char* value);
-  void set_description(const char* value, size_t size);
-  ::std::string* mutable_description();
-  ::std::string* release_description();
-  void set_allocated_description(::std::string* description);
+  // repeated .gpb.FileReactionData fileDetections = 4;
+  int filedetections_size() const;
+  void clear_filedetections();
+  static const int kFileDetectionsFieldNumber = 4;
+  ::gpb::FileReactionData* mutable_filedetections(int index);
+  ::google::protobuf::RepeatedPtrField< ::gpb::FileReactionData >*
+      mutable_filedetections();
+  const ::gpb::FileReactionData& filedetections(int index) const;
+  ::gpb::FileReactionData* add_filedetections();
+  const ::google::protobuf::RepeatedPtrField< ::gpb::FileReactionData >&
+      filedetections() const;
 
-  // .RegistryReactionData info = 2;
+  // repeated .gpb.RegistryReactionData registryDetections = 5;
+  int registrydetections_size() const;
+  void clear_registrydetections();
+  static const int kRegistryDetectionsFieldNumber = 5;
+  ::gpb::RegistryReactionData* mutable_registrydetections(int index);
+  ::google::protobuf::RepeatedPtrField< ::gpb::RegistryReactionData >*
+      mutable_registrydetections();
+  const ::gpb::RegistryReactionData& registrydetections(int index) const;
+  ::gpb::RegistryReactionData* add_registrydetections();
+  const ::google::protobuf::RepeatedPtrField< ::gpb::RegistryReactionData >&
+      registrydetections() const;
+
+  // repeated .gpb.ProcessReactionData processDetections = 6;
+  int processdetections_size() const;
+  void clear_processdetections();
+  static const int kProcessDetectionsFieldNumber = 6;
+  ::gpb::ProcessReactionData* mutable_processdetections(int index);
+  ::google::protobuf::RepeatedPtrField< ::gpb::ProcessReactionData >*
+      mutable_processdetections();
+  const ::gpb::ProcessReactionData& processdetections(int index) const;
+  ::gpb::ProcessReactionData* add_processdetections();
+  const ::google::protobuf::RepeatedPtrField< ::gpb::ProcessReactionData >&
+      processdetections() const;
+
+  // repeated .gpb.ServiceReactionData serviceDetections = 7;
+  int servicedetections_size() const;
+  void clear_servicedetections();
+  static const int kServiceDetectionsFieldNumber = 7;
+  ::gpb::ServiceReactionData* mutable_servicedetections(int index);
+  ::google::protobuf::RepeatedPtrField< ::gpb::ServiceReactionData >*
+      mutable_servicedetections();
+  const ::gpb::ServiceReactionData& servicedetections(int index) const;
+  ::gpb::ServiceReactionData* add_servicedetections();
+  const ::google::protobuf::RepeatedPtrField< ::gpb::ServiceReactionData >&
+      servicedetections() const;
+
+  // string extraMessage = 3;
+  void clear_extramessage();
+  static const int kExtraMessageFieldNumber = 3;
+  const ::std::string& extramessage() const;
+  void set_extramessage(const ::std::string& value);
+  #if LANG_CXX11
+  void set_extramessage(::std::string&& value);
+  #endif
+  void set_extramessage(const char* value);
+  void set_extramessage(const char* value, size_t size);
+  ::std::string* mutable_extramessage();
+  ::std::string* release_extramessage();
+  void set_allocated_extramessage(::std::string* extramessage);
+
+  // .gpb.HuntInfo info = 1;
   bool has_info() const;
   void clear_info();
-  static const int kInfoFieldNumber = 2;
-  const ::RegistryReactionData& info() const;
-  ::RegistryReactionData* release_info();
-  ::RegistryReactionData* mutable_info();
-  void set_allocated_info(::RegistryReactionData* info);
+  static const int kInfoFieldNumber = 1;
+  const ::gpb::HuntInfo& info() const;
+  ::gpb::HuntInfo* release_info();
+  ::gpb::HuntInfo* mutable_info();
+  void set_allocated_info(::gpb::HuntInfo* info);
 
-  // @@protoc_insertion_point(class_scope:RegistryReaction)
+  // @@protoc_insertion_point(class_scope:gpb.HuntMessage)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr description_;
-  ::RegistryReactionData* info_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_ReactionData_2eproto;
-};
-// -------------------------------------------------------------------
-
-class ProcessReaction final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:ProcessReaction) */ {
- public:
-  ProcessReaction();
-  virtual ~ProcessReaction();
-
-  ProcessReaction(const ProcessReaction& from);
-
-  inline ProcessReaction& operator=(const ProcessReaction& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  ProcessReaction(ProcessReaction&& from) noexcept
-    : ProcessReaction() {
-    *this = ::std::move(from);
-  }
-
-  inline ProcessReaction& operator=(ProcessReaction&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const ProcessReaction& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ProcessReaction* internal_default_instance() {
-    return reinterpret_cast<const ProcessReaction*>(
-               &_ProcessReaction_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    8;
-
-  void Swap(ProcessReaction* other);
-  friend void swap(ProcessReaction& a, ProcessReaction& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline ProcessReaction* New() const final {
-    return CreateMaybeMessage<ProcessReaction>(nullptr);
-  }
-
-  ProcessReaction* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ProcessReaction>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ProcessReaction& from);
-  void MergeFrom(const ProcessReaction& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(ProcessReaction* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string description = 1;
-  void clear_description();
-  static const int kDescriptionFieldNumber = 1;
-  const ::std::string& description() const;
-  void set_description(const ::std::string& value);
-  #if LANG_CXX11
-  void set_description(::std::string&& value);
-  #endif
-  void set_description(const char* value);
-  void set_description(const char* value, size_t size);
-  ::std::string* mutable_description();
-  ::std::string* release_description();
-  void set_allocated_description(::std::string* description);
-
-  // .ProcessReactionData info = 2;
-  bool has_info() const;
-  void clear_info();
-  static const int kInfoFieldNumber = 2;
-  const ::ProcessReactionData& info() const;
-  ::ProcessReactionData* release_info();
-  ::ProcessReactionData* mutable_info();
-  void set_allocated_info(::ProcessReactionData* info);
-
-  // @@protoc_insertion_point(class_scope:ProcessReaction)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr description_;
-  ::ProcessReactionData* info_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_ReactionData_2eproto;
-};
-// -------------------------------------------------------------------
-
-class ServiceReaction final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:ServiceReaction) */ {
- public:
-  ServiceReaction();
-  virtual ~ServiceReaction();
-
-  ServiceReaction(const ServiceReaction& from);
-
-  inline ServiceReaction& operator=(const ServiceReaction& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  ServiceReaction(ServiceReaction&& from) noexcept
-    : ServiceReaction() {
-    *this = ::std::move(from);
-  }
-
-  inline ServiceReaction& operator=(ServiceReaction&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const ServiceReaction& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ServiceReaction* internal_default_instance() {
-    return reinterpret_cast<const ServiceReaction*>(
-               &_ServiceReaction_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    9;
-
-  void Swap(ServiceReaction* other);
-  friend void swap(ServiceReaction& a, ServiceReaction& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline ServiceReaction* New() const final {
-    return CreateMaybeMessage<ServiceReaction>(nullptr);
-  }
-
-  ServiceReaction* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ServiceReaction>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ServiceReaction& from);
-  void MergeFrom(const ServiceReaction& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(ServiceReaction* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string description = 1;
-  void clear_description();
-  static const int kDescriptionFieldNumber = 1;
-  const ::std::string& description() const;
-  void set_description(const ::std::string& value);
-  #if LANG_CXX11
-  void set_description(::std::string&& value);
-  #endif
-  void set_description(const char* value);
-  void set_description(const char* value, size_t size);
-  ::std::string* mutable_description();
-  ::std::string* release_description();
-  void set_allocated_description(::std::string* description);
-
-  // .ServiceReactionData info = 2;
-  bool has_info() const;
-  void clear_info();
-  static const int kInfoFieldNumber = 2;
-  const ::ServiceReactionData& info() const;
-  ::ServiceReactionData* release_info();
-  ::ServiceReactionData* mutable_info();
-  void set_allocated_info(::ServiceReactionData* info);
-
-  // @@protoc_insertion_point(class_scope:ServiceReaction)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr description_;
-  ::ServiceReactionData* info_;
+  ::google::protobuf::RepeatedPtrField< ::gpb::FileReactionData > filedetections_;
+  ::google::protobuf::RepeatedPtrField< ::gpb::RegistryReactionData > registrydetections_;
+  ::google::protobuf::RepeatedPtrField< ::gpb::ProcessReactionData > processdetections_;
+  ::google::protobuf::RepeatedPtrField< ::gpb::ServiceReactionData > servicedetections_;
+  ::google::protobuf::internal::ArenaStringPtr extramessage_;
+  ::gpb::HuntInfo* info_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_ReactionData_2eproto;
 };
@@ -1913,41 +1844,41 @@ inline void ACLEntry::clear_user() {
   user_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ACLEntry::user() const {
-  // @@protoc_insertion_point(field_get:ACLEntry.user)
+  // @@protoc_insertion_point(field_get:gpb.ACLEntry.user)
   return user_.GetNoArena();
 }
 inline void ACLEntry::set_user(const ::std::string& value) {
   
   user_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ACLEntry.user)
+  // @@protoc_insertion_point(field_set:gpb.ACLEntry.user)
 }
 #if LANG_CXX11
 inline void ACLEntry::set_user(::std::string&& value) {
   
   user_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ACLEntry.user)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ACLEntry.user)
 }
 #endif
 inline void ACLEntry::set_user(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   user_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ACLEntry.user)
+  // @@protoc_insertion_point(field_set_char:gpb.ACLEntry.user)
 }
 inline void ACLEntry::set_user(const char* value, size_t size) {
   
   user_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ACLEntry.user)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ACLEntry.user)
 }
 inline ::std::string* ACLEntry::mutable_user() {
   
-  // @@protoc_insertion_point(field_mutable:ACLEntry.user)
+  // @@protoc_insertion_point(field_mutable:gpb.ACLEntry.user)
   return user_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ACLEntry::release_user() {
-  // @@protoc_insertion_point(field_release:ACLEntry.user)
+  // @@protoc_insertion_point(field_release:gpb.ACLEntry.user)
   
   return user_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -1958,7 +1889,7 @@ inline void ACLEntry::set_allocated_user(::std::string* user) {
     
   }
   user_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user);
-  // @@protoc_insertion_point(field_set_allocated:ACLEntry.user)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ACLEntry.user)
 }
 
 // string group = 2;
@@ -1966,41 +1897,41 @@ inline void ACLEntry::clear_group() {
   group_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ACLEntry::group() const {
-  // @@protoc_insertion_point(field_get:ACLEntry.group)
+  // @@protoc_insertion_point(field_get:gpb.ACLEntry.group)
   return group_.GetNoArena();
 }
 inline void ACLEntry::set_group(const ::std::string& value) {
   
   group_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ACLEntry.group)
+  // @@protoc_insertion_point(field_set:gpb.ACLEntry.group)
 }
 #if LANG_CXX11
 inline void ACLEntry::set_group(::std::string&& value) {
   
   group_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ACLEntry.group)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ACLEntry.group)
 }
 #endif
 inline void ACLEntry::set_group(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   group_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ACLEntry.group)
+  // @@protoc_insertion_point(field_set_char:gpb.ACLEntry.group)
 }
 inline void ACLEntry::set_group(const char* value, size_t size) {
   
   group_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ACLEntry.group)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ACLEntry.group)
 }
 inline ::std::string* ACLEntry::mutable_group() {
   
-  // @@protoc_insertion_point(field_mutable:ACLEntry.group)
+  // @@protoc_insertion_point(field_mutable:gpb.ACLEntry.group)
   return group_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ACLEntry::release_group() {
-  // @@protoc_insertion_point(field_release:ACLEntry.group)
+  // @@protoc_insertion_point(field_release:gpb.ACLEntry.group)
   
   return group_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2011,7 +1942,7 @@ inline void ACLEntry::set_allocated_group(::std::string* group) {
     
   }
   group_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), group);
-  // @@protoc_insertion_point(field_set_allocated:ACLEntry.group)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ACLEntry.group)
 }
 
 // uint32 securityAttributes = 3;
@@ -2019,13 +1950,13 @@ inline void ACLEntry::clear_securityattributes() {
   securityattributes_ = 0u;
 }
 inline ::google::protobuf::uint32 ACLEntry::securityattributes() const {
-  // @@protoc_insertion_point(field_get:ACLEntry.securityAttributes)
+  // @@protoc_insertion_point(field_get:gpb.ACLEntry.securityAttributes)
   return securityattributes_;
 }
 inline void ACLEntry::set_securityattributes(::google::protobuf::uint32 value) {
   
   securityattributes_ = value;
-  // @@protoc_insertion_point(field_set:ACLEntry.securityAttributes)
+  // @@protoc_insertion_point(field_set:gpb.ACLEntry.securityAttributes)
 }
 
 // -------------------------------------------------------------------
@@ -2037,41 +1968,41 @@ inline void FileReactionData_Signature::clear_signername() {
   signername_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& FileReactionData_Signature::signername() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.Signature.signerName)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.Signature.signerName)
   return signername_.GetNoArena();
 }
 inline void FileReactionData_Signature::set_signername(const ::std::string& value) {
   
   signername_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:FileReactionData.Signature.signerName)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.Signature.signerName)
 }
 #if LANG_CXX11
 inline void FileReactionData_Signature::set_signername(::std::string&& value) {
   
   signername_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:FileReactionData.Signature.signerName)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.FileReactionData.Signature.signerName)
 }
 #endif
 inline void FileReactionData_Signature::set_signername(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   signername_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:FileReactionData.Signature.signerName)
+  // @@protoc_insertion_point(field_set_char:gpb.FileReactionData.Signature.signerName)
 }
 inline void FileReactionData_Signature::set_signername(const char* value, size_t size) {
   
   signername_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:FileReactionData.Signature.signerName)
+  // @@protoc_insertion_point(field_set_pointer:gpb.FileReactionData.Signature.signerName)
 }
 inline ::std::string* FileReactionData_Signature::mutable_signername() {
   
-  // @@protoc_insertion_point(field_mutable:FileReactionData.Signature.signerName)
+  // @@protoc_insertion_point(field_mutable:gpb.FileReactionData.Signature.signerName)
   return signername_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* FileReactionData_Signature::release_signername() {
-  // @@protoc_insertion_point(field_release:FileReactionData.Signature.signerName)
+  // @@protoc_insertion_point(field_release:gpb.FileReactionData.Signature.signerName)
   
   return signername_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2082,7 +2013,7 @@ inline void FileReactionData_Signature::set_allocated_signername(::std::string* 
     
   }
   signername_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), signername);
-  // @@protoc_insertion_point(field_set_allocated:FileReactionData.Signature.signerName)
+  // @@protoc_insertion_point(field_set_allocated:gpb.FileReactionData.Signature.signerName)
 }
 
 // string digestAlgorithm = 2;
@@ -2090,41 +2021,41 @@ inline void FileReactionData_Signature::clear_digestalgorithm() {
   digestalgorithm_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& FileReactionData_Signature::digestalgorithm() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.Signature.digestAlgorithm)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.Signature.digestAlgorithm)
   return digestalgorithm_.GetNoArena();
 }
 inline void FileReactionData_Signature::set_digestalgorithm(const ::std::string& value) {
   
   digestalgorithm_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:FileReactionData.Signature.digestAlgorithm)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.Signature.digestAlgorithm)
 }
 #if LANG_CXX11
 inline void FileReactionData_Signature::set_digestalgorithm(::std::string&& value) {
   
   digestalgorithm_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:FileReactionData.Signature.digestAlgorithm)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.FileReactionData.Signature.digestAlgorithm)
 }
 #endif
 inline void FileReactionData_Signature::set_digestalgorithm(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   digestalgorithm_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:FileReactionData.Signature.digestAlgorithm)
+  // @@protoc_insertion_point(field_set_char:gpb.FileReactionData.Signature.digestAlgorithm)
 }
 inline void FileReactionData_Signature::set_digestalgorithm(const char* value, size_t size) {
   
   digestalgorithm_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:FileReactionData.Signature.digestAlgorithm)
+  // @@protoc_insertion_point(field_set_pointer:gpb.FileReactionData.Signature.digestAlgorithm)
 }
 inline ::std::string* FileReactionData_Signature::mutable_digestalgorithm() {
   
-  // @@protoc_insertion_point(field_mutable:FileReactionData.Signature.digestAlgorithm)
+  // @@protoc_insertion_point(field_mutable:gpb.FileReactionData.Signature.digestAlgorithm)
   return digestalgorithm_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* FileReactionData_Signature::release_digestalgorithm() {
-  // @@protoc_insertion_point(field_release:FileReactionData.Signature.digestAlgorithm)
+  // @@protoc_insertion_point(field_release:gpb.FileReactionData.Signature.digestAlgorithm)
   
   return digestalgorithm_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2135,7 +2066,7 @@ inline void FileReactionData_Signature::set_allocated_digestalgorithm(::std::str
     
   }
   digestalgorithm_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), digestalgorithm);
-  // @@protoc_insertion_point(field_set_allocated:FileReactionData.Signature.digestAlgorithm)
+  // @@protoc_insertion_point(field_set_allocated:gpb.FileReactionData.Signature.digestAlgorithm)
 }
 
 // uint32 timestamp = 3;
@@ -2143,13 +2074,13 @@ inline void FileReactionData_Signature::clear_timestamp() {
   timestamp_ = 0u;
 }
 inline ::google::protobuf::uint32 FileReactionData_Signature::timestamp() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.Signature.timestamp)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.Signature.timestamp)
   return timestamp_;
 }
 inline void FileReactionData_Signature::set_timestamp(::google::protobuf::uint32 value) {
   
   timestamp_ = value;
-  // @@protoc_insertion_point(field_set:FileReactionData.Signature.timestamp)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.Signature.timestamp)
 }
 
 // -------------------------------------------------------------------
@@ -2161,13 +2092,13 @@ inline void FileReactionData::clear_mitreid() {
   mitreid_ = 0u;
 }
 inline ::google::protobuf::uint32 FileReactionData::mitreid() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.mitreID)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.mitreID)
   return mitreid_;
 }
 inline void FileReactionData::set_mitreid(::google::protobuf::uint32 value) {
   
   mitreid_ = value;
-  // @@protoc_insertion_point(field_set:FileReactionData.mitreID)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.mitreID)
 }
 
 // string fileName = 2;
@@ -2175,41 +2106,41 @@ inline void FileReactionData::clear_filename() {
   filename_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& FileReactionData::filename() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.fileName)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.fileName)
   return filename_.GetNoArena();
 }
 inline void FileReactionData::set_filename(const ::std::string& value) {
   
   filename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:FileReactionData.fileName)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.fileName)
 }
 #if LANG_CXX11
 inline void FileReactionData::set_filename(::std::string&& value) {
   
   filename_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:FileReactionData.fileName)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.FileReactionData.fileName)
 }
 #endif
 inline void FileReactionData::set_filename(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   filename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:FileReactionData.fileName)
+  // @@protoc_insertion_point(field_set_char:gpb.FileReactionData.fileName)
 }
 inline void FileReactionData::set_filename(const char* value, size_t size) {
   
   filename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:FileReactionData.fileName)
+  // @@protoc_insertion_point(field_set_pointer:gpb.FileReactionData.fileName)
 }
 inline ::std::string* FileReactionData::mutable_filename() {
   
-  // @@protoc_insertion_point(field_mutable:FileReactionData.fileName)
+  // @@protoc_insertion_point(field_mutable:gpb.FileReactionData.fileName)
   return filename_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* FileReactionData::release_filename() {
-  // @@protoc_insertion_point(field_release:FileReactionData.fileName)
+  // @@protoc_insertion_point(field_release:gpb.FileReactionData.fileName)
   
   return filename_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2220,7 +2151,7 @@ inline void FileReactionData::set_allocated_filename(::std::string* filename) {
     
   }
   filename_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), filename);
-  // @@protoc_insertion_point(field_set_allocated:FileReactionData.fileName)
+  // @@protoc_insertion_point(field_set_allocated:gpb.FileReactionData.fileName)
 }
 
 // string description = 3;
@@ -2228,41 +2159,41 @@ inline void FileReactionData::clear_description() {
   description_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& FileReactionData::description() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.description)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.description)
   return description_.GetNoArena();
 }
 inline void FileReactionData::set_description(const ::std::string& value) {
   
   description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:FileReactionData.description)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.description)
 }
 #if LANG_CXX11
 inline void FileReactionData::set_description(::std::string&& value) {
   
   description_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:FileReactionData.description)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.FileReactionData.description)
 }
 #endif
 inline void FileReactionData::set_description(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:FileReactionData.description)
+  // @@protoc_insertion_point(field_set_char:gpb.FileReactionData.description)
 }
 inline void FileReactionData::set_description(const char* value, size_t size) {
   
   description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:FileReactionData.description)
+  // @@protoc_insertion_point(field_set_pointer:gpb.FileReactionData.description)
 }
 inline ::std::string* FileReactionData::mutable_description() {
   
-  // @@protoc_insertion_point(field_mutable:FileReactionData.description)
+  // @@protoc_insertion_point(field_mutable:gpb.FileReactionData.description)
   return description_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* FileReactionData::release_description() {
-  // @@protoc_insertion_point(field_release:FileReactionData.description)
+  // @@protoc_insertion_point(field_release:gpb.FileReactionData.description)
   
   return description_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2273,7 +2204,7 @@ inline void FileReactionData::set_allocated_description(::std::string* descripti
     
   }
   description_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), description);
-  // @@protoc_insertion_point(field_set_allocated:FileReactionData.description)
+  // @@protoc_insertion_point(field_set_allocated:gpb.FileReactionData.description)
 }
 
 // string owner = 4;
@@ -2281,41 +2212,41 @@ inline void FileReactionData::clear_owner() {
   owner_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& FileReactionData::owner() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.owner)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.owner)
   return owner_.GetNoArena();
 }
 inline void FileReactionData::set_owner(const ::std::string& value) {
   
   owner_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:FileReactionData.owner)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.owner)
 }
 #if LANG_CXX11
 inline void FileReactionData::set_owner(::std::string&& value) {
   
   owner_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:FileReactionData.owner)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.FileReactionData.owner)
 }
 #endif
 inline void FileReactionData::set_owner(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   owner_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:FileReactionData.owner)
+  // @@protoc_insertion_point(field_set_char:gpb.FileReactionData.owner)
 }
 inline void FileReactionData::set_owner(const char* value, size_t size) {
   
   owner_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:FileReactionData.owner)
+  // @@protoc_insertion_point(field_set_pointer:gpb.FileReactionData.owner)
 }
 inline ::std::string* FileReactionData::mutable_owner() {
   
-  // @@protoc_insertion_point(field_mutable:FileReactionData.owner)
+  // @@protoc_insertion_point(field_mutable:gpb.FileReactionData.owner)
   return owner_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* FileReactionData::release_owner() {
-  // @@protoc_insertion_point(field_release:FileReactionData.owner)
+  // @@protoc_insertion_point(field_release:gpb.FileReactionData.owner)
   
   return owner_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2326,7 +2257,7 @@ inline void FileReactionData::set_allocated_owner(::std::string* owner) {
     
   }
   owner_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), owner);
-  // @@protoc_insertion_point(field_set_allocated:FileReactionData.owner)
+  // @@protoc_insertion_point(field_set_allocated:gpb.FileReactionData.owner)
 }
 
 // uint32 size = 5;
@@ -2334,13 +2265,13 @@ inline void FileReactionData::clear_size() {
   size_ = 0u;
 }
 inline ::google::protobuf::uint32 FileReactionData::size() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.size)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.size)
   return size_;
 }
 inline void FileReactionData::set_size(::google::protobuf::uint32 value) {
   
   size_ = value;
-  // @@protoc_insertion_point(field_set:FileReactionData.size)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.size)
 }
 
 // uint32 timeCreated = 6;
@@ -2348,13 +2279,13 @@ inline void FileReactionData::clear_timecreated() {
   timecreated_ = 0u;
 }
 inline ::google::protobuf::uint32 FileReactionData::timecreated() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.timeCreated)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.timeCreated)
   return timecreated_;
 }
 inline void FileReactionData::set_timecreated(::google::protobuf::uint32 value) {
   
   timecreated_ = value;
-  // @@protoc_insertion_point(field_set:FileReactionData.timeCreated)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.timeCreated)
 }
 
 // uint32 timeModified = 7;
@@ -2362,13 +2293,13 @@ inline void FileReactionData::clear_timemodified() {
   timemodified_ = 0u;
 }
 inline ::google::protobuf::uint32 FileReactionData::timemodified() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.timeModified)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.timeModified)
   return timemodified_;
 }
 inline void FileReactionData::set_timemodified(::google::protobuf::uint32 value) {
   
   timemodified_ = value;
-  // @@protoc_insertion_point(field_set:FileReactionData.timeModified)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.timeModified)
 }
 
 // uint32 timeAccessed = 8;
@@ -2376,13 +2307,13 @@ inline void FileReactionData::clear_timeaccessed() {
   timeaccessed_ = 0u;
 }
 inline ::google::protobuf::uint32 FileReactionData::timeaccessed() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.timeAccessed)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.timeAccessed)
   return timeaccessed_;
 }
 inline void FileReactionData::set_timeaccessed(::google::protobuf::uint32 value) {
   
   timeaccessed_ = value;
-  // @@protoc_insertion_point(field_set:FileReactionData.timeAccessed)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.timeAccessed)
 }
 
 // bytes fileContents = 9;
@@ -2390,41 +2321,41 @@ inline void FileReactionData::clear_filecontents() {
   filecontents_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& FileReactionData::filecontents() const {
-  // @@protoc_insertion_point(field_get:FileReactionData.fileContents)
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.fileContents)
   return filecontents_.GetNoArena();
 }
 inline void FileReactionData::set_filecontents(const ::std::string& value) {
   
   filecontents_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:FileReactionData.fileContents)
+  // @@protoc_insertion_point(field_set:gpb.FileReactionData.fileContents)
 }
 #if LANG_CXX11
 inline void FileReactionData::set_filecontents(::std::string&& value) {
   
   filecontents_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:FileReactionData.fileContents)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.FileReactionData.fileContents)
 }
 #endif
 inline void FileReactionData::set_filecontents(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   filecontents_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:FileReactionData.fileContents)
+  // @@protoc_insertion_point(field_set_char:gpb.FileReactionData.fileContents)
 }
 inline void FileReactionData::set_filecontents(const void* value, size_t size) {
   
   filecontents_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:FileReactionData.fileContents)
+  // @@protoc_insertion_point(field_set_pointer:gpb.FileReactionData.fileContents)
 }
 inline ::std::string* FileReactionData::mutable_filecontents() {
   
-  // @@protoc_insertion_point(field_mutable:FileReactionData.fileContents)
+  // @@protoc_insertion_point(field_mutable:gpb.FileReactionData.fileContents)
   return filecontents_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* FileReactionData::release_filecontents() {
-  // @@protoc_insertion_point(field_release:FileReactionData.fileContents)
+  // @@protoc_insertion_point(field_release:gpb.FileReactionData.fileContents)
   
   return filecontents_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2435,66 +2366,66 @@ inline void FileReactionData::set_allocated_filecontents(::std::string* filecont
     
   }
   filecontents_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), filecontents);
-  // @@protoc_insertion_point(field_set_allocated:FileReactionData.fileContents)
+  // @@protoc_insertion_point(field_set_allocated:gpb.FileReactionData.fileContents)
 }
 
-// repeated .FileReactionData.Signature signatures = 10;
+// repeated .gpb.FileReactionData.Signature signatures = 10;
 inline int FileReactionData::signatures_size() const {
   return signatures_.size();
 }
 inline void FileReactionData::clear_signatures() {
   signatures_.Clear();
 }
-inline ::FileReactionData_Signature* FileReactionData::mutable_signatures(int index) {
-  // @@protoc_insertion_point(field_mutable:FileReactionData.signatures)
+inline ::gpb::FileReactionData_Signature* FileReactionData::mutable_signatures(int index) {
+  // @@protoc_insertion_point(field_mutable:gpb.FileReactionData.signatures)
   return signatures_.Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField< ::FileReactionData_Signature >*
+inline ::google::protobuf::RepeatedPtrField< ::gpb::FileReactionData_Signature >*
 FileReactionData::mutable_signatures() {
-  // @@protoc_insertion_point(field_mutable_list:FileReactionData.signatures)
+  // @@protoc_insertion_point(field_mutable_list:gpb.FileReactionData.signatures)
   return &signatures_;
 }
-inline const ::FileReactionData_Signature& FileReactionData::signatures(int index) const {
-  // @@protoc_insertion_point(field_get:FileReactionData.signatures)
+inline const ::gpb::FileReactionData_Signature& FileReactionData::signatures(int index) const {
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.signatures)
   return signatures_.Get(index);
 }
-inline ::FileReactionData_Signature* FileReactionData::add_signatures() {
-  // @@protoc_insertion_point(field_add:FileReactionData.signatures)
+inline ::gpb::FileReactionData_Signature* FileReactionData::add_signatures() {
+  // @@protoc_insertion_point(field_add:gpb.FileReactionData.signatures)
   return signatures_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::FileReactionData_Signature >&
+inline const ::google::protobuf::RepeatedPtrField< ::gpb::FileReactionData_Signature >&
 FileReactionData::signatures() const {
-  // @@protoc_insertion_point(field_list:FileReactionData.signatures)
+  // @@protoc_insertion_point(field_list:gpb.FileReactionData.signatures)
   return signatures_;
 }
 
-// repeated .ACLEntry ACL = 11;
+// repeated .gpb.ACLEntry ACL = 11;
 inline int FileReactionData::acl_size() const {
   return acl_.size();
 }
 inline void FileReactionData::clear_acl() {
   acl_.Clear();
 }
-inline ::ACLEntry* FileReactionData::mutable_acl(int index) {
-  // @@protoc_insertion_point(field_mutable:FileReactionData.ACL)
+inline ::gpb::ACLEntry* FileReactionData::mutable_acl(int index) {
+  // @@protoc_insertion_point(field_mutable:gpb.FileReactionData.ACL)
   return acl_.Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField< ::ACLEntry >*
+inline ::google::protobuf::RepeatedPtrField< ::gpb::ACLEntry >*
 FileReactionData::mutable_acl() {
-  // @@protoc_insertion_point(field_mutable_list:FileReactionData.ACL)
+  // @@protoc_insertion_point(field_mutable_list:gpb.FileReactionData.ACL)
   return &acl_;
 }
-inline const ::ACLEntry& FileReactionData::acl(int index) const {
-  // @@protoc_insertion_point(field_get:FileReactionData.ACL)
+inline const ::gpb::ACLEntry& FileReactionData::acl(int index) const {
+  // @@protoc_insertion_point(field_get:gpb.FileReactionData.ACL)
   return acl_.Get(index);
 }
-inline ::ACLEntry* FileReactionData::add_acl() {
-  // @@protoc_insertion_point(field_add:FileReactionData.ACL)
+inline ::gpb::ACLEntry* FileReactionData::add_acl() {
+  // @@protoc_insertion_point(field_add:gpb.FileReactionData.ACL)
   return acl_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::ACLEntry >&
+inline const ::google::protobuf::RepeatedPtrField< ::gpb::ACLEntry >&
 FileReactionData::acl() const {
-  // @@protoc_insertion_point(field_list:FileReactionData.ACL)
+  // @@protoc_insertion_point(field_list:gpb.FileReactionData.ACL)
   return acl_;
 }
 
@@ -2507,13 +2438,13 @@ inline void RegistryReactionData::clear_mitreid() {
   mitreid_ = 0u;
 }
 inline ::google::protobuf::uint32 RegistryReactionData::mitreid() const {
-  // @@protoc_insertion_point(field_get:RegistryReactionData.mitreID)
+  // @@protoc_insertion_point(field_get:gpb.RegistryReactionData.mitreID)
   return mitreid_;
 }
 inline void RegistryReactionData::set_mitreid(::google::protobuf::uint32 value) {
   
   mitreid_ = value;
-  // @@protoc_insertion_point(field_set:RegistryReactionData.mitreID)
+  // @@protoc_insertion_point(field_set:gpb.RegistryReactionData.mitreID)
 }
 
 // string key = 2;
@@ -2521,41 +2452,41 @@ inline void RegistryReactionData::clear_key() {
   key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& RegistryReactionData::key() const {
-  // @@protoc_insertion_point(field_get:RegistryReactionData.key)
+  // @@protoc_insertion_point(field_get:gpb.RegistryReactionData.key)
   return key_.GetNoArena();
 }
 inline void RegistryReactionData::set_key(const ::std::string& value) {
   
   key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:RegistryReactionData.key)
+  // @@protoc_insertion_point(field_set:gpb.RegistryReactionData.key)
 }
 #if LANG_CXX11
 inline void RegistryReactionData::set_key(::std::string&& value) {
   
   key_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:RegistryReactionData.key)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.RegistryReactionData.key)
 }
 #endif
 inline void RegistryReactionData::set_key(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:RegistryReactionData.key)
+  // @@protoc_insertion_point(field_set_char:gpb.RegistryReactionData.key)
 }
 inline void RegistryReactionData::set_key(const char* value, size_t size) {
   
   key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:RegistryReactionData.key)
+  // @@protoc_insertion_point(field_set_pointer:gpb.RegistryReactionData.key)
 }
 inline ::std::string* RegistryReactionData::mutable_key() {
   
-  // @@protoc_insertion_point(field_mutable:RegistryReactionData.key)
+  // @@protoc_insertion_point(field_mutable:gpb.RegistryReactionData.key)
   return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* RegistryReactionData::release_key() {
-  // @@protoc_insertion_point(field_release:RegistryReactionData.key)
+  // @@protoc_insertion_point(field_release:gpb.RegistryReactionData.key)
   
   return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2566,7 +2497,7 @@ inline void RegistryReactionData::set_allocated_key(::std::string* key) {
     
   }
   key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
-  // @@protoc_insertion_point(field_set_allocated:RegistryReactionData.key)
+  // @@protoc_insertion_point(field_set_allocated:gpb.RegistryReactionData.key)
 }
 
 // bytes data = 3;
@@ -2574,41 +2505,41 @@ inline void RegistryReactionData::clear_data() {
   data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& RegistryReactionData::data() const {
-  // @@protoc_insertion_point(field_get:RegistryReactionData.data)
+  // @@protoc_insertion_point(field_get:gpb.RegistryReactionData.data)
   return data_.GetNoArena();
 }
 inline void RegistryReactionData::set_data(const ::std::string& value) {
   
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:RegistryReactionData.data)
+  // @@protoc_insertion_point(field_set:gpb.RegistryReactionData.data)
 }
 #if LANG_CXX11
 inline void RegistryReactionData::set_data(::std::string&& value) {
   
   data_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:RegistryReactionData.data)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.RegistryReactionData.data)
 }
 #endif
 inline void RegistryReactionData::set_data(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:RegistryReactionData.data)
+  // @@protoc_insertion_point(field_set_char:gpb.RegistryReactionData.data)
 }
 inline void RegistryReactionData::set_data(const void* value, size_t size) {
   
   data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:RegistryReactionData.data)
+  // @@protoc_insertion_point(field_set_pointer:gpb.RegistryReactionData.data)
 }
 inline ::std::string* RegistryReactionData::mutable_data() {
   
-  // @@protoc_insertion_point(field_mutable:RegistryReactionData.data)
+  // @@protoc_insertion_point(field_mutable:gpb.RegistryReactionData.data)
   return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* RegistryReactionData::release_data() {
-  // @@protoc_insertion_point(field_release:RegistryReactionData.data)
+  // @@protoc_insertion_point(field_release:gpb.RegistryReactionData.data)
   
   return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2619,7 +2550,7 @@ inline void RegistryReactionData::set_allocated_data(::std::string* data) {
     
   }
   data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
-  // @@protoc_insertion_point(field_set_allocated:RegistryReactionData.data)
+  // @@protoc_insertion_point(field_set_allocated:gpb.RegistryReactionData.data)
 }
 
 // bytes newData = 4;
@@ -2627,41 +2558,41 @@ inline void RegistryReactionData::clear_newdata() {
   newdata_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& RegistryReactionData::newdata() const {
-  // @@protoc_insertion_point(field_get:RegistryReactionData.newData)
+  // @@protoc_insertion_point(field_get:gpb.RegistryReactionData.newData)
   return newdata_.GetNoArena();
 }
 inline void RegistryReactionData::set_newdata(const ::std::string& value) {
   
   newdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:RegistryReactionData.newData)
+  // @@protoc_insertion_point(field_set:gpb.RegistryReactionData.newData)
 }
 #if LANG_CXX11
 inline void RegistryReactionData::set_newdata(::std::string&& value) {
   
   newdata_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:RegistryReactionData.newData)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.RegistryReactionData.newData)
 }
 #endif
 inline void RegistryReactionData::set_newdata(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   newdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:RegistryReactionData.newData)
+  // @@protoc_insertion_point(field_set_char:gpb.RegistryReactionData.newData)
 }
 inline void RegistryReactionData::set_newdata(const void* value, size_t size) {
   
   newdata_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:RegistryReactionData.newData)
+  // @@protoc_insertion_point(field_set_pointer:gpb.RegistryReactionData.newData)
 }
 inline ::std::string* RegistryReactionData::mutable_newdata() {
   
-  // @@protoc_insertion_point(field_mutable:RegistryReactionData.newData)
+  // @@protoc_insertion_point(field_mutable:gpb.RegistryReactionData.newData)
   return newdata_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* RegistryReactionData::release_newdata() {
-  // @@protoc_insertion_point(field_release:RegistryReactionData.newData)
+  // @@protoc_insertion_point(field_release:gpb.RegistryReactionData.newData)
   
   return newdata_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2672,50 +2603,50 @@ inline void RegistryReactionData::set_allocated_newdata(::std::string* newdata) 
     
   }
   newdata_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), newdata);
-  // @@protoc_insertion_point(field_set_allocated:RegistryReactionData.newData)
+  // @@protoc_insertion_point(field_set_allocated:gpb.RegistryReactionData.newData)
 }
 
-// .RegistryReactionData.Type type = 5;
+// .gpb.RegistryReactionData.RegType type = 5;
 inline void RegistryReactionData::clear_type() {
   type_ = 0;
 }
-inline ::RegistryReactionData_Type RegistryReactionData::type() const {
-  // @@protoc_insertion_point(field_get:RegistryReactionData.type)
-  return static_cast< ::RegistryReactionData_Type >(type_);
+inline ::gpb::RegistryReactionData_RegType RegistryReactionData::type() const {
+  // @@protoc_insertion_point(field_get:gpb.RegistryReactionData.type)
+  return static_cast< ::gpb::RegistryReactionData_RegType >(type_);
 }
-inline void RegistryReactionData::set_type(::RegistryReactionData_Type value) {
+inline void RegistryReactionData::set_type(::gpb::RegistryReactionData_RegType value) {
   
   type_ = value;
-  // @@protoc_insertion_point(field_set:RegistryReactionData.type)
+  // @@protoc_insertion_point(field_set:gpb.RegistryReactionData.type)
 }
 
-// repeated .ACLEntry ACL = 6;
+// repeated .gpb.ACLEntry ACL = 6;
 inline int RegistryReactionData::acl_size() const {
   return acl_.size();
 }
 inline void RegistryReactionData::clear_acl() {
   acl_.Clear();
 }
-inline ::ACLEntry* RegistryReactionData::mutable_acl(int index) {
-  // @@protoc_insertion_point(field_mutable:RegistryReactionData.ACL)
+inline ::gpb::ACLEntry* RegistryReactionData::mutable_acl(int index) {
+  // @@protoc_insertion_point(field_mutable:gpb.RegistryReactionData.ACL)
   return acl_.Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField< ::ACLEntry >*
+inline ::google::protobuf::RepeatedPtrField< ::gpb::ACLEntry >*
 RegistryReactionData::mutable_acl() {
-  // @@protoc_insertion_point(field_mutable_list:RegistryReactionData.ACL)
+  // @@protoc_insertion_point(field_mutable_list:gpb.RegistryReactionData.ACL)
   return &acl_;
 }
-inline const ::ACLEntry& RegistryReactionData::acl(int index) const {
-  // @@protoc_insertion_point(field_get:RegistryReactionData.ACL)
+inline const ::gpb::ACLEntry& RegistryReactionData::acl(int index) const {
+  // @@protoc_insertion_point(field_get:gpb.RegistryReactionData.ACL)
   return acl_.Get(index);
 }
-inline ::ACLEntry* RegistryReactionData::add_acl() {
-  // @@protoc_insertion_point(field_add:RegistryReactionData.ACL)
+inline ::gpb::ACLEntry* RegistryReactionData::add_acl() {
+  // @@protoc_insertion_point(field_add:gpb.RegistryReactionData.ACL)
   return acl_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::ACLEntry >&
+inline const ::google::protobuf::RepeatedPtrField< ::gpb::ACLEntry >&
 RegistryReactionData::acl() const {
-  // @@protoc_insertion_point(field_list:RegistryReactionData.ACL)
+  // @@protoc_insertion_point(field_list:gpb.RegistryReactionData.ACL)
   return acl_;
 }
 
@@ -2728,13 +2659,13 @@ inline void ProcessReactionData::clear_mitreid() {
   mitreid_ = 0u;
 }
 inline ::google::protobuf::uint32 ProcessReactionData::mitreid() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.mitreID)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.mitreID)
   return mitreid_;
 }
 inline void ProcessReactionData::set_mitreid(::google::protobuf::uint32 value) {
   
   mitreid_ = value;
-  // @@protoc_insertion_point(field_set:ProcessReactionData.mitreID)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.mitreID)
 }
 
 // uint32 pid = 2;
@@ -2742,13 +2673,13 @@ inline void ProcessReactionData::clear_pid() {
   pid_ = 0u;
 }
 inline ::google::protobuf::uint32 ProcessReactionData::pid() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.pid)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.pid)
   return pid_;
 }
 inline void ProcessReactionData::set_pid(::google::protobuf::uint32 value) {
   
   pid_ = value;
-  // @@protoc_insertion_point(field_set:ProcessReactionData.pid)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.pid)
 }
 
 // string name = 3;
@@ -2756,41 +2687,41 @@ inline void ProcessReactionData::clear_name() {
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ProcessReactionData::name() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.name)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.name)
   return name_.GetNoArena();
 }
 inline void ProcessReactionData::set_name(const ::std::string& value) {
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ProcessReactionData.name)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.name)
 }
 #if LANG_CXX11
 inline void ProcessReactionData::set_name(::std::string&& value) {
   
   name_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ProcessReactionData.name)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ProcessReactionData.name)
 }
 #endif
 inline void ProcessReactionData::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ProcessReactionData.name)
+  // @@protoc_insertion_point(field_set_char:gpb.ProcessReactionData.name)
 }
 inline void ProcessReactionData::set_name(const char* value, size_t size) {
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ProcessReactionData.name)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ProcessReactionData.name)
 }
 inline ::std::string* ProcessReactionData::mutable_name() {
   
-  // @@protoc_insertion_point(field_mutable:ProcessReactionData.name)
+  // @@protoc_insertion_point(field_mutable:gpb.ProcessReactionData.name)
   return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ProcessReactionData::release_name() {
-  // @@protoc_insertion_point(field_release:ProcessReactionData.name)
+  // @@protoc_insertion_point(field_release:gpb.ProcessReactionData.name)
   
   return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2801,7 +2732,7 @@ inline void ProcessReactionData::set_allocated_name(::std::string* name) {
     
   }
   name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
-  // @@protoc_insertion_point(field_set_allocated:ProcessReactionData.name)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ProcessReactionData.name)
 }
 
 // string description = 4;
@@ -2809,41 +2740,41 @@ inline void ProcessReactionData::clear_description() {
   description_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ProcessReactionData::description() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.description)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.description)
   return description_.GetNoArena();
 }
 inline void ProcessReactionData::set_description(const ::std::string& value) {
   
   description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ProcessReactionData.description)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.description)
 }
 #if LANG_CXX11
 inline void ProcessReactionData::set_description(::std::string&& value) {
   
   description_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ProcessReactionData.description)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ProcessReactionData.description)
 }
 #endif
 inline void ProcessReactionData::set_description(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ProcessReactionData.description)
+  // @@protoc_insertion_point(field_set_char:gpb.ProcessReactionData.description)
 }
 inline void ProcessReactionData::set_description(const char* value, size_t size) {
   
   description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ProcessReactionData.description)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ProcessReactionData.description)
 }
 inline ::std::string* ProcessReactionData::mutable_description() {
   
-  // @@protoc_insertion_point(field_mutable:ProcessReactionData.description)
+  // @@protoc_insertion_point(field_mutable:gpb.ProcessReactionData.description)
   return description_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ProcessReactionData::release_description() {
-  // @@protoc_insertion_point(field_release:ProcessReactionData.description)
+  // @@protoc_insertion_point(field_release:gpb.ProcessReactionData.description)
   
   return description_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2854,7 +2785,7 @@ inline void ProcessReactionData::set_allocated_description(::std::string* descri
     
   }
   description_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), description);
-  // @@protoc_insertion_point(field_set_allocated:ProcessReactionData.description)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ProcessReactionData.description)
 }
 
 // string commandLine = 5;
@@ -2862,41 +2793,41 @@ inline void ProcessReactionData::clear_commandline() {
   commandline_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ProcessReactionData::commandline() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.commandLine)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.commandLine)
   return commandline_.GetNoArena();
 }
 inline void ProcessReactionData::set_commandline(const ::std::string& value) {
   
   commandline_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ProcessReactionData.commandLine)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.commandLine)
 }
 #if LANG_CXX11
 inline void ProcessReactionData::set_commandline(::std::string&& value) {
   
   commandline_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ProcessReactionData.commandLine)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ProcessReactionData.commandLine)
 }
 #endif
 inline void ProcessReactionData::set_commandline(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   commandline_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ProcessReactionData.commandLine)
+  // @@protoc_insertion_point(field_set_char:gpb.ProcessReactionData.commandLine)
 }
 inline void ProcessReactionData::set_commandline(const char* value, size_t size) {
   
   commandline_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ProcessReactionData.commandLine)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ProcessReactionData.commandLine)
 }
 inline ::std::string* ProcessReactionData::mutable_commandline() {
   
-  // @@protoc_insertion_point(field_mutable:ProcessReactionData.commandLine)
+  // @@protoc_insertion_point(field_mutable:gpb.ProcessReactionData.commandLine)
   return commandline_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ProcessReactionData::release_commandline() {
-  // @@protoc_insertion_point(field_release:ProcessReactionData.commandLine)
+  // @@protoc_insertion_point(field_release:gpb.ProcessReactionData.commandLine)
   
   return commandline_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2907,7 +2838,7 @@ inline void ProcessReactionData::set_allocated_commandline(::std::string* comman
     
   }
   commandline_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), commandline);
-  // @@protoc_insertion_point(field_set_allocated:ProcessReactionData.commandLine)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ProcessReactionData.commandLine)
 }
 
 // string path = 6;
@@ -2915,41 +2846,41 @@ inline void ProcessReactionData::clear_path() {
   path_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ProcessReactionData::path() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.path)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.path)
   return path_.GetNoArena();
 }
 inline void ProcessReactionData::set_path(const ::std::string& value) {
   
   path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ProcessReactionData.path)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.path)
 }
 #if LANG_CXX11
 inline void ProcessReactionData::set_path(::std::string&& value) {
   
   path_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ProcessReactionData.path)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ProcessReactionData.path)
 }
 #endif
 inline void ProcessReactionData::set_path(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ProcessReactionData.path)
+  // @@protoc_insertion_point(field_set_char:gpb.ProcessReactionData.path)
 }
 inline void ProcessReactionData::set_path(const char* value, size_t size) {
   
   path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ProcessReactionData.path)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ProcessReactionData.path)
 }
 inline ::std::string* ProcessReactionData::mutable_path() {
   
-  // @@protoc_insertion_point(field_mutable:ProcessReactionData.path)
+  // @@protoc_insertion_point(field_mutable:gpb.ProcessReactionData.path)
   return path_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ProcessReactionData::release_path() {
-  // @@protoc_insertion_point(field_release:ProcessReactionData.path)
+  // @@protoc_insertion_point(field_release:gpb.ProcessReactionData.path)
   
   return path_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -2960,7 +2891,7 @@ inline void ProcessReactionData::set_allocated_path(::std::string* path) {
     
   }
   path_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), path);
-  // @@protoc_insertion_point(field_set_allocated:ProcessReactionData.path)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ProcessReactionData.path)
 }
 
 // string currentDirectory = 7;
@@ -2968,41 +2899,41 @@ inline void ProcessReactionData::clear_currentdirectory() {
   currentdirectory_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ProcessReactionData::currentdirectory() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.currentDirectory)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.currentDirectory)
   return currentdirectory_.GetNoArena();
 }
 inline void ProcessReactionData::set_currentdirectory(const ::std::string& value) {
   
   currentdirectory_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ProcessReactionData.currentDirectory)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.currentDirectory)
 }
 #if LANG_CXX11
 inline void ProcessReactionData::set_currentdirectory(::std::string&& value) {
   
   currentdirectory_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ProcessReactionData.currentDirectory)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ProcessReactionData.currentDirectory)
 }
 #endif
 inline void ProcessReactionData::set_currentdirectory(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   currentdirectory_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ProcessReactionData.currentDirectory)
+  // @@protoc_insertion_point(field_set_char:gpb.ProcessReactionData.currentDirectory)
 }
 inline void ProcessReactionData::set_currentdirectory(const char* value, size_t size) {
   
   currentdirectory_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ProcessReactionData.currentDirectory)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ProcessReactionData.currentDirectory)
 }
 inline ::std::string* ProcessReactionData::mutable_currentdirectory() {
   
-  // @@protoc_insertion_point(field_mutable:ProcessReactionData.currentDirectory)
+  // @@protoc_insertion_point(field_mutable:gpb.ProcessReactionData.currentDirectory)
   return currentdirectory_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ProcessReactionData::release_currentdirectory() {
-  // @@protoc_insertion_point(field_release:ProcessReactionData.currentDirectory)
+  // @@protoc_insertion_point(field_release:gpb.ProcessReactionData.currentDirectory)
   
   return currentdirectory_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3013,7 +2944,7 @@ inline void ProcessReactionData::set_allocated_currentdirectory(::std::string* c
     
   }
   currentdirectory_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), currentdirectory);
-  // @@protoc_insertion_point(field_set_allocated:ProcessReactionData.currentDirectory)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ProcessReactionData.currentDirectory)
 }
 
 // string autostartLocation = 8;
@@ -3021,41 +2952,41 @@ inline void ProcessReactionData::clear_autostartlocation() {
   autostartlocation_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ProcessReactionData::autostartlocation() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.autostartLocation)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.autostartLocation)
   return autostartlocation_.GetNoArena();
 }
 inline void ProcessReactionData::set_autostartlocation(const ::std::string& value) {
   
   autostartlocation_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ProcessReactionData.autostartLocation)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.autostartLocation)
 }
 #if LANG_CXX11
 inline void ProcessReactionData::set_autostartlocation(::std::string&& value) {
   
   autostartlocation_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ProcessReactionData.autostartLocation)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ProcessReactionData.autostartLocation)
 }
 #endif
 inline void ProcessReactionData::set_autostartlocation(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   autostartlocation_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ProcessReactionData.autostartLocation)
+  // @@protoc_insertion_point(field_set_char:gpb.ProcessReactionData.autostartLocation)
 }
 inline void ProcessReactionData::set_autostartlocation(const char* value, size_t size) {
   
   autostartlocation_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ProcessReactionData.autostartLocation)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ProcessReactionData.autostartLocation)
 }
 inline ::std::string* ProcessReactionData::mutable_autostartlocation() {
   
-  // @@protoc_insertion_point(field_mutable:ProcessReactionData.autostartLocation)
+  // @@protoc_insertion_point(field_mutable:gpb.ProcessReactionData.autostartLocation)
   return autostartlocation_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ProcessReactionData::release_autostartlocation() {
-  // @@protoc_insertion_point(field_release:ProcessReactionData.autostartLocation)
+  // @@protoc_insertion_point(field_release:gpb.ProcessReactionData.autostartLocation)
   
   return autostartlocation_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3066,7 +2997,7 @@ inline void ProcessReactionData::set_allocated_autostartlocation(::std::string* 
     
   }
   autostartlocation_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), autostartlocation);
-  // @@protoc_insertion_point(field_set_allocated:ProcessReactionData.autostartLocation)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ProcessReactionData.autostartLocation)
 }
 
 // string parent = 9;
@@ -3074,41 +3005,41 @@ inline void ProcessReactionData::clear_parent() {
   parent_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ProcessReactionData::parent() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.parent)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.parent)
   return parent_.GetNoArena();
 }
 inline void ProcessReactionData::set_parent(const ::std::string& value) {
   
   parent_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ProcessReactionData.parent)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.parent)
 }
 #if LANG_CXX11
 inline void ProcessReactionData::set_parent(::std::string&& value) {
   
   parent_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ProcessReactionData.parent)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ProcessReactionData.parent)
 }
 #endif
 inline void ProcessReactionData::set_parent(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   parent_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ProcessReactionData.parent)
+  // @@protoc_insertion_point(field_set_char:gpb.ProcessReactionData.parent)
 }
 inline void ProcessReactionData::set_parent(const char* value, size_t size) {
   
   parent_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ProcessReactionData.parent)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ProcessReactionData.parent)
 }
 inline ::std::string* ProcessReactionData::mutable_parent() {
   
-  // @@protoc_insertion_point(field_mutable:ProcessReactionData.parent)
+  // @@protoc_insertion_point(field_mutable:gpb.ProcessReactionData.parent)
   return parent_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ProcessReactionData::release_parent() {
-  // @@protoc_insertion_point(field_release:ProcessReactionData.parent)
+  // @@protoc_insertion_point(field_release:gpb.ProcessReactionData.parent)
   
   return parent_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3119,7 +3050,7 @@ inline void ProcessReactionData::set_allocated_parent(::std::string* parent) {
     
   }
   parent_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), parent);
-  // @@protoc_insertion_point(field_set_allocated:ProcessReactionData.parent)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ProcessReactionData.parent)
 }
 
 // string user = 10;
@@ -3127,41 +3058,41 @@ inline void ProcessReactionData::clear_user() {
   user_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ProcessReactionData::user() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.user)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.user)
   return user_.GetNoArena();
 }
 inline void ProcessReactionData::set_user(const ::std::string& value) {
   
   user_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ProcessReactionData.user)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.user)
 }
 #if LANG_CXX11
 inline void ProcessReactionData::set_user(::std::string&& value) {
   
   user_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ProcessReactionData.user)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ProcessReactionData.user)
 }
 #endif
 inline void ProcessReactionData::set_user(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   user_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ProcessReactionData.user)
+  // @@protoc_insertion_point(field_set_char:gpb.ProcessReactionData.user)
 }
 inline void ProcessReactionData::set_user(const char* value, size_t size) {
   
   user_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ProcessReactionData.user)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ProcessReactionData.user)
 }
 inline ::std::string* ProcessReactionData::mutable_user() {
   
-  // @@protoc_insertion_point(field_mutable:ProcessReactionData.user)
+  // @@protoc_insertion_point(field_mutable:gpb.ProcessReactionData.user)
   return user_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ProcessReactionData::release_user() {
-  // @@protoc_insertion_point(field_release:ProcessReactionData.user)
+  // @@protoc_insertion_point(field_release:gpb.ProcessReactionData.user)
   
   return user_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3172,7 +3103,7 @@ inline void ProcessReactionData::set_allocated_user(::std::string* user) {
     
   }
   user_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), user);
-  // @@protoc_insertion_point(field_set_allocated:ProcessReactionData.user)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ProcessReactionData.user)
 }
 
 // uint32 timeStarted = 11;
@@ -3180,13 +3111,13 @@ inline void ProcessReactionData::clear_timestarted() {
   timestarted_ = 0u;
 }
 inline ::google::protobuf::uint32 ProcessReactionData::timestarted() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.timeStarted)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.timeStarted)
   return timestarted_;
 }
 inline void ProcessReactionData::set_timestarted(::google::protobuf::uint32 value) {
   
   timestarted_ = value;
-  // @@protoc_insertion_point(field_set:ProcessReactionData.timeStarted)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.timeStarted)
 }
 
 // uint32 recievedBytes = 12;
@@ -3194,13 +3125,13 @@ inline void ProcessReactionData::clear_recievedbytes() {
   recievedbytes_ = 0u;
 }
 inline ::google::protobuf::uint32 ProcessReactionData::recievedbytes() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.recievedBytes)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.recievedBytes)
   return recievedbytes_;
 }
 inline void ProcessReactionData::set_recievedbytes(::google::protobuf::uint32 value) {
   
   recievedbytes_ = value;
-  // @@protoc_insertion_point(field_set:ProcessReactionData.recievedBytes)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.recievedBytes)
 }
 
 // uint32 sentBytes = 13;
@@ -3208,13 +3139,13 @@ inline void ProcessReactionData::clear_sentbytes() {
   sentbytes_ = 0u;
 }
 inline ::google::protobuf::uint32 ProcessReactionData::sentbytes() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.sentBytes)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.sentBytes)
   return sentbytes_;
 }
 inline void ProcessReactionData::set_sentbytes(::google::protobuf::uint32 value) {
   
   sentbytes_ = value;
-  // @@protoc_insertion_point(field_set:ProcessReactionData.sentBytes)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.sentBytes)
 }
 
 // uint32 privateBytes = 14;
@@ -3222,13 +3153,13 @@ inline void ProcessReactionData::clear_privatebytes() {
   privatebytes_ = 0u;
 }
 inline ::google::protobuf::uint32 ProcessReactionData::privatebytes() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.privateBytes)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.privateBytes)
   return privatebytes_;
 }
 inline void ProcessReactionData::set_privatebytes(::google::protobuf::uint32 value) {
   
   privatebytes_ = value;
-  // @@protoc_insertion_point(field_set:ProcessReactionData.privateBytes)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.privateBytes)
 }
 
 // uint32 workingSet = 15;
@@ -3236,13 +3167,13 @@ inline void ProcessReactionData::clear_workingset() {
   workingset_ = 0u;
 }
 inline ::google::protobuf::uint32 ProcessReactionData::workingset() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.workingSet)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.workingSet)
   return workingset_;
 }
 inline void ProcessReactionData::set_workingset(::google::protobuf::uint32 value) {
   
   workingset_ = value;
-  // @@protoc_insertion_point(field_set:ProcessReactionData.workingSet)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.workingSet)
 }
 
 // bytes binaryContents = 16;
@@ -3250,41 +3181,41 @@ inline void ProcessReactionData::clear_binarycontents() {
   binarycontents_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ProcessReactionData::binarycontents() const {
-  // @@protoc_insertion_point(field_get:ProcessReactionData.binaryContents)
+  // @@protoc_insertion_point(field_get:gpb.ProcessReactionData.binaryContents)
   return binarycontents_.GetNoArena();
 }
 inline void ProcessReactionData::set_binarycontents(const ::std::string& value) {
   
   binarycontents_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ProcessReactionData.binaryContents)
+  // @@protoc_insertion_point(field_set:gpb.ProcessReactionData.binaryContents)
 }
 #if LANG_CXX11
 inline void ProcessReactionData::set_binarycontents(::std::string&& value) {
   
   binarycontents_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ProcessReactionData.binaryContents)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ProcessReactionData.binaryContents)
 }
 #endif
 inline void ProcessReactionData::set_binarycontents(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   binarycontents_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ProcessReactionData.binaryContents)
+  // @@protoc_insertion_point(field_set_char:gpb.ProcessReactionData.binaryContents)
 }
 inline void ProcessReactionData::set_binarycontents(const void* value, size_t size) {
   
   binarycontents_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ProcessReactionData.binaryContents)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ProcessReactionData.binaryContents)
 }
 inline ::std::string* ProcessReactionData::mutable_binarycontents() {
   
-  // @@protoc_insertion_point(field_mutable:ProcessReactionData.binaryContents)
+  // @@protoc_insertion_point(field_mutable:gpb.ProcessReactionData.binaryContents)
   return binarycontents_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ProcessReactionData::release_binarycontents() {
-  // @@protoc_insertion_point(field_release:ProcessReactionData.binaryContents)
+  // @@protoc_insertion_point(field_release:gpb.ProcessReactionData.binaryContents)
   
   return binarycontents_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3295,7 +3226,7 @@ inline void ProcessReactionData::set_allocated_binarycontents(::std::string* bin
     
   }
   binarycontents_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), binarycontents);
-  // @@protoc_insertion_point(field_set_allocated:ProcessReactionData.binaryContents)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ProcessReactionData.binaryContents)
 }
 
 // -------------------------------------------------------------------
@@ -3307,13 +3238,13 @@ inline void ServiceReactionData::clear_mitreid() {
   mitreid_ = 0u;
 }
 inline ::google::protobuf::uint32 ServiceReactionData::mitreid() const {
-  // @@protoc_insertion_point(field_get:ServiceReactionData.mitreID)
+  // @@protoc_insertion_point(field_get:gpb.ServiceReactionData.mitreID)
   return mitreid_;
 }
 inline void ServiceReactionData::set_mitreid(::google::protobuf::uint32 value) {
   
   mitreid_ = value;
-  // @@protoc_insertion_point(field_set:ServiceReactionData.mitreID)
+  // @@protoc_insertion_point(field_set:gpb.ServiceReactionData.mitreID)
 }
 
 // uint32 pid = 2;
@@ -3321,13 +3252,13 @@ inline void ServiceReactionData::clear_pid() {
   pid_ = 0u;
 }
 inline ::google::protobuf::uint32 ServiceReactionData::pid() const {
-  // @@protoc_insertion_point(field_get:ServiceReactionData.pid)
+  // @@protoc_insertion_point(field_get:gpb.ServiceReactionData.pid)
   return pid_;
 }
 inline void ServiceReactionData::set_pid(::google::protobuf::uint32 value) {
   
   pid_ = value;
-  // @@protoc_insertion_point(field_set:ServiceReactionData.pid)
+  // @@protoc_insertion_point(field_set:gpb.ServiceReactionData.pid)
 }
 
 // string name = 3;
@@ -3335,41 +3266,41 @@ inline void ServiceReactionData::clear_name() {
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ServiceReactionData::name() const {
-  // @@protoc_insertion_point(field_get:ServiceReactionData.name)
+  // @@protoc_insertion_point(field_get:gpb.ServiceReactionData.name)
   return name_.GetNoArena();
 }
 inline void ServiceReactionData::set_name(const ::std::string& value) {
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ServiceReactionData.name)
+  // @@protoc_insertion_point(field_set:gpb.ServiceReactionData.name)
 }
 #if LANG_CXX11
 inline void ServiceReactionData::set_name(::std::string&& value) {
   
   name_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ServiceReactionData.name)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ServiceReactionData.name)
 }
 #endif
 inline void ServiceReactionData::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ServiceReactionData.name)
+  // @@protoc_insertion_point(field_set_char:gpb.ServiceReactionData.name)
 }
 inline void ServiceReactionData::set_name(const char* value, size_t size) {
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ServiceReactionData.name)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ServiceReactionData.name)
 }
 inline ::std::string* ServiceReactionData::mutable_name() {
   
-  // @@protoc_insertion_point(field_mutable:ServiceReactionData.name)
+  // @@protoc_insertion_point(field_mutable:gpb.ServiceReactionData.name)
   return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ServiceReactionData::release_name() {
-  // @@protoc_insertion_point(field_release:ServiceReactionData.name)
+  // @@protoc_insertion_point(field_release:gpb.ServiceReactionData.name)
   
   return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3380,7 +3311,7 @@ inline void ServiceReactionData::set_allocated_name(::std::string* name) {
     
   }
   name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
-  // @@protoc_insertion_point(field_set_allocated:ServiceReactionData.name)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ServiceReactionData.name)
 }
 
 // string description = 4;
@@ -3388,41 +3319,41 @@ inline void ServiceReactionData::clear_description() {
   description_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ServiceReactionData::description() const {
-  // @@protoc_insertion_point(field_get:ServiceReactionData.description)
+  // @@protoc_insertion_point(field_get:gpb.ServiceReactionData.description)
   return description_.GetNoArena();
 }
 inline void ServiceReactionData::set_description(const ::std::string& value) {
   
   description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ServiceReactionData.description)
+  // @@protoc_insertion_point(field_set:gpb.ServiceReactionData.description)
 }
 #if LANG_CXX11
 inline void ServiceReactionData::set_description(::std::string&& value) {
   
   description_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ServiceReactionData.description)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ServiceReactionData.description)
 }
 #endif
 inline void ServiceReactionData::set_description(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ServiceReactionData.description)
+  // @@protoc_insertion_point(field_set_char:gpb.ServiceReactionData.description)
 }
 inline void ServiceReactionData::set_description(const char* value, size_t size) {
   
   description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ServiceReactionData.description)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ServiceReactionData.description)
 }
 inline ::std::string* ServiceReactionData::mutable_description() {
   
-  // @@protoc_insertion_point(field_mutable:ServiceReactionData.description)
+  // @@protoc_insertion_point(field_mutable:gpb.ServiceReactionData.description)
   return description_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ServiceReactionData::release_description() {
-  // @@protoc_insertion_point(field_release:ServiceReactionData.description)
+  // @@protoc_insertion_point(field_release:gpb.ServiceReactionData.description)
   
   return description_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3433,7 +3364,7 @@ inline void ServiceReactionData::set_allocated_description(::std::string* descri
     
   }
   description_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), description);
-  // @@protoc_insertion_point(field_set_allocated:ServiceReactionData.description)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ServiceReactionData.description)
 }
 
 // string logOnAs = 5;
@@ -3441,41 +3372,41 @@ inline void ServiceReactionData::clear_logonas() {
   logonas_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ServiceReactionData::logonas() const {
-  // @@protoc_insertion_point(field_get:ServiceReactionData.logOnAs)
+  // @@protoc_insertion_point(field_get:gpb.ServiceReactionData.logOnAs)
   return logonas_.GetNoArena();
 }
 inline void ServiceReactionData::set_logonas(const ::std::string& value) {
   
   logonas_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ServiceReactionData.logOnAs)
+  // @@protoc_insertion_point(field_set:gpb.ServiceReactionData.logOnAs)
 }
 #if LANG_CXX11
 inline void ServiceReactionData::set_logonas(::std::string&& value) {
   
   logonas_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ServiceReactionData.logOnAs)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ServiceReactionData.logOnAs)
 }
 #endif
 inline void ServiceReactionData::set_logonas(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   logonas_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ServiceReactionData.logOnAs)
+  // @@protoc_insertion_point(field_set_char:gpb.ServiceReactionData.logOnAs)
 }
 inline void ServiceReactionData::set_logonas(const char* value, size_t size) {
   
   logonas_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ServiceReactionData.logOnAs)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ServiceReactionData.logOnAs)
 }
 inline ::std::string* ServiceReactionData::mutable_logonas() {
   
-  // @@protoc_insertion_point(field_mutable:ServiceReactionData.logOnAs)
+  // @@protoc_insertion_point(field_mutable:gpb.ServiceReactionData.logOnAs)
   return logonas_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ServiceReactionData::release_logonas() {
-  // @@protoc_insertion_point(field_release:ServiceReactionData.logOnAs)
+  // @@protoc_insertion_point(field_release:gpb.ServiceReactionData.logOnAs)
   
   return logonas_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3486,7 +3417,7 @@ inline void ServiceReactionData::set_allocated_logonas(::std::string* logonas) {
     
   }
   logonas_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), logonas);
-  // @@protoc_insertion_point(field_set_allocated:ServiceReactionData.logOnAs)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ServiceReactionData.logOnAs)
 }
 
 // string startupType = 6;
@@ -3494,41 +3425,41 @@ inline void ServiceReactionData::clear_startuptype() {
   startuptype_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ServiceReactionData::startuptype() const {
-  // @@protoc_insertion_point(field_get:ServiceReactionData.startupType)
+  // @@protoc_insertion_point(field_get:gpb.ServiceReactionData.startupType)
   return startuptype_.GetNoArena();
 }
 inline void ServiceReactionData::set_startuptype(const ::std::string& value) {
   
   startuptype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ServiceReactionData.startupType)
+  // @@protoc_insertion_point(field_set:gpb.ServiceReactionData.startupType)
 }
 #if LANG_CXX11
 inline void ServiceReactionData::set_startuptype(::std::string&& value) {
   
   startuptype_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ServiceReactionData.startupType)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ServiceReactionData.startupType)
 }
 #endif
 inline void ServiceReactionData::set_startuptype(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   startuptype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ServiceReactionData.startupType)
+  // @@protoc_insertion_point(field_set_char:gpb.ServiceReactionData.startupType)
 }
 inline void ServiceReactionData::set_startuptype(const char* value, size_t size) {
   
   startuptype_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ServiceReactionData.startupType)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ServiceReactionData.startupType)
 }
 inline ::std::string* ServiceReactionData::mutable_startuptype() {
   
-  // @@protoc_insertion_point(field_mutable:ServiceReactionData.startupType)
+  // @@protoc_insertion_point(field_mutable:gpb.ServiceReactionData.startupType)
   return startuptype_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ServiceReactionData::release_startuptype() {
-  // @@protoc_insertion_point(field_release:ServiceReactionData.startupType)
+  // @@protoc_insertion_point(field_release:gpb.ServiceReactionData.startupType)
   
   return startuptype_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3539,7 +3470,7 @@ inline void ServiceReactionData::set_allocated_startuptype(::std::string* startu
     
   }
   startuptype_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), startuptype);
-  // @@protoc_insertion_point(field_set_allocated:ServiceReactionData.startupType)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ServiceReactionData.startupType)
 }
 
 // string startParameters = 7;
@@ -3547,41 +3478,41 @@ inline void ServiceReactionData::clear_startparameters() {
   startparameters_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ServiceReactionData::startparameters() const {
-  // @@protoc_insertion_point(field_get:ServiceReactionData.startParameters)
+  // @@protoc_insertion_point(field_get:gpb.ServiceReactionData.startParameters)
   return startparameters_.GetNoArena();
 }
 inline void ServiceReactionData::set_startparameters(const ::std::string& value) {
   
   startparameters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ServiceReactionData.startParameters)
+  // @@protoc_insertion_point(field_set:gpb.ServiceReactionData.startParameters)
 }
 #if LANG_CXX11
 inline void ServiceReactionData::set_startparameters(::std::string&& value) {
   
   startparameters_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ServiceReactionData.startParameters)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ServiceReactionData.startParameters)
 }
 #endif
 inline void ServiceReactionData::set_startparameters(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   startparameters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ServiceReactionData.startParameters)
+  // @@protoc_insertion_point(field_set_char:gpb.ServiceReactionData.startParameters)
 }
 inline void ServiceReactionData::set_startparameters(const char* value, size_t size) {
   
   startparameters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ServiceReactionData.startParameters)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ServiceReactionData.startParameters)
 }
 inline ::std::string* ServiceReactionData::mutable_startparameters() {
   
-  // @@protoc_insertion_point(field_mutable:ServiceReactionData.startParameters)
+  // @@protoc_insertion_point(field_mutable:gpb.ServiceReactionData.startParameters)
   return startparameters_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ServiceReactionData::release_startparameters() {
-  // @@protoc_insertion_point(field_release:ServiceReactionData.startParameters)
+  // @@protoc_insertion_point(field_release:gpb.ServiceReactionData.startParameters)
   
   return startparameters_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3592,7 +3523,7 @@ inline void ServiceReactionData::set_allocated_startparameters(::std::string* st
     
   }
   startparameters_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), startparameters);
-  // @@protoc_insertion_point(field_set_allocated:ServiceReactionData.startParameters)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ServiceReactionData.startParameters)
 }
 
 // bool allowDesktopInteract = 8;
@@ -3600,13 +3531,13 @@ inline void ServiceReactionData::clear_allowdesktopinteract() {
   allowdesktopinteract_ = false;
 }
 inline bool ServiceReactionData::allowdesktopinteract() const {
-  // @@protoc_insertion_point(field_get:ServiceReactionData.allowDesktopInteract)
+  // @@protoc_insertion_point(field_get:gpb.ServiceReactionData.allowDesktopInteract)
   return allowdesktopinteract_;
 }
 inline void ServiceReactionData::set_allowdesktopinteract(bool value) {
   
   allowdesktopinteract_ = value;
-  // @@protoc_insertion_point(field_set:ServiceReactionData.allowDesktopInteract)
+  // @@protoc_insertion_point(field_set:gpb.ServiceReactionData.allowDesktopInteract)
 }
 
 // string runProgramPath = 9;
@@ -3614,41 +3545,41 @@ inline void ServiceReactionData::clear_runprogrampath() {
   runprogrampath_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ServiceReactionData::runprogrampath() const {
-  // @@protoc_insertion_point(field_get:ServiceReactionData.runProgramPath)
+  // @@protoc_insertion_point(field_get:gpb.ServiceReactionData.runProgramPath)
   return runprogrampath_.GetNoArena();
 }
 inline void ServiceReactionData::set_runprogrampath(const ::std::string& value) {
   
   runprogrampath_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ServiceReactionData.runProgramPath)
+  // @@protoc_insertion_point(field_set:gpb.ServiceReactionData.runProgramPath)
 }
 #if LANG_CXX11
 inline void ServiceReactionData::set_runprogrampath(::std::string&& value) {
   
   runprogrampath_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ServiceReactionData.runProgramPath)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ServiceReactionData.runProgramPath)
 }
 #endif
 inline void ServiceReactionData::set_runprogrampath(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   runprogrampath_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ServiceReactionData.runProgramPath)
+  // @@protoc_insertion_point(field_set_char:gpb.ServiceReactionData.runProgramPath)
 }
 inline void ServiceReactionData::set_runprogrampath(const char* value, size_t size) {
   
   runprogrampath_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ServiceReactionData.runProgramPath)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ServiceReactionData.runProgramPath)
 }
 inline ::std::string* ServiceReactionData::mutable_runprogrampath() {
   
-  // @@protoc_insertion_point(field_mutable:ServiceReactionData.runProgramPath)
+  // @@protoc_insertion_point(field_mutable:gpb.ServiceReactionData.runProgramPath)
   return runprogrampath_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ServiceReactionData::release_runprogrampath() {
-  // @@protoc_insertion_point(field_release:ServiceReactionData.runProgramPath)
+  // @@protoc_insertion_point(field_release:gpb.ServiceReactionData.runProgramPath)
   
   return runprogrampath_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3659,7 +3590,7 @@ inline void ServiceReactionData::set_allocated_runprogrampath(::std::string* run
     
   }
   runprogrampath_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), runprogrampath);
-  // @@protoc_insertion_point(field_set_allocated:ServiceReactionData.runProgramPath)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ServiceReactionData.runProgramPath)
 }
 
 // string binaryPath = 10;
@@ -3667,41 +3598,41 @@ inline void ServiceReactionData::clear_binarypath() {
   binarypath_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ServiceReactionData::binarypath() const {
-  // @@protoc_insertion_point(field_get:ServiceReactionData.binaryPath)
+  // @@protoc_insertion_point(field_get:gpb.ServiceReactionData.binaryPath)
   return binarypath_.GetNoArena();
 }
 inline void ServiceReactionData::set_binarypath(const ::std::string& value) {
   
   binarypath_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ServiceReactionData.binaryPath)
+  // @@protoc_insertion_point(field_set:gpb.ServiceReactionData.binaryPath)
 }
 #if LANG_CXX11
 inline void ServiceReactionData::set_binarypath(::std::string&& value) {
   
   binarypath_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ServiceReactionData.binaryPath)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ServiceReactionData.binaryPath)
 }
 #endif
 inline void ServiceReactionData::set_binarypath(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   binarypath_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ServiceReactionData.binaryPath)
+  // @@protoc_insertion_point(field_set_char:gpb.ServiceReactionData.binaryPath)
 }
 inline void ServiceReactionData::set_binarypath(const char* value, size_t size) {
   
   binarypath_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ServiceReactionData.binaryPath)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ServiceReactionData.binaryPath)
 }
 inline ::std::string* ServiceReactionData::mutable_binarypath() {
   
-  // @@protoc_insertion_point(field_mutable:ServiceReactionData.binaryPath)
+  // @@protoc_insertion_point(field_mutable:gpb.ServiceReactionData.binaryPath)
   return binarypath_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ServiceReactionData::release_binarypath() {
-  // @@protoc_insertion_point(field_release:ServiceReactionData.binaryPath)
+  // @@protoc_insertion_point(field_release:gpb.ServiceReactionData.binaryPath)
   
   return binarypath_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3712,7 +3643,7 @@ inline void ServiceReactionData::set_allocated_binarypath(::std::string* binaryp
     
   }
   binarypath_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), binarypath);
-  // @@protoc_insertion_point(field_set_allocated:ServiceReactionData.binaryPath)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ServiceReactionData.binaryPath)
 }
 
 // bytes binaryContents = 11;
@@ -3720,41 +3651,41 @@ inline void ServiceReactionData::clear_binarycontents() {
   binarycontents_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline const ::std::string& ServiceReactionData::binarycontents() const {
-  // @@protoc_insertion_point(field_get:ServiceReactionData.binaryContents)
+  // @@protoc_insertion_point(field_get:gpb.ServiceReactionData.binaryContents)
   return binarycontents_.GetNoArena();
 }
 inline void ServiceReactionData::set_binarycontents(const ::std::string& value) {
   
   binarycontents_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ServiceReactionData.binaryContents)
+  // @@protoc_insertion_point(field_set:gpb.ServiceReactionData.binaryContents)
 }
 #if LANG_CXX11
 inline void ServiceReactionData::set_binarycontents(::std::string&& value) {
   
   binarycontents_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ServiceReactionData.binaryContents)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.ServiceReactionData.binaryContents)
 }
 #endif
 inline void ServiceReactionData::set_binarycontents(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   binarycontents_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ServiceReactionData.binaryContents)
+  // @@protoc_insertion_point(field_set_char:gpb.ServiceReactionData.binaryContents)
 }
 inline void ServiceReactionData::set_binarycontents(const void* value, size_t size) {
   
   binarycontents_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ServiceReactionData.binaryContents)
+  // @@protoc_insertion_point(field_set_pointer:gpb.ServiceReactionData.binaryContents)
 }
 inline ::std::string* ServiceReactionData::mutable_binarycontents() {
   
-  // @@protoc_insertion_point(field_mutable:ServiceReactionData.binaryContents)
+  // @@protoc_insertion_point(field_mutable:gpb.ServiceReactionData.binaryContents)
   return binarycontents_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ServiceReactionData::release_binarycontents() {
-  // @@protoc_insertion_point(field_release:ServiceReactionData.binaryContents)
+  // @@protoc_insertion_point(field_release:gpb.ServiceReactionData.binaryContents)
   
   return binarycontents_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3765,99 +3696,221 @@ inline void ServiceReactionData::set_allocated_binarycontents(::std::string* bin
     
   }
   binarycontents_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), binarycontents);
-  // @@protoc_insertion_point(field_set_allocated:ServiceReactionData.binaryContents)
+  // @@protoc_insertion_point(field_set_allocated:gpb.ServiceReactionData.binaryContents)
 }
 
 // -------------------------------------------------------------------
 
-// FileReaction
+// HuntInfo
 
-// string description = 1;
-inline void FileReaction::clear_description() {
-  description_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string huntName = 1;
+inline void HuntInfo::clear_huntname() {
+  huntname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& FileReaction::description() const {
-  // @@protoc_insertion_point(field_get:FileReaction.description)
-  return description_.GetNoArena();
+inline const ::std::string& HuntInfo::huntname() const {
+  // @@protoc_insertion_point(field_get:gpb.HuntInfo.huntName)
+  return huntname_.GetNoArena();
 }
-inline void FileReaction::set_description(const ::std::string& value) {
+inline void HuntInfo::set_huntname(const ::std::string& value) {
   
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:FileReaction.description)
+  huntname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:gpb.HuntInfo.huntName)
 }
 #if LANG_CXX11
-inline void FileReaction::set_description(::std::string&& value) {
+inline void HuntInfo::set_huntname(::std::string&& value) {
   
-  description_.SetNoArena(
+  huntname_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:FileReaction.description)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.HuntInfo.huntName)
 }
 #endif
-inline void FileReaction::set_description(const char* value) {
+inline void HuntInfo::set_huntname(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:FileReaction.description)
+  huntname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:gpb.HuntInfo.huntName)
 }
-inline void FileReaction::set_description(const char* value, size_t size) {
+inline void HuntInfo::set_huntname(const char* value, size_t size) {
   
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  huntname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:FileReaction.description)
+  // @@protoc_insertion_point(field_set_pointer:gpb.HuntInfo.huntName)
 }
-inline ::std::string* FileReaction::mutable_description() {
+inline ::std::string* HuntInfo::mutable_huntname() {
   
-  // @@protoc_insertion_point(field_mutable:FileReaction.description)
-  return description_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:gpb.HuntInfo.huntName)
+  return huntname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* FileReaction::release_description() {
-  // @@protoc_insertion_point(field_release:FileReaction.description)
+inline ::std::string* HuntInfo::release_huntname() {
+  // @@protoc_insertion_point(field_release:gpb.HuntInfo.huntName)
   
-  return description_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return huntname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void FileReaction::set_allocated_description(::std::string* description) {
-  if (description != nullptr) {
+inline void HuntInfo::set_allocated_huntname(::std::string* huntname) {
+  if (huntname != nullptr) {
     
   } else {
     
   }
-  description_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), description);
-  // @@protoc_insertion_point(field_set_allocated:FileReaction.description)
+  huntname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), huntname);
+  // @@protoc_insertion_point(field_set_allocated:gpb.HuntInfo.huntName)
 }
 
-// .FileReactionData info = 2;
-inline bool FileReaction::has_info() const {
+// .gpb.Aggressiveness huntAggressiveness = 2;
+inline void HuntInfo::clear_huntaggressiveness() {
+  huntaggressiveness_ = 0;
+}
+inline ::gpb::Aggressiveness HuntInfo::huntaggressiveness() const {
+  // @@protoc_insertion_point(field_get:gpb.HuntInfo.huntAggressiveness)
+  return static_cast< ::gpb::Aggressiveness >(huntaggressiveness_);
+}
+inline void HuntInfo::set_huntaggressiveness(::gpb::Aggressiveness value) {
+  
+  huntaggressiveness_ = value;
+  // @@protoc_insertion_point(field_set:gpb.HuntInfo.huntAggressiveness)
+}
+
+// repeated .gpb.Tactic huntTactics = 3;
+inline int HuntInfo::hunttactics_size() const {
+  return hunttactics_.size();
+}
+inline void HuntInfo::clear_hunttactics() {
+  hunttactics_.Clear();
+}
+inline ::gpb::Tactic HuntInfo::hunttactics(int index) const {
+  // @@protoc_insertion_point(field_get:gpb.HuntInfo.huntTactics)
+  return static_cast< ::gpb::Tactic >(hunttactics_.Get(index));
+}
+inline void HuntInfo::set_hunttactics(int index, ::gpb::Tactic value) {
+  hunttactics_.Set(index, value);
+  // @@protoc_insertion_point(field_set:gpb.HuntInfo.huntTactics)
+}
+inline void HuntInfo::add_hunttactics(::gpb::Tactic value) {
+  hunttactics_.Add(value);
+  // @@protoc_insertion_point(field_add:gpb.HuntInfo.huntTactics)
+}
+inline const ::google::protobuf::RepeatedField<int>&
+HuntInfo::hunttactics() const {
+  // @@protoc_insertion_point(field_list:gpb.HuntInfo.huntTactics)
+  return hunttactics_;
+}
+inline ::google::protobuf::RepeatedField<int>*
+HuntInfo::mutable_hunttactics() {
+  // @@protoc_insertion_point(field_mutable_list:gpb.HuntInfo.huntTactics)
+  return &hunttactics_;
+}
+
+// repeated .gpb.Category huntCategories = 4;
+inline int HuntInfo::huntcategories_size() const {
+  return huntcategories_.size();
+}
+inline void HuntInfo::clear_huntcategories() {
+  huntcategories_.Clear();
+}
+inline ::gpb::Category HuntInfo::huntcategories(int index) const {
+  // @@protoc_insertion_point(field_get:gpb.HuntInfo.huntCategories)
+  return static_cast< ::gpb::Category >(huntcategories_.Get(index));
+}
+inline void HuntInfo::set_huntcategories(int index, ::gpb::Category value) {
+  huntcategories_.Set(index, value);
+  // @@protoc_insertion_point(field_set:gpb.HuntInfo.huntCategories)
+}
+inline void HuntInfo::add_huntcategories(::gpb::Category value) {
+  huntcategories_.Add(value);
+  // @@protoc_insertion_point(field_add:gpb.HuntInfo.huntCategories)
+}
+inline const ::google::protobuf::RepeatedField<int>&
+HuntInfo::huntcategories() const {
+  // @@protoc_insertion_point(field_list:gpb.HuntInfo.huntCategories)
+  return huntcategories_;
+}
+inline ::google::protobuf::RepeatedField<int>*
+HuntInfo::mutable_huntcategories() {
+  // @@protoc_insertion_point(field_mutable_list:gpb.HuntInfo.huntCategories)
+  return &huntcategories_;
+}
+
+// repeated .gpb.DataSource huntDatasources = 5;
+inline int HuntInfo::huntdatasources_size() const {
+  return huntdatasources_.size();
+}
+inline void HuntInfo::clear_huntdatasources() {
+  huntdatasources_.Clear();
+}
+inline ::gpb::DataSource HuntInfo::huntdatasources(int index) const {
+  // @@protoc_insertion_point(field_get:gpb.HuntInfo.huntDatasources)
+  return static_cast< ::gpb::DataSource >(huntdatasources_.Get(index));
+}
+inline void HuntInfo::set_huntdatasources(int index, ::gpb::DataSource value) {
+  huntdatasources_.Set(index, value);
+  // @@protoc_insertion_point(field_set:gpb.HuntInfo.huntDatasources)
+}
+inline void HuntInfo::add_huntdatasources(::gpb::DataSource value) {
+  huntdatasources_.Add(value);
+  // @@protoc_insertion_point(field_add:gpb.HuntInfo.huntDatasources)
+}
+inline const ::google::protobuf::RepeatedField<int>&
+HuntInfo::huntdatasources() const {
+  // @@protoc_insertion_point(field_list:gpb.HuntInfo.huntDatasources)
+  return huntdatasources_;
+}
+inline ::google::protobuf::RepeatedField<int>*
+HuntInfo::mutable_huntdatasources() {
+  // @@protoc_insertion_point(field_mutable_list:gpb.HuntInfo.huntDatasources)
+  return &huntdatasources_;
+}
+
+// uint32 huntStartTime = 6;
+inline void HuntInfo::clear_huntstarttime() {
+  huntstarttime_ = 0u;
+}
+inline ::google::protobuf::uint32 HuntInfo::huntstarttime() const {
+  // @@protoc_insertion_point(field_get:gpb.HuntInfo.huntStartTime)
+  return huntstarttime_;
+}
+inline void HuntInfo::set_huntstarttime(::google::protobuf::uint32 value) {
+  
+  huntstarttime_ = value;
+  // @@protoc_insertion_point(field_set:gpb.HuntInfo.huntStartTime)
+}
+
+// -------------------------------------------------------------------
+
+// HuntMessage
+
+// .gpb.HuntInfo info = 1;
+inline bool HuntMessage::has_info() const {
   return this != internal_default_instance() && info_ != nullptr;
 }
-inline void FileReaction::clear_info() {
+inline void HuntMessage::clear_info() {
   if (GetArenaNoVirtual() == nullptr && info_ != nullptr) {
     delete info_;
   }
   info_ = nullptr;
 }
-inline const ::FileReactionData& FileReaction::info() const {
-  const ::FileReactionData* p = info_;
-  // @@protoc_insertion_point(field_get:FileReaction.info)
-  return p != nullptr ? *p : *reinterpret_cast<const ::FileReactionData*>(
-      &::_FileReactionData_default_instance_);
+inline const ::gpb::HuntInfo& HuntMessage::info() const {
+  const ::gpb::HuntInfo* p = info_;
+  // @@protoc_insertion_point(field_get:gpb.HuntMessage.info)
+  return p != nullptr ? *p : *reinterpret_cast<const ::gpb::HuntInfo*>(
+      &::gpb::_HuntInfo_default_instance_);
 }
-inline ::FileReactionData* FileReaction::release_info() {
-  // @@protoc_insertion_point(field_release:FileReaction.info)
+inline ::gpb::HuntInfo* HuntMessage::release_info() {
+  // @@protoc_insertion_point(field_release:gpb.HuntMessage.info)
   
-  ::FileReactionData* temp = info_;
+  ::gpb::HuntInfo* temp = info_;
   info_ = nullptr;
   return temp;
 }
-inline ::FileReactionData* FileReaction::mutable_info() {
+inline ::gpb::HuntInfo* HuntMessage::mutable_info() {
   
   if (info_ == nullptr) {
-    auto* p = CreateMaybeMessage<::FileReactionData>(GetArenaNoVirtual());
+    auto* p = CreateMaybeMessage<::gpb::HuntInfo>(GetArenaNoVirtual());
     info_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:FileReaction.info)
+  // @@protoc_insertion_point(field_mutable:gpb.HuntMessage.info)
   return info_;
 }
-inline void FileReaction::set_allocated_info(::FileReactionData* info) {
+inline void HuntMessage::set_allocated_info(::gpb::HuntInfo* info) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == nullptr) {
     delete info_;
@@ -3873,331 +3926,180 @@ inline void FileReaction::set_allocated_info(::FileReactionData* info) {
     
   }
   info_ = info;
-  // @@protoc_insertion_point(field_set_allocated:FileReaction.info)
+  // @@protoc_insertion_point(field_set_allocated:gpb.HuntMessage.info)
 }
 
-// -------------------------------------------------------------------
-
-// RegistryReaction
-
-// string description = 1;
-inline void RegistryReaction::clear_description() {
-  description_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string extraMessage = 3;
+inline void HuntMessage::clear_extramessage() {
+  extramessage_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& RegistryReaction::description() const {
-  // @@protoc_insertion_point(field_get:RegistryReaction.description)
-  return description_.GetNoArena();
+inline const ::std::string& HuntMessage::extramessage() const {
+  // @@protoc_insertion_point(field_get:gpb.HuntMessage.extraMessage)
+  return extramessage_.GetNoArena();
 }
-inline void RegistryReaction::set_description(const ::std::string& value) {
+inline void HuntMessage::set_extramessage(const ::std::string& value) {
   
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:RegistryReaction.description)
+  extramessage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:gpb.HuntMessage.extraMessage)
 }
 #if LANG_CXX11
-inline void RegistryReaction::set_description(::std::string&& value) {
+inline void HuntMessage::set_extramessage(::std::string&& value) {
   
-  description_.SetNoArena(
+  extramessage_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:RegistryReaction.description)
+  // @@protoc_insertion_point(field_set_rvalue:gpb.HuntMessage.extraMessage)
 }
 #endif
-inline void RegistryReaction::set_description(const char* value) {
+inline void HuntMessage::set_extramessage(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:RegistryReaction.description)
+  extramessage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:gpb.HuntMessage.extraMessage)
 }
-inline void RegistryReaction::set_description(const char* value, size_t size) {
+inline void HuntMessage::set_extramessage(const char* value, size_t size) {
   
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  extramessage_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:RegistryReaction.description)
+  // @@protoc_insertion_point(field_set_pointer:gpb.HuntMessage.extraMessage)
 }
-inline ::std::string* RegistryReaction::mutable_description() {
+inline ::std::string* HuntMessage::mutable_extramessage() {
   
-  // @@protoc_insertion_point(field_mutable:RegistryReaction.description)
-  return description_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:gpb.HuntMessage.extraMessage)
+  return extramessage_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* RegistryReaction::release_description() {
-  // @@protoc_insertion_point(field_release:RegistryReaction.description)
+inline ::std::string* HuntMessage::release_extramessage() {
+  // @@protoc_insertion_point(field_release:gpb.HuntMessage.extraMessage)
   
-  return description_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return extramessage_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void RegistryReaction::set_allocated_description(::std::string* description) {
-  if (description != nullptr) {
+inline void HuntMessage::set_allocated_extramessage(::std::string* extramessage) {
+  if (extramessage != nullptr) {
     
   } else {
     
   }
-  description_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), description);
-  // @@protoc_insertion_point(field_set_allocated:RegistryReaction.description)
+  extramessage_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), extramessage);
+  // @@protoc_insertion_point(field_set_allocated:gpb.HuntMessage.extraMessage)
 }
 
-// .RegistryReactionData info = 2;
-inline bool RegistryReaction::has_info() const {
-  return this != internal_default_instance() && info_ != nullptr;
+// repeated .gpb.FileReactionData fileDetections = 4;
+inline int HuntMessage::filedetections_size() const {
+  return filedetections_.size();
 }
-inline void RegistryReaction::clear_info() {
-  if (GetArenaNoVirtual() == nullptr && info_ != nullptr) {
-    delete info_;
-  }
-  info_ = nullptr;
+inline void HuntMessage::clear_filedetections() {
+  filedetections_.Clear();
 }
-inline const ::RegistryReactionData& RegistryReaction::info() const {
-  const ::RegistryReactionData* p = info_;
-  // @@protoc_insertion_point(field_get:RegistryReaction.info)
-  return p != nullptr ? *p : *reinterpret_cast<const ::RegistryReactionData*>(
-      &::_RegistryReactionData_default_instance_);
+inline ::gpb::FileReactionData* HuntMessage::mutable_filedetections(int index) {
+  // @@protoc_insertion_point(field_mutable:gpb.HuntMessage.fileDetections)
+  return filedetections_.Mutable(index);
 }
-inline ::RegistryReactionData* RegistryReaction::release_info() {
-  // @@protoc_insertion_point(field_release:RegistryReaction.info)
-  
-  ::RegistryReactionData* temp = info_;
-  info_ = nullptr;
-  return temp;
+inline ::google::protobuf::RepeatedPtrField< ::gpb::FileReactionData >*
+HuntMessage::mutable_filedetections() {
+  // @@protoc_insertion_point(field_mutable_list:gpb.HuntMessage.fileDetections)
+  return &filedetections_;
 }
-inline ::RegistryReactionData* RegistryReaction::mutable_info() {
-  
-  if (info_ == nullptr) {
-    auto* p = CreateMaybeMessage<::RegistryReactionData>(GetArenaNoVirtual());
-    info_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:RegistryReaction.info)
-  return info_;
+inline const ::gpb::FileReactionData& HuntMessage::filedetections(int index) const {
+  // @@protoc_insertion_point(field_get:gpb.HuntMessage.fileDetections)
+  return filedetections_.Get(index);
 }
-inline void RegistryReaction::set_allocated_info(::RegistryReactionData* info) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete info_;
-  }
-  if (info) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      info = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, info, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  info_ = info;
-  // @@protoc_insertion_point(field_set_allocated:RegistryReaction.info)
+inline ::gpb::FileReactionData* HuntMessage::add_filedetections() {
+  // @@protoc_insertion_point(field_add:gpb.HuntMessage.fileDetections)
+  return filedetections_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::gpb::FileReactionData >&
+HuntMessage::filedetections() const {
+  // @@protoc_insertion_point(field_list:gpb.HuntMessage.fileDetections)
+  return filedetections_;
 }
 
-// -------------------------------------------------------------------
-
-// ProcessReaction
-
-// string description = 1;
-inline void ProcessReaction::clear_description() {
-  description_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// repeated .gpb.RegistryReactionData registryDetections = 5;
+inline int HuntMessage::registrydetections_size() const {
+  return registrydetections_.size();
 }
-inline const ::std::string& ProcessReaction::description() const {
-  // @@protoc_insertion_point(field_get:ProcessReaction.description)
-  return description_.GetNoArena();
+inline void HuntMessage::clear_registrydetections() {
+  registrydetections_.Clear();
 }
-inline void ProcessReaction::set_description(const ::std::string& value) {
-  
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ProcessReaction.description)
+inline ::gpb::RegistryReactionData* HuntMessage::mutable_registrydetections(int index) {
+  // @@protoc_insertion_point(field_mutable:gpb.HuntMessage.registryDetections)
+  return registrydetections_.Mutable(index);
 }
-#if LANG_CXX11
-inline void ProcessReaction::set_description(::std::string&& value) {
-  
-  description_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ProcessReaction.description)
+inline ::google::protobuf::RepeatedPtrField< ::gpb::RegistryReactionData >*
+HuntMessage::mutable_registrydetections() {
+  // @@protoc_insertion_point(field_mutable_list:gpb.HuntMessage.registryDetections)
+  return &registrydetections_;
 }
-#endif
-inline void ProcessReaction::set_description(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ProcessReaction.description)
+inline const ::gpb::RegistryReactionData& HuntMessage::registrydetections(int index) const {
+  // @@protoc_insertion_point(field_get:gpb.HuntMessage.registryDetections)
+  return registrydetections_.Get(index);
 }
-inline void ProcessReaction::set_description(const char* value, size_t size) {
-  
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ProcessReaction.description)
+inline ::gpb::RegistryReactionData* HuntMessage::add_registrydetections() {
+  // @@protoc_insertion_point(field_add:gpb.HuntMessage.registryDetections)
+  return registrydetections_.Add();
 }
-inline ::std::string* ProcessReaction::mutable_description() {
-  
-  // @@protoc_insertion_point(field_mutable:ProcessReaction.description)
-  return description_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* ProcessReaction::release_description() {
-  // @@protoc_insertion_point(field_release:ProcessReaction.description)
-  
-  return description_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void ProcessReaction::set_allocated_description(::std::string* description) {
-  if (description != nullptr) {
-    
-  } else {
-    
-  }
-  description_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), description);
-  // @@protoc_insertion_point(field_set_allocated:ProcessReaction.description)
+inline const ::google::protobuf::RepeatedPtrField< ::gpb::RegistryReactionData >&
+HuntMessage::registrydetections() const {
+  // @@protoc_insertion_point(field_list:gpb.HuntMessage.registryDetections)
+  return registrydetections_;
 }
 
-// .ProcessReactionData info = 2;
-inline bool ProcessReaction::has_info() const {
-  return this != internal_default_instance() && info_ != nullptr;
+// repeated .gpb.ProcessReactionData processDetections = 6;
+inline int HuntMessage::processdetections_size() const {
+  return processdetections_.size();
 }
-inline void ProcessReaction::clear_info() {
-  if (GetArenaNoVirtual() == nullptr && info_ != nullptr) {
-    delete info_;
-  }
-  info_ = nullptr;
+inline void HuntMessage::clear_processdetections() {
+  processdetections_.Clear();
 }
-inline const ::ProcessReactionData& ProcessReaction::info() const {
-  const ::ProcessReactionData* p = info_;
-  // @@protoc_insertion_point(field_get:ProcessReaction.info)
-  return p != nullptr ? *p : *reinterpret_cast<const ::ProcessReactionData*>(
-      &::_ProcessReactionData_default_instance_);
+inline ::gpb::ProcessReactionData* HuntMessage::mutable_processdetections(int index) {
+  // @@protoc_insertion_point(field_mutable:gpb.HuntMessage.processDetections)
+  return processdetections_.Mutable(index);
 }
-inline ::ProcessReactionData* ProcessReaction::release_info() {
-  // @@protoc_insertion_point(field_release:ProcessReaction.info)
-  
-  ::ProcessReactionData* temp = info_;
-  info_ = nullptr;
-  return temp;
+inline ::google::protobuf::RepeatedPtrField< ::gpb::ProcessReactionData >*
+HuntMessage::mutable_processdetections() {
+  // @@protoc_insertion_point(field_mutable_list:gpb.HuntMessage.processDetections)
+  return &processdetections_;
 }
-inline ::ProcessReactionData* ProcessReaction::mutable_info() {
-  
-  if (info_ == nullptr) {
-    auto* p = CreateMaybeMessage<::ProcessReactionData>(GetArenaNoVirtual());
-    info_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:ProcessReaction.info)
-  return info_;
+inline const ::gpb::ProcessReactionData& HuntMessage::processdetections(int index) const {
+  // @@protoc_insertion_point(field_get:gpb.HuntMessage.processDetections)
+  return processdetections_.Get(index);
 }
-inline void ProcessReaction::set_allocated_info(::ProcessReactionData* info) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete info_;
-  }
-  if (info) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      info = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, info, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  info_ = info;
-  // @@protoc_insertion_point(field_set_allocated:ProcessReaction.info)
+inline ::gpb::ProcessReactionData* HuntMessage::add_processdetections() {
+  // @@protoc_insertion_point(field_add:gpb.HuntMessage.processDetections)
+  return processdetections_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::gpb::ProcessReactionData >&
+HuntMessage::processdetections() const {
+  // @@protoc_insertion_point(field_list:gpb.HuntMessage.processDetections)
+  return processdetections_;
 }
 
-// -------------------------------------------------------------------
-
-// ServiceReaction
-
-// string description = 1;
-inline void ServiceReaction::clear_description() {
-  description_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// repeated .gpb.ServiceReactionData serviceDetections = 7;
+inline int HuntMessage::servicedetections_size() const {
+  return servicedetections_.size();
 }
-inline const ::std::string& ServiceReaction::description() const {
-  // @@protoc_insertion_point(field_get:ServiceReaction.description)
-  return description_.GetNoArena();
+inline void HuntMessage::clear_servicedetections() {
+  servicedetections_.Clear();
 }
-inline void ServiceReaction::set_description(const ::std::string& value) {
-  
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:ServiceReaction.description)
+inline ::gpb::ServiceReactionData* HuntMessage::mutable_servicedetections(int index) {
+  // @@protoc_insertion_point(field_mutable:gpb.HuntMessage.serviceDetections)
+  return servicedetections_.Mutable(index);
 }
-#if LANG_CXX11
-inline void ServiceReaction::set_description(::std::string&& value) {
-  
-  description_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:ServiceReaction.description)
+inline ::google::protobuf::RepeatedPtrField< ::gpb::ServiceReactionData >*
+HuntMessage::mutable_servicedetections() {
+  // @@protoc_insertion_point(field_mutable_list:gpb.HuntMessage.serviceDetections)
+  return &servicedetections_;
 }
-#endif
-inline void ServiceReaction::set_description(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:ServiceReaction.description)
+inline const ::gpb::ServiceReactionData& HuntMessage::servicedetections(int index) const {
+  // @@protoc_insertion_point(field_get:gpb.HuntMessage.serviceDetections)
+  return servicedetections_.Get(index);
 }
-inline void ServiceReaction::set_description(const char* value, size_t size) {
-  
-  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:ServiceReaction.description)
+inline ::gpb::ServiceReactionData* HuntMessage::add_servicedetections() {
+  // @@protoc_insertion_point(field_add:gpb.HuntMessage.serviceDetections)
+  return servicedetections_.Add();
 }
-inline ::std::string* ServiceReaction::mutable_description() {
-  
-  // @@protoc_insertion_point(field_mutable:ServiceReaction.description)
-  return description_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* ServiceReaction::release_description() {
-  // @@protoc_insertion_point(field_release:ServiceReaction.description)
-  
-  return description_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void ServiceReaction::set_allocated_description(::std::string* description) {
-  if (description != nullptr) {
-    
-  } else {
-    
-  }
-  description_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), description);
-  // @@protoc_insertion_point(field_set_allocated:ServiceReaction.description)
-}
-
-// .ServiceReactionData info = 2;
-inline bool ServiceReaction::has_info() const {
-  return this != internal_default_instance() && info_ != nullptr;
-}
-inline void ServiceReaction::clear_info() {
-  if (GetArenaNoVirtual() == nullptr && info_ != nullptr) {
-    delete info_;
-  }
-  info_ = nullptr;
-}
-inline const ::ServiceReactionData& ServiceReaction::info() const {
-  const ::ServiceReactionData* p = info_;
-  // @@protoc_insertion_point(field_get:ServiceReaction.info)
-  return p != nullptr ? *p : *reinterpret_cast<const ::ServiceReactionData*>(
-      &::_ServiceReactionData_default_instance_);
-}
-inline ::ServiceReactionData* ServiceReaction::release_info() {
-  // @@protoc_insertion_point(field_release:ServiceReaction.info)
-  
-  ::ServiceReactionData* temp = info_;
-  info_ = nullptr;
-  return temp;
-}
-inline ::ServiceReactionData* ServiceReaction::mutable_info() {
-  
-  if (info_ == nullptr) {
-    auto* p = CreateMaybeMessage<::ServiceReactionData>(GetArenaNoVirtual());
-    info_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:ServiceReaction.info)
-  return info_;
-}
-inline void ServiceReaction::set_allocated_info(::ServiceReactionData* info) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete info_;
-  }
-  if (info) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      info = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, info, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  info_ = info;
-  // @@protoc_insertion_point(field_set_allocated:ServiceReaction.info)
+inline const ::google::protobuf::RepeatedPtrField< ::gpb::ServiceReactionData >&
+HuntMessage::servicedetections() const {
+  // @@protoc_insertion_point(field_list:gpb.HuntMessage.serviceDetections)
+  return servicedetections_;
 }
 
 #ifdef __GNUC__
@@ -4217,21 +4119,38 @@ inline void ServiceReaction::set_allocated_info(::ServiceReactionData* info) {
 
 // -------------------------------------------------------------------
 
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 
 // @@protoc_insertion_point(namespace_scope)
 
+}  // namespace gpb
 
 namespace google {
 namespace protobuf {
 
-template <> struct is_proto_enum< ::RegistryReactionData_Type> : ::std::true_type {};
+template <> struct is_proto_enum< ::gpb::RegistryReactionData_RegType> : ::std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::RegistryReactionData_Type>() {
-  return ::RegistryReactionData_Type_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::gpb::RegistryReactionData_RegType>() {
+  return ::gpb::RegistryReactionData_RegType_descriptor();
+}
+template <> struct is_proto_enum< ::gpb::Tactic> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::gpb::Tactic>() {
+  return ::gpb::Tactic_descriptor();
+}
+template <> struct is_proto_enum< ::gpb::DataSource> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::gpb::DataSource>() {
+  return ::gpb::DataSource_descriptor();
+}
+template <> struct is_proto_enum< ::gpb::Category> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::gpb::Category>() {
+  return ::gpb::Category_descriptor();
+}
+template <> struct is_proto_enum< ::gpb::Aggressiveness> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::gpb::Aggressiveness>() {
+  return ::gpb::Aggressiveness_descriptor();
 }
 
 }  // namespace protobuf
