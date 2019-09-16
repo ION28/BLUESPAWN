@@ -14,7 +14,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1131::ScanCursory(const Scope& scope, Reaction* reaction) const {
+	int HuntT1131::ScanCursory(const Scope& scope, Reaction reaction) const {
 		LOG_INFO("Hunting for T1131 - Authentication Package at level Cursory");
 
 		int identified = 0;

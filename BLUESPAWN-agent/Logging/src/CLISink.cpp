@@ -34,7 +34,7 @@ namespace Log {
 						std::wcout << L"\tPotentially malicious service detected - " << lpServiceDetection->wsServiceName << L" (PID is " << lpServiceDetection->ServicePID << L")" << std::endl;
 					} else if(detection->DetectionType == DetectionType::Registry){
 						auto* lpRegistryDetection = reinterpret_cast<REGISTRY_DETECTION*>(detection);
-						std::wcout << L"\tPotentially malicious registry key detected - " << lpRegistryDetection->wsRegistryKeyPath << L": " << lpRegistryDetection->wsRegistryKeyValue << std::endl;
+						std::wcout << L"\tPotentially malicious registry key detected - " << lpRegistryDetection->wsRegistryKeyPath << (lpRegistryDetection->wsRegistryKeyValue.length() ? L": " : L"") << lpRegistryDetection->wsRegistryKeyValue << std::endl;
 					} else {
 						std::wcout << L"\tUnknown detection type!" << std::endl;
 					}

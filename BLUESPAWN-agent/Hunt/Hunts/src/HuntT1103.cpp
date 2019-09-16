@@ -13,7 +13,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	int HuntT1103::ScanCursory(const Scope& scope, Reaction* reaction) const {
+	int HuntT1103::ScanCursory(const Scope& scope, Reaction reaction) const {
 		LOG_INFO("Hunting for T1103 - AppInit DLLs at level Cursory");
 
 		int identified = 0;

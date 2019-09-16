@@ -13,7 +13,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::LateralMovement;
 	}
 
-	int HuntT1037::ScanCursory(const Scope& scope, Reaction* reaction) const {
+	int HuntT1037::ScanCursory(const Scope& scope, Reaction reaction) const {
 		LOG_INFO("Hunting for T1037 - Logon Scripts at level Cursory");
 
 		int identified = 0;
