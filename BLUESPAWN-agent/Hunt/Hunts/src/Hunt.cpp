@@ -2,9 +2,11 @@
 #include "hunts/HuntRegister.h"
 #include "reactions/Reaction.h"
 
+#include <iostream>
+
 Hunt::Hunt(HuntRegister& record, const std::wstring& name) : 
 	name{ name }{
-	record.RegisterHunt(*this);
+	record.RegisterHunt(this);
 
 	dwTacticsUsed = 0;
 	dwSourcesInvolved = 0;
@@ -12,28 +14,29 @@ Hunt::Hunt(HuntRegister& record, const std::wstring& name) :
 	dwSupportedScans = 0;
 }
 
-int Hunt::ScanCursory(const Scope& scope, Reaction reaction) const {
+int Hunt::ScanCursory(const Scope& scope, Reaction reaction){
+	std::wcout << L"Running hunt handler for " << name << std::endl;
 	if(!(dwSupportedScans & (DWORD) Aggressiveness::Cursory)){
 		return -1;
 	}
 	return 0;
 }
 
-int Hunt::ScanModerate(const Scope& scope, Reaction reaction) const {
+int Hunt::ScanModerate(const Scope& scope, Reaction reaction){
 	if(!(dwSupportedScans & (DWORD) Aggressiveness::Moderate)){
 		return -1;
 	}
 	return 0;
 }
 
-int Hunt::ScanCareful(const Scope& scope, Reaction reaction) const {
+int Hunt::ScanCareful(const Scope& scope, Reaction reaction){
 	if(!(dwSupportedScans & (DWORD) Aggressiveness::Careful)){
 		return -1;
 	}
 	return 0;
 }
 
-int Hunt::ScanAggressive(const Scope& scope, Reaction reaction) const {
+int Hunt::ScanAggressive(const Scope& scope, Reaction reaction){
 	if(!(dwSupportedScans & (DWORD) Aggressiveness::Aggressive)){
 		return -1;
 	}

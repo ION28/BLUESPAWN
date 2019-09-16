@@ -14,13 +14,15 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	int HuntT1182::ScanCursory(const Scope& scope, Reaction reaction) const {
+	int HuntT1182::ScanCursory(const Scope& scope, Reaction reaction){
 		LOG_INFO("Hunting for T1182 - AppCert DLLs at level Cursory");
+		reaction.BeginHunt(GET_INFO());
 
 		int identified = 0;
 
 		identified += CheckForSubkeys(RegistryKey(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls"), reaction);
 		
+		reaction.EndHunt();
 		return identified;
 	}
 

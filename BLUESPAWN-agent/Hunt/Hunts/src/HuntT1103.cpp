@@ -13,8 +13,9 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	int HuntT1103::ScanCursory(const Scope& scope, Reaction reaction) const {
+	int HuntT1103::ScanCursory(const Scope& scope, Reaction reaction){
 		LOG_INFO("Hunting for T1103 - AppInit DLLs at level Cursory");
+		reaction.BeginHunt(GET_INFO());
 
 		int identified = 0;
 
@@ -23,6 +24,7 @@ namespace Hunts {
 		identified += CheckKey<REG_DWORD_T>({ HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", L"LoadAppInit_DLLs" }, 0, reaction);
 		identified += CheckKey<REG_DWORD_T>({ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows", L"LoadAppInit_DLLs" }, 0, reaction);
 
+		reaction.EndHunt();
 		return identified;
 	}
 
