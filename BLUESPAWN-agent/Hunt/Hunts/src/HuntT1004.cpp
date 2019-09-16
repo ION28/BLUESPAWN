@@ -3,6 +3,7 @@
 
 #include "configuration/Registry.h"
 #include "logging/Log.h"
+#include "logging/HuntLogMessage.h"
 
 using namespace Registry;
 
@@ -15,8 +16,9 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1004::ScanCursory(const Scope& scope, Reaction* reaction) const {
+	int HuntT1004::ScanCursory(const Scope& scope, Reaction reaction) const {
 		LOG_INFO("Hunting for T1004 - Winlogon Helper DLL at level Cursory");
+		reaction.BeginHunt(GET_INFO());
 
 		int identified = 0;
 
@@ -30,6 +32,7 @@ namespace Hunts {
 		identified += CheckKey({ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Userinit"}, L"", reaction);
 		identified += CheckForSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" }, reaction);
 
+		reaction.EndHunt();
 		return identified;
 	}
 

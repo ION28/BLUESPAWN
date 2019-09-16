@@ -14,7 +14,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	int HuntT1138::ScanCursory(const Scope& scope, Reaction* reaction) const {
+	int HuntT1138::ScanCursory(const Scope& scope, Reaction reaction) const {
 		LOG_INFO("Hunting for T1138 - Application Shimming at level Cursory");
 
 		int identified = 0;
