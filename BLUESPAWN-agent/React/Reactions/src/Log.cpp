@@ -11,6 +11,7 @@ namespace Reactions {
 		HuntBegun = true;
 	}
 	void LogReaction::EndHunt(){
+		_HuntLogMessage << Log::endlog;
 		_HuntLogMessage = { HuntInfo{}, std::vector<std::reference_wrapper<Log::LogSink>>{} };
 		HuntBegun = false;
 	}

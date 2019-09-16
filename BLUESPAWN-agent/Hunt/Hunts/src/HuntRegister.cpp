@@ -1,6 +1,6 @@
 #include "hunts/HuntRegister.h"
 
-void HuntRegister::RegisterHunt(const Hunt& hunt){
+void HuntRegister::RegisterHunt(Hunt* hunt){
 	// The actual hunt itself is stored in the vector here!
 	// Make sure that all internal references to it are referencing
 	// the copy in vRegisteredHunts and not the argument to this function.
@@ -26,36 +26,34 @@ void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffecte
 	for (auto name : vRegisteredHunts) {
 		switch (aggressiveness) {
 		case Aggressiveness::Cursory:
-			name.ScanCursory(scope, reaction);
+			name->ScanCursory(scope, reaction);
 			break;
 		case Aggressiveness::Moderate:
-			name.ScanModerate(scope, reaction);
+			name->ScanModerate(scope, reaction);
 			break;
 		case Aggressiveness::Careful:
-			name.ScanCareful(scope, reaction);
+			name->ScanCareful(scope, reaction);
 			break;
 		case Aggressiveness::Aggressive:
-			name.ScanAggressive(scope, reaction);
+			name->ScanAggressive(scope, reaction);
 			break;
 		}
 	}
 }
 
-void HuntRegister::RunHunt(const Hunt& name, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction){
-	switch(aggressiveness){
-		switch(aggressiveness) {
-		case Aggressiveness::Cursory:
-			name.ScanCursory(scope, reaction);
-			break;
-		case Aggressiveness::Moderate:
-			name.ScanModerate(scope, reaction);
-			break;
-		case Aggressiveness::Careful:
-			name.ScanCareful(scope, reaction);
-			break;
-		case Aggressiveness::Aggressive:
-			name.ScanAggressive(scope, reaction);
-			break;
-		}
+void HuntRegister::RunHunt(Hunt& name, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction){
+	switch(aggressiveness) {
+	case Aggressiveness::Cursory:
+		name.ScanCursory(scope, reaction);
+		break;
+	case Aggressiveness::Moderate:
+		name.ScanModerate(scope, reaction);
+		break;
+	case Aggressiveness::Careful:
+		name.ScanCareful(scope, reaction);
+		break;
+	case Aggressiveness::Aggressive:
+		name.ScanAggressive(scope, reaction);
+		break;
 	}
 }
