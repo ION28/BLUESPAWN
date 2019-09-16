@@ -35,8 +35,8 @@ public:
 	bool AffectsCategory(DWORD category);
 	bool SupportsScan(Aggressiveness scan);
 
-	virtual int ScanCursory(const Scope& scope, Reaction reaction = Reaction{}) const;
-	virtual int ScanModerate(const Scope& scope, Reaction reaction = Reaction{}) const;
-	virtual int ScanCareful(const Scope& scope, Reaction reaction = Reaction{}) const;
-	virtual int ScanAggressive(const Scope& scope, Reaction reaction = Reaction{}) const;
+	virtual int ScanCursory(const Scope& scope, Reaction reaction);
+	virtual int ScanModerate(const Scope& scope, Reaction reaction);
+	virtual int ScanCareful(const Scope& scope, Reaction reaction);
+	virtual int ScanAggressive(const Scope& scope, Reaction reaction);
 };

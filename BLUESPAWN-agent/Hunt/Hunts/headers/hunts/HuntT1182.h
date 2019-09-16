@@ -19,6 +19,6 @@ namespace Hunts {
 	public:
 		HuntT1182(HuntRegister& record);
 
-		virtual int ScanCursory(const Scope& scope, Reaction reaction = Reactions::LogReaction()) const;
+		virtual int ScanCursory(const Scope& scope, Reaction reaction);
 	};
 }
