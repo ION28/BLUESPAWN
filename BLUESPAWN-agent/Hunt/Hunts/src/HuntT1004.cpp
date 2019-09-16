@@ -16,7 +16,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1004::ScanCursory(const Scope& scope, Reaction reaction) const {
+	int HuntT1004::ScanCursory(const Scope& scope, Reaction reaction){
 		LOG_INFO("Hunting for T1004 - Winlogon Helper DLL at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 

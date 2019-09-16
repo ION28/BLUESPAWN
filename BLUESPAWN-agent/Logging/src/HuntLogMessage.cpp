@@ -21,10 +21,15 @@ namespace Log {
 	LogMessage& HuntLogMessage::operator<<(const LogTerminator& terminator){
 		std::string message = InternalStream.str();
 
-		InternalStream = std::stringstream();
+		InternalStream.str(std::string{});
 		for(int idx = 0; idx < Sinks.size(); idx++){
 			Sinks[idx].get().LogMessage(Level, message, HuntName, Detections);
 		}
+
+		for(auto Detection : Detections){
+			delete Detection;
+		}
+
 		return *this;
 	}
 
