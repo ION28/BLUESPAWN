@@ -16,19 +16,21 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
+namespace gpb {
 class EmptyDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<Empty> _instance;
 } _Empty_default_instance_;
+}  // namespace gpb
 static void InitDefaultsEmpty_ServerServices_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::_Empty_default_instance_;
-    new (ptr) ::Empty();
+    void* ptr = &::gpb::_Empty_default_instance_;
+    new (ptr) ::gpb::Empty();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::Empty::InitAsDefaultInstance();
+  ::gpb::Empty::InitAsDefaultInstance();
 }
 
 ::google::protobuf::internal::SCCInfo<0> scc_info_Empty_ServerServices_2eproto =
@@ -44,17 +46,17 @@ constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descr
 
 const ::google::protobuf::uint32 TableStruct_ServerServices_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::Empty, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::gpb::Empty, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::Empty)},
+  { 0, -1, sizeof(::gpb::Empty)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::google::protobuf::Message*>(&::_Empty_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::gpb::_Empty_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_ServerServices_2eproto = {
@@ -64,18 +66,15 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_ServerServices_2eproto[] =
-  "\n\024ServerServices.proto\032\022ReactionData.pro"
-  "to\"\007\n\005Empty2\320\001\n\006Server\022+\n\020SendFileReacti"
-  "on\022\r.FileReaction\032\006.Empty\"\000\0223\n\024SendRegis"
-  "tryReaction\022\021.RegistryReaction\032\006.Empty\"\000"
-  "\0221\n\023SendProcessReaction\022\020.ProcessReactio"
-  "n\032\006.Empty\"\000\0221\n\023SendServiceReaction\022\020.Ser"
-  "viceReaction\032\006.Empty\"\000b\006proto3"
+  "\n\024ServerServices.proto\022\003gpb\032\022ReactionDat"
+  "a.proto\"\007\n\005Empty2;\n\006Server\0221\n\017SendHuntMe"
+  "ssage\022\020.gpb.HuntMessage\032\n.gpb.Empty\"\000b\006p"
+  "roto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_ServerServices_2eproto = {
   false, InitDefaults_ServerServices_2eproto, 
   descriptor_table_protodef_ServerServices_2eproto,
-  "ServerServices.proto", &assign_descriptors_table_ServerServices_2eproto, 270,
+  "ServerServices.proto", &assign_descriptors_table_ServerServices_2eproto, 125,
 };
 
 void AddDescriptors_ServerServices_2eproto() {
@@ -88,6 +87,7 @@ void AddDescriptors_ServerServices_2eproto() {
 
 // Force running AddDescriptors() at dynamic initialization time.
 static bool dynamic_init_dummy_ServerServices_2eproto = []() { AddDescriptors_ServerServices_2eproto(); return true; }();
+namespace gpb {
 
 // ===================================================================
 
@@ -103,20 +103,20 @@ class Empty::HasBitSetters {
 Empty::Empty()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:Empty)
+  // @@protoc_insertion_point(constructor:gpb.Empty)
 }
 Empty::Empty(const Empty& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:Empty)
+  // @@protoc_insertion_point(copy_constructor:gpb.Empty)
 }
 
 void Empty::SharedCtor() {
 }
 
 Empty::~Empty() {
-  // @@protoc_insertion_point(destructor:Empty)
+  // @@protoc_insertion_point(destructor:gpb.Empty)
   SharedDtor();
 }
 
@@ -133,7 +133,7 @@ const Empty& Empty::default_instance() {
 
 
 void Empty::Clear() {
-// @@protoc_insertion_point(message_clear_start:Empty)
+// @@protoc_insertion_point(message_clear_start:gpb.Empty)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -174,7 +174,7 @@ bool Empty::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:Empty)
+  // @@protoc_insertion_point(parse_start:gpb.Empty)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -187,10 +187,10 @@ bool Empty::MergePartialFromCodedStream(
           input, tag, _internal_metadata_.mutable_unknown_fields()));
   }
 success:
-  // @@protoc_insertion_point(parse_success:Empty)
+  // @@protoc_insertion_point(parse_success:gpb.Empty)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:Empty)
+  // @@protoc_insertion_point(parse_failure:gpb.Empty)
   return false;
 #undef DO_
 }
@@ -198,7 +198,7 @@ failure:
 
 void Empty::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:Empty)
+  // @@protoc_insertion_point(serialize_start:gpb.Empty)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -206,12 +206,12 @@ void Empty::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:Empty)
+  // @@protoc_insertion_point(serialize_end:gpb.Empty)
 }
 
 ::google::protobuf::uint8* Empty::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:Empty)
+  // @@protoc_insertion_point(serialize_to_array_start:gpb.Empty)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -219,12 +219,12 @@ void Empty::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:Empty)
+  // @@protoc_insertion_point(serialize_to_array_end:gpb.Empty)
   return target;
 }
 
 size_t Empty::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:Empty)
+// @@protoc_insertion_point(message_byte_size_start:gpb.Empty)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -242,22 +242,22 @@ size_t Empty::ByteSizeLong() const {
 }
 
 void Empty::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:Empty)
+// @@protoc_insertion_point(generalized_merge_from_start:gpb.Empty)
   GOOGLE_DCHECK_NE(&from, this);
   const Empty* source =
       ::google::protobuf::DynamicCastToGenerated<Empty>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:Empty)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:gpb.Empty)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:Empty)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:gpb.Empty)
     MergeFrom(*source);
   }
 }
 
 void Empty::MergeFrom(const Empty& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:Empty)
+// @@protoc_insertion_point(class_specific_merge_from_start:gpb.Empty)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -266,14 +266,14 @@ void Empty::MergeFrom(const Empty& from) {
 }
 
 void Empty::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:Empty)
+// @@protoc_insertion_point(generalized_copy_from_start:gpb.Empty)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
 void Empty::CopyFrom(const Empty& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:Empty)
+// @@protoc_insertion_point(class_specific_copy_from_start:gpb.Empty)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -299,10 +299,11 @@ void Empty::InternalSwap(Empty* other) {
 
 
 // @@protoc_insertion_point(namespace_scope)
+}  // namespace gpb
 namespace google {
 namespace protobuf {
-template<> PROTOBUF_NOINLINE ::Empty* Arena::CreateMaybeMessage< ::Empty >(Arena* arena) {
-  return Arena::CreateInternal< ::Empty >(arena);
+template<> PROTOBUF_NOINLINE ::gpb::Empty* Arena::CreateMaybeMessage< ::gpb::Empty >(Arena* arena) {
+  return Arena::CreateInternal< ::gpb::Empty >(arena);
 }
 }  // namespace protobuf
 }  // namespace google
