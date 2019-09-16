@@ -1,4 +1,5 @@
 syntax = "proto3";
+package gpb;
 
 message ACLEntry {
 		string user = 1;
@@ -79,22 +80,60 @@ message ServiceReactionData {
 	bytes binaryContents = 11;
 }
 
-message FileReaction {
-	string description = 1;
-	FileReactionData info = 2;
+enum Tactic {
+	InitialAccess = 0;
+	Execution = 1;
+	Persistence = 2;
+	PrivilegeEscalation = 3;
+	DefenseEvasion = 4;
+	CredentialAccess = 5;
+	Discovery = 6;
+	LateralMovement = 7;
+	Collection = 8;
+	CommandControl = 9;
+	Exfiltration = 10;
+	Impact = 12;
 }
 
-message RegistryReaction {
-	string description = 1;
-	RegistryReactionData info = 2;
+enum DataSource {
+	ServiceSource = 0;
+	ProcessSource = 1;
+	DriverSource = 2;
+	FileSystemSource = 3;
+	RegistrySource = 4;
+	GPOSource = 5;
+	EventLogsSource = 6;
+	NetworkSource = 7;
 }
 
-message ProcessReaction {
-	string description = 1;
-	ProcessReactionData info = 2;
+enum Category {
+	Configurations = 0;
+	Processes = 1;
+	Files = 2;
+	Network = 3;
 }
 
-message ServiceReaction {
-	string description = 1;
-	ServiceReactionData info = 2;
+enum Aggressiveness {
+	Cursory = 0;
+	Moderate = 1;
+	Careful = 2;
+	Aggressive = 3;
+}
+
+message HuntInfo {
+	string huntName = 1;
+	Aggressiveness huntAggressiveness = 2;
+	repeated Tactic huntTactics = 3;
+	repeated Category huntCategories = 4; 
+	repeated DataSource huntDatasources = 5;
+	uint32 huntStartTime = 6;
+}
+
+message HuntMessage {
+	HuntInfo info = 1;
+	string extraMessage = 3;
+	repeated FileReactionData fileDetections = 4;
+	repeated RegistryReactionData registryDetections = 5;
+	repeated ProcessReactionData processDetections = 6;
+	repeated ServiceReactionData serviceDetections = 7;
 }
