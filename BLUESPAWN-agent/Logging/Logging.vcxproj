@@ -27,6 +27,7 @@
     <ClCompile Include="src\HuntLogMessage.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\LogLevel.cpp" />
+    <ClCompile Include="src\ServerSink.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="grpc\generated\grpc++\alarm.h" />
@@ -309,6 +310,7 @@
     <ClInclude Include="headers\logging\Loggable.h" />
     <ClInclude Include="headers\logging\LogLevel.h" />
     <ClInclude Include="headers\logging\LogSink.h" />
+    <ClInclude Include="headers\logging\ServerSink.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="protos\ReactionData.proto" />
@@ -387,7 +389,8 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_WIN32_WINNT=0x600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\CCDC\BLUESPAWN\BLUESPAWN-agent\Hunt\Configuration\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\CCDC\BLUESPAWN\BLUESPAWN-agent\Logging\grpc\generated;D:\CCDC\BLUESPAWN\BLUESPAWN-agent\Hunt\Configuration\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-DNOMINMAX %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -426,9 +429,12 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>D:\CCDC\BLUESPAWN\BLUESPAWN-agent\Logging\grpc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>-DNOMINMAX %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
