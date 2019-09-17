@@ -31,8 +31,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "React", "React", "{C25E38D1
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Reactions", "React\Reactions\Reactions.vcxproj", "{076A8013-C6D3-45B0-AACB-68DC66915FF6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonLib", "CommonLib\CommonLib.vcxproj", "{25AE1D80-3E17-4E1D-BFB4-8AFB375EBAF1}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Logging", "Logging\Logging.vcxproj", "{EFB79DF3-1891-4A0D-869C-76F7FA4AD239}"
 EndProject
 Global
