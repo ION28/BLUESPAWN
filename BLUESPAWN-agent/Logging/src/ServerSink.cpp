@@ -12,19 +12,19 @@ namespace Log {
 	}
 
 	gpb::Aggressiveness ServerSink::HuntAggressivenessToGPB(const Aggressiveness& info) {
-
+		return gpb::Aggressiveness();
 	}
 
 	std::vector<gpb::Tactic> ServerSink::HuntTacticsToGPB(const DWORD& info) {
-
+		return std::vector<gpb::Tactic>();
 	}
 
 	std::vector<gpb::Category> ServerSink::HuntCategoriesToGPB(const DWORD& info) {
-
+		return std::vector<gpb::Category>();
 	}
 
 	std::vector<gpb::DataSource> ServerSink::HuntDatasourcesToGPB(const DWORD& info) {
-
+		return std::vector<gpb::DataSource>();
 	}
 
 	gpb::HuntInfo ServerSink::HuntInfoToGPB(const HuntInfo& info) {
@@ -46,6 +46,8 @@ namespace Log {
 			gpbInfo.set_huntdatasources(i, huntDatasources[i]);
 
 		gpbInfo.set_huntstarttime(info.HuntStartTime);
+    
+		return gpbInfo;
 	}
 
 	std::vector<gpb::FileReactionData> ServerSink::GetFileReactions(const std::vector<DETECTION*>& detections) {
@@ -66,15 +68,15 @@ namespace Log {
 	}
 
 	std::vector<gpb::RegistryReactionData> ServerSink::GetRegistryReactions(const std::vector<DETECTION*>& detections) {
-
+		return std::vector<gpb::RegistryReactionData>();
 	}
 
 	std::vector<gpb::ProcessReactionData> ServerSink::GetProcessReactions(const std::vector<DETECTION*>& detections) {
-
+		return std::vector<gpb::ProcessReactionData>();
 	}
 
 	std::vector<gpb::ServiceReactionData> ServerSink::GetServiceReactions(const std::vector<DETECTION*>& detections) {
-
+		return std::vector<gpb::ServiceReactionData>();
 	}
 
 	void ServerSink::LogMessage(const LogLevel& level, const std::string& message, const HuntInfo& info, const std::vector<DETECTION*>& detections){
