@@ -20,12 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CLISink.cpp" />
+    <ClCompile Include="src\DebugSink.cpp" />
     <ClCompile Include="src\HuntLogMessage.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\LogLevel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\logging\CLISink.h" />
+    <ClInclude Include="headers\logging\DebugSink.h" />
     <ClInclude Include="headers\logging\HuntLogMessage.h" />
     <ClInclude Include="headers\logging\Log.h" />
     <ClInclude Include="headers\logging\Loggable.h" />
