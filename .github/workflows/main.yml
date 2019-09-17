@@ -17,6 +17,5 @@ jobs:
     - name: Run a one-line script
       run: echo Hello, world!
 
-    - name: MSBuild
-      working-directory: BLUESPAWN-agent
-      run: "%ProgramFiles(x86)%\\Microsoft Visual Studio\\2019\\Enterprise\\MSBuild\\Current\\Bin\\MSBuild.exe" BLUESPAWN-agent.sln
+    - name: MSBuild BLUESPAWN-agent
+      run: build-agent.bat
