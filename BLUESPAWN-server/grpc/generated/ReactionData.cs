@@ -33,55 +33,55 @@ namespace Gpb {
             "aWxlQ29udGVudHMYCSABKAwSMwoKc2lnbmF0dXJlcxgKIAMoCzIfLmdwYi5G",
             "aWxlUmVhY3Rpb25EYXRhLlNpZ25hdHVyZRIaCgNBQ0wYCyADKAsyDS5ncGIu",
             "QUNMRW50cnkaSwoJU2lnbmF0dXJlEhIKCnNpZ25lck5hbWUYASABKAkSFwoP",
-            "ZGlnZXN0QWxnb3JpdGhtGAIgASgJEhEKCXRpbWVzdGFtcBgDIAEoDSKEAgoU",
+            "ZGlnZXN0QWxnb3JpdGhtGAIgASgJEhEKCXRpbWVzdGFtcBgDIAEoDSLyAQoU",
             "UmVnaXN0cnlSZWFjdGlvbkRhdGESDwoHbWl0cmVJRBgBIAEoDRILCgNrZXkY",
-            "AiABKAkSDAoEZGF0YRgDIAEoDBIPCgduZXdEYXRhGAQgASgMEiwKBHR5cGUY",
-            "BSABKA4yHi5ncGIuUmVnaXN0cnlSZWFjdGlvbkRhdGEuVHlwZRIaCgNBQ0wY",
-            "BiADKAsyDS5ncGIuQUNMRW50cnkiZQoEVHlwZRIKCgZSRUdfU1oQABIQCgxS",
-            "RUdfTVVMVElfU1oQARIRCg1SRUdfRVhQQU5EX1NaEAISDgoKUkVHX0JJTkFS",
-            "WRADEg0KCVJFR19EV09SRBAEEg0KCVJFR19RV09SRBAFIs0CChNQcm9jZXNz",
-            "UmVhY3Rpb25EYXRhEg8KB21pdHJlSUQYASABKA0SCwoDcGlkGAIgASgNEgwK",
-            "BG5hbWUYAyABKAkSEwoLZGVzY3JpcHRpb24YBCABKAkSEwoLY29tbWFuZExp",
-            "bmUYBSABKAkSDAoEcGF0aBgGIAEoCRIYChBjdXJyZW50RGlyZWN0b3J5GAcg",
-            "ASgJEhkKEWF1dG9zdGFydExvY2F0aW9uGAggASgJEg4KBnBhcmVudBgJIAEo",
-            "CRIMCgR1c2VyGAogASgJEhMKC3RpbWVTdGFydGVkGAsgASgNEhUKDXJlY2ll",
-            "dmVkQnl0ZXMYDCABKA0SEQoJc2VudEJ5dGVzGA0gASgNEhQKDHByaXZhdGVC",
-            "eXRlcxgOIAEoDRISCgp3b3JraW5nU2V0GA8gASgNEhYKDmJpbmFyeUNvbnRl",
-            "bnRzGBAgASgMIvcBChNTZXJ2aWNlUmVhY3Rpb25EYXRhEg8KB21pdHJlSUQY",
-            "ASABKA0SCwoDcGlkGAIgASgNEgwKBG5hbWUYAyABKAkSEwoLZGVzY3JpcHRp",
-            "b24YBCABKAkSDwoHbG9nT25BcxgFIAEoCRITCgtzdGFydHVwVHlwZRgGIAEo",
-            "CRIXCg9zdGFydFBhcmFtZXRlcnMYByABKAkSHAoUYWxsb3dEZXNrdG9wSW50",
-            "ZXJhY3QYCCABKAgSFgoOcnVuUHJvZ3JhbVBhdGgYCSABKAkSEgoKYmluYXJ5",
-            "UGF0aBgKIAEoCRIWCg5iaW5hcnlDb250ZW50cxgLIAEoDCLXAQoISHVudElu",
-            "Zm8SEAoIaHVudE5hbWUYASABKAkSLwoSaHVudEFnZ3Jlc3NpdmVuZXNzGAIg",
-            "ASgOMhMuZ3BiLkFnZ3Jlc3NpdmVuZXNzEiAKC2h1bnRUYWN0aWNzGAMgAygO",
-            "MgsuZ3BiLlRhY3RpYxIlCg5odW50Q2F0ZWdvcmllcxgEIAMoDjINLmdwYi5D",
-            "YXRlZ29yeRIoCg9odW50RGF0YXNvdXJjZXMYBSADKA4yDy5ncGIuRGF0YVNv",
-            "dXJjZRIVCg1odW50U3RhcnRUaW1lGAYgASgNIpACCgtIdW50TWVzc2FnZRIb",
-            "CgRpbmZvGAEgASgLMg0uZ3BiLkh1bnRJbmZvEhQKDGV4dHJhTWVzc2FnZRgD",
-            "IAEoCRItCg5maWxlRGV0ZWN0aW9ucxgEIAMoCzIVLmdwYi5GaWxlUmVhY3Rp",
-            "b25EYXRhEjUKEnJlZ2lzdHJ5RGV0ZWN0aW9ucxgFIAMoCzIZLmdwYi5SZWdp",
-            "c3RyeVJlYWN0aW9uRGF0YRIzChFwcm9jZXNzRGV0ZWN0aW9ucxgGIAMoCzIY",
-            "LmdwYi5Qcm9jZXNzUmVhY3Rpb25EYXRhEjMKEXNlcnZpY2VEZXRlY3Rpb25z",
-            "GAcgAygLMhguZ3BiLlNlcnZpY2VSZWFjdGlvbkRhdGEq5AEKBlRhY3RpYxIR",
-            "Cg1Jbml0aWFsQWNjZXNzEAASDQoJRXhlY3V0aW9uEAESDwoLUGVyc2lzdGVu",
-            "Y2UQAhIXChNQcml2aWxlZ2VFc2NhbGF0aW9uEAMSEgoORGVmZW5zZUV2YXNp",
-            "b24QBBIUChBDcmVkZW50aWFsQWNjZXNzEAUSDQoJRGlzY292ZXJ5EAYSEwoP",
-            "TGF0ZXJhbE1vdmVtZW50EAcSDgoKQ29sbGVjdGlvbhAIEhIKDkNvbW1hbmRD",
-            "b250cm9sEAkSEAoMRXhmaWx0cmF0aW9uEAoSCgoGSW1wYWN0EAwqpQEKCkRh",
-            "dGFTb3VyY2USEQoNU2VydmljZVNvdXJjZRAAEhEKDVByb2Nlc3NTb3VyY2UQ",
-            "ARIQCgxEcml2ZXJTb3VyY2UQAhIUChBGaWxlU3lzdGVtU291cmNlEAMSEgoO",
-            "UmVnaXN0cnlTb3VyY2UQBBINCglHUE9Tb3VyY2UQBRITCg9FdmVudExvZ3NT",
-            "b3VyY2UQBhIRCg1OZXR3b3JrU291cmNlEAcqRQoIQ2F0ZWdvcnkSEgoOQ29u",
-            "ZmlndXJhdGlvbnMQABINCglQcm9jZXNzZXMQARIJCgVGaWxlcxACEgsKB05l",
-            "dHdvcmsQAypICg5BZ2dyZXNzaXZlbmVzcxILCgdDdXJzb3J5EAASDAoITW9k",
-            "ZXJhdGUQARILCgdDYXJlZnVsEAISDgoKQWdncmVzc2l2ZRADYgZwcm90bzM="));
+            "AiABKAkSDAoEZGF0YRgDIAEoDBIPCgduZXdEYXRhGAQgASgMEi8KBHR5cGUY",
+            "BSABKA4yIS5ncGIuUmVnaXN0cnlSZWFjdGlvbkRhdGEuUmVnVHlwZRIaCgNB",
+            "Q0wYBiADKAsyDS5ncGIuQUNMRW50cnkiUAoHUmVnVHlwZRIGCgJTWhAAEgwK",
+            "CE1VTFRJX1NaEAESDQoJRVhQQU5EX1NaEAISCgoGQklOQVJZEAMSCQoFRFdP",
+            "UkQQBBIJCgVRV09SRBAFIs0CChNQcm9jZXNzUmVhY3Rpb25EYXRhEg8KB21p",
+            "dHJlSUQYASABKA0SCwoDcGlkGAIgASgNEgwKBG5hbWUYAyABKAkSEwoLZGVz",
+            "Y3JpcHRpb24YBCABKAkSEwoLY29tbWFuZExpbmUYBSABKAkSDAoEcGF0aBgG",
+            "IAEoCRIYChBjdXJyZW50RGlyZWN0b3J5GAcgASgJEhkKEWF1dG9zdGFydExv",
+            "Y2F0aW9uGAggASgJEg4KBnBhcmVudBgJIAEoCRIMCgR1c2VyGAogASgJEhMK",
+            "C3RpbWVTdGFydGVkGAsgASgNEhUKDXJlY2lldmVkQnl0ZXMYDCABKA0SEQoJ",
+            "c2VudEJ5dGVzGA0gASgNEhQKDHByaXZhdGVCeXRlcxgOIAEoDRISCgp3b3Jr",
+            "aW5nU2V0GA8gASgNEhYKDmJpbmFyeUNvbnRlbnRzGBAgASgMIvcBChNTZXJ2",
+            "aWNlUmVhY3Rpb25EYXRhEg8KB21pdHJlSUQYASABKA0SCwoDcGlkGAIgASgN",
+            "EgwKBG5hbWUYAyABKAkSEwoLZGVzY3JpcHRpb24YBCABKAkSDwoHbG9nT25B",
+            "cxgFIAEoCRITCgtzdGFydHVwVHlwZRgGIAEoCRIXCg9zdGFydFBhcmFtZXRl",
+            "cnMYByABKAkSHAoUYWxsb3dEZXNrdG9wSW50ZXJhY3QYCCABKAgSFgoOcnVu",
+            "UHJvZ3JhbVBhdGgYCSABKAkSEgoKYmluYXJ5UGF0aBgKIAEoCRIWCg5iaW5h",
+            "cnlDb250ZW50cxgLIAEoDCLXAQoISHVudEluZm8SEAoIaHVudE5hbWUYASAB",
+            "KAkSLwoSaHVudEFnZ3Jlc3NpdmVuZXNzGAIgASgOMhMuZ3BiLkFnZ3Jlc3Np",
+            "dmVuZXNzEiAKC2h1bnRUYWN0aWNzGAMgAygOMgsuZ3BiLlRhY3RpYxIlCg5o",
+            "dW50Q2F0ZWdvcmllcxgEIAMoDjINLmdwYi5DYXRlZ29yeRIoCg9odW50RGF0",
+            "YXNvdXJjZXMYBSADKA4yDy5ncGIuRGF0YVNvdXJjZRIVCg1odW50U3RhcnRU",
+            "aW1lGAYgASgNIpACCgtIdW50TWVzc2FnZRIbCgRpbmZvGAEgASgLMg0uZ3Bi",
+            "Lkh1bnRJbmZvEhQKDGV4dHJhTWVzc2FnZRgDIAEoCRItCg5maWxlRGV0ZWN0",
+            "aW9ucxgEIAMoCzIVLmdwYi5GaWxlUmVhY3Rpb25EYXRhEjUKEnJlZ2lzdHJ5",
+            "RGV0ZWN0aW9ucxgFIAMoCzIZLmdwYi5SZWdpc3RyeVJlYWN0aW9uRGF0YRIz",
+            "ChFwcm9jZXNzRGV0ZWN0aW9ucxgGIAMoCzIYLmdwYi5Qcm9jZXNzUmVhY3Rp",
+            "b25EYXRhEjMKEXNlcnZpY2VEZXRlY3Rpb25zGAcgAygLMhguZ3BiLlNlcnZp",
+            "Y2VSZWFjdGlvbkRhdGEq5AEKBlRhY3RpYxIRCg1Jbml0aWFsQWNjZXNzEAAS",
+            "DQoJRXhlY3V0aW9uEAESDwoLUGVyc2lzdGVuY2UQAhIXChNQcml2aWxlZ2VF",
+            "c2NhbGF0aW9uEAMSEgoORGVmZW5zZUV2YXNpb24QBBIUChBDcmVkZW50aWFs",
+            "QWNjZXNzEAUSDQoJRGlzY292ZXJ5EAYSEwoPTGF0ZXJhbE1vdmVtZW50EAcS",
+            "DgoKQ29sbGVjdGlvbhAIEhIKDkNvbW1hbmRDb250cm9sEAkSEAoMRXhmaWx0",
+            "cmF0aW9uEAoSCgoGSW1wYWN0EAwqpQEKCkRhdGFTb3VyY2USEQoNU2Vydmlj",
+            "ZVNvdXJjZRAAEhEKDVByb2Nlc3NTb3VyY2UQARIQCgxEcml2ZXJTb3VyY2UQ",
+            "AhIUChBGaWxlU3lzdGVtU291cmNlEAMSEgoOUmVnaXN0cnlTb3VyY2UQBBIN",
+            "CglHUE9Tb3VyY2UQBRITCg9FdmVudExvZ3NTb3VyY2UQBhIRCg1OZXR3b3Jr",
+            "U291cmNlEAcqRQoIQ2F0ZWdvcnkSEgoOQ29uZmlndXJhdGlvbnMQABINCglQ",
+            "cm9jZXNzZXMQARIJCgVGaWxlcxACEgsKB05ldHdvcmsQAypICg5BZ2dyZXNz",
+            "aXZlbmVzcxILCgdDdXJzb3J5EAASDAoITW9kZXJhdGUQARILCgdDYXJlZnVs",
+            "EAISDgoKQWdncmVzc2l2ZRADYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Gpb.Tactic), typeof(global::Gpb.DataSource), typeof(global::Gpb.Category), typeof(global::Gpb.Aggressiveness), }, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Gpb.ACLEntry), global::Gpb.ACLEntry.Parser, new[]{ "User", "Group", "SecurityAttributes" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gpb.FileReactionData), global::Gpb.FileReactionData.Parser, new[]{ "MitreID", "FileName", "Description", "Owner", "Size", "TimeCreated", "TimeModified", "TimeAccessed", "FileContents", "Signatures", "ACL" }, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::Gpb.FileReactionData.Types.Signature), global::Gpb.FileReactionData.Types.Signature.Parser, new[]{ "SignerName", "DigestAlgorithm", "Timestamp" }, null, null, null)}),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Gpb.RegistryReactionData), global::Gpb.RegistryReactionData.Parser, new[]{ "MitreID", "Key", "Data", "NewData", "Type", "ACL" }, null, new[]{ typeof(global::Gpb.RegistryReactionData.Types.Type) }, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Gpb.RegistryReactionData), global::Gpb.RegistryReactionData.Parser, new[]{ "MitreID", "Key", "Data", "NewData", "Type", "ACL" }, null, new[]{ typeof(global::Gpb.RegistryReactionData.Types.RegType) }, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gpb.ProcessReactionData), global::Gpb.ProcessReactionData.Parser, new[]{ "MitreID", "Pid", "Name", "Description", "CommandLine", "Path", "CurrentDirectory", "AutostartLocation", "Parent", "User", "TimeStarted", "RecievedBytes", "SentBytes", "PrivateBytes", "WorkingSet", "BinaryContents" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gpb.ServiceReactionData), global::Gpb.ServiceReactionData.Parser, new[]{ "MitreID", "Pid", "Name", "Description", "LogOnAs", "StartupType", "StartParameters", "AllowDesktopInteract", "RunProgramPath", "BinaryPath", "BinaryContents" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Gpb.HuntInfo), global::Gpb.HuntInfo.Parser, new[]{ "HuntName", "HuntAggressiveness", "HuntTactics", "HuntCategories", "HuntDatasources", "HuntStartTime" }, null, null, null),
@@ -990,9 +990,9 @@ namespace Gpb {
 
     /// <summary>Field number for the "type" field.</summary>
     public const int TypeFieldNumber = 5;
-    private global::Gpb.RegistryReactionData.Types.Type type_ = 0;
+    private global::Gpb.RegistryReactionData.Types.RegType type_ = 0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::Gpb.RegistryReactionData.Types.Type Type {
+    public global::Gpb.RegistryReactionData.Types.RegType Type {
       get { return type_; }
       set {
         type_ = value;
@@ -1153,7 +1153,7 @@ namespace Gpb {
             break;
           }
           case 40: {
-            Type = (global::Gpb.RegistryReactionData.Types.Type) input.ReadEnum();
+            Type = (global::Gpb.RegistryReactionData.Types.RegType) input.ReadEnum();
             break;
           }
           case 50: {
@@ -1168,13 +1168,13 @@ namespace Gpb {
     /// <summary>Container for nested types declared in the RegistryReactionData message type.</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static partial class Types {
-      public enum Type {
-        [pbr::OriginalName("REG_SZ")] RegSz = 0,
-        [pbr::OriginalName("REG_MULTI_SZ")] RegMultiSz = 1,
-        [pbr::OriginalName("REG_EXPAND_SZ")] RegExpandSz = 2,
-        [pbr::OriginalName("REG_BINARY")] RegBinary = 3,
-        [pbr::OriginalName("REG_DWORD")] RegDword = 4,
-        [pbr::OriginalName("REG_QWORD")] RegQword = 5,
+      public enum RegType {
+        [pbr::OriginalName("SZ")] Sz = 0,
+        [pbr::OriginalName("MULTI_SZ")] MultiSz = 1,
+        [pbr::OriginalName("EXPAND_SZ")] ExpandSz = 2,
+        [pbr::OriginalName("BINARY")] Binary = 3,
+        [pbr::OriginalName("DWORD")] Dword = 4,
+        [pbr::OriginalName("QWORD")] Qword = 5,
       }
 
     }

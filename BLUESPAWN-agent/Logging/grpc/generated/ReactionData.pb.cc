@@ -336,59 +336,59 @@ const char descriptor_table_protodef_ReactionData_2eproto[] =
   "actionData.Signature\022\032\n\003ACL\030\013 \003(\0132\r.gpb."
   "ACLEntry\032K\n\tSignature\022\022\n\nsignerName\030\001 \001("
   "\t\022\027\n\017digestAlgorithm\030\002 \001(\t\022\021\n\ttimestamp\030"
-  "\003 \001(\r\"\204\002\n\024RegistryReactionData\022\017\n\007mitreI"
+  "\003 \001(\r\"\362\001\n\024RegistryReactionData\022\017\n\007mitreI"
   "D\030\001 \001(\r\022\013\n\003key\030\002 \001(\t\022\014\n\004data\030\003 \001(\014\022\017\n\007ne"
-  "wData\030\004 \001(\014\022,\n\004type\030\005 \001(\0162\036.gpb.Registry"
-  "ReactionData.Type\022\032\n\003ACL\030\006 \003(\0132\r.gpb.ACL"
-  "Entry\"e\n\004Type\022\n\n\006REG_SZ\020\000\022\020\n\014REG_MULTI_S"
-  "Z\020\001\022\021\n\rREG_EXPAND_SZ\020\002\022\016\n\nREG_BINARY\020\003\022\r"
-  "\n\tREG_DWORD\020\004\022\r\n\tREG_QWORD\020\005\"\315\002\n\023Process"
-  "ReactionData\022\017\n\007mitreID\030\001 \001(\r\022\013\n\003pid\030\002 \001"
-  "(\r\022\014\n\004name\030\003 \001(\t\022\023\n\013description\030\004 \001(\t\022\023\n"
-  "\013commandLine\030\005 \001(\t\022\014\n\004path\030\006 \001(\t\022\030\n\020curr"
-  "entDirectory\030\007 \001(\t\022\031\n\021autostartLocation\030"
-  "\010 \001(\t\022\016\n\006parent\030\t \001(\t\022\014\n\004user\030\n \001(\t\022\023\n\013t"
-  "imeStarted\030\013 \001(\r\022\025\n\rrecievedBytes\030\014 \001(\r\022"
-  "\021\n\tsentBytes\030\r \001(\r\022\024\n\014privateBytes\030\016 \001(\r"
-  "\022\022\n\nworkingSet\030\017 \001(\r\022\026\n\016binaryContents\030\020"
-  " \001(\014\"\367\001\n\023ServiceReactionData\022\017\n\007mitreID\030"
-  "\001 \001(\r\022\013\n\003pid\030\002 \001(\r\022\014\n\004name\030\003 \001(\t\022\023\n\013desc"
-  "ription\030\004 \001(\t\022\017\n\007logOnAs\030\005 \001(\t\022\023\n\013startu"
-  "pType\030\006 \001(\t\022\027\n\017startParameters\030\007 \001(\t\022\034\n\024"
-  "allowDesktopInteract\030\010 \001(\010\022\026\n\016runProgram"
-  "Path\030\t \001(\t\022\022\n\nbinaryPath\030\n \001(\t\022\026\n\016binary"
-  "Contents\030\013 \001(\014\"\327\001\n\010HuntInfo\022\020\n\010huntName\030"
-  "\001 \001(\t\022/\n\022huntAggressiveness\030\002 \001(\0162\023.gpb."
-  "Aggressiveness\022 \n\013huntTactics\030\003 \003(\0162\013.gp"
-  "b.Tactic\022%\n\016huntCategories\030\004 \003(\0162\r.gpb.C"
-  "ategory\022(\n\017huntDatasources\030\005 \003(\0162\017.gpb.D"
-  "ataSource\022\025\n\rhuntStartTime\030\006 \001(\r\"\220\002\n\013Hun"
-  "tMessage\022\033\n\004info\030\001 \001(\0132\r.gpb.HuntInfo\022\024\n"
-  "\014extraMessage\030\003 \001(\t\022-\n\016fileDetections\030\004 "
-  "\003(\0132\025.gpb.FileReactionData\0225\n\022registryDe"
-  "tections\030\005 \003(\0132\031.gpb.RegistryReactionDat"
-  "a\0223\n\021processDetections\030\006 \003(\0132\030.gpb.Proce"
-  "ssReactionData\0223\n\021serviceDetections\030\007 \003("
-  "\0132\030.gpb.ServiceReactionData*\344\001\n\006Tactic\022\021"
-  "\n\rInitialAccess\020\000\022\r\n\tExecution\020\001\022\017\n\013Pers"
-  "istence\020\002\022\027\n\023PrivilegeEscalation\020\003\022\022\n\016De"
-  "fenseEvasion\020\004\022\024\n\020CredentialAccess\020\005\022\r\n\t"
-  "Discovery\020\006\022\023\n\017LateralMovement\020\007\022\016\n\nColl"
-  "ection\020\010\022\022\n\016CommandControl\020\t\022\020\n\014Exfiltra"
-  "tion\020\n\022\n\n\006Impact\020\014*\245\001\n\nDataSource\022\021\n\rSer"
-  "viceSource\020\000\022\021\n\rProcessSource\020\001\022\020\n\014Drive"
-  "rSource\020\002\022\024\n\020FileSystemSource\020\003\022\022\n\016Regis"
-  "trySource\020\004\022\r\n\tGPOSource\020\005\022\023\n\017EventLogsS"
-  "ource\020\006\022\021\n\rNetworkSource\020\007*E\n\010Category\022\022"
-  "\n\016Configurations\020\000\022\r\n\tProcesses\020\001\022\t\n\005Fil"
-  "es\020\002\022\013\n\007Network\020\003*H\n\016Aggressiveness\022\013\n\007C"
-  "ursory\020\000\022\014\n\010Moderate\020\001\022\013\n\007Careful\020\002\022\016\n\nA"
-  "ggressive\020\003b\006proto3"
+  "wData\030\004 \001(\014\022/\n\004type\030\005 \001(\0162!.gpb.Registry"
+  "ReactionData.RegType\022\032\n\003ACL\030\006 \003(\0132\r.gpb."
+  "ACLEntry\"P\n\007RegType\022\006\n\002SZ\020\000\022\014\n\010MULTI_SZ\020"
+  "\001\022\r\n\tEXPAND_SZ\020\002\022\n\n\006BINARY\020\003\022\t\n\005DWORD\020\004\022"
+  "\t\n\005QWORD\020\005\"\315\002\n\023ProcessReactionData\022\017\n\007mi"
+  "treID\030\001 \001(\r\022\013\n\003pid\030\002 \001(\r\022\014\n\004name\030\003 \001(\t\022\023"
+  "\n\013description\030\004 \001(\t\022\023\n\013commandLine\030\005 \001(\t"
+  "\022\014\n\004path\030\006 \001(\t\022\030\n\020currentDirectory\030\007 \001(\t"
+  "\022\031\n\021autostartLocation\030\010 \001(\t\022\016\n\006parent\030\t "
+  "\001(\t\022\014\n\004user\030\n \001(\t\022\023\n\013timeStarted\030\013 \001(\r\022\025"
+  "\n\rrecievedBytes\030\014 \001(\r\022\021\n\tsentBytes\030\r \001(\r"
+  "\022\024\n\014privateBytes\030\016 \001(\r\022\022\n\nworkingSet\030\017 \001"
+  "(\r\022\026\n\016binaryContents\030\020 \001(\014\"\367\001\n\023ServiceRe"
+  "actionData\022\017\n\007mitreID\030\001 \001(\r\022\013\n\003pid\030\002 \001(\r"
+  "\022\014\n\004name\030\003 \001(\t\022\023\n\013description\030\004 \001(\t\022\017\n\007l"
+  "ogOnAs\030\005 \001(\t\022\023\n\013startupType\030\006 \001(\t\022\027\n\017sta"
+  "rtParameters\030\007 \001(\t\022\034\n\024allowDesktopIntera"
+  "ct\030\010 \001(\010\022\026\n\016runProgramPath\030\t \001(\t\022\022\n\nbina"
+  "ryPath\030\n \001(\t\022\026\n\016binaryContents\030\013 \001(\014\"\327\001\n"
+  "\010HuntInfo\022\020\n\010huntName\030\001 \001(\t\022/\n\022huntAggre"
+  "ssiveness\030\002 \001(\0162\023.gpb.Aggressiveness\022 \n\013"
+  "huntTactics\030\003 \003(\0162\013.gpb.Tactic\022%\n\016huntCa"
+  "tegories\030\004 \003(\0162\r.gpb.Category\022(\n\017huntDat"
+  "asources\030\005 \003(\0162\017.gpb.DataSource\022\025\n\rhuntS"
+  "tartTime\030\006 \001(\r\"\220\002\n\013HuntMessage\022\033\n\004info\030\001"
+  " \001(\0132\r.gpb.HuntInfo\022\024\n\014extraMessage\030\003 \001("
+  "\t\022-\n\016fileDetections\030\004 \003(\0132\025.gpb.FileReac"
+  "tionData\0225\n\022registryDetections\030\005 \003(\0132\031.g"
+  "pb.RegistryReactionData\0223\n\021processDetect"
+  "ions\030\006 \003(\0132\030.gpb.ProcessReactionData\0223\n\021"
+  "serviceDetections\030\007 \003(\0132\030.gpb.ServiceRea"
+  "ctionData*\344\001\n\006Tactic\022\021\n\rInitialAccess\020\000\022"
+  "\r\n\tExecution\020\001\022\017\n\013Persistence\020\002\022\027\n\023Privi"
+  "legeEscalation\020\003\022\022\n\016DefenseEvasion\020\004\022\024\n\020"
+  "CredentialAccess\020\005\022\r\n\tDiscovery\020\006\022\023\n\017Lat"
+  "eralMovement\020\007\022\016\n\nCollection\020\010\022\022\n\016Comman"
+  "dControl\020\t\022\020\n\014Exfiltration\020\n\022\n\n\006Impact\020\014"
+  "*\245\001\n\nDataSource\022\021\n\rServiceSource\020\000\022\021\n\rPr"
+  "ocessSource\020\001\022\020\n\014DriverSource\020\002\022\024\n\020FileS"
+  "ystemSource\020\003\022\022\n\016RegistrySource\020\004\022\r\n\tGPO"
+  "Source\020\005\022\023\n\017EventLogsSource\020\006\022\021\n\rNetwork"
+  "Source\020\007*E\n\010Category\022\022\n\016Configurations\020\000"
+  "\022\r\n\tProcesses\020\001\022\t\n\005Files\020\002\022\013\n\007Network\020\003*"
+  "H\n\016Aggressiveness\022\013\n\007Cursory\020\000\022\014\n\010Modera"
+  "te\020\001\022\013\n\007Careful\020\002\022\016\n\nAggressive\020\003b\006proto"
+  "3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_ReactionData_2eproto = {
   false, InitDefaults_ReactionData_2eproto, 
   descriptor_table_protodef_ReactionData_2eproto,
-  "ReactionData.proto", &assign_descriptors_table_ReactionData_2eproto, 2339,
+  "ReactionData.proto", &assign_descriptors_table_ReactionData_2eproto, 2321,
 };
 
 void AddDescriptors_ReactionData_2eproto() {
@@ -401,11 +401,11 @@ void AddDescriptors_ReactionData_2eproto() {
 // Force running AddDescriptors() at dynamic initialization time.
 static bool dynamic_init_dummy_ReactionData_2eproto = []() { AddDescriptors_ReactionData_2eproto(); return true; }();
 namespace gpb {
-const ::google::protobuf::EnumDescriptor* RegistryReactionData_Type_descriptor() {
+const ::google::protobuf::EnumDescriptor* RegistryReactionData_RegType_descriptor() {
   ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_ReactionData_2eproto);
   return file_level_enum_descriptors_ReactionData_2eproto[0];
 }
-bool RegistryReactionData_Type_IsValid(int value) {
+bool RegistryReactionData_RegType_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:
@@ -420,15 +420,15 @@ bool RegistryReactionData_Type_IsValid(int value) {
 }
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const RegistryReactionData_Type RegistryReactionData::REG_SZ;
-const RegistryReactionData_Type RegistryReactionData::REG_MULTI_SZ;
-const RegistryReactionData_Type RegistryReactionData::REG_EXPAND_SZ;
-const RegistryReactionData_Type RegistryReactionData::REG_BINARY;
-const RegistryReactionData_Type RegistryReactionData::REG_DWORD;
-const RegistryReactionData_Type RegistryReactionData::REG_QWORD;
-const RegistryReactionData_Type RegistryReactionData::Type_MIN;
-const RegistryReactionData_Type RegistryReactionData::Type_MAX;
-const int RegistryReactionData::Type_ARRAYSIZE;
+const RegistryReactionData_RegType RegistryReactionData::SZ;
+const RegistryReactionData_RegType RegistryReactionData::MULTI_SZ;
+const RegistryReactionData_RegType RegistryReactionData::EXPAND_SZ;
+const RegistryReactionData_RegType RegistryReactionData::BINARY;
+const RegistryReactionData_RegType RegistryReactionData::DWORD;
+const RegistryReactionData_RegType RegistryReactionData::QWORD;
+const RegistryReactionData_RegType RegistryReactionData::RegType_MIN;
+const RegistryReactionData_RegType RegistryReactionData::RegType_MAX;
+const int RegistryReactionData::RegType_ARRAYSIZE;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 const ::google::protobuf::EnumDescriptor* Tactic_descriptor() {
   ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_ReactionData_2eproto);
@@ -2337,11 +2337,11 @@ const char* RegistryReactionData::_InternalParse(const char* begin, const char* 
         ptr += size;
         break;
       }
-      // .gpb.RegistryReactionData.Type type = 5;
+      // .gpb.RegistryReactionData.RegType type = 5;
       case 5: {
         if (static_cast<::google::protobuf::uint8>(tag) != 40) goto handle_unusual;
         ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
-        msg->set_type(static_cast<::gpb::RegistryReactionData_Type>(val));
+        msg->set_type(static_cast<::gpb::RegistryReactionData_RegType>(val));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
@@ -2445,14 +2445,14 @@ bool RegistryReactionData::MergePartialFromCodedStream(
         break;
       }
 
-      // .gpb.RegistryReactionData.Type type = 5;
+      // .gpb.RegistryReactionData.RegType type = 5;
       case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (40 & 0xFF)) {
           int value = 0;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
-          set_type(static_cast< ::gpb::RegistryReactionData_Type >(value));
+          set_type(static_cast< ::gpb::RegistryReactionData_RegType >(value));
         } else {
           goto handle_unusual;
         }
@@ -2524,7 +2524,7 @@ void RegistryReactionData::SerializeWithCachedSizes(
       4, this->newdata(), output);
   }
 
-  // .gpb.RegistryReactionData.Type type = 5;
+  // .gpb.RegistryReactionData.RegType type = 5;
   if (this->type() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       5, this->type(), output);
@@ -2582,7 +2582,7 @@ void RegistryReactionData::SerializeWithCachedSizes(
         4, this->newdata(), target);
   }
 
-  // .gpb.RegistryReactionData.Type type = 5;
+  // .gpb.RegistryReactionData.RegType type = 5;
   if (this->type() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       5, this->type(), target);
@@ -2656,7 +2656,7 @@ size_t RegistryReactionData::ByteSizeLong() const {
         this->mitreid());
   }
 
-  // .gpb.RegistryReactionData.Type type = 5;
+  // .gpb.RegistryReactionData.RegType type = 5;
   if (this->type() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
