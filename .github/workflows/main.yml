@@ -1,4 +1,4 @@
-name: BLUESPAWN-agent Test Build Success
+name: BLUESPAWN-agent Release Build Success
 
 on:
   pull_request:
