@@ -39,7 +39,7 @@ Set-ItemProperty "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\" 
 ```powershell
 Set-ItemProperty "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\" "Shell" "explorer.exe" -Force
 ```
-![BLUESPAWN in Action](https://user-images.githubusercontent.com/3931697/64458506-86c88880-d0c3-11e9-9586-099928c30d7d.png)
+![BLUESPAWN in Action](https://user-images.githubusercontent.com/3931697/65073414-d11df500-d960-11e9-9516-7e310996d889.png)
 
 ## Lines of Effort
 BLUESPAWN consists of 5 major modules as listed below. Several of these modules have submodules (which may not be created in the codebase yet) as listed below and all are in varying stages of planning, research, and development.
