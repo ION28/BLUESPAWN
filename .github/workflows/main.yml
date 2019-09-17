@@ -18,5 +18,6 @@ jobs:
       run: echo Hello, world!
 
     - name: MSBuild BLUESPAWN-agent
+      working-directory: BLUESPAWN-agent
       run: |
-        call build-agent.bat
+        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN-agent.sln
