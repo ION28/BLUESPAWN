@@ -1,9 +1,10 @@
 name: BLUESPAWN-agent Test Build Success
 
 on:
-  push:
+  pull_request:
     branches:
-      - *
+    - master
+    - develop
 
 jobs:
   build:
