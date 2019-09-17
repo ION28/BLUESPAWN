@@ -1,4 +1,4 @@
-name: BLUESPAWN-agent Release Build Success
+name: BLUESPAWN-agent Build Success
 
 on:
   pull_request:
@@ -9,8 +9,12 @@ on:
 jobs:
   build:
 
+    strategy:
+      matrix:
+        buildtype: [Release, Debug]
+
     runs-on: windows-2019
-    
+
     steps:
     - uses: actions/checkout@v1
     
@@ -20,4 +24,4 @@ jobs:
     - name: Build BLUESPAWN-agent
       working-directory: BLUESPAWN-agent
       run: |
-        "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN-agent.sln /p:Configuration=Release
+        "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN-agent.sln /p:Configuration=${{ matrix.buildtype }}
