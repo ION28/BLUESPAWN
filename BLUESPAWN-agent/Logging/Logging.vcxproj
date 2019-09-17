@@ -389,7 +389,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_WIN32_WINNT=0x600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\CCDC\BLUESPAWN\BLUESPAWN-agent\Logging\grpc\generated;D:\CCDC\BLUESPAWN\BLUESPAWN-agent\Hunt\Configuration\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\grpc\include;$(ProjectDir)\grpc\generated;$(SolutionDir)\Hunt\Configuration\headers;%(AdditionalIncludeDirectories) (edited) </AdditionalIncludeDirectories>
       <AdditionalOptions>-DNOMINMAX %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -432,7 +432,7 @@
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>D:\CCDC\BLUESPAWN\BLUESPAWN-agent\Logging\grpc\generated;D:\CCDC\BLUESPAWN\BLUESPAWN-agent\Logging\grpc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\grpc\include;$(ProjectDir)\grpc\generated;$(SolutionDir)\Hunt\Configuration\headers;%(AdditionalIncludeDirectories) (edited) </AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-DNOMINMAX %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
