@@ -27,6 +27,9 @@
     <ClCompile Include="src\HuntLogMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DebugSink.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\logging\Log.h">
@@ -45,6 +48,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\logging\HuntLogMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\logging\DebugSink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

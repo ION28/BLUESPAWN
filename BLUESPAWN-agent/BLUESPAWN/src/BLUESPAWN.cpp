@@ -1,14 +1,16 @@
 #include "bluespawn/bluespawn.h"
 #include "common/wrappers.hpp"
 #include "logging/HuntLogMessage.h"
+#include "logging/DebugSink.h"
 
 #include <iostream>
 
 int main(int argc, char* argv[])
 {
-	Log::CLISink output{};
-	//Log::AddSink(output);
-	Log::AddHuntSink(output);
+	Log::DebugSink DebugOutput{};
+	Log::CLISink ConsoleOutput{};
+	Log::AddSink(DebugOutput);
+	Log::AddHuntSink(ConsoleOutput);
 
 	print_banner();
 
