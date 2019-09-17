@@ -17,9 +17,6 @@ jobs:
     - name: Run a one-line script
       run: echo Hello, world!
 
-    - name: Setup MSBUILD
-      uses: warrenbuckley/Setup-MSBuild@v1
-
-    - name: MSBuild BLUESPAWN-agent
-      working-directory: BLUESPAWN-agent
-      run: msbuild BLUESPAWN-agent.sln
+    - name: find msbuild
+      run: |
+        dir "C:\Program Files (x86)\Microsoft Visual Studio\2019\" /s
