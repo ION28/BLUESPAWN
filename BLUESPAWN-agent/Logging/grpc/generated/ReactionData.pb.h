@@ -89,30 +89,30 @@ template<> ::gpb::ServiceReactionData* Arena::CreateMaybeMessage<::gpb::ServiceR
 }  // namespace google
 namespace gpb {
 
-enum RegistryReactionData_Type {
-  RegistryReactionData_Type_REG_SZ = 0,
-  RegistryReactionData_Type_REG_MULTI_SZ = 1,
-  RegistryReactionData_Type_REG_EXPAND_SZ = 2,
-  RegistryReactionData_Type_REG_BINARY = 3,
-  RegistryReactionData_Type_REG_DWORD = 4,
-  RegistryReactionData_Type_REG_QWORD = 5,
-  RegistryReactionData_Type_RegistryReactionData_Type_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
-  RegistryReactionData_Type_RegistryReactionData_Type_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+enum RegistryReactionData_RegType {
+  RegistryReactionData_RegType_SZ = 0,
+  RegistryReactionData_RegType_MULTI_SZ = 1,
+  RegistryReactionData_RegType_EXPAND_SZ = 2,
+  RegistryReactionData_RegType_BINARY = 3,
+  RegistryReactionData_RegType_DWORD = 4,
+  RegistryReactionData_RegType_QWORD = 5,
+  RegistryReactionData_RegType_RegistryReactionData_RegType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  RegistryReactionData_RegType_RegistryReactionData_RegType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
-bool RegistryReactionData_Type_IsValid(int value);
-const RegistryReactionData_Type RegistryReactionData_Type_Type_MIN = RegistryReactionData_Type_REG_SZ;
-const RegistryReactionData_Type RegistryReactionData_Type_Type_MAX = RegistryReactionData_Type_REG_QWORD;
-const int RegistryReactionData_Type_Type_ARRAYSIZE = RegistryReactionData_Type_Type_MAX + 1;
+bool RegistryReactionData_RegType_IsValid(int value);
+const RegistryReactionData_RegType RegistryReactionData_RegType_RegType_MIN = RegistryReactionData_RegType_SZ;
+const RegistryReactionData_RegType RegistryReactionData_RegType_RegType_MAX = RegistryReactionData_RegType_QWORD;
+const int RegistryReactionData_RegType_RegType_ARRAYSIZE = RegistryReactionData_RegType_RegType_MAX + 1;
 
-const ::google::protobuf::EnumDescriptor* RegistryReactionData_Type_descriptor();
-inline const ::std::string& RegistryReactionData_Type_Name(RegistryReactionData_Type value) {
+const ::google::protobuf::EnumDescriptor* RegistryReactionData_RegType_descriptor();
+inline const ::std::string& RegistryReactionData_RegType_Name(RegistryReactionData_RegType value) {
   return ::google::protobuf::internal::NameOfEnum(
-    RegistryReactionData_Type_descriptor(), value);
+    RegistryReactionData_RegType_descriptor(), value);
 }
-inline bool RegistryReactionData_Type_Parse(
-    const ::std::string& name, RegistryReactionData_Type* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<RegistryReactionData_Type>(
-    RegistryReactionData_Type_descriptor(), name, value);
+inline bool RegistryReactionData_RegType_Parse(
+    const ::std::string& name, RegistryReactionData_RegType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<RegistryReactionData_RegType>(
+    RegistryReactionData_RegType_descriptor(), name, value);
 }
 enum Tactic {
   InitialAccess = 0,
@@ -825,38 +825,38 @@ class RegistryReactionData final :
 
   // nested types ----------------------------------------------------
 
-  typedef RegistryReactionData_Type Type;
-  static const Type REG_SZ =
-    RegistryReactionData_Type_REG_SZ;
-  static const Type REG_MULTI_SZ =
-    RegistryReactionData_Type_REG_MULTI_SZ;
-  static const Type REG_EXPAND_SZ =
-    RegistryReactionData_Type_REG_EXPAND_SZ;
-  static const Type REG_BINARY =
-    RegistryReactionData_Type_REG_BINARY;
-  static const Type REG_DWORD =
-    RegistryReactionData_Type_REG_DWORD;
-  static const Type REG_QWORD =
-    RegistryReactionData_Type_REG_QWORD;
-  static inline bool Type_IsValid(int value) {
-    return RegistryReactionData_Type_IsValid(value);
+  typedef RegistryReactionData_RegType RegType;
+  static const RegType SZ =
+    RegistryReactionData_RegType_SZ;
+  static const RegType MULTI_SZ =
+    RegistryReactionData_RegType_MULTI_SZ;
+  static const RegType EXPAND_SZ =
+    RegistryReactionData_RegType_EXPAND_SZ;
+  static const RegType BINARY =
+    RegistryReactionData_RegType_BINARY;
+  static const RegType DWORD =
+    RegistryReactionData_RegType_DWORD;
+  static const RegType QWORD =
+    RegistryReactionData_RegType_QWORD;
+  static inline bool RegType_IsValid(int value) {
+    return RegistryReactionData_RegType_IsValid(value);
   }
-  static const Type Type_MIN =
-    RegistryReactionData_Type_Type_MIN;
-  static const Type Type_MAX =
-    RegistryReactionData_Type_Type_MAX;
-  static const int Type_ARRAYSIZE =
-    RegistryReactionData_Type_Type_ARRAYSIZE;
+  static const RegType RegType_MIN =
+    RegistryReactionData_RegType_RegType_MIN;
+  static const RegType RegType_MAX =
+    RegistryReactionData_RegType_RegType_MAX;
+  static const int RegType_ARRAYSIZE =
+    RegistryReactionData_RegType_RegType_ARRAYSIZE;
   static inline const ::google::protobuf::EnumDescriptor*
-  Type_descriptor() {
-    return RegistryReactionData_Type_descriptor();
+  RegType_descriptor() {
+    return RegistryReactionData_RegType_descriptor();
   }
-  static inline const ::std::string& Type_Name(Type value) {
-    return RegistryReactionData_Type_Name(value);
+  static inline const ::std::string& RegType_Name(RegType value) {
+    return RegistryReactionData_RegType_Name(value);
   }
-  static inline bool Type_Parse(const ::std::string& name,
-      Type* value) {
-    return RegistryReactionData_Type_Parse(name, value);
+  static inline bool RegType_Parse(const ::std::string& name,
+      RegType* value) {
+    return RegistryReactionData_RegType_Parse(name, value);
   }
 
   // accessors -------------------------------------------------------
@@ -921,11 +921,11 @@ class RegistryReactionData final :
   ::google::protobuf::uint32 mitreid() const;
   void set_mitreid(::google::protobuf::uint32 value);
 
-  // .gpb.RegistryReactionData.Type type = 5;
+  // .gpb.RegistryReactionData.RegType type = 5;
   void clear_type();
   static const int kTypeFieldNumber = 5;
-  ::gpb::RegistryReactionData_Type type() const;
-  void set_type(::gpb::RegistryReactionData_Type value);
+  ::gpb::RegistryReactionData_RegType type() const;
+  void set_type(::gpb::RegistryReactionData_RegType value);
 
   // @@protoc_insertion_point(class_scope:gpb.RegistryReactionData)
  private:
@@ -2606,15 +2606,15 @@ inline void RegistryReactionData::set_allocated_newdata(::std::string* newdata) 
   // @@protoc_insertion_point(field_set_allocated:gpb.RegistryReactionData.newData)
 }
 
-// .gpb.RegistryReactionData.Type type = 5;
+// .gpb.RegistryReactionData.RegType type = 5;
 inline void RegistryReactionData::clear_type() {
   type_ = 0;
 }
-inline ::gpb::RegistryReactionData_Type RegistryReactionData::type() const {
+inline ::gpb::RegistryReactionData_RegType RegistryReactionData::type() const {
   // @@protoc_insertion_point(field_get:gpb.RegistryReactionData.type)
-  return static_cast< ::gpb::RegistryReactionData_Type >(type_);
+  return static_cast< ::gpb::RegistryReactionData_RegType >(type_);
 }
-inline void RegistryReactionData::set_type(::gpb::RegistryReactionData_Type value) {
+inline void RegistryReactionData::set_type(::gpb::RegistryReactionData_RegType value) {
   
   type_ = value;
   // @@protoc_insertion_point(field_set:gpb.RegistryReactionData.type)
@@ -4127,10 +4127,10 @@ HuntMessage::servicedetections() const {
 namespace google {
 namespace protobuf {
 
-template <> struct is_proto_enum< ::gpb::RegistryReactionData_Type> : ::std::true_type {};
+template <> struct is_proto_enum< ::gpb::RegistryReactionData_RegType> : ::std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::gpb::RegistryReactionData_Type>() {
-  return ::gpb::RegistryReactionData_Type_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::gpb::RegistryReactionData_RegType>() {
+  return ::gpb::RegistryReactionData_RegType_descriptor();
 }
 template <> struct is_proto_enum< ::gpb::Tactic> : ::std::true_type {};
 template <>
