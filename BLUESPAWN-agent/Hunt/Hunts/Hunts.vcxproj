@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\hunts\Hunt.h" />
+    <ClInclude Include="headers\hunts\HuntInfo.h" />
     <ClInclude Include="headers\hunts\HuntRegister.h" />
     <ClInclude Include="headers\hunts\HuntT1004.h" />
     <ClInclude Include="headers\hunts\HuntT1037.h" />

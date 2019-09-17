@@ -11,6 +11,8 @@ namespace Log {
 
 	const LogLevel LogLevel::LogInfo{ Severity::LogInfo, true };
 
+	const LogLevel LogLevel::LogHunt{ Severity::LogHunt, true };
+
 	const LogLevel LogLevel::LogVerbose1{ Severity::LogInfo, false };
 
 	const LogLevel LogLevel::LogVerbose2{ Severity::LogInfo, false };
@@ -20,5 +22,5 @@ namespace Log {
 	void LogLevel::Enable(){ enabled = true; }
 	void LogLevel::Disable(){ enabled = true; }
 	bool LogLevel::Toggle(){ return enabled = !enabled; }
-	bool LogLevel::Enabled(){ return enabled; }
+	bool LogLevel::Enabled() const { return enabled; }
 }
