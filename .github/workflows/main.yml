@@ -13,6 +13,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    
+    - uses: textbook/git-checkout-submodule-action@master
 
     - name: Run a one-line script
       run: echo Hello, world!
