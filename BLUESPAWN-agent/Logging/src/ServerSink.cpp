@@ -46,7 +46,7 @@ namespace Log {
 			gpbInfo.set_huntdatasources(i, huntDatasources[i]);
 
 		gpbInfo.set_huntstarttime(info.HuntStartTime);
-
+    
 		return gpbInfo;
 	}
 
