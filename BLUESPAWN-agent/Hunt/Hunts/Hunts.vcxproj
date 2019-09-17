@@ -30,7 +30,6 @@
     <ClCompile Include="src\HuntT1131.cpp" />
     <ClCompile Include="src\HuntT1138.cpp" />
     <ClCompile Include="src\HuntT1182.cpp" />
-    <ClCompile Include="src\HuntT9999.cpp" />
     <ClCompile Include="src\Scope.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -40,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\hunts\Hunt.h" />
+    <ClInclude Include="headers\hunts\HuntInfo.h" />
     <ClInclude Include="headers\hunts\HuntRegister.h" />
     <ClInclude Include="headers\hunts\HuntT1004.h" />
     <ClInclude Include="headers\hunts\HuntT1037.h" />
@@ -50,7 +50,6 @@
     <ClInclude Include="headers\hunts\HuntT1131.h" />
     <ClInclude Include="headers\hunts\HuntT1138.h" />
     <ClInclude Include="headers\hunts\HuntT1182.h" />
-    <ClInclude Include="headers\hunts\HuntT9999.h" />
     <ClInclude Include="headers\hunts\RegistryHunt.hpp" />
     <ClInclude Include="headers\hunts\Scope.h" />
   </ItemGroup>

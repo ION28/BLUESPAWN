@@ -8,7 +8,8 @@ namespace Log {
 		LogError = 0,
 		LogWarn = 1,
 		LogInfo = 2,
-		LogOther = 3
+		LogOther = 3,
+		LogHunt = 4
 	};
 
 	/**
@@ -28,6 +29,7 @@ namespace Log {
 
 		// Default logging levels available, though custom ones can be created
 		static const LogLevel
+			LogHunt,     // Intended for logging hunts
 			LogError,    // Intended for logging errors
 			LogWarn,     // Intended for logging warnings
 			LogInfo,     // Intended for logging information and statuses of hunts
@@ -72,6 +74,6 @@ namespace Log {
 		 * @return A boolean indicating whether or not log messages at this level should
 		 *       be recorded.
 		 */
-		bool Enabled();
+		bool Enabled() const;
 	};
 }

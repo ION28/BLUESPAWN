@@ -7,15 +7,16 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1060::HuntT1060(HuntRegister& record) : Hunt(record) {
-		dwSupportedScans = Aggressiveness::Cursory;
-		dwStuffAffected = AffectedThing::Configurations;
-		dwSourcesInvolved = DataSource::Registry;
-		dwTacticsUsed = Tactic::Persistence;
+	HuntT1060::HuntT1060(HuntRegister& record) : Hunt(record, L"T1060 - Registry Run Keys / Startup Folder") {
+		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
+		dwCategoriesAffected = (DWORD) Category::Configurations;
+		dwSourcesInvolved = (DWORD) DataSource::Registry;
+		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1060::ScanCursory(Scope& scope, Reaction* reaction){
+	int HuntT1060::ScanCursory(const Scope& scope, Reaction reaction){
 		LOG_INFO("Hunting for T1060 - Registry Run Keys / Startup Folder at level Cursory");
+		reaction.BeginHunt(GET_INFO());
 
 		int identified = 0;
 
@@ -39,6 +40,7 @@ namespace Hunts {
 		identified += CheckKey({ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", L"Common Startup" }, 
 			                   L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", reaction);
 
+		reaction.EndHunt();
 		return identified;
 	}
 
