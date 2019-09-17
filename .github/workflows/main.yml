@@ -18,4 +18,5 @@ jobs:
       run: echo Hello, world!
 
     - name: find msbuild
-      run: dir "%ProgramFiles(x86)%\Microsoft Visual Studio\"
+      run: |
+        "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
