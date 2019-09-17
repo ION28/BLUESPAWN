@@ -20,11 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CLISink.cpp" />
+    <ClCompile Include="src\HuntLogMessage.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\LogLevel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\logging\CLISink.h" />
+    <ClInclude Include="headers\logging\HuntLogMessage.h" />
     <ClInclude Include="headers\logging\Log.h" />
     <ClInclude Include="headers\logging\Loggable.h" />
     <ClInclude Include="headers\logging\LogLevel.h" />
@@ -71,18 +73,26 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\Project Configurations\buildsettings.props" />
+    <Import Project="..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\Project Configurations\buildsettings.props" />
+    <Import Project="..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\Project Configurations\buildsettings.props" />
+    <Import Project="..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\Project Configurations\buildsettings.props" />
+    <Import Project="..\React\Reactions\reactions.props" />
+    <Import Project="..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />

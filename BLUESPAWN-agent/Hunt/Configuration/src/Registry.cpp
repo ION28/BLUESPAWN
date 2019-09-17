@@ -117,7 +117,7 @@ namespace Registry {
 	}
 
 	std::wstring RegistryKey::GetName(){
-		return vHives[hive] + L"\\" + path + (name.length() ? L":" + name : L"");
+		return name;
 	}
 
 	std::wstring RegistryKey::GetPath(){
