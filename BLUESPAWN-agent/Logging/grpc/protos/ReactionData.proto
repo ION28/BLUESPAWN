@@ -34,15 +34,15 @@ message RegistryReactionData {
 	bytes data = 3;
 	bytes newData = 4;
 
-	enum Type {
-		REG_SZ = 0;
-		REG_MULTI_SZ = 1;
-		REG_EXPAND_SZ = 2;
-		REG_BINARY = 3;
-		REG_DWORD = 4;
-		REG_QWORD = 5;
+	enum RegType {
+		SZ = 0;
+		MULTI_SZ = 1;
+		EXPAND_SZ = 2;
+		BINARY = 3;
+		DWORD = 4;
+		QWORD = 5;
 	}
-	Type type = 5;
+	RegType type = 5;
 
 	repeated ACLEntry ACL = 6;
 }
