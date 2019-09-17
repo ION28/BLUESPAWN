@@ -18,4 +18,5 @@ jobs:
       run: echo Hello, world!
 
     - name: MSBuild BLUESPAWN-agent
-      run: build-agent.bat
+      run: |
+        call build-agent.bat
