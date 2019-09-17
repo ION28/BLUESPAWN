@@ -18,5 +18,4 @@ jobs:
       run: echo Hello, world!
 
     - name: find msbuild
-      run: |
-        dir "C:\Program Files (x86)\Microsoft Visual Studio\2019\" /s
+      run: dir "C:\Program Files (x86)\Microsoft Visual Studio\2019\" /s
