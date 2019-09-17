@@ -22,4 +22,4 @@ jobs:
 
     - name: MSBuild
       working-directory: BLUESPAWN-agent
-      run: msbuild BLUSPAWN-agent.sln
+      run: msbuild BLUESPAWN-agent.sln
