@@ -1,0 +1,139 @@
+syntax = "proto3";
+package gpb;
+
+message ACLEntry {
+		string user = 1;
+		string group = 2;
+		uint32 securityAttributes = 3;
+}
+
+message FileReactionData {
+	uint32 mitreID = 1;
+	string fileName = 2;
+	string description = 3;
+	string owner = 4;
+	uint32 size = 5;
+	uint32 timeCreated = 6;
+	uint32 timeModified = 7;
+	uint32 timeAccessed = 8;
+	bytes fileContents = 9;
+
+	message Signature {
+		string signerName = 1;
+		string digestAlgorithm = 2;
+		uint32 timestamp = 3;
+	}
+	repeated Signature signatures = 10;
+
+	repeated ACLEntry ACL = 11;
+}
+
+message RegistryReactionData {
+	uint32 mitreID = 1;
+	string key = 2;
+	bytes data = 3;
+	bytes newData = 4;
+
+	enum RegType {
+		SZ = 0;
+		MULTI_SZ = 1;
+		EXPAND_SZ = 2;
+		BINARY = 3;
+		DWORD = 4;
+		QWORD = 5;
+	}
+	RegType type = 5;
+
+	repeated ACLEntry ACL = 6;
+}
+
+message ProcessReactionData {
+	uint32 mitreID = 1;
+	uint32 pid = 2;
+	string name = 3;
+	string description = 4;
+	string commandLine = 5;
+	string path = 6;
+	string currentDirectory = 7;
+	string autostartLocation = 8;
+	string parent = 9;
+	string user = 10;
+	uint32 timeStarted = 11;
+	uint32 recievedBytes = 12;
+	uint32 sentBytes = 13;
+	uint32 privateBytes = 14;
+	uint32 workingSet = 15;
+	bytes binaryContents = 16;
+}
+
+message ServiceReactionData {
+	uint32 mitreID = 1;
+	uint32 pid = 2;
+	string name = 3;
+	string description = 4;
+	string logOnAs = 5;
+	string startupType = 6;
+	string startParameters = 7;
+	bool allowDesktopInteract = 8;
+	string runProgramPath = 9;
+	string binaryPath = 10;
+	bytes binaryContents = 11;
+}
+
+enum Tactic {
+	InitialAccess = 0;
+	Execution = 1;
+	Persistence = 2;
+	PrivilegeEscalation = 3;
+	DefenseEvasion = 4;
+	CredentialAccess = 5;
+	Discovery = 6;
+	LateralMovement = 7;
+	Collection = 8;
+	CommandControl = 9;
+	Exfiltration = 10;
+	Impact = 12;
+}
+
+enum DataSource {
+	ServiceSource = 0;
+	ProcessSource = 1;
+	DriverSource = 2;
+	FileSystemSource = 3;
+	RegistrySource = 4;
+	GPOSource = 5;
+	EventLogsSource = 6;
+	NetworkSource = 7;
+}
+
+enum Category {
+	Configurations = 0;
+	Processes = 1;
+	Files = 2;
+	Network = 3;
+}
+
+enum Aggressiveness {
+	Cursory = 0;
+	Moderate = 1;
+	Careful = 2;
+	Aggressive = 3;
+}
+
+message HuntInfo {
+	string huntName = 1;
+	Aggressiveness huntAggressiveness = 2;
+	repeated Tactic huntTactics = 3;
+	repeated Category huntCategories = 4; 
+	repeated DataSource huntDatasources = 5;
+	uint32 huntStartTime = 6;
+}
+
+message HuntMessage {
+	HuntInfo info = 1;
+	string extraMessage = 3;
+	repeated FileReactionData fileDetections = 4;
+	repeated RegistryReactionData registryDetections = 5;
+	repeated ProcessReactionData processDetections = 6;
+	repeated ServiceReactionData serviceDetections = 7;
+}
