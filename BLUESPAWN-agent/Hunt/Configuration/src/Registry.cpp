@@ -117,7 +117,11 @@ namespace Registry {
 	}
 
 	std::wstring RegistryKey::GetName(){
-		return vHives[hive] + L"\\" + path + (name.length() ? L":" + name : L"");
+		return name;
+	}
+
+	std::wstring RegistryKey::GetPath(){
+		return vHives[hive] + L"\\" + path;
 	}
 
 	bool RegistryKey::Set(LPVOID value, DWORD dwSize, DWORD dwType) {

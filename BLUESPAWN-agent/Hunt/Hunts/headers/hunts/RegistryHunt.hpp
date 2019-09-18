@@ -2,6 +2,9 @@
 #include "configuration/Registry.h"
 #include "reactions/Reaction.h"
 
+#include "logging/HuntLogMessage.h"
+#include "logging/Log.h"
+
 #include <algorithm>
 
 /**
@@ -31,13 +34,14 @@ namespace Registry {
 	 * @return True if a detection occured and a reaction was dispatched; false otherwise
 	 */
 	template<class T>
-	inline bool CheckKey(RegistryKey key, T value, Reaction* reaction, MatchAction bOnMatch = NO_MATCH_BAD){
+	inline bool CheckKey(RegistryKey key, T value, const Reaction& reaction, MatchAction bOnMatch = NO_MATCH_BAD){
 		bool equal = key.Get<T>() == value;
 
 		if(!equal && bOnMatch == NO_MATCH_BAD || equal && bOnMatch == MATCH_BAD){
 			LOG_WARNING("Potentially bad registry key " << key << " with value \"" << key.Get<T>() << "\". Value should " << (bOnMatch == NO_MATCH_BAD ? "" : "not ") << "be \"" << value << "\"");
 
-			reaction->RegistryKeyIdentified(key);
+			auto detection = new REGISTRY_DETECTION{ DetectionType::Registry, key.GetPath(), key.GetName(), reinterpret_cast<BYTE*>(key.GetRaw()) };
+			reaction.RegistryKeyIdentified(detection);
 
 			return true;
 		} else {
@@ -60,7 +64,7 @@ namespace Registry {
 	 * @return True if a detection occured and a reaction was dispatched; false otherwise
 	 */
 	template<class T>
-	inline bool CheckKey(RegistryKey key, std::vector<T> values, Reaction* reaction, MatchAction bOnMatch = NO_MATCH_BAD){
+	inline bool CheckKey(RegistryKey key, std::vector<T> values, const Reaction& reaction, MatchAction bOnMatch = NO_MATCH_BAD){
 		T KeyValue = key.Get<T>();
 		bool matched = false;
 		for(auto value : values){
@@ -69,7 +73,8 @@ namespace Registry {
 			if(equal && bOnMatch == MATCH_BAD){
 				LOG_WARNING("Potentially bad registry key " << key << " with value \"" << KeyValue << "\". Value should not be \"" << value << "\"");
 
-				reaction->RegistryKeyIdentified(key);
+				auto detection = new REGISTRY_DETECTION{ key.GetPath(), key.GetName(), reinterpret_cast<BYTE*>(key.GetRaw()) };
+				reaction.RegistryKeyIdentified(detection);
 
 				return true;
 			} else if(equal && bOnMatch == NO_MATCH_BAD){
@@ -95,7 +100,7 @@ namespace Registry {
 
 	/// A specialization of CheckKey in the case that the value is a C wide-string
 	template<>
-	inline bool CheckKey(RegistryKey key, LPCWSTR value, Reaction* reaction, MatchAction bOnMatch){
+	inline bool CheckKey(RegistryKey key, LPCWSTR value, const Reaction& reaction, MatchAction bOnMatch){
 		return CheckKey(key, std::wstring(value), reaction, bOnMatch);
 	}
 
@@ -105,7 +110,7 @@ namespace Registry {
 	 * then the same logic is applied to just the one value, acting like the CheckKey function normally does when given a vector.
 	 */
 	template<>
-	inline bool CheckKey(RegistryKey key, REG_MULTI_SZ_T values, Reaction* reaction, MatchAction bOnMatch){
+	inline bool CheckKey(RegistryKey key, REG_MULTI_SZ_T values, const Reaction& reaction, MatchAction bOnMatch){
 		bool good = true;
 
 		for(auto value : key.Get<REG_MULTI_SZ_T>()){
@@ -118,7 +123,9 @@ namespace Registry {
 		}
 
 		if(!good){
-			reaction->RegistryKeyIdentified(key);
+			auto detection = new REGISTRY_DETECTION{ DetectionType::Registry, key.GetPath(), key.GetName(), reinterpret_cast<BYTE*>(key.GetRaw()) };
+			reaction.RegistryKeyIdentified(detection);
+
 		} else {
 			LOG_VERBOSE(1, "Registry key value " << key << " is okay");
 		}
@@ -134,11 +141,12 @@ namespace Registry {
 	 *
 	 * @return The number of subkeys present
 	 */
-	inline int CheckForSubkeys(RegistryKey key, Reaction* reaction){
+	inline int CheckForSubkeys(RegistryKey key, const Reaction& reaction){
 		int IDd = 0;
 		for(auto subkey : key.Subkeys()){
 			IDd++;
-			reaction->RegistryKeyIdentified(subkey);
+			auto detection = new REGISTRY_DETECTION{ DetectionType::Registry, subkey.GetPath(), subkey.GetName(), reinterpret_cast<BYTE*>(subkey.GetRaw()) };
+			reaction.RegistryKeyIdentified(detection);
 		}
 
 		return IDd;
@@ -153,11 +161,12 @@ namespace Registry {
 	 *
 	 * @return The number of values present
 	 */
-	inline int CheckForValues(RegistryKey key, Reaction* reaction){
+	inline int CheckForValues(RegistryKey key, const Reaction& reaction){
 		int IDd = 0;
 		for(auto subkey : key.KeyValues()){
 			IDd++;
-			reaction->RegistryKeyIdentified(subkey);
+			auto detection = new REGISTRY_DETECTION{ DetectionType::Registry, subkey.GetPath(), subkey.GetName(), reinterpret_cast<BYTE*>(subkey.GetRaw()) };
+			reaction.RegistryKeyIdentified(detection);
 		}
 
 		return IDd;

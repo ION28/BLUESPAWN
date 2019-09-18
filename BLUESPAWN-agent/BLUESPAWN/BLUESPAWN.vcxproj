@@ -35,9 +35,6 @@
     <ProjectReference Include="..\Hunt\Hunts\Hunts.vcxproj">
       <Project>{49d0b6f0-5ae2-40f9-a476-6cc71c3a4568}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Logging\Logging.vcxproj">
-      <Project>{efb79df3-1891-4a0d-869c-76f7fa4ad239}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\bluespawn\banners.h" />
