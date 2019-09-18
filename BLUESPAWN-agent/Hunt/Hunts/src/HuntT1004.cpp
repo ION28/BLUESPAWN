@@ -3,20 +3,22 @@
 
 #include "configuration/Registry.h"
 #include "logging/Log.h"
+#include "logging/HuntLogMessage.h"
 
 using namespace Registry;
 
 namespace Hunts {
 
-	HuntT1004::HuntT1004(HuntRegister& record) : Hunt(record) {
-		dwSupportedScans = Aggressiveness::Cursory;
-		dwStuffAffected = AffectedThing::Configurations;
-		dwSourcesInvolved = DataSource::Registry;
-		dwTacticsUsed = Tactic::Persistence;
+	HuntT1004::HuntT1004(HuntRegister& record) : Hunt(record, L"T1004 - Winlogon Helper DLL") {
+		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
+		dwCategoriesAffected = (DWORD) Category::Configurations;
+		dwSourcesInvolved = (DWORD) DataSource::Registry;
+		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1004::ScanCursory(Scope& scope, Reaction* reaction){
+	int HuntT1004::ScanCursory(const Scope& scope, Reaction reaction){
 		LOG_INFO("Hunting for T1004 - Winlogon Helper DLL at level Cursory");
+		reaction.BeginHunt(GET_INFO());
 
 		int identified = 0;
 
@@ -30,6 +32,7 @@ namespace Hunts {
 		identified += CheckKey({ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", L"Userinit"}, L"", reaction);
 		identified += CheckForSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" }, reaction);
 
+		reaction.EndHunt();
 		return identified;
 	}
 
