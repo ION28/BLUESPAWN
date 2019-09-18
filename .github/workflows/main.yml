@@ -1,6 +1,9 @@
-name: BLUESPAWN-agent Build Success
+name: BLUESPAWN agent build
 
 on:
+  push:
+    branches:
+    - master
   pull_request:
     branches:
     - master
