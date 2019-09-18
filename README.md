@@ -1,6 +1,6 @@
 # BLUESPAWN
 
-![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN)
+[![Actions Status](https://github.com/ION28/BLUESPAWN/workflows/BLUESPAWN%20agent%20build/badge.svg)](https://github.com/ION28/BLUESPAWN/actions) ![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN)
 
 ## Our Mission
 BLUESPAWN helps blue teams monitor Windows systems in real-time against active attackers by detecting anomalous activity
