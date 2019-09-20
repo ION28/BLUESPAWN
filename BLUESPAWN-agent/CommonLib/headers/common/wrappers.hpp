@@ -46,14 +46,10 @@ public:
 	GenericWrapper& operator=(const GenericWrapper& copy){ 
 		freeResource = copy.freeResource; 
 		DestroyReference(); 
-		SetReference(copy); 
+		SetReference(copy.WrappedObject); 
+		return *this;
 	}
-	GenericWrapper&& operator=(GenericWrapper&& move){ 
-		freeResource = move.freeResource;
-		DestroyReference(); 
-		SetReference(move);  
-		move.DestroyReference(); 
-	}
+	GenericWrapper&& operator=(GenericWrapper&& move) = delete;
 
 	~GenericWrapper(){ DestroyReference(); }
 
@@ -156,12 +152,13 @@ public:
 		return !memcmp(&data1, &data2, min(memory.MemorySize, MemorySize));
 	}
 
-	bool Protect(DWORD protections, DWORD size = MemorySize){
+	bool Protect(DWORD protections, SIZE_T size = -1){
+		if(size == -1) size = MemorySize;
 		DWORD dwOldProtections{};
 		if(!process){
 			return VirtualProtect(address, size, protections, &dwOldProtections);
 		} else {
-			return VirtualProtextEx(process, address, size, protections, &dwOldProtections);
+			return VirtualProtectEx(process, address, size, protections, &dwOldProtections);
 		}
 	}
 

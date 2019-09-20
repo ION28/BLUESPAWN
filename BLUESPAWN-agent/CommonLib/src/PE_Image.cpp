@@ -147,11 +147,11 @@ bool PE_Image::ApplyTargetRelocations(MemoryWrapper<> TargetLocation){
 }
 
 bool PE_Image::ParseLocalImports(HandleWrapper process){
-	imports->LoadAllImports(base, process, expanded);
+	return imports->LoadAllImports(base, process, expanded);
 }
 
 bool PE_Image::ParseTargetImports(MemoryWrapper<> TargetLocation){
-	imports->LoadAllImports(TargetLocation, TargetLocation.process, true);
+	return imports->LoadAllImports(TargetLocation, TargetLocation.process, true);
 }
 
 bool PE_Image::ApplyProtections(MemoryWrapper<> TargetLocation){
@@ -166,9 +166,16 @@ bool PE_Image::ApplyProtections(MemoryWrapper<> TargetLocation){
 	};
 
 	for(auto pair : sections){
-		DWORD protection = dwProtectionMap[]
-		TargetLocation.GetOffset(pair.second.SectionHeader.VirtualAddress).Protect(x, pair.second.SectionHeader.SizeOfRawData);
+		DWORD dwProtIdx = ((pair.second.SectionHeader.Characteristics & IMAGE_SCN_MEM_EXECUTE) ? 4 : 0) +
+			((pair.second.SectionHeader.Characteristics & IMAGE_SCN_MEM_WRITE) ? 2 : 0) +
+			((pair.second.SectionHeader.Characteristics & IMAGE_SCN_MEM_READ) ? 1 : 0);
+		DWORD protection = dwProtectionMap[dwProtIdx];
+		protection |= (pair.second.SectionHeader.Characteristics & IMAGE_SCN_MEM_NOT_CACHED) ? PAGE_NOACCESS : 0;
+		if(!TargetLocation.GetOffset(pair.second.SectionHeader.VirtualAddress).Protect(protection, pair.second.SectionHeader.SizeOfRawData)){
+			return false;
+		}
 	}
+	return true;
 }
 
 DWORD PE_Image::RVAToOffset(DWORD rva){

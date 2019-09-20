@@ -26,6 +26,9 @@
     <ClCompile Include="src\BLUESPAWN.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonLib\CommonLib.vcxproj">
+      <Project>{25ae1d80-3e17-4e1d-bfb4-8afb375ebaf1}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Hunt\Configuration\Configuration.vcxproj">
       <Project>{73d597b4-7735-4c99-bd34-1f01633e43da}</Project>
     </ProjectReference>
