@@ -6,7 +6,6 @@
 int main(int argc, char* argv[])
 {
 	Log::CLISink output{};
-	Log::AddSink(output);
 	Log::AddHuntSink(output);
 
 	print_banner();
