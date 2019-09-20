@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 // Creates a Hunt log message named _HuntLogMessage. This macro is only to be called inside
 // ScanCursory, ScanModerate, ScanCareful, or ScanAggressive.
@@ -15,7 +16,7 @@
     auto _HuntLogMessage = Log::HuntLogMessage(GET_INFO(), Log::_LogHuntSinks)
 
 // Logs a detection to the log message for the current hunt. LOG_HUNT_BEGIN should be called first.
-#define LOG_HUNT_DETECTION(detection) _HuntLogMessage.AddDetection(reinterpret_cast<DETECTION*>(detection))
+#define LOG_HUNT_DETECTION(detection) _HuntLogMessage.AddDetection(std::static_pointer_cast<DETECTION>(detection))
 
 // Adds a message to the log for this hunt. LOG_HUNT_BEGIN should be called first.
 #define LOG_HUNT_MESSAGE(...) _HuntLogMessage << __VA_ARGS__
@@ -38,7 +39,7 @@ namespace Log {
 	 */
 	class HuntLogMessage : public LogMessage {
 	protected:
-		std::vector<DETECTION*> Detections;
+		std::vector<std::shared_ptr<DETECTION>> Detections;
 		HuntInfo HuntName;
 
 	public:
@@ -65,7 +66,7 @@ namespace Log {
 		 * @param detection The detection to record. This should be an instance of 
 		 *		  FILE_DETECTION, REGISTRY_DETECTION, SERIVCE_DETECTION, or PROCESS_DETECTION.
 		 */
-		void AddDetection(DETECTION* detection);
+		void AddDetection(std::shared_ptr<DETECTION> detection);
 
 		/**
 		 * When the LogTerminator is supplied to the stream, the stream is terminated and forwarded to

@@ -16,7 +16,7 @@ namespace Log {
 	LogMessage& LogMessage::operator<<(PCWSTR pointer){
 		return operator<<(std::wstring(pointer));
 	}
-	LogMessage& LogMessage::operator<<(const LogTerminator& terminator){		
+	LogMessage& LogMessage::operator<<(const LogTerminator& terminator){
 		std::string message = InternalStream.str();
 
 		InternalStream = std::stringstream();

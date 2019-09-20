@@ -28,14 +28,14 @@ protected:
 
 public: 
 	/// These functions handle the beginning and end of hunts
-	void BeginHunt(const HuntInfo& info) const;
-	void EndHunt() const;
+	void BeginHunt(const HuntInfo& info);
+	void EndHunt();
 
 	/// These functions handle the identification of a detection by calling all of the associated handlers
-	void FileIdentified(FILE_DETECTION*) const;
-	void RegistryKeyIdentified(REGISTRY_DETECTION*) const;
-	void ProcessIdentified(PROCESS_DETECTION*) const;
-	void ServiceIdentified(SERVICE_DETECTION*) const;
+	void FileIdentified(std::shared_ptr<FILE_DETECTION>);
+	void RegistryKeyIdentified(std::shared_ptr<REGISTRY_DETECTION>);
+	void ProcessIdentified(std::shared_ptr<PROCESS_DETECTION>);
+	void ServiceIdentified(std::shared_ptr<SERVICE_DETECTION>);
 
 	/// These functions add handlers for beginning and ending hunts
 	void AddHuntBegin(HuntStart handler);
