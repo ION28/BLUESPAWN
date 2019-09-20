@@ -1,5 +1,4 @@
 #include "bluespawn/bluespawn.h"
-#include "common/stringutils.h"
 #include "logging/HuntLogMessage.h"
 
 #include <iostream>
@@ -9,13 +8,6 @@ int main(int argc, char* argv[])
 	Log::CLISink output{};
 	Log::AddSink(output);
 	Log::AddHuntSink(output);
-
-	std::string s1 = "ThIs Is A tEsT";
-	std::cout << s1 << std::endl;
-	std::cout << ToUpperCaseA(s1) << std::endl;
-	std::cout << ToLowerCaseA(s1) << std::endl;
-	std::cout << CompareIgnoreCaseA(ToUpperCaseA(s1), ToLowerCaseA(s1)) << std::endl;
-	std::wcout << StringToWidestring(s1) << std::endl;
 
 	print_banner();
 
