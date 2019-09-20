@@ -1,12 +1,15 @@
 #include "bluespawn/bluespawn.h"
 #include "logging/HuntLogMessage.h"
+#include "logging/DebugSink.h"
 
 #include <iostream>
 
 int main(int argc, char* argv[])
 {
-	Log::CLISink output{};
-	Log::AddHuntSink(output);
+	Log::DebugSink DebugOutput{};
+	Log::CLISink ConsoleOutput{};
+	Log::AddSink(DebugOutput);
+	Log::AddHuntSink(ConsoleOutput);
 
 	print_banner();
 
@@ -96,4 +99,3 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	Scope scope{};
 	Reaction reaction = Reactions::LogReaction();
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
-}
