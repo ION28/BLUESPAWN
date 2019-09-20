@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-Accounts",
+      "appliesTo": "BLUESPAWN-server/BLUESPAWN-server/protos/Accounts.proto",
+      "type": "launch"
+    }
+  ]
+}
