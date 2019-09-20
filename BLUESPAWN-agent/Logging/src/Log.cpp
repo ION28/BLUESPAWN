@@ -5,7 +5,7 @@ namespace Log {
 	std::vector<std::reference_wrapper<Log::LogSink>> _LogCurrentSinks; 
 	LogTerminator endlog{};
 
-	LogMessage& LogMessage::operator<<(const std::wstring message){
+	LogMessage& LogMessage::operator<<(const std::wstring& message){
 		LPCWSTR lpwMessage = message.c_str();
 		LPSTR lpMessage = new CHAR[message.length() + 1]{};
 		WideCharToMultiByte(CP_ACP, 0, lpwMessage, static_cast<int>(message.length()), lpMessage, static_cast<int>(message.length()), 0, nullptr);
@@ -16,7 +16,7 @@ namespace Log {
 	LogMessage& LogMessage::operator<<(PCWSTR pointer){
 		return operator<<(std::wstring(pointer));
 	}
-	LogMessage& LogMessage::operator<<(const LogTerminator& terminator){		
+	LogMessage& LogMessage::operator<<(const LogTerminator& terminator){
 		std::string message = InternalStream.str();
 
 		InternalStream = std::stringstream();
@@ -26,8 +26,8 @@ namespace Log {
 		return *this;
 	}
 
-	LogMessage::LogMessage(LogSink& Sink, LogLevel Level) : Level{ Level } {
-		Sinks.emplace_back(Sink);
+	LogMessage::LogMessage(const LogSink& Sink, LogLevel Level) : Level{ Level } {
+		Sinks.emplace_back(std::reference_wrapper<LogSink>(const_cast<LogSink&>(Sink)));
 	}
 	LogMessage::LogMessage(std::vector<std::reference_wrapper<LogSink>> Sinks, LogLevel Level) : LogMessage(Sinks, Level, std::stringstream{}) {}
 	LogMessage::LogMessage(std::vector<std::reference_wrapper<LogSink>> Sinks, LogLevel Level, std::stringstream Stream) : Level{ Level } {
@@ -36,18 +36,18 @@ namespace Log {
 		InternalStream << StreamContents;
 	}
 
-	bool AddSink(LogSink& sink){
+	bool AddSink(const LogSink& sink){
 		for(int idx = 0; idx < _LogCurrentSinks.size(); idx++){
 			if(_LogCurrentSinks[idx].get() == sink){
 				return false;
 			}
 		}
 
-		_LogCurrentSinks.emplace_back(sink);
+		_LogCurrentSinks.emplace_back(std::reference_wrapper<LogSink>(const_cast<LogSink&>(sink)));
 		return true;
 	}
 
-	bool RemoveSink(LogSink& sink){
+	bool RemoveSink(const LogSink& sink){
 		for(int idx = 0; idx < _LogCurrentSinks.size(); idx++){
 			if(_LogCurrentSinks[idx].get() == sink){
 				_LogCurrentSinks.erase(_LogCurrentSinks.begin() + idx);

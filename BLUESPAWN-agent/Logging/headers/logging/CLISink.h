@@ -35,7 +35,7 @@ namespace Log {
 			WHITE     = 0xF
 		};
 		std::string MessagePrepends[4] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]" };
-		MessageColor PrependColors[4] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, MessageColor::GREEN };
+		MessageColor PrependColors[5] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, MessageColor::GREEN, MessageColor::GOLD };
 
 		/**
 		 * Sets the color of text written to the console. The low order nibble is the color
@@ -56,7 +56,8 @@ namespace Log {
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
 		 */
-		virtual void LogMessage(LogLevel& level, std::string& message);
+		virtual void LogMessage(const LogLevel& level, const std::string& message, const HuntInfo& info = {}, 
+			                    const std::vector<std::shared_ptr<DETECTION>>& detections = {}) override;
 
 		/**
 		 * Compares this CLISink to another LogSink. Currently, as only one console is supported,
@@ -67,6 +68,6 @@ namespace Log {
 		 *
 		 * @return Whether or not the argument and this sink are considered equal.
 		 */
-		virtual bool operator==(LogSink& sink);
+		virtual bool operator==(const LogSink& sink) const;
 	};
 }

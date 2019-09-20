@@ -14,6 +14,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level1</WarningLevel>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;_ITERATOR_DEBUG_LEVEL=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

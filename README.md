@@ -1,6 +1,6 @@
 # BLUESPAWN
 
-![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN)
+[![Actions Status](https://github.com/ION28/BLUESPAWN/workflows/BLUESPAWN%20agent%20build/badge.svg)](https://github.com/ION28/BLUESPAWN/actions) ![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN)
 
 ## Our Mission
 BLUESPAWN helps blue teams monitor Windows systems in real-time against active attackers by detecting anomalous activity
@@ -39,7 +39,7 @@ Set-ItemProperty "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\" 
 ```powershell
 Set-ItemProperty "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\" "Shell" "explorer.exe" -Force
 ```
-![BLUESPAWN in Action](https://user-images.githubusercontent.com/3931697/64458506-86c88880-d0c3-11e9-9586-099928c30d7d.png)
+![BLUESPAWN in Action](https://user-images.githubusercontent.com/3931697/65073414-d11df500-d960-11e9-9516-7e310996d889.png)
 
 ## Lines of Effort
 BLUESPAWN consists of 5 major modules as listed below. Several of these modules have submodules (which may not be created in the codebase yet) as listed below and all are in varying stages of planning, research, and development.
