@@ -27,15 +27,15 @@ namespace Hunts {
 		std::regex jsp_indicators{};
 		std::smatch match_index{};
 
-		void SetRegexAggressivenessLevel(Aggressiveness::Aggressiveness aLevel);
+		void SetRegexAggressivenessLevel(Aggressiveness aLevel);
 
 	public:
 		HuntT1100(HuntRegister& record);
 
-		void AddDirectoryToSearch(std::string sFileName);
-		void AddFileExtensionToSearch(std::string sFileExtension);
+		void AddDirectoryToSearch(const std::string& sFileName);
+		void AddFileExtensionToSearch(const std::string& sFileExtension);
 
-		int ScanCursory(Scope& scope, Reaction* reaction = new Reactions::LogReaction());
-		int ScanModerate(Scope& scope, Reaction* reaction = new Reactions::LogReaction());
+		virtual int ScanCursory(const Scope& scope, Reaction reaction = Reactions::LogReaction());
+		virtual int ScanModerate(const Scope& scope, Reaction reaction = Reactions::LogReaction());
 	};
 }
