@@ -117,7 +117,7 @@ namespace Registry {
 	}
 
 	std::wstring RegistryKey::GetName(){
-		return vHives[hive] + L"\\" + path + (name.length() ? L":" + name : L"");
+		return name;
 	}
 
 	std::wstring RegistryKey::GetPath(){
@@ -207,7 +207,7 @@ namespace Registry {
 
 		LOG_VERBOSE(1, dwValueCount << " subkeys detected under " << vHives[hive] << "\\" << path);
 
-		std::vector<RegistryKey> vSubKeys{};
+		auto vSubKeys = std::vector<RegistryKey>();
 
 		if(status == ERROR_SUCCESS && dwValueCount) {
 			for(unsigned i = 0; i < dwValueCount; i++) {
@@ -216,12 +216,13 @@ namespace Registry {
 				status = RegEnumValueW(key, i, lpwName, &length, nullptr, nullptr, nullptr, nullptr);
 
 				if(status == ERROR_SUCCESS) {
-					vSubKeys.push_back({ hive, path, lpwName });
+					vSubKeys.push_back(RegistryKey{ hive, path, std::wstring{lpwName} });
 				} else {
 					LOG_WARNING("Error " << status << " when enumerating the next value!");
 				}
 			}
 		}
+
 		return vSubKeys;
 	}
 

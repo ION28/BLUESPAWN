@@ -1,0 +1,9 @@
+syntax = "proto3";
+package gpb;
+import "ReactionData.proto";
+
+message Empty {}
+
+service Server {
+	rpc SendHuntMessage (HuntMessage) returns (Empty) {}
+}

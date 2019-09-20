@@ -61,24 +61,28 @@
     <Import Project="..\..\Project Configurations\buildsettings.props" />
     <Import Project="..\..\Logging\Logging.props" />
     <Import Project="..\..\Hunt\Configuration\Configuration.props" />
+    <Import Project="..\..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Project Configurations\buildsettings.props" />
     <Import Project="..\..\Logging\Logging.props" />
     <Import Project="..\..\Hunt\Configuration\Configuration.props" />
+    <Import Project="..\..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Project Configurations\buildsettings.props" />
     <Import Project="..\..\Logging\Logging.props" />
     <Import Project="..\..\Hunt\Configuration\Configuration.props" />
+    <Import Project="..\..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Project Configurations\buildsettings.props" />
     <Import Project="..\..\Logging\Logging.props" />
     <Import Project="..\..\Hunt\Configuration\Configuration.props" />
+    <Import Project="..\..\Hunt\Hunts\Hunts.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -99,6 +103,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,6 +144,7 @@
     <ClCompile Include="src\Reaction.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\reactions\Detections.h" />
     <ClInclude Include="headers\reactions\Log.h" />
     <ClInclude Include="headers\reactions\Reaction.h" />
   </ItemGroup>
