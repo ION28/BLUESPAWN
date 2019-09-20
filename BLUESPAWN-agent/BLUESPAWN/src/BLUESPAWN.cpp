@@ -61,24 +61,20 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	std::string sHuntLevelFlag = "Moderate";
 	Aggressiveness aHuntLevel;
-	if (result.count("level")) {
+	if(result.count("level")) {
 		try {
 			sHuntLevelFlag = result["level"].as < std::string >();
-		}
-		catch (int e) {
+		} catch(int e) {
 			std::cerr << "Error " << e << " - Unknown hunt level. Please specify either Cursory, Moderate, Careful, or Aggressive" << std::endl;
 		}
 	}
-	if (sHuntLevelFlag == "Cursory") {
+	if(sHuntLevelFlag == "Cursory") {
 		aHuntLevel = Aggressiveness::Cursory;
-	}
-	else if (sHuntLevelFlag == "Moderate") {
+	} else if(sHuntLevelFlag == "Moderate") {
 		aHuntLevel = Aggressiveness::Moderate;
-	}
-	else if (sHuntLevelFlag == "Careful") {
+	} else if(sHuntLevelFlag == "Careful") {
 		aHuntLevel = Aggressiveness::Careful;
-	}
-	else {
+	} else {
 		aHuntLevel = Aggressiveness::Aggressive;
 	}
 
@@ -99,3 +95,4 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	Scope scope{};
 	Reaction reaction = Reactions::LogReaction();
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+}
