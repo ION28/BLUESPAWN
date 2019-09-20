@@ -1,32 +1,32 @@
 #include "reactions/Reaction.h"
 
-void Reaction::BeginHunt(const HuntInfo& info) const {
+void Reaction::BeginHunt(const HuntInfo& info){
 	for(auto BeginProc : vStartHuntProcs){
 		BeginProc(info);
 	}
 }
-void Reaction::EndHunt() const {
+void Reaction::EndHunt(){
 	for(auto EndProc : vEndHuntProcs){
 		EndProc();
 	}
 }
 
-void Reaction::FileIdentified(FILE_DETECTION* info) const {
+void Reaction::FileIdentified(std::shared_ptr<FILE_DETECTION> info){
 	for(auto reaction : vFileReactions){
 		reaction(info);
 	}
 }
-void Reaction::RegistryKeyIdentified(REGISTRY_DETECTION* info) const {
+void Reaction::RegistryKeyIdentified(std::shared_ptr<REGISTRY_DETECTION> info){
 	for(auto reaction : vRegistryReactions){
 		reaction(info);
 	}
 }
-void Reaction::ProcessIdentified(PROCESS_DETECTION* info) const {
+void Reaction::ProcessIdentified(std::shared_ptr<PROCESS_DETECTION> info){
 	for(auto reaction : vProcessReactions){
 		reaction(info);
 	}
 }
-void Reaction::ServiceIdentified(SERVICE_DETECTION* info) const {
+void Reaction::ServiceIdentified(std::shared_ptr<SERVICE_DETECTION> info){
 	for(auto reaction : vServiceReactions){
 		reaction(info);
 	}
