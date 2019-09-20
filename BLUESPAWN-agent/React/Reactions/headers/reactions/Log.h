@@ -12,14 +12,14 @@ namespace Reactions {
 		Log::HuntLogMessage _HuntLogMessage;
 		bool HuntBegun = false;
 
-		void BeginHunt(const HuntInfo& info);
-		void EndHunt();
+		void LogBeginHunt(const HuntInfo& info);
+		void LogEndHunt();
 
 		/// Handlers for detections that log the detection
-		void FileIdentified(FILE_DETECTION* detection);
-		void RegistryKeyIdentified(REGISTRY_DETECTION* detection);
-		void ProcessIdentified(PROCESS_DETECTION* detection);
-		void ServiceIdentified(SERVICE_DETECTION* detection);
+		void LogFileIdentified(std::shared_ptr<FILE_DETECTION> detection);
+		void LogRegistryKeyIdentified(std::shared_ptr<REGISTRY_DETECTION> detection);
+		void LogProcessIdentified(std::shared_ptr<PROCESS_DETECTION> detection);
+		void LogServiceIdentified(std::shared_ptr<SERVICE_DETECTION> detection);
 
 	public:
 		LogReaction();

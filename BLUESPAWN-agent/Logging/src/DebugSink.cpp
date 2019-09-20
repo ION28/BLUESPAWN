@@ -5,7 +5,8 @@
 #include "logging/DebugSink.h"
 
 namespace Log {
-	void DebugSink::LogMessage(const LogLevel& level, const std::string& message, const HuntInfo& info, const std::vector<DETECTION*>& detections){
+	void DebugSink::LogMessage(const LogLevel& level, const std::string& message, const HuntInfo& info, 
+		const std::vector<std::shared_ptr<DETECTION>>& detections){
 		if(level.Enabled()){
 			if(level.severity == Severity::LogHunt){
 				std::wstring aggressiveness = info.HuntAggressiveness == Aggressiveness::Aggressive ? L"Aggressive" :
@@ -14,17 +15,17 @@ namespace Log {
 				std::wstring sLogHeader = L"[" + info.HuntName + L": " + aggressiveness + L"] - ";
 				OutputDebugStringW((sLogHeader + std::to_wstring(detections.size()) + L" detection" + (detections.size() == 1 ? L"!" : L"s!")).c_str());
 				for(auto detection : detections){
-					if(detection->DetectionType == DetectionType::File){
-						auto* lpFileDetection = reinterpret_cast<FILE_DETECTION*>(detection);
+					if(detection->Type == DetectionType::File){
+						auto lpFileDetection = std::static_pointer_cast<FILE_DETECTION>(detection);
 						OutputDebugStringW((sLogHeader + L"\tPotentially malicious file detected - " + lpFileDetection->wsFileName).c_str());
-					} else if(detection->DetectionType == DetectionType::Process){
-						auto* lpProcessDetection = reinterpret_cast<PROCESS_DETECTION*>(detection);
+					} else if(detection->Type == DetectionType::Process){
+						auto lpProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);
 						OutputDebugStringW((sLogHeader + L"\tPotentially malicious process detected - " + lpProcessDetection->wsImageName + L" (PID is " + std::to_wstring(lpProcessDetection->PID) + L")").c_str());
-					} else if(detection->DetectionType == DetectionType::Service){
-						auto* lpServiceDetection = reinterpret_cast<SERVICE_DETECTION*>(detection);
+					} else if(detection->Type == DetectionType::Service){
+						auto lpServiceDetection = std::static_pointer_cast<SERVICE_DETECTION>(detection);
 						OutputDebugStringW((sLogHeader + L"\tPotentially malicious service detected - " + lpServiceDetection->wsServiceName + L" (PID is " + std::to_wstring(lpServiceDetection->ServicePID) + L")").c_str());
-					} else if(detection->DetectionType == DetectionType::Registry){
-						auto* lpRegistryDetection = reinterpret_cast<REGISTRY_DETECTION*>(detection);
+					} else if(detection->Type == DetectionType::Registry){
+						auto lpRegistryDetection = std::static_pointer_cast<REGISTRY_DETECTION>(detection);
 						OutputDebugStringW((sLogHeader + L"\tPotentially malicious registry key detected - " + lpRegistryDetection->wsRegistryKeyPath + (lpRegistryDetection->wsRegistryKeyValue.length() ? L": " : L"") + lpRegistryDetection->wsRegistryKeyValue).c_str());
 					} else {
 						OutputDebugStringW((sLogHeader + L"\tUnknown detection type!").c_str());

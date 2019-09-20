@@ -437,6 +437,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\grpc\include;$(ProjectDir)\grpc\generated;$(SolutionDir)\Hunt\Configuration\headers;%(AdditionalIncludeDirectories) (edited) </AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN32_WINNT=0x600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-DNOMINMAX %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
