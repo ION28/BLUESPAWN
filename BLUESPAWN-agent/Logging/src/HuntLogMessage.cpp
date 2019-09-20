@@ -8,13 +8,15 @@ namespace Log {
 
 	HuntLogMessage::HuntLogMessage(const HuntInfo& Hunt, std::vector<std::reference_wrapper<LogSink>> sinks) :
 		LogMessage(sinks, LogLevel::LogHunt),
-		HuntName{ Hunt }{}
+		HuntName{ Hunt },
+		Detections{}{}
 
 	HuntLogMessage::HuntLogMessage(const HuntInfo& Hunt, const LogSink& sink) :
 		LogMessage(sink, LogLevel::LogHunt),
-		HuntName{ Hunt }{}
+		HuntName{ Hunt },
+		Detections{}{}
 
-	void HuntLogMessage::AddDetection(DETECTION* detection){
+	void HuntLogMessage::AddDetection(std::shared_ptr<DETECTION> detection){
 		this->Detections.emplace_back(detection);
 	}
 
@@ -26,9 +28,7 @@ namespace Log {
 			Sinks[idx].get().LogMessage(Level, message, HuntName, Detections);
 		}
 
-		for(auto Detection : Detections){
-			delete Detection;
-		}
+		Detections = {};
 
 		return *this;
 	}
