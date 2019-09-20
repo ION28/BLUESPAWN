@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\common\StringUtils.h" />
     <ClInclude Include="headers\common\wrappers.hpp" />
     <ClInclude Include="headers\pe\Export_Section.h" />
     <ClInclude Include="headers\pe\Import_Section.h" />
@@ -34,6 +35,7 @@
     <ClCompile Include="src\PE_Section.cpp" />
     <ClCompile Include="src\Relocation_Section.cpp" />
     <ClCompile Include="src\Resource_Section.cpp" />
+    <ClCompile Include="src\StringUtils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -56,7 +58,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
