@@ -31,5 +31,5 @@ jobs:
 
     - uses: actions/upload-artifact@master
       with:
-        name: BLUESPAWN.exe
+        name: BLUESPAWN-agent
         path: BLUESPAWN-agent\artifacts\x64\${{ matrix.buildtype }}\BLUESPAWN.exe
