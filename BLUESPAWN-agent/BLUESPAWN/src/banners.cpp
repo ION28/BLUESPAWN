@@ -1,6 +1,7 @@
 #include "bluespawn/banners.h"
 
 #include <algorithm>
+#include <iostream>
 #include <time.h>
 
 #include "logging/Log.h"
@@ -18,5 +19,5 @@ void print_banner() {
 
 	srand(static_cast<unsigned int>(time(nullptr)));
 
-	LOG_INFO(banners.at(std::rand() % banners.size()));
+	std::cout << banners.at(std::rand() % banners.size()) << std::endl;
 }

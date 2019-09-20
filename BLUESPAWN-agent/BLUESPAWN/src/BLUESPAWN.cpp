@@ -1,5 +1,6 @@
 #include "bluespawn/bluespawn.h"
 #include "common/stringutils.h"
+#include "logging/HuntLogMessage.h"
 
 #include <iostream>
 
@@ -7,6 +8,7 @@ int main(int argc, char* argv[])
 {
 	Log::CLISink output{};
 	Log::AddSink(output);
+	Log::AddHuntSink(output);
 
 	std::string s1 = "ThIs Is A tEsT";
 	std::cout << s1 << std::endl;
@@ -52,25 +54,25 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 		help_category.begin(), [](unsigned char c) { return std::tolower(c); });
 
 	if (help_category.compare("hunt") == 0) {
-		LOG_INFO(options.help({ "hunt" }));
+		std::cout << (options.help({ "hunt" })) << std::endl;
 	}
 	else if (help_category.compare("general") == 0) {
-		LOG_INFO(options.help());
+		std::cout << (options.help()) << std::endl;
 	}
 	else {
-		LOG_ERROR("Unknown help category");
+		std::cerr << ("Unknown help category") << std::endl;
 	}
 }
 
 void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	std::string sHuntLevelFlag = "Moderate";
-	Aggressiveness::Aggressiveness aHuntLevel;
+	Aggressiveness aHuntLevel;
 	if (result.count("level")) {
 		try {
 			sHuntLevelFlag = result["level"].as < std::string >();
 		}
 		catch (int e) {
-			LOG_ERROR("Error " << e << " - Unknown hunt level. Please specify either Cursory, Moderate, Careful, or Aggressive");
+			std::cerr << "Error " << e << " - Unknown hunt level. Please specify either Cursory, Moderate, Careful, or Aggressive" << std::endl;
 		}
 	}
 	if (sHuntLevelFlag == "Cursory") {
@@ -101,6 +103,6 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
-	Reaction* reaction = new Reactions::LogReaction();
+	Reaction reaction = Reactions::LogReaction();
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
 }

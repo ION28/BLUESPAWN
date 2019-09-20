@@ -2,45 +2,49 @@
 #include "hunts/HuntRegister.h"
 #include "reactions/Reaction.h"
 
-Hunt::Hunt(HuntRegister& record){
+#include <iostream>
+
+Hunt::Hunt(HuntRegister& record, const std::wstring& name) : 
+	name{ name }{
 	record.RegisterHunt(this);
 
 	dwTacticsUsed = 0;
 	dwSourcesInvolved = 0;
-	dwStuffAffected = 0;
+	dwCategoriesAffected = 0;
 	dwSupportedScans = 0;
 }
 
-int Hunt::ScanCursory(Scope& scope, Reaction* reaction){
-	if(!(dwSupportedScans & Aggressiveness::Cursory)){
+int Hunt::ScanCursory(const Scope& scope, Reaction reaction){
+	std::wcout << L"Running hunt handler for " << name << std::endl;
+	if(!(dwSupportedScans & (DWORD) Aggressiveness::Cursory)){
 		return -1;
 	}
 	return 0;
 }
 
-int Hunt::ScanModerate(Scope& scope, Reaction* reaction){
-	if(!(dwSupportedScans & Aggressiveness::Moderate)){
+int Hunt::ScanModerate(const Scope& scope, Reaction reaction){
+	if(!(dwSupportedScans & (DWORD) Aggressiveness::Moderate)){
 		return -1;
 	}
 	return 0;
 }
 
-int Hunt::ScanCareful(Scope& scope, Reaction* reaction){
-	if(!(dwSupportedScans & Aggressiveness::Careful)){
+int Hunt::ScanCareful(const Scope& scope, Reaction reaction){
+	if(!(dwSupportedScans & (DWORD) Aggressiveness::Careful)){
 		return -1;
 	}
 	return 0;
 }
 
-int Hunt::ScanAggressive(Scope& scope, Reaction* reaction){
-	if(!(dwSupportedScans & Aggressiveness::Aggressive)){
+int Hunt::ScanAggressive(const Scope& scope, Reaction reaction){
+	if(!(dwSupportedScans & (DWORD) Aggressiveness::Aggressive)){
 		return -1;
 	}
 	return 0;
 }
 
-bool Hunt::AffectsStuff(DWORD dwStuff){
-	return (dwStuff && dwStuffAffected) == dwStuff;
+bool Hunt::AffectsCategory(DWORD dwStuff){
+	return (dwStuff && dwCategoriesAffected) == dwStuff;
 }
 
 bool Hunt::UsesTactics(DWORD dwTactics){
@@ -51,6 +55,6 @@ bool Hunt::UsesSources(DWORD dwSources){
 	return (dwSources && dwSourcesInvolved) == dwSources;
 }
 
-bool Hunt::SupportsScan(Aggressiveness::Aggressiveness aggressiveness){
-	return (aggressiveness && dwSupportedScans) == aggressiveness;
+bool Hunt::SupportsScan(Aggressiveness aggressiveness){
+	return ((DWORD) aggressiveness & dwSupportedScans) == (DWORD) aggressiveness;
 }
