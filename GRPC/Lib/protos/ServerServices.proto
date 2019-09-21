@@ -4,6 +4,18 @@ import "protos/ReactionData.proto";
 
 message Empty {}
 
-service Server {
+message HandshakeRequest
+{
+	string contents = 1;
+}
+
+message HandshakeResponse
+{
+	string contents = 1;
+}
+
+service BLUESPAWN {
 	rpc SendHuntMessage (HuntMessage) returns (Empty) {}
+
+	rpc Handshake (HandshakeRequest) returns (HandshakeResponse) {}
 }

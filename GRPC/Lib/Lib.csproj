@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="$(Relativepath)protos\route_guide.proto" Link="protos\route_guide.proto" />
     <Protobuf Include="$(Relativepath)protos\ReactionData.proto" Link="protos\ReactionData.proto" />
     <Protobuf Include="$(Relativepath)protos\ServerServices.proto" Link="protos\ServerServices.proto" />
   </ItemGroup>

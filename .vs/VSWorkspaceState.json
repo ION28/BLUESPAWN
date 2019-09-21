@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\GRPC"
   ],
-  "SelectedNode": "\\BLUESPAWN-grpc",
+  "SelectedNode": "\\GRPC\\Lib",
   "PreviewInSolutionExplorer": false
 }

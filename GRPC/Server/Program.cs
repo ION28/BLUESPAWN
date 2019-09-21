@@ -12,31 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Grpc.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Grpc.Core;
 
-namespace Routeguide
+namespace Gpb
 {
+    class BLUESPAWNImpl : BLUESPAWN.BLUESPAWNBase
+    {
+        public override Task<Empty> SendHuntMessage(HuntMessage request, ServerCallContext context)
+        {
+            return base.SendHuntMessage(request, context);
+        }
+
+        public override Task<HandshakeResponse> Handshake(HandshakeRequest request, ServerCallContext context)
+        {
+            if (request.Contents.Length > 0)
+            {
+                Console.WriteLine("Recieved: " + request.Contents + " from " + context.Peer);
+                return Task.FromResult(new HandshakeResponse { Contents = "Recieved: " + request.Contents });
+            }
+            else
+                return Task.FromResult(new HandshakeResponse { Contents = "Ending Session" });
+        }
+    }
+
     class Program
     {
-        static void Main(string[] args)
+        const int Port = 50051;
+
+        public static void Main(string[] args)
         {
-            const int Port = 50052;
-
-            var features = RouteGuideUtil.ParseFeatures(RouteGuideUtil.DefaultFeaturesFile);
-
             Server server = new Server
             {
-                Services = { RouteGuide.BindService(new RouteGuideImpl(features)) },
+                Services = { BLUESPAWN.BindService(new BLUESPAWNImpl()) },
                 Ports = { new ServerPort("localhost", Port, ServerCredentials.Insecure) }
             };
             server.Start();
 
-            Console.WriteLine("RouteGuide server listening on port " + Port);
+            Console.WriteLine("Greeter server listening on port " + Port);
             Console.WriteLine("Press any key to stop the server...");
             Console.ReadKey();
 
