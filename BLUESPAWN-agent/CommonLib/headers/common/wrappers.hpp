@@ -84,7 +84,7 @@ public:
 	MemoryWrapper(LPVOID lpMemoryBase, SIZE_T size = sizeof(T), HANDLE process = GetCurrentProcess()) 
 		: address{ reinterpret_cast<T*>(lpMemoryBase) }, process{ process }, MemorySize{ size } {}
 
-	T Dereferene(){
+	T Dereference() const {
 		if(!process){
 			return *address;
 		} else {
@@ -94,16 +94,16 @@ public:
 		}
 	}
 
-	T operator *(){
-		return Dereferene();
+	T operator *() const {
+		return Dereference();
 	}
-	T** operator &(){
+	T** operator &() const {
 		return &(address);
 	}
-	operator T* (){
+	operator T* () const {
 		return (address);
 	}
-	T* operator->(){
+	T* operator->() const {
 		if(!process){
 			return address;
 		} else {
@@ -117,11 +117,11 @@ public:
 	}
 
 	template<class V>
-	MemoryWrapper<V> Convert(){
+	MemoryWrapper<V> Convert() const {
 		return { reinterpret_cast<V*>(address), MemorySize, process };
 	}
 
-	MemoryWrapper<T> GetOffset(SIZE_T offset){
+	MemoryWrapper<T> GetOffset(SIZE_T offset) const {
 		if(offset > MemorySize){
 			return { nullptr, 0, process };
 		} else {
@@ -146,9 +146,9 @@ public:
 		}
 	}
 
-	bool CompareMemory(MemoryWrapper<T> memory){
-		auto data1 = Dereferene();
-		auto data2 = memory.Dereferene();
+	bool CompareMemory(MemoryWrapper<T> memory) const {
+		auto data1 = Dereference();
+		auto data2 = memory.Dereference();
 		return !memcmp(&data1, &data2, min(memory.MemorySize, MemorySize));
 	}
 
@@ -162,8 +162,8 @@ public:
 		}
 	}
 
-	operator bool(){ return address; }
-	bool operator !(){ return !address; }
+	operator bool() const { return address; }
+	bool operator !() const { return !address; }
 };
 
 template<class T>
