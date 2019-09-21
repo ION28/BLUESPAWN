@@ -6,7 +6,7 @@
 template<class T>
 class GenericWrapper {
 protected:
-	static inline map<T, DWORD> mReferenceCounts{};
+	static inline std::map<T, DWORD> mReferenceCounts{};
 
 	T WrappedObject;
 	T BadValue;
@@ -38,22 +38,18 @@ public:
 		: WrappedObject{ object }, freeResource{ freeFunction }, BadValue{ BadValue } { SetReference(object); }
 
 	GenericWrapper(const GenericWrapper& copy)
-		: freeResource{ copy.freeResource } { SetReference(copy); }
+		: freeResource{ copy.freeResource } { SetReference(copy.WrappedObject); }
 
 	GenericWrapper(GenericWrapper&& move)
-		: freeResource{ move.freeResource } { SetRefernce(move); move.DestroyReference(); }
+		: freeResource{ move.freeResource } { SetRefernce(move.WrappedObject); move.DestroyReference(); }
 
 	GenericWrapper& operator=(const GenericWrapper& copy){ 
 		freeResource = copy.freeResource; 
 		DestroyReference(); 
-		SetReference(copy); 
+		SetReference(copy.WrappedObject); 
+		return *this;
 	}
-	GenericWrapper&& operator=(GenericWrapper&& move){ 
-		freeResource = move.freeResource;
-		DestroyReference(); 
-		SetReference(copy);  
-		move.DestroyReference(); 
-	}
+	GenericWrapper&& operator=(GenericWrapper&& move) = delete;
 
 	~GenericWrapper(){ DestroyReference(); }
 
@@ -76,7 +72,7 @@ public:
 		GenericWrapper(handle, (void(*)(HANDLE)) CloseHandle, INVALID_HANDLE_VALUE){};
 };
 
-template<class T = VOID>
+template<class T = CHAR>
 class MemoryWrapper {
 	T LocalCopy{};
 
@@ -88,7 +84,7 @@ public:
 	MemoryWrapper(LPVOID lpMemoryBase, SIZE_T size = sizeof(T), HANDLE process = GetCurrentProcess()) 
 		: address{ reinterpret_cast<T*>(lpMemoryBase) }, process{ process }, MemorySize{ size } {}
 
-	T operator *(){
+	T Dereferene(){
 		if(!process){
 			return *address;
 		} else {
@@ -96,6 +92,10 @@ public:
 			ReadProcessMemory(process, address, &LocalCopy, MemorySize, nullptr);
 			return LocalCopy;
 		}
+	}
+
+	T operator *(){
+		return Dereferene();
 	}
 	T** operator &(){
 		return &(address);
@@ -147,7 +147,19 @@ public:
 	}
 
 	bool CompareMemory(MemoryWrapper<T> memory){
-		return !memcmp(&(this->operator T*()), memory, min(memory.MemorySize, MemorySize));
+		auto data1 = Dereferene();
+		auto data2 = memory.Dereferene();
+		return !memcmp(&data1, &data2, min(memory.MemorySize, MemorySize));
+	}
+
+	bool Protect(DWORD protections, SIZE_T size = -1){
+		if(size == -1) size = MemorySize;
+		DWORD dwOldProtections{};
+		if(!process){
+			return VirtualProtect(address, size, protections, &dwOldProtections);
+		} else {
+			return VirtualProtectEx(process, address, size, protections, &dwOldProtections);
+		}
 	}
 
 	operator bool(){ return address; }

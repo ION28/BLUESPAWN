@@ -5,14 +5,17 @@
 #include <vector>
 
 #include "PE_Section.h"
+#include "common/wrappers.hpp"
 
-class Relocation_Section : public PE_Section {
-public:
-	std::vector<Relocation_Block> vRelocationBlocks;
+struct Relocation_Block;
 
-	Relocation_Section(const PE_Section& section);
+struct Relocation_Entry {
+	WORD type : 3;
+	WORD offset : 9;
 
-	std::vector<DWORD> GetRelocRVAs();
+	Relocation_Block& block;
+
+	DWORD GetRVA();
 };
 
 struct Relocation_Block {
@@ -26,11 +29,11 @@ struct Relocation_Block {
 	std::vector<DWORD> GetRelocRVAs();
 };
 
-struct Relocation_Entry {
-	WORD type : 3;
-	WORD offset : 9;
+class Relocation_Section : public PE_Section {
+public:
+	std::vector<Relocation_Block> vRelocationBlocks;
 
-	Relocation_Block block;
+	Relocation_Section(const PE_Section& section);
 
-	DWORD GetRVA();
+	std::vector<DWORD> GetRelocRVAs();
 };
