@@ -50,7 +50,7 @@ namespace Gpb
             };
             server.Start();
 
-            Console.WriteLine("Greeter server listening on port " + Port);
+            Console.WriteLine("BLUESPAWN server listening on port " + Port);
             Console.WriteLine("Press any key to stop the server...");
             Console.ReadKey();
 
