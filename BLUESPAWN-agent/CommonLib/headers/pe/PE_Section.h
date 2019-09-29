@@ -6,15 +6,19 @@
 
 #include "Common/Wrappers.hpp"
 
+class PE_Image;
 class PE_Section {
 public:
 	MemoryWrapper<> SectionContent;
+	const PE_Image& AssociatedImage;
 
 	IMAGE_SECTION_HEADER SectionHeader;
 
 	std::wstring Signature;
 
-	PE_Section(PIMAGE_SECTION_HEADER SectionHeader = nullptr, MemoryWrapper<> lpImageBase = { nullptr }, bool expanded = false);
+	bool expanded;
+
+	PE_Section(const PE_Image& image, PIMAGE_SECTION_HEADER SectionHeader = nullptr, MemoryWrapper<> lpImageBase = { nullptr }, bool expanded = false);
 	PE_Section(const PE_Section& copy);
 
 	bool ContainsRVA(DWORD rva);
