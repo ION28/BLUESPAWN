@@ -7,14 +7,20 @@
 struct PE_Export {
 	DWORD rva;
 	WORD ordinal;
-	std::wstring name;
+	std::string name;
+	std::string redirect;
+
+	PE_Export(DWORD rva, WORD ordinal, std::string name);
 };
 
 class Export_Section : public PE_Section {
 public:
 	std::vector<PE_Export> exports;
-	IMAGE_EXPORT_DIRECTORY export_directory;
+	IMAGE_EXPORT_DIRECTORY ExportDirectory;
 
 	Export_Section(const PE_Section& section);
+
+	LPVOID GetExportAddress(std::string name);
+	LPVOID GetExportAddress(WORD ordinal);
 };
 

@@ -1,11 +1,14 @@
 #include "pe/PE_Section.h"
+#include "pe/PE_Image.h"
 
 #include <Windows.h>
 
 #include <string>
 
-PE_Section::PE_Section(PIMAGE_SECTION_HEADER SectionHeader, MemoryWrapper<> lpImageBase, bool expanded)
-	: SectionContent{ lpImageBase.GetOffset(expanded ? SectionHeader->VirtualAddress : SectionHeader->PointerToRawData) }{
+PE_Section::PE_Section(const PE_Image& image, PIMAGE_SECTION_HEADER SectionHeader, MemoryWrapper<> lpImageBase, bool expanded) : 
+	AssociatedImage{ image },
+	expanded{ expanded },
+	SectionContent{ lpImageBase.GetOffset(expanded ? SectionHeader->VirtualAddress : SectionHeader->PointerToRawData) }{
 	this->SectionHeader = *SectionHeader;
 
 	WCHAR signature[9]{};
@@ -19,7 +22,8 @@ PE_Section::PE_Section(PIMAGE_SECTION_HEADER SectionHeader, MemoryWrapper<> lpIm
 PE_Section::PE_Section(const PE_Section& copy) :
 	SectionHeader{ copy.SectionHeader },
 	SectionContent{ copy.SectionContent },
-	Signature{ copy.Signature }{}
+	Signature{ copy.Signature },
+	AssociatedImage{ copy.AssociatedImage }{}
 
 bool PE_Section::ContainsOffset(DWORD offset){
 	return offset >= SectionHeader.PointerToRawData && offset < SectionHeader.PointerToRawData + SectionHeader.SizeOfRawData;
