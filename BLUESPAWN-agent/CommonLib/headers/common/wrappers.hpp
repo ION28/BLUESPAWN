@@ -2,6 +2,7 @@
 #include <Windows.h>
 
 #include <map>
+#include <string>
 
 template<class T>
 class GenericWrapper {
@@ -53,14 +54,14 @@ public:
 
 	~GenericWrapper(){ DestroyReference(); }
 
-	operator T(){ return WrappedObject; }
+	operator T() const { return WrappedObject; }
 	T* operator *(){ return *WrappedObject; }
 	T& operator &(){ return &WrappedObject; }
 	bool operator ==(T object){ return WrappedObject == object; }
 	bool operator !(){ return !WrappedObject || WrappedObject == BadValue; }
 	operator bool(){ return !operator!(); }
 
-	T Get(){ return WrappedObject; }
+	T Get() const { return WrappedObject; }
 	bool Release(){ return bFreeOnDestruction != (bFreeOnDestruction = false); }
 	bool Lock(){ return bFreeOnDestruction != (bFreeOnDestruction = true);  }
 	DWORD GetReferenceCount(){ return mReferenceCounts[WrappedObject]; }
@@ -88,9 +89,9 @@ public:
 		if(!process){
 			return *address;
 		} else {
-			LocalCopy = {};
-			ReadProcessMemory(process, address, &LocalCopy, MemorySize, nullptr);
-			return LocalCopy;
+			T mem = {};
+			ReadProcessMemory(process, address, &mem, MemorySize, nullptr);
+			return mem;
 		}
 	}
 
@@ -103,7 +104,7 @@ public:
 	operator T* () const {
 		return (address);
 	}
-	T* operator->() const {
+	T* operator->(){
 		if(!process){
 			return address;
 		} else {
@@ -164,7 +165,7 @@ public:
 
 	std::string ReadString(){
 		if(!process){
-			return std::string{ address };
+			return std::string{ reinterpret_cast<char*>(address) };
 		} else {
 			int idx = 0;
 			int maxIdx = 10;
@@ -188,7 +189,7 @@ public:
 
 	std::string ReadWstring(){
 		if(!process){
-			return std::wstring{ address };
+			return std::wstring{ reinterpret_cast<WCHAR*>(address) };
 		} else {
 			int idx = 0;
 			int maxIdx = 10;

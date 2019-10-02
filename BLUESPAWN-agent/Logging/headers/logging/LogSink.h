@@ -4,8 +4,8 @@
 #include <vector>
 #include <memory>
 
-#include "reactions/Reaction.h"
-#include "hunts/Hunt.h"
+#include "reactions/Detections.h"
+#include "hunts/HuntInfo.h"
 
 #include "LogLevel.h"
 

@@ -17,8 +17,8 @@ DWORD Relocation_Entry::GetRVA(){
 }
 
 Relocation_Block::Relocation_Block(DWORD offset, DWORD size, MemoryWrapper<RelocEntry> memory){
-	for(int i = 0; i < size; i += sizeof(RelocEntry)){
-		entries.emplace_back(memory.GetOffset(i), *this);
+	for(unsigned int i = 0; i < size; i += sizeof(RelocEntry)){
+		entries.emplace_back(memory.GetOffset(i).Dereference(), *this);
 	}
 }
 
@@ -43,7 +43,7 @@ Relocation_Section::Relocation_Section(const PE_Section& section) : PE_Section(s
 std::vector<DWORD> Relocation_Section::GetRelocRVAs(){
 	std::vector<DWORD> RVAs = {};
 	for(auto block : vRelocationBlocks){
-		for(auto entry : block.GetRelocRVAs){
+		for(auto entry : block.GetRelocRVAs()){
 			RVAs.emplace_back(entry);
 		}
 	}

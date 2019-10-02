@@ -47,8 +47,8 @@ Export_Section::Export_Section(const PE_Section& section) :
 			std::wstring wsProcessedDllName{};
 			wsProcessedDllName.resize(MAX_PATH);
 
-			UNICODE_STRING usPreprocessed = { dllName.length() * 2, MAX_PATH * 2, &dllName[0] };
-			UNICODE_STRING usProcessed = { wsProcessedDllName.length() * 2, MAX_PATH * 2, &wsProcessedDllName[0] };
+			UNICODE_STRING usPreprocessed = { static_cast<USHORT>(dllName.length() * 2), static_cast<USHORT>(MAX_PATH * 2), &dllName[0] };
+			UNICODE_STRING usProcessed = { static_cast<USHORT>(wsProcessedDllName.length() * 2), static_cast<USHORT>(MAX_PATH * 2), &wsProcessedDllName[0] };
 			ULONG_PTR zero = 0;
 
 			NTSTATUS status = Linker::LdrpPreprocessDllName(&usPreprocessed, &usProcessed, &zero, &zero);

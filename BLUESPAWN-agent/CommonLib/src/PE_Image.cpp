@@ -45,10 +45,10 @@ PE_Image::PE_Image(LPVOID lpBaseAddress, HANDLE hProcess, bool expanded) :
 	do sections.emplace(PCHAR(SectionHeaders->Name), PE_Section{ *this, SectionHeaders, MemoryWrapper<>{ lpBaseAddress, 0xFFFFFFFF, hProcess}, expanded });
 	while(SectionHeaders = SectionHeaders.GetOffset(sizeof(IMAGE_SECTION_HEADER)));
 
-	this->resources = new Resource_Section(!sections.count(".rsrc") ? PE_Section{nullptr, nullptr, false} : sections[".rsrc"]);
-	this->relocations = new Relocation_Section(!sections.count(".reloc") ? PE_Section{ nullptr, nullptr, false } : sections[".reloc"]);
-	this->imports = new Import_Section(!sections.count(".idata") ? PE_Section{ nullptr, nullptr, false } : sections[".idata"]);
-	this->exports = new Export_Section(!sections.count(".edata") ? PE_Section{ nullptr, nullptr, false } : sections[".edata"]);
+	this->resources = new Resource_Section(!sections.count(".rsrc") ? PE_Section{nullptr, nullptr, false} : sections.at(".rsrc"));
+	this->relocations = new Relocation_Section(!sections.count(".reloc") ? PE_Section{ nullptr, nullptr, false } : sections.at(".reloc"));
+	this->imports = new Import_Section(!sections.count(".idata") ? PE_Section{ nullptr, nullptr, false } : sections.at(".idata"));
+	this->exports = new Export_Section(!sections.count(".edata") ? PE_Section{ nullptr, nullptr, false } : sections.at(".edata"));
 
 	for(auto entry : sections){
 		IMAGE_SECTION_HEADER header = entry.second;
