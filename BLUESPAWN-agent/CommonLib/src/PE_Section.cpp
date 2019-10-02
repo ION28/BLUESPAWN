@@ -25,26 +25,26 @@ PE_Section::PE_Section(const PE_Section& copy) :
 	Signature{ copy.Signature },
 	AssociatedImage{ copy.AssociatedImage }{}
 
-bool PE_Section::ContainsOffset(DWORD offset){
+bool PE_Section::ContainsOffset(DWORD offset) const {
 	return offset >= SectionHeader.PointerToRawData && offset < SectionHeader.PointerToRawData + SectionHeader.SizeOfRawData;
 }
 
-bool PE_Section::ContainsRVA(DWORD rva){
+bool PE_Section::ContainsRVA(DWORD rva) const {
 	return rva >= SectionHeader.VirtualAddress && rva < SectionHeader.VirtualAddress + SectionHeader.SizeOfRawData;
 }
 
-DWORD PE_Section::ConvertOffsetToRVA(DWORD offset){
+DWORD PE_Section::ConvertOffsetToRVA(DWORD offset) const {
 	return ContainsOffset(offset) ? offset - SectionHeader.PointerToRawData + SectionHeader.VirtualAddress : 0;
 }
 
-DWORD PE_Section::ConvertRVAToOffset(DWORD offset){
+DWORD PE_Section::ConvertRVAToOffset(DWORD offset) const {
 	return ContainsRVA(offset) ? offset - SectionHeader.VirtualAddress + SectionHeader.SizeOfRawData : 0;
 }
 
-std::wstring PE_Section::GetSignature(){
+std::wstring PE_Section::GetSignature() const {
 	return Signature;
 }
 
-PE_Section::operator IMAGE_SECTION_HEADER(){
+PE_Section::operator IMAGE_SECTION_HEADER() const {
 	return SectionHeader;
 }
