@@ -35,10 +35,10 @@ Export_Section::Export_Section(const PE_Section& section) :
 		auto name = AssociatedImage.base.GetOffset(*lpNameAddresses.GetOffset(i * sizeof(DWORD))).ReadString();
 		auto address = *lpFunctionAddresses.GetOffset(i * sizeof(DWORD));
 
-		if(name.find(".") == std::string::npos){
+		if(!AssociatedImage.sections.at(".text").ContainsRVA(address)){
 			exports.emplace_back(PE_Export{ address, *lpOrdinalAddresses.GetOffset(i * sizeof(WORD)), name });
 		} else {
-			std::string redirection{};
+			std::string redirection = lpNameAddresses.GetOffset(address - ExportDirectory.AddressOfNames).ReadString();
 
 			size_t idx = redirection.find(".");
 			std::wstring dllName = StringToWidestring(redirection.substr(0, idx));
