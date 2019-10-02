@@ -162,6 +162,54 @@ public:
 		}
 	}
 
+	std::string ReadString(){
+		if(!process){
+			return std::string{ address };
+		} else {
+			int idx = 0;
+			int maxIdx = 10;
+			char* memory = nullptr;
+			bool valid = false;
+			while(!valid && !ReadProcessMemory(process, address, memory, maxIdx *= 2, nullptr)){
+				for(; idx < maxIdx; idx++){
+					if(memory[idx] == 0){
+						valid = true;
+						break;
+					}
+				}
+			}
+			if(valid){
+				return std::string{ memory };
+			} else {
+				return std::string{};
+			}
+		}
+	}
+
+	std::string ReadWstring(){
+		if(!process){
+			return std::wstring{ address };
+		} else {
+			int idx = 0;
+			int maxIdx = 10;
+			wchar_t* memory = nullptr;
+			bool valid = false;
+			while(!valid && !ReadProcessMemory(process, address, memory, (maxIdx *= 2) * sizeof(wchar_t), nullptr)){
+				for(; idx < maxIdx; idx++){
+					if(memory[idx] == 0){
+						valid = true;
+						break;
+					}
+				}
+			}
+			if(valid){
+				return std::string{ memory };
+			} else {
+				return std::string{};
+			}
+		}
+	}
+
 	operator bool() const { return address; }
 	bool operator !() const { return !address; }
 };
