@@ -1,11 +1,14 @@
 #include "bluespawn/bluespawn.h"
 #include "logging/HuntLogMessage.h"
 #include "logging/DebugSink.h"
+#include "common/DynamicLinker.h"
 
 #include <iostream>
 
 int main(int argc, char* argv[])
 {
+	Linker::LinkFunctions();
+
 	Log::DebugSink DebugOutput{};
 	Log::CLISink ConsoleOutput{};
 	Log::AddSink(DebugOutput);

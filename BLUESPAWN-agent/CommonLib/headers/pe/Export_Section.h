@@ -8,9 +8,10 @@ struct PE_Export {
 	DWORD rva;
 	WORD ordinal;
 	std::string name;
-	std::string redirect;
+	std::wstring redirect;
 
 	PE_Export(DWORD rva, WORD ordinal, std::string name);
+	PE_Export(WORD ordinal, std::string name, std::wstring redirect);
 };
 
 class Export_Section : public PE_Section {
