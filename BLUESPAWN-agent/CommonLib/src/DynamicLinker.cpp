@@ -18,7 +18,7 @@ namespace Linker {
 
 	LINK_FUNCTION(LdrpPreprocessDllName, NTDLL.dll);
 
-	bool LoadFunctions(){
+	bool LinkFunctions(){
 		for(auto func : LoadCalls){
 			if(!func()){
 				return false;
