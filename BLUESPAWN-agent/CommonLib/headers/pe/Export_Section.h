@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 
+#include "common/DynamicLinker.h"
+
+DEFINE_FUNCTION(NTSTATUS, LdrpPreprocessDllName, NTAPI, __in PUNICODE_STRING input, __out PUNICODE_STRING output, PULONG_PTR zero1, PULONG_PTR zero2);
+
 struct PE_Export {
 	DWORD rva;
 	WORD ordinal;
