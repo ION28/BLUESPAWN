@@ -23,7 +23,8 @@ PE_Section::PE_Section(const PE_Section& copy) :
 	SectionHeader{ copy.SectionHeader },
 	SectionContent{ copy.SectionContent },
 	Signature{ copy.Signature },
-	AssociatedImage{ copy.AssociatedImage }{}
+	AssociatedImage{ copy.AssociatedImage },
+	expanded{ copy.expanded }{}
 
 bool PE_Section::ContainsOffset(DWORD offset) const {
 	return offset >= SectionHeader.PointerToRawData && offset < SectionHeader.PointerToRawData + SectionHeader.SizeOfRawData;

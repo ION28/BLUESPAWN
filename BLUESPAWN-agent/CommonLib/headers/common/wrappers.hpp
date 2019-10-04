@@ -187,7 +187,7 @@ public:
 		}
 	}
 
-	std::string ReadWstring(){
+	std::wstring ReadWstring(){
 		if(!process){
 			return std::wstring{ reinterpret_cast<WCHAR*>(address) };
 		} else {
@@ -204,9 +204,9 @@ public:
 				}
 			}
 			if(valid){
-				return std::string{ memory };
+				return std::wstring{ memory };
 			} else {
-				return std::string{};
+				return std::wstring{};
 			}
 		}
 	}

@@ -10,6 +10,9 @@
 
 #include <vector>
 #include <string>
+#include <functional>
+
+LINK_FUNCTION(LdrpPreprocessDllName, NTDLL.dll);
 
 PE_Export::PE_Export(DWORD rva, WORD ordinal, std::string name) : 
 	rva{ rva }, ordinal{ ordinal }, name{ name }, redirect{} {}
