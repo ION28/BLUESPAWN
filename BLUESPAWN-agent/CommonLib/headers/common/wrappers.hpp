@@ -169,9 +169,11 @@ public:
 		} else {
 			int idx = 0;
 			int maxIdx = 10;
-			char* memory = nullptr;
+			char* memory = new char[maxIdx];
 			bool valid = false;
 			while(!valid && !ReadProcessMemory(process, address, memory, maxIdx *= 2, nullptr)){
+				delete[] memory;
+				memory = new char[maxIdx];
 				for(; idx < maxIdx; idx++){
 					if(memory[idx] == 0){
 						valid = true;
@@ -193,7 +195,7 @@ public:
 		} else {
 			int idx = 0;
 			int maxIdx = 10;
-			wchar_t* memory = nullptr;
+			wchar_t* memory = new wchar_t[maxIdx];
 			bool valid = false;
 			while(!valid && !ReadProcessMemory(process, address, memory, (maxIdx *= 2) * sizeof(wchar_t), nullptr)){
 				for(; idx < maxIdx; idx++){

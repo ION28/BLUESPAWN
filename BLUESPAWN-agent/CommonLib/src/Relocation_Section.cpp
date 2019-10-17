@@ -29,6 +29,7 @@ std::vector<DWORD> Relocation_Block::GetRelocRVAs(){
 			RVAs.emplace_back(entry.GetRVA());
 		}
 	}
+	return RVAs;
 }
 
 Relocation_Section::Relocation_Section(const PE_Section& section) : PE_Section(section) {

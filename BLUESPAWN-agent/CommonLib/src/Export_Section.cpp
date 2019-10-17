@@ -1,5 +1,6 @@
 #include "pe/Export_Section.h"
 #include "pe/PE_Image.h"
+#include "pe/Image_Loader.h"
 
 #include "common/DynamicLinker.h"
 #include "common/StringUtils.h"
@@ -67,15 +68,10 @@ Export_Section::Export_Section(const PE_Section& section) :
 LPVOID Export_Section::GetExportAddress(std::string name){
 	for(auto dllExport : exports){
 		if(dllExport.name == name){
-			if(dllExport.rva){
-				return AssociatedImage.base.GetOffset(AssociatedImage.RVAToOffset(dllExport.rva));
-			} else {
-				LOG_WARNING("Exporting function from separate DLL! Functionality is not yet implemented!");
-
-				return nullptr;
-			}
+			return GetExportAddress(dllExport.ordinal);
 		}
 	}
+	return nullptr;
 }
 
 LPVOID Export_Section::GetExportAddress(WORD ordinal){
@@ -84,10 +80,31 @@ LPVOID Export_Section::GetExportAddress(WORD ordinal){
 			if(dllExport.rva){
 				return AssociatedImage.base.GetOffset(AssociatedImage.RVAToOffset(dllExport.rva));
 			} else {
-				LOG_WARNING("Exporting function from separate DLL! Functionality is not yet implemented!");
+				auto Process = AssociatedImage.base.process;
+				auto Loader = Image_Loader(Process);
+				if(!Loader.ContainsImage(StringToWidestring(dllExport.name))){
 
-				return nullptr;
+					// Assume the image is in System32
+					auto ImagePath = "%SystemRoot%\\System32\\" + dllExport.name;
+
+					HandleWrapper file = CreateFileA(ImagePath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
+					if(!file){
+						return nullptr;
+					}
+	
+					auto FileSize = GetFileSize(file, nullptr);
+					const MemoryAllocationWrapper<CHAR>& contents = { new CHAR[FileSize], FileSize };
+
+					PE_Image image = PE_Image(dynamic_cast<const MemoryWrapper<CHAR>&>(contents), Process, false);
+					image.LoadTo({ VirtualAllocEx(Process, nullptr, image.dwExpandSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE),
+						image.dwExpandSize, Process }, true);
+				}
+
+				auto ImageInfo = Loader.GetImageInfo(StringToWidestring(dllExport.name));
+				auto Image = ImageInfo.GetImage();
+				return Image.exports->GetExportAddress(ordinal);
 			}
 		}
 	}
+	return nullptr;
 }
