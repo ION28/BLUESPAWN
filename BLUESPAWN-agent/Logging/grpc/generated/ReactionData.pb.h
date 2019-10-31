@@ -87,8 +87,9 @@ template<> ::gpb::RegistryReactionData* Arena::CreateMaybeMessage<::gpb::Registr
 template<> ::gpb::ServiceReactionData* Arena::CreateMaybeMessage<::gpb::ServiceReactionData>(Arena*);
 }  // namespace protobuf
 }  // namespace google
+#undef min
+#undef max
 namespace gpb {
-
 enum RegistryReactionData_RegType {
   RegistryReactionData_RegType_SZ = 0,
   RegistryReactionData_RegType_MULTI_SZ = 1,
