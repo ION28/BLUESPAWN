@@ -17,7 +17,7 @@ Loaded_Image::Loaded_Image(const LDR_ENTRY& entry, const HandleWrapper& process,
 Image_Loader::Image_Loader(const HandleWrapper& process, LPVOID address) : 
 	process{ process }, LoadedImages{}{
 	if(!address){
-		if(!process && false){
+		if(process){
 			PROCESS_BASIC_INFORMATION information = {};
 			NTSTATUS status = Linker::NtQueryInformationProcess(process, ProcessBasicInformation, &information, sizeof(information), nullptr);
 			if(!NT_SUCCESS(status)){
@@ -27,7 +27,11 @@ Image_Loader::Image_Loader(const HandleWrapper& process, LPVOID address) :
 			PEB peb = *MemoryWrapper<PEB>(information.PebBaseAddress, sizeof(PEB), process);
 			address = peb.Ldr;
 		} else {
-			// Compile some assembly here to read the PEB's address from fs:[0x30] (32 bit) or gs:[0x60] (64-bit)
+#ifdef _WIN64
+			address = ( LPVOID) __readgsqword(0x60);
+#else
+			address = ( LPVOID) __readfsdword(0x30);
+#endif`
 		}
 	}
 
