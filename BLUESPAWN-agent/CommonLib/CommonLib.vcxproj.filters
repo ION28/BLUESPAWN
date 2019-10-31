@@ -48,6 +48,12 @@
     <ClInclude Include="headers\common\StringUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\common\DynamicLinker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\pe\Image_Loader.h">
+      <Filter>Header Files\PE</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Export_Section.cpp">
@@ -70,6 +76,12 @@
     </ClCompile>
     <ClCompile Include="src\StringUtils.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DynamicLinker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Image_Loader.cpp">
+      <Filter>Source Files\PE</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

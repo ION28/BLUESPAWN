@@ -2,6 +2,7 @@
 #include <Windows.h>
 
 #include <map>
+#include <string>
 
 template<class T>
 class GenericWrapper {
@@ -53,14 +54,14 @@ public:
 
 	~GenericWrapper(){ DestroyReference(); }
 
-	operator T(){ return WrappedObject; }
+	operator T() const { return WrappedObject; }
 	T* operator *(){ return *WrappedObject; }
 	T& operator &(){ return &WrappedObject; }
 	bool operator ==(T object){ return WrappedObject == object; }
 	bool operator !(){ return !WrappedObject || WrappedObject == BadValue; }
 	operator bool(){ return !operator!(); }
 
-	T Get(){ return WrappedObject; }
+	T Get() const { return WrappedObject; }
 	bool Release(){ return bFreeOnDestruction != (bFreeOnDestruction = false); }
 	bool Lock(){ return bFreeOnDestruction != (bFreeOnDestruction = true);  }
 	DWORD GetReferenceCount(){ return mReferenceCounts[WrappedObject]; }
@@ -84,23 +85,23 @@ public:
 	MemoryWrapper(LPVOID lpMemoryBase, SIZE_T size = sizeof(T), HANDLE process = GetCurrentProcess()) 
 		: address{ reinterpret_cast<T*>(lpMemoryBase) }, process{ process }, MemorySize{ size } {}
 
-	T Dereferene(){
+	T Dereference() const {
 		if(!process){
 			return *address;
 		} else {
-			LocalCopy = {};
-			ReadProcessMemory(process, address, &LocalCopy, MemorySize, nullptr);
-			return LocalCopy;
+			T mem = {};
+			ReadProcessMemory(process, address, &mem, MemorySize, nullptr);
+			return mem;
 		}
 	}
 
-	T operator *(){
-		return Dereferene();
+	T operator *() const {
+		return Dereference();
 	}
-	T** operator &(){
+	T** operator &() const {
 		return &(address);
 	}
-	operator T* (){
+	operator T* () const {
 		return (address);
 	}
 	T* operator->(){
@@ -117,11 +118,11 @@ public:
 	}
 
 	template<class V>
-	MemoryWrapper<V> Convert(){
+	MemoryWrapper<V> Convert() const {
 		return { reinterpret_cast<V*>(address), MemorySize, process };
 	}
 
-	MemoryWrapper<T> GetOffset(SIZE_T offset){
+	MemoryWrapper<T> GetOffset(SIZE_T offset) const {
 		if(offset > MemorySize){
 			return { nullptr, 0, process };
 		} else {
@@ -146,9 +147,9 @@ public:
 		}
 	}
 
-	bool CompareMemory(MemoryWrapper<T> memory){
-		auto data1 = Dereferene();
-		auto data2 = memory.Dereferene();
+	bool CompareMemory(MemoryWrapper<T> memory) const {
+		auto data1 = Dereference();
+		auto data2 = memory.Dereference();
 		return !memcmp(&data1, &data2, min(memory.MemorySize, MemorySize));
 	}
 
@@ -162,8 +163,58 @@ public:
 		}
 	}
 
-	operator bool(){ return address; }
-	bool operator !(){ return !address; }
+	std::string ReadString(){
+		if(!process){
+			return std::string{ reinterpret_cast<char*>(address) };
+		} else {
+			int idx = 0;
+			int maxIdx = 10;
+			char* memory = new char[maxIdx];
+			bool valid = false;
+			while(!valid && !ReadProcessMemory(process, address, memory, maxIdx *= 2, nullptr)){
+				delete[] memory;
+				memory = new char[maxIdx];
+				for(; idx < maxIdx; idx++){
+					if(memory[idx] == 0){
+						valid = true;
+						break;
+					}
+				}
+			}
+			if(valid){
+				return std::string{ memory };
+			} else {
+				return std::string{};
+			}
+		}
+	}
+
+	std::wstring ReadWstring(){
+		if(!process){
+			return std::wstring{ reinterpret_cast<WCHAR*>(address) };
+		} else {
+			int idx = 0;
+			int maxIdx = 10;
+			wchar_t* memory = new wchar_t[maxIdx];
+			bool valid = false;
+			while(!valid && !ReadProcessMemory(process, address, memory, (maxIdx *= 2) * sizeof(wchar_t), nullptr)){
+				for(; idx < maxIdx; idx++){
+					if(memory[idx] == 0){
+						valid = true;
+						break;
+					}
+				}
+			}
+			if(valid){
+				return std::wstring{ memory };
+			} else {
+				return std::wstring{};
+			}
+		}
+	}
+
+	operator bool() const { return address; }
+	bool operator !() const { return !address; }
 };
 
 template<class T>

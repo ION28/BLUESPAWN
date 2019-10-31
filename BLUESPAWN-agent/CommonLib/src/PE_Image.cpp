@@ -2,7 +2,7 @@
 #include "pe/PE_Section.h"
 #include "common/wrappers.hpp"
 
-bool PE_Image::ValidatePE(){
+bool PE_Image::ValidatePE() const {
 	MemoryWrapper<> PESignature = { new BYTE[2]{0x4D, 0x5A}, 2 };
 	MemoryWrapper<> PE2Signature = { new BYTE[4]{0x50, 0x45, 0x00, 0x00}, 4 };
 	return base.CompareMemory(PESignature) && base.GetOffset(base.Convert<IMAGE_DOS_HEADER>()->e_lfanew).CompareMemory(PE2Signature);
@@ -42,13 +42,13 @@ PE_Image::PE_Image(LPVOID lpBaseAddress, HANDLE hProcess, bool expanded) :
 		hProcess
 	};
 
-	do sections.emplace(PCHAR(SectionHeaders->Name), PE_Section{ SectionHeaders, MemoryWrapper<>{ lpBaseAddress, 0xFFFFFFFF, hProcess}, expanded });
+	do sections.emplace(PCHAR(SectionHeaders->Name), PE_Section{ *this, SectionHeaders, MemoryWrapper<>{ lpBaseAddress, 0xFFFFFFFF, hProcess}, expanded });
 	while(SectionHeaders = SectionHeaders.GetOffset(sizeof(IMAGE_SECTION_HEADER)));
 
-	this->resources = new Resource_Section(!sections.count(".rsrc") ? PE_Section{nullptr, nullptr, false} : sections[".rsrc"]);
-	this->relocations = new Relocation_Section(!sections.count(".reloc") ? PE_Section{ nullptr, nullptr, false } : sections[".reloc"]);
-	this->imports = new Import_Section(!sections.count(".idata") ? PE_Section{ nullptr, nullptr, false } : sections[".idata"]);
-	this->exports = new Export_Section(!sections.count(".edata") ? PE_Section{ nullptr, nullptr, false } : sections[".edata"]);
+	this->resources = new Resource_Section(!sections.count(".rsrc") ? PE_Section{nullptr, nullptr, false} : sections.at(".rsrc"));
+	this->relocations = new Relocation_Section(!sections.count(".reloc") ? PE_Section{ nullptr, nullptr, false } : sections.at(".reloc"));
+	this->imports = new Import_Section(!sections.count(".idata") ? PE_Section{ nullptr, nullptr, false } : sections.at(".idata"));
+	this->exports = new Export_Section(!sections.count(".edata") ? PE_Section{ nullptr, nullptr, false } : sections.at(".edata"));
 
 	for(auto entry : sections){
 		IMAGE_SECTION_HEADER header = entry.second;
@@ -118,7 +118,7 @@ bool PE_Image::ApplyLocalRelocations(DWORD64 offset){
 	return true;
 }
 
-bool PE_Image::ApplyTargetRelocations(MemoryWrapper<> TargetLocation){
+bool PE_Image::ApplyTargetRelocations(MemoryWrapper<> TargetLocation) const {
 	DWORD64 offset = reinterpret_cast<DWORD64>(TargetLocation.address) - BaseAddress;
 
 	if(relocations->GetSignature() != L".reloc"){
@@ -150,11 +150,11 @@ bool PE_Image::ParseLocalImports(HandleWrapper process){
 	return imports->LoadAllImports(base, process, expanded);
 }
 
-bool PE_Image::ParseTargetImports(MemoryWrapper<> TargetLocation){
+bool PE_Image::ParseTargetImports(MemoryWrapper<> TargetLocation) const {
 	return imports->LoadAllImports(TargetLocation, TargetLocation.process, true);
 }
 
-bool PE_Image::ApplyProtections(MemoryWrapper<> TargetLocation){
+bool PE_Image::ApplyProtections(MemoryWrapper<> TargetLocation) const {
 	TargetLocation.Protect(PAGE_READONLY);
 
 	DWORD dwProtectionMap[8]{
@@ -178,7 +178,7 @@ bool PE_Image::ApplyProtections(MemoryWrapper<> TargetLocation){
 	return true;
 }
 
-DWORD PE_Image::RVAToOffset(DWORD rva){
+DWORD PE_Image::RVAToOffset(DWORD rva) const {
 	for(auto pair : sections){
 		if(pair.second.ContainsRVA(rva)){
 			return pair.second.ConvertRVAToOffset(rva);
@@ -188,7 +188,7 @@ DWORD PE_Image::RVAToOffset(DWORD rva){
 	return rva;
 }
 
-DWORD PE_Image::OffsetToRVA(DWORD offset){
+DWORD PE_Image::OffsetToRVA(DWORD offset) const {
 	for(auto pair : sections){
 		if(pair.second.ContainsOffset(offset)){
 			return pair.second.ConvertOffsetToRVA(offset);
