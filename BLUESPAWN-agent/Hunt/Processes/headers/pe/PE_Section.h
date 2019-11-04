@@ -18,7 +18,7 @@ public:
 
 	bool expanded;
 
-	PE_Section(const PE_Image& image, PIMAGE_SECTION_HEADER SectionHeader = nullptr, MemoryWrapper<> lpImageBase = { nullptr }, bool expanded = false);
+	PE_Section(const PE_Image& image, IMAGE_SECTION_HEADER SectionHeader = {}, MemoryWrapper<> lpImageBase = { nullptr }, bool expanded = false);
 	PE_Section(const PE_Section& copy);
 
 	bool ContainsRVA(DWORD rva) const;

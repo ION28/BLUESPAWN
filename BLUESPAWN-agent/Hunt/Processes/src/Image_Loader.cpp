@@ -28,10 +28,10 @@ Image_Loader::Image_Loader(const HandleWrapper& process, LPVOID address) :
 			address = peb.Ldr;
 		} else {
 #ifdef _WIN64
-			address = ( LPVOID) __readgsqword(0x60);
+			address = (LPVOID) __readgsqword(0x60);
 #else
-			address = ( LPVOID) __readfsdword(0x30);
-#endif`
+			address = (LPVOID) __readfsdword(0x30);
+#endif
 		}
 	}
 
