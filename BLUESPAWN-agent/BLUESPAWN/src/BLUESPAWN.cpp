@@ -77,8 +77,13 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	else if (sHuntLevelFlag == "Careful") {
 		aHuntLevel = Aggressiveness::Careful;
 	}
-	else {
+	else if (sHuntLevelFlag == "Aggressive") {
 		aHuntLevel = Aggressiveness::Aggressive;
+	}
+	else {
+		std::cerr << "Error " << sHuntLevelFlag << " - Unknown hunt level. Please specify either Cursory, Moderate, Careful, or Aggressive" << std::endl;
+		std::cerr << "Will default to Moderate for this run." << std::endl;
+		aHuntLevel = Aggressiveness::Moderate;
 	}
 
 	HuntRegister record{};
