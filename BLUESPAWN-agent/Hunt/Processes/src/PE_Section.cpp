@@ -5,15 +5,15 @@
 
 #include <string>
 
-PE_Section::PE_Section(const PE_Image& image, PIMAGE_SECTION_HEADER SectionHeader, MemoryWrapper<> lpImageBase, bool expanded) : 
+PE_Section::PE_Section(const PE_Image& image, IMAGE_SECTION_HEADER SectionHeader, MemoryWrapper<> lpImageBase, bool expanded) : 
 	AssociatedImage{ image },
 	expanded{ expanded },
-	SectionContent{ lpImageBase.GetOffset(expanded ? SectionHeader->VirtualAddress : SectionHeader->PointerToRawData) }{
-	this->SectionHeader = *SectionHeader;
+	SectionContent{ lpImageBase.GetOffset(expanded ? SectionHeader.VirtualAddress : SectionHeader.PointerToRawData) }{
+	this->SectionHeader = SectionHeader;
 
 	WCHAR signature[9]{};
 	for(int i = 0; i < 8; i++){
-		signature[i] = SectionHeader->Name[i];
+		signature[i] = SectionHeader.Name[i];
 	}
 
 	this->Signature = signature;
