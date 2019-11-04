@@ -18,8 +18,6 @@ namespace Registry {
 	extern std::map<std::wstring, HKEY> vHiveNames;
 	extern std::map<HKEY, std::wstring> vHives;
 	extern std::map<HKEY, DWORD> _globalOpenKeys;
-	
-	HKEY RemoveHive(std::wstring& path);
 
 	class RegistryKey : public Loggable {
 		HKEY hive;

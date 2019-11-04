@@ -29,10 +29,10 @@ namespace Log {
 		std::vector<gpb::DataSource> HuntDatasourcesToGPB(const DWORD& info);
 		gpb::HuntInfo HuntInfoToGPB(const HuntInfo& info);
 
-		std::vector<gpb::FileReactionData> GetFileReactions(const std::vector<DETECTION*>& detections);
-		std::vector<gpb::RegistryReactionData> GetRegistryReactions(const std::vector<DETECTION*>& detections);
-		std::vector<gpb::ProcessReactionData> GetProcessReactions(const std::vector<DETECTION*>& detections);
-		std::vector<gpb::ServiceReactionData> GetServiceReactions(const std::vector<DETECTION*>& detections);
+		std::vector<gpb::FileReactionData> GetFileReactions(const std::vector<std::shared_ptr<DETECTION>>& detections);
+		std::vector<gpb::RegistryReactionData> GetRegistryReactions(const std::vector<std::shared_ptr<DETECTION>>& detections);
+		std::vector<gpb::ProcessReactionData> GetProcessReactions(const std::vector<std::shared_ptr<DETECTION>>& detections);
+		std::vector<gpb::ServiceReactionData> GetServiceReactions(const std::vector<std::shared_ptr<DETECTION>>& detections);
 
 	public:
 
@@ -43,7 +43,8 @@ namespace Log {
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
 		 */
-		virtual void LogMessage(const LogLevel& level, const std::string& message, const HuntInfo& info = {}, const std::vector<DETECTION*>& detections = {});
+		virtual void LogMessage(const LogLevel& level, const std::string& message, const HuntInfo& info = {}, 
+			                    const std::vector<std::shared_ptr<DETECTION>>& detections = {}) override;
 
 		/**
 		 * Compares this ServerSink to another LogSink. Currently, as only one console is supported,

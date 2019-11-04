@@ -2,13 +2,21 @@
 #include "pe/PE_Section.h"
 #include "common/wrappers.hpp"
 
-bool PE_Image::ValidatePE(){
+bool PE_Image::ValidatePE() const {
 	MemoryWrapper<> PESignature = { new BYTE[2]{0x4D, 0x5A}, 2 };
 	MemoryWrapper<> PE2Signature = { new BYTE[4]{0x50, 0x45, 0x00, 0x00}, 4 };
 	return base.CompareMemory(PESignature) && base.GetOffset(base.Convert<IMAGE_DOS_HEADER>()->e_lfanew).CompareMemory(PE2Signature);
 }
 
-PE_Image::PE_Image(LPVOID lpBaseAddress, HANDLE hProcess, bool expanded) : expanded{ expanded } {
+PE_Image::PE_Image(LPVOID lpBaseAddress, HANDLE hProcess, bool expanded) : 
+	expanded{ expanded },
+	base{ nullptr },
+	BaseAddress{ nullptr },
+	relocations{ nullptr },
+	imports{ nullptr },
+	exports{ nullptr },
+	resources{ nullptr }
+{
 
 	MemoryWrapper<IMAGE_DOS_HEADER> dos = { lpBaseAddress, sizeof(IMAGE_DOS_HEADER), hProcess };
 
@@ -34,13 +42,13 @@ PE_Image::PE_Image(LPVOID lpBaseAddress, HANDLE hProcess, bool expanded) : expan
 		hProcess
 	};
 
-	do sections.emplace(SectionHeaders->Name, PE_Section{ SectionHeaders, MemoryWrapper<>{ lpBaseAddress, 0xFFFFFFFF, hProcess}, expanded });
+	do sections.emplace(PCHAR(SectionHeaders->Name), PE_Section{ *this, SectionHeaders, MemoryWrapper<>{ lpBaseAddress, 0xFFFFFFFF, hProcess}, expanded });
 	while(SectionHeaders = SectionHeaders.GetOffset(sizeof(IMAGE_SECTION_HEADER)));
 
-	this->resources = sections.find(".rsrc") == sections.end() ? PE_Section{nullptr, nullptr, false} : sections[".rsrc"];
-	this->relocations = sections.find(".reloc") == sections.end() ? PE_Section{ nullptr, nullptr, false } : sections[".reloc"];
-	this->imports = sections.find(".idata") == sections.end() ? PE_Section{ nullptr, nullptr, false } : sections[".idata"];
-	this->exports = sections.find(".edata") == sections.end() ? PE_Section{ nullptr, nullptr, false } : sections[".edata"];
+	this->resources = new Resource_Section(!sections.count(".rsrc") ? PE_Section{nullptr, nullptr, false} : sections.at(".rsrc"));
+	this->relocations = new Relocation_Section(!sections.count(".reloc") ? PE_Section{ nullptr, nullptr, false } : sections.at(".reloc"));
+	this->imports = new Import_Section(!sections.count(".idata") ? PE_Section{ nullptr, nullptr, false } : sections.at(".idata"));
+	this->exports = new Export_Section(!sections.count(".edata") ? PE_Section{ nullptr, nullptr, false } : sections.at(".edata"));
 
 	for(auto entry : sections){
 		IMAGE_SECTION_HEADER header = entry.second;
@@ -80,7 +88,7 @@ PE_Image PE_Image::LoadTo(MemoryWrapper<> location, bool AvoidTargetChanges){
 }
 
 bool PE_Image::ApplyLocalRelocations(DWORD64 offset){
-	if(relocations.GetSignature() != L".reloc"){
+	if(relocations->GetSignature() != L".reloc"){
 		return false;
 	}
 
@@ -95,14 +103,14 @@ bool PE_Image::ApplyLocalRelocations(DWORD64 offset){
 		BaseAddress.Convert<DWORD>().Write(&off32);
 	}
 
-	auto RelocRVAs = relocations.GetRelocRVAs();
+	auto RelocRVAs = relocations->GetRelocRVAs();
 
 	for(auto rva : RelocRVAs){
-		rva = relocations.ConvertRVAToOffset(rva);
+		rva = relocations->ConvertRVAToOffset(rva);
 
 		DWORD64 PatchedMemory64 = offset + *base.GetOffset(rva).Convert<DWORD64>();
-		DWORD PatchedMemory32 = offset + *base.GetOffset(rva).Convert<DWORD>();
-		if(!base.Write(arch == x64 ? (LPVOID) & PatchedMemory64 : (LPVOID) & PatchedMemory32, arch == x64 ? 8 : 4, rva)){
+		DWORD PatchedMemory32 = static_cast<DWORD>(offset + *base.GetOffset(rva).Convert<DWORD>());
+		if(!base.Write(arch == x64 ? (PCHAR) &PatchedMemory64 : (PCHAR) &PatchedMemory32, arch == x64 ? 8 : 4, rva)){
 			return false;
 		}
 	}
@@ -110,16 +118,16 @@ bool PE_Image::ApplyLocalRelocations(DWORD64 offset){
 	return true;
 }
 
-bool PE_Image::ApplyTargetRelocations(MemoryWrapper<> TargetLocation){
+bool PE_Image::ApplyTargetRelocations(MemoryWrapper<> TargetLocation) const {
 	DWORD64 offset = reinterpret_cast<DWORD64>(TargetLocation.address) - BaseAddress;
 
-	if(relocations.GetSignature() != L".reloc"){
+	if(relocations->GetSignature() != L".reloc"){
 		return false;
 	}
 
-	auto RelocRVAs = relocations.GetRelocRVAs();
+	auto RelocRVAs = relocations->GetRelocRVAs();
 
-	DWORD BaseOffset = reinterpret_cast<DWORD>(BaseAddress.address) - reinterpret_cast<DWORD>(base.address);
+	DWORD BaseOffset = static_cast<DWORD>(reinterpret_cast<DWORD64>(BaseAddress.address) - reinterpret_cast<DWORD64>(base.address));
 	if(arch == x64) {
 		TargetLocation.Convert<DWORD64>().Write(&offset, 8, BaseOffset);
 	} else {
@@ -129,8 +137,8 @@ bool PE_Image::ApplyTargetRelocations(MemoryWrapper<> TargetLocation){
 
 	for(auto rva : RelocRVAs){
 		DWORD64 PatchedMemory64 = offset + *base.GetOffset(rva).Convert<DWORD64>();
-		DWORD PatchedMemory32 = offset + *base.GetOffset(rva).Convert<DWORD>();
-		if(!TargetLocation.Write(arch == x64 ? (LPVOID) &PatchedMemory64 : (LPVOID) &PatchedMemory32, arch == x64 ? 8 : 4, rva)){
+		DWORD PatchedMemory32 = static_cast<DWORD>(offset + *base.GetOffset(rva).Convert<DWORD>());
+		if(!TargetLocation.Write(arch == x64 ? (PCHAR) &PatchedMemory64 : (PCHAR) &PatchedMemory32, arch == x64 ? 8 : 4, rva)){
 			return false;
 		}
 	}
@@ -139,9 +147,53 @@ bool PE_Image::ApplyTargetRelocations(MemoryWrapper<> TargetLocation){
 }
 
 bool PE_Image::ParseLocalImports(HandleWrapper process){
-	imports.LoadAllImports(base, process, expanded);
+	return imports->LoadAllImports(base, process, expanded);
 }
 
-bool PE_Image::ParseTargetImports(MemoryWrapper<> TargetLocation){
-	imports.LoadAllImports(TargetLocation, TargetLocation.process, true);
+bool PE_Image::ParseTargetImports(MemoryWrapper<> TargetLocation) const {
+	return imports->LoadAllImports(TargetLocation, TargetLocation.process, true);
+}
+
+bool PE_Image::ApplyProtections(MemoryWrapper<> TargetLocation) const {
+	TargetLocation.Protect(PAGE_READONLY);
+
+	DWORD dwProtectionMap[8]{
+		PAGE_NOACCESS, PAGE_READONLY,
+		PAGE_READWRITE, PAGE_READWRITE,
+
+		PAGE_EXECUTE, PAGE_EXECUTE_READ,
+		PAGE_EXECUTE_WRITECOPY, PAGE_EXECUTE_READWRITE
+	};
+
+	for(auto pair : sections){
+		DWORD dwProtIdx = ((pair.second.SectionHeader.Characteristics & IMAGE_SCN_MEM_EXECUTE) ? 4 : 0) +
+			((pair.second.SectionHeader.Characteristics & IMAGE_SCN_MEM_WRITE) ? 2 : 0) +
+			((pair.second.SectionHeader.Characteristics & IMAGE_SCN_MEM_READ) ? 1 : 0);
+		DWORD protection = dwProtectionMap[dwProtIdx];
+		protection |= (pair.second.SectionHeader.Characteristics & IMAGE_SCN_MEM_NOT_CACHED) ? PAGE_NOACCESS : 0;
+		if(!TargetLocation.GetOffset(pair.second.SectionHeader.VirtualAddress).Protect(protection, pair.second.SectionHeader.SizeOfRawData)){
+			return false;
+		}
+	}
+	return true;
+}
+
+DWORD PE_Image::RVAToOffset(DWORD rva) const {
+	for(auto pair : sections){
+		if(pair.second.ContainsRVA(rva)){
+			return pair.second.ConvertRVAToOffset(rva);
+		}
+	}
+
+	return rva;
+}
+
+DWORD PE_Image::OffsetToRVA(DWORD offset) const {
+	for(auto pair : sections){
+		if(pair.second.ContainsOffset(offset)){
+			return pair.second.ConvertOffsetToRVA(offset);
+		}
+	}
+
+	return offset;
 }

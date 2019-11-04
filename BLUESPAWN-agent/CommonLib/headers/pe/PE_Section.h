@@ -6,25 +6,29 @@
 
 #include "Common/Wrappers.hpp"
 
+class PE_Image;
 class PE_Section {
 public:
 	MemoryWrapper<> SectionContent;
+	const PE_Image& AssociatedImage;
 
 	IMAGE_SECTION_HEADER SectionHeader;
 
 	std::wstring Signature;
 
-	PE_Section(PIMAGE_SECTION_HEADER SectionHeader, MemoryWrapper<> lpImageBase, bool expanded);
+	bool expanded;
+
+	PE_Section(const PE_Image& image, PIMAGE_SECTION_HEADER SectionHeader = nullptr, MemoryWrapper<> lpImageBase = { nullptr }, bool expanded = false);
 	PE_Section(const PE_Section& copy);
 
-	bool ContainsRVA(DWORD rva);
-	bool ContainsOffset(DWORD offset);
+	bool ContainsRVA(DWORD rva) const;
+	bool ContainsOffset(DWORD offset) const;
 
-	DWORD ConvertOffsetToRVA(DWORD offset);
-	DWORD ConvertRVAToOffset(DWORD rva);
+	DWORD ConvertOffsetToRVA(DWORD offset) const;
+	DWORD ConvertRVAToOffset(DWORD rva) const;
 
-	std::wstring GetSignature();
+	std::wstring GetSignature() const;
 
-	operator IMAGE_SECTION_HEADER();
+	operator IMAGE_SECTION_HEADER() const;
 };
 

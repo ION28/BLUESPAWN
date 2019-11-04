@@ -28,3 +28,9 @@ jobs:
       working-directory: BLUESPAWN-agent
       run: |
         "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN-agent.sln /p:Configuration=${{ matrix.buildtype }}
+      shell: cmd
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: BLUESPAWN-agent-${{ matrix.buildtype }}
+        path: BLUESPAWN-agent\artifacts\x64\${{ matrix.buildtype }}\BLUESPAWN.exe
