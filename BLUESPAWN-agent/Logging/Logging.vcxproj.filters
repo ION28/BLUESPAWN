@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="grpc\generated\ReactionData.grpc.pb.cc" />
@@ -10,6 +10,7 @@
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\LogLevel.cpp" />
     <ClCompile Include="src\ServerSink.cpp" />
+    <ClCompile Include="src\DebugSink.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="grpc\generated\grpc++\alarm.h" />
@@ -293,6 +294,7 @@
     <ClInclude Include="headers\logging\LogLevel.h" />
     <ClInclude Include="headers\logging\LogSink.h" />
     <ClInclude Include="headers\logging\ServerSink.h" />
+    <ClInclude Include="headers\logging\DebugSink.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="protos\ReactionData.proto" />
