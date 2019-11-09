@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\pe">
+      <UniqueIdentifier>{5fc84d5a-be22-4662-96ac-3659233a1e51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pe">
+      <UniqueIdentifier>{7e70f441-0894-4097-b8e0-b02f9f23f2c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Analyzer.cpp">
@@ -21,10 +27,52 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Export_Section.cpp">
+      <Filter>Source Files\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Image_Loader.cpp">
+      <Filter>Source Files\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Import_Section.cpp">
+      <Filter>Source Files\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PE_Image.cpp">
+      <Filter>Source Files\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PE_Section.cpp">
+      <Filter>Source Files\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Relocation_Section.cpp">
+      <Filter>Source Files\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resource_Section.cpp">
+      <Filter>Source Files\pe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\processes\Analyzer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\pe\Export_Section.h">
+      <Filter>Header Files\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\pe\Image_Loader.h">
+      <Filter>Header Files\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\pe\Import_Section.h">
+      <Filter>Header Files\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\pe\PE_Image.h">
+      <Filter>Header Files\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\pe\PE_Section.h">
+      <Filter>Header Files\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\pe\Relocation_Section.h">
+      <Filter>Header Files\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\pe\Resource_Section.h">
+      <Filter>Header Files\pe</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
