@@ -27,61 +27,19 @@
     <ClInclude Include="headers\common\wrappers.hpp">
       <Filter>Header Files\Wrappers</Filter>
     </ClInclude>
-    <ClInclude Include="headers\pe\Export_Section.h">
-      <Filter>Header Files\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\pe\Import_Section.h">
-      <Filter>Header Files\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\pe\PE_Image.h">
-      <Filter>Header Files\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\pe\PE_Section.h">
-      <Filter>Header Files\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\pe\Relocation_Section.h">
-      <Filter>Header Files\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\pe\Resource_Section.h">
-      <Filter>Header Files\PE</Filter>
-    </ClInclude>
     <ClInclude Include="headers\common\StringUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\common\DynamicLinker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\pe\Image_Loader.h">
-      <Filter>Header Files\PE</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Export_Section.cpp">
-      <Filter>Source Files\PE</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Import_Section.cpp">
-      <Filter>Source Files\PE</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PE_Image.cpp">
-      <Filter>Source Files\PE</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PE_Section.cpp">
-      <Filter>Source Files\PE</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Relocation_Section.cpp">
-      <Filter>Source Files\PE</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Resource_Section.cpp">
-      <Filter>Source Files\PE</Filter>
-    </ClCompile>
     <ClCompile Include="src\StringUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DynamicLinker.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Image_Loader.cpp">
-      <Filter>Source Files\PE</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

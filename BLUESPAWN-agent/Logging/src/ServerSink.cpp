@@ -3,13 +3,9 @@
 #include <iostream>
 
 #include "logging/ServerSink.h"
+#include "common/StringUtils.h"
 
 namespace Log {
-
-	std::string& ServerSink::wstring_to_string(const std::wstring& ws) {
-		std::string s(ws.begin(), ws.end());
-		return s;
-	}
 
 	gpb::Aggressiveness ServerSink::HuntAggressivenessToGPB(const Aggressiveness& info) {
 		return gpb::Aggressiveness();
@@ -30,7 +26,7 @@ namespace Log {
 	gpb::HuntInfo ServerSink::HuntInfoToGPB(const HuntInfo& info) {
 		gpb::HuntInfo gpbInfo;
 
-		gpbInfo.set_huntname(wstring_to_string(info.HuntName));
+		gpbInfo.set_huntname(WidestringToString(info.HuntName));
 		gpbInfo.set_huntaggressiveness(HuntAggressivenessToGPB(info.HuntAggressiveness));
 
 		auto huntTactics = HuntTacticsToGPB(info.HuntTactics);
