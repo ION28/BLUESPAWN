@@ -1,0 +1,11 @@
+﻿  DynamicLinker.cpp
+  Export_Section.cpp
+  Image_Loader.cpp
+  Import_Section.cpp
+  PE_Image.cpp
+  PE_Section.cpp
+  Relocation_Section.cpp
+  Resource_Section.cpp
+  StringUtils.cpp
+  Generating Code...
+  CommonLib.vcxproj -> D:\CCDC\BLUESPAWN\BLUESPAWN-agent\artifacts\x64\Debug\CommonLib.lib

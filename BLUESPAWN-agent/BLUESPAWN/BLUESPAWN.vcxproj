@@ -18,6 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link>
+      <AdditionalDependencies>D:\CCDC\BLUESPAWN\BLUESPAWN-agent\artifacts\x64\Debug\ETW.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonLib\CommonLib.vcxproj">
       <Project>{25ae1d80-3e17-4e1d-bfb4-8afb375ebaf1}</Project>
@@ -57,6 +62,7 @@
     <Import Project="..\Logging\Logging.props" />
     <Import Project="..\Hunt\FileSystem\FileSystem.props" />
     <Import Project="..\Hunt\Configuration\Configuration.props" />
+    <Import Project="..\Monitor\ETW\ETW.props" />
     <Import Project="..\Hunt\Hunts\Hunts.props" />
     <Import Project="..\React\Reactions\reactions.props" />
     <Import Project="..\External Dependencies\cxxopt.props" />
