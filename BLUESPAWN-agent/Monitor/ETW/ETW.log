@@ -38,15 +38,85 @@ D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.
 D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :             _Iter=std::_String_const_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
 D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :             _Alloc=std::allocator<char>
 D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :         ]
-D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\boost.1.68.0.0\lib\native\include\boost\bind\placeholders.hpp(54): message : see reference to class template instantiation 'boost::arg<9>' being compiled
-D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\boost.1.68.0.0\lib\native\include\boost\bind\placeholders.hpp(53): message : see reference to class template instantiation 'boost::arg<8>' being compiled
-D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\boost.1.68.0.0\lib\native\include\boost\bind\placeholders.hpp(52): message : see reference to class template instantiation 'boost::arg<7>' being compiled
-D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\boost.1.68.0.0\lib\native\include\boost\bind\placeholders.hpp(51): message : see reference to class template instantiation 'boost::arg<6>' being compiled
-D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\boost.1.68.0.0\lib\native\include\boost\bind\placeholders.hpp(50): message : see reference to class template instantiation 'boost::arg<5>' being compiled
-D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\boost.1.68.0.0\lib\native\include\boost\bind\placeholders.hpp(49): message : see reference to class template instantiation 'boost::arg<4>' being compiled
-D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\boost.1.68.0.0\lib\native\include\boost\bind\placeholders.hpp(48): message : see reference to class template instantiation 'boost::arg<3>' being compiled
-D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\boost.1.68.0.0\lib\native\include\boost\bind\placeholders.hpp(47): message : see reference to class template instantiation 'boost::arg<2>' being compiled
-D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\boost.1.68.0.0\lib\native\include\boost\bind\placeholders.hpp(46): message : see reference to class template instantiation 'boost::arg<1>' being compiled
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244: 'argument': conversion from 'wchar_t' to 'const _Elem', possible loss of data
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244:         with
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244:         [
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244:             _Elem=char
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244:         ]
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<wchar_t*>(_Iter,const _Iter,std::input_iterator_tag)' being compiled
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         with
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         [
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :             _Iter=wchar_t *
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         ]
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<wchar_t*>(_Iter,const _Iter,std::input_iterator_tag)' being compiled
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         with
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         [
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :             _Iter=wchar_t *
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         ]
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<wchar_t*>(const _Iter,const _Iter,std::forward_iterator_tag)' being compiled
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         with
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         [
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :             _Iter=wchar_t *
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         ]
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<wchar_t*>(const _Iter,const _Iter,std::forward_iterator_tag)' being compiled
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         with
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         [
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :             _Iter=wchar_t *
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         ]
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message : see reference to function template instantiation 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,void>(_Iter,_Iter,const _Alloc &)' being compiled
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :         with
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :         [
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :             _Elem=wchar_t,
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :             _Iter=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :             _Alloc=std::allocator<char>
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :         ]
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message : see reference to function template instantiation 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string<std::_String_iterator<std::_String_val<std::_Simple_types<_Elem>>>,void>(_Iter,_Iter,const _Alloc &)' being compiled
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :         with
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :         [
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :             _Elem=wchar_t,
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :             _Iter=std::_String_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :             _Alloc=std::allocator<char>
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\testing\record_builder.hpp(237): message :         ]
+  krabs.cpp
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244: 'argument': conversion from 'const wchar_t' to 'const _Elem', possible loss of data
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244:         with
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244:         [
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244:             _Elem=char
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244:         ]
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<const wchar_t*>(_Iter,const _Iter,std::input_iterator_tag)' being compiled
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         with
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         [
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :             _Iter=const wchar_t *
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         ]
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<const wchar_t*>(_Iter,const _Iter,std::input_iterator_tag)' being compiled
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         with
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         [
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :             _Iter=const wchar_t *
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2366): message :         ]
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<const wchar_t*>(const _Iter,const _Iter,std::forward_iterator_tag)' being compiled
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         with
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         [
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :             _Iter=const wchar_t *
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         ]
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message : see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct<const wchar_t*>(const _Iter,const _Iter,std::forward_iterator_tag)' being compiled
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         with
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         [
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :             _Iter=const wchar_t *
+D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2346): message :         ]
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message : see reference to function template instantiation 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string<std::_String_const_iterator<std::_String_val<std::_Simple_types<_Elem>>>,void>(_Iter,_Iter,const _Alloc &)' being compiled
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :         with
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :         [
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :             _Elem=wchar_t,
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :             _Iter=std::_String_const_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :             _Alloc=std::allocator<char>
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :         ]
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message : see reference to function template instantiation 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string<std::_String_const_iterator<std::_String_val<std::_Simple_types<_Elem>>>,void>(_Iter,_Iter,const _Alloc &)' being compiled
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :         with
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :         [
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :             _Elem=wchar_t,
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :             _Iter=std::_String_const_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :             _Alloc=std::allocator<char>
+D:\CCDC\BLUESPAWN\BLUESPAWN-agent\packages\Microsoft.O365.Security.Krabsetw.2.0.2\lib\native\include\krabs\guid.hpp(62): message :         ]
 D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244: 'argument': conversion from 'wchar_t' to 'const _Elem', possible loss of data
 D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244:         with
 D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.23.28105\include\xstring(2355,23): warning C4244:         [

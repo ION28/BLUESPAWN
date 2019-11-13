@@ -1,6 +1,5 @@
 #include "ETW\ETW_Wrapper.h"
 #include <thread>
-#include <boost/thread/thread.hpp>
 #include <iostream>
 #include "krabs.hpp"
 
@@ -46,7 +45,7 @@ void ETW_Wrapper::start() {
 			std::wcout << L"\tContext: " << context << std::endl;
 		}
 	});
-
+	
 	// the user_trace needs to know about the provider that we've set up.
 	trace.enable(provider);
 
