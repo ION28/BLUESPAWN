@@ -1,0 +1,4 @@
+﻿  banners.cpp
+  BLUESPAWN.cpp
+  Generating Code...
+LINK : fatal error LNK1104: cannot open file 'libboost_thread-vc141-mt-gd-x64-1_68.lib'

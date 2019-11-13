@@ -22,6 +22,8 @@
 #include "logging/CLISink.h"
 #include "configuration/Registry.h"
 
+#include "ETW\ETW_Wrapper.h"
+
 #include "hunts/Hunt.h"
 #include "hunts/HuntRegister.h"
 #include "hunts/HuntT1004.h"

@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BLUESPAWN", "BLUESPAWN\BLUESPAWN.vcxproj", "{3F2806C6-D5E6-482E-8891-8AFE2BB4CDEF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BC9BC6AA-FFF3-4219-B712-E3DE2A5C4D82} = {BC9BC6AA-FFF3-4219-B712-E3DE2A5C4D82}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Configuration", "Hunt\Configuration\Configuration.vcxproj", "{73D597B4-7735-4C99-BD34-1F01633E43DA}"
 EndProject
@@ -131,14 +134,6 @@ Global
 		{076A8013-C6D3-45B0-AACB-68DC66915FF6}.Release|x64.Build.0 = Release|x64
 		{076A8013-C6D3-45B0-AACB-68DC66915FF6}.Release|x86.ActiveCfg = Release|Win32
 		{076A8013-C6D3-45B0-AACB-68DC66915FF6}.Release|x86.Build.0 = Release|Win32
-		{25AE1D80-3E17-4E1D-BFB4-8AFB375EBAF1}.Debug|x64.ActiveCfg = Debug|x64
-		{25AE1D80-3E17-4E1D-BFB4-8AFB375EBAF1}.Debug|x64.Build.0 = Debug|x64
-		{25AE1D80-3E17-4E1D-BFB4-8AFB375EBAF1}.Debug|x86.ActiveCfg = Debug|Win32
-		{25AE1D80-3E17-4E1D-BFB4-8AFB375EBAF1}.Debug|x86.Build.0 = Debug|Win32
-		{25AE1D80-3E17-4E1D-BFB4-8AFB375EBAF1}.Release|x64.ActiveCfg = Release|x64
-		{25AE1D80-3E17-4E1D-BFB4-8AFB375EBAF1}.Release|x64.Build.0 = Release|x64
-		{25AE1D80-3E17-4E1D-BFB4-8AFB375EBAF1}.Release|x86.ActiveCfg = Release|Win32
-		{25AE1D80-3E17-4E1D-BFB4-8AFB375EBAF1}.Release|x86.Build.0 = Release|Win32
 		{EFB79DF3-1891-4A0D-869C-76F7FA4AD239}.Debug|x64.ActiveCfg = Debug|x64
 		{EFB79DF3-1891-4A0D-869C-76F7FA4AD239}.Debug|x64.Build.0 = Debug|x64
 		{EFB79DF3-1891-4A0D-869C-76F7FA4AD239}.Debug|x86.ActiveCfg = Debug|Win32
