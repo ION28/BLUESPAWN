@@ -4,6 +4,7 @@
 #define NOMINMAX
 #endif
 
+#include <winsock2.h>
 #include <Windows.h>
 
 // The developer of this library is a bad developer who left warnings in his code.

@@ -1,7 +1,6 @@
 #include "ETW\ETW_Wrapper.h"
 #include <thread>
 #include <iostream>
-#include "krabs.hpp"
 
 void ETW_Wrapper::start() {
 
