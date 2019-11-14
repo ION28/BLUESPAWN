@@ -1,26 +1,19 @@
 #include "ETW\ETW_Wrapper.h"
-#include <thread>
 #include <iostream>
 
-void ETW_Wrapper::start() {
+ETW_Wrapper::ETW_Wrapper() : pshellProvider(krabs::guid(L"{A0C1853B-5C40-4B15-8766-3CF1C58F985A}"))
+{
+}
 
-	// user_trace instances should be used for any non-kernel traces that are defined
-	// by components or programs in Windows.
-	krabs::user_trace trace;
-
-	// A trace can have any number of providers, which are identified by GUID. These
-	// GUIDs are defined by the components that emit events, and their GUIDs can
-	// usually be found with various ETW tools (like wevutil).
-	krabs::provider<> provider(krabs::guid(L"{A0C1853B-5C40-4B15-8766-3CF1C58F985A}"));
-
+void ETW_Wrapper::initProviders() {
 	// user_trace providers typically have any and all flags, whose meanings are
 	// unique to the specific providers that are being invoked. To understand these
 	// flags, you'll need to look to the ETW event producer.
-	provider.any(0xf0010000000003ff);
+	pshellProvider.any(0xf0010000000003ff);
 
 	// providers should be wired up with functions (or functors) that are called when
 	// events from that provider are fired.
-	provider.add_on_event_callback([](const EVENT_RECORD& record) {
+	pshellProvider.add_on_event_callback([](const EVENT_RECORD& record) {
 
 		// Once an event is received, if we want krabs to help us analyze it, we need
 		// to snap in a schema to ask it for information.
@@ -44,12 +37,18 @@ void ETW_Wrapper::start() {
 			std::wcout << L"\tContext: " << context << std::endl;
 		}
 	});
-	
+}
+
+void ETW_Wrapper::start() {
+	traceThread = new std::thread(&ETW_Wrapper::start_trace, this);
+	std::wcout << "trace started . . ." << std::endl;
+}
+
+void ETW_Wrapper::start_trace() {
 	// the user_trace needs to know about the provider that we've set up.
-	trace.enable(provider);
+	trace.enable(pshellProvider);
 
 	// begin listening for events. This call blocks, so if you want to do other things
 	// while this runs, you'll need to call this on another thread.
 	trace.start();
-
 }
