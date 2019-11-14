@@ -1,55 +1,44 @@
 #include "ETW\ETW_Wrapper.h"
-#include <thread>
 #include <iostream>
 
-void ETW_Wrapper::start() {
+ETW_Wrapper::ETW_Wrapper() : pshellProvider(etw_guid::powershell),
+firewallProvider(etw_guid::firewall),
+groupPolicyProvider(etw_guid::groupPolicy)
+{
+}
 
-	// user_trace instances should be used for any non-kernel traces that are defined
-	// by components or programs in Windows.
-	krabs::user_trace trace;
+ETW_Wrapper::~ETW_Wrapper() {
+	traceThread->join();
+	delete traceThread;
+}
 
-	// A trace can have any number of providers, which are identified by GUID. These
-	// GUIDs are defined by the components that emit events, and their GUIDs can
-	// usually be found with various ETW tools (like wevutil).
-	krabs::provider<> provider(krabs::guid(L"{A0C1853B-5C40-4B15-8766-3CF1C58F985A}"));
+void ETW_Wrapper::addPowershellCallback(const std::function <void(const EVENT_RECORD&)>& f) {
+	pshellProvider.add_on_event_callback(f);
+}
 
+void addFirewallCallback(const std::function <void(const EVENT_RECORD&)>& f) {
+	firewallProvider.add_on_event_callback(f);
+}
+
+void addGPCallback(const std::function <void(const EVENT_RECORD&)>& f) {
+	groupPolicyProvider.add_on_event_callback(f);
+}
+
+void ETW_Wrapper::init() {
 	// user_trace providers typically have any and all flags, whose meanings are
 	// unique to the specific providers that are being invoked. To understand these
 	// flags, you'll need to look to the ETW event producer.
-	provider.any(0xf0010000000003ff);
+	//pshellProvider.any(0xf0010000000003ff);
 
-	// providers should be wired up with functions (or functors) that are called when
-	// events from that provider are fired.
-	provider.add_on_event_callback([](const EVENT_RECORD& record) {
+	traceThread = new std::thread(&ETW_Wrapper::startUserTrace, this);
+}
 
-		// Once an event is received, if we want krabs to help us analyze it, we need
-		// to snap in a schema to ask it for information.
-		krabs::schema schema(record);
-
-		// We then have the ability to ask a few questions of the event.
-		std::wcout << L"Event " << schema.event_id();
-		std::wcout << L"(" << schema.event_name() << L") received." << std::endl;
-
-		if (schema.event_id() == 7937) {
-			// The event we're interested in has a field that contains a bunch of
-			// info about what it's doing. We can snap in a parser to help us get
-			// the property information out.
-			krabs::parser parser(schema);
-
-			// We have to explicitly name the type that we're parsing in a template
-			// argument.
-			// We could alternatively use try_parse if we didn't want an exception to
-			// be thrown in the case of failure.
-			std::wstring context = parser.parse<std::wstring>(L"ContextInfo");
-			std::wcout << L"\tContext: " << context << std::endl;
-		}
-	});
-	
-	// the user_trace needs to know about the provider that we've set up.
-	trace.enable(provider);
+void ETW_Wrapper::startUserTrace() {
+	userTrace.enable(pshellProvider);
+	userTrace.enable(firewallProvider);
+	userTrace.enable(groupPolicyProvider);
 
 	// begin listening for events. This call blocks, so if you want to do other things
 	// while this runs, you'll need to call this on another thread.
-	trace.start();
-
+	userTrace.start();
 }
