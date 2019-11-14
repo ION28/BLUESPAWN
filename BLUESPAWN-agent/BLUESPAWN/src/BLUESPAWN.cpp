@@ -18,6 +18,10 @@ int main(int argc, char* argv[])
 
 	ETW_Wrapper wrapper;
 	wrapper.start();
+	for (int i = 0; i < 1000; i++) { std::wcout << i << std::endl;  }
+	std::wcout << "wait ended" << std::endl;
+	wrapper.initProviders();
+	while (true) {}
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
