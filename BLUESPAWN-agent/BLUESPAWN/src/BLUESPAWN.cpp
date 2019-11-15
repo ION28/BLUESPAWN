@@ -17,11 +17,31 @@ int main(int argc, char* argv[])
 	print_banner();
 
 	ETW_Wrapper wrapper;
-	wrapper.start();
-	for (int i = 0; i < 1000; i++) { std::wcout << i << std::endl;  }
-	std::wcout << "wait ended" << std::endl;
-	wrapper.initProviders();
-	while (true) {}
+	wrapper.init();
+	wrapper.addPowershellCallback([](const EVENT_RECORD& record) {
+
+		// Once an event is received, if we want krabs to help us analyze it, we need
+		// to snap in a schema to ask it for information.
+		krabs::schema schema(record);
+
+		// We then have the ability to ask a few questions of the event.
+		std::wcout << L"Event " << schema.event_id();
+		std::wcout << L"(" << schema.event_name() << L") received." << std::endl;
+
+		if (schema.event_id() == 7937) {
+			// The event we're interested in has a field that contains a bunch of
+			// info about what it's doing. We can snap in a parser to help us get
+			// the property information out.
+			krabs::parser parser(schema);
+
+			// We have to explicitly name the type that we're parsing in a template
+			// argument.
+			// We could alternatively use try_parse if we didn't want an exception to
+			// be thrown in the case of failure.
+			std::wstring context = parser.parse<std::wstring>(L"ContextInfo");
+			std::wcout << L"\tContext: " << context << std::endl;
+		}
+	});
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
