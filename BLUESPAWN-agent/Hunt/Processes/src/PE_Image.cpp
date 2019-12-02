@@ -16,16 +16,17 @@ IMAGE_SECTION_HEADER CreateVirtualHeader(std::string name, DWORD dwRVA, DWORD dw
 	return VirtualHeader;
 }
 
-PE_Image::PE_Image(LPVOID lpBaseAddress, HANDLE hProcess, bool expanded) : 
+PE_Image::PE_Image(LPVOID lpBaseAddress, HANDLE hProcess, bool expanded, std::optional<std::wstring> swzImageName,
+	std::optional<std::wstring> swzImagePath) : 
 	expanded{ expanded },
 	base{ nullptr },
 	BaseAddress{ nullptr },
 	relocations{ nullptr },
 	imports{ nullptr },
 	exports{ nullptr },
-	resources{ nullptr }
-{
-
+	resources{ nullptr },
+	swzImageName{ swzImageName },
+	swzImagePath{ swzImagePath }{
 	MemoryWrapper<IMAGE_DOS_HEADER> dos = { lpBaseAddress, sizeof(IMAGE_DOS_HEADER), hProcess };
 
 	DWORD NTHeaderOffset = dos->e_lfanew;
@@ -42,6 +43,7 @@ PE_Image::PE_Image(LPVOID lpBaseAddress, HANDLE hProcess, bool expanded) :
 
 	this->dwExpandSize = arch == x64 ? NTHeaders64.OptionalHeader.SizeOfImage : NTHeaders32.OptionalHeader.SizeOfImage;
 	this->dwHeaderSize = arch == x64 ? NTHeaders64.OptionalHeader.SizeOfHeaders : NTHeaders32.OptionalHeader.SizeOfHeaders;
+	this->dwEntryPoint = arch == x64 ? NTHeaders64.OptionalHeader.AddressOfEntryPoint : NTHeaders32.OptionalHeader.AddressOfEntryPoint;
 
 	this->sections = {};
 	MemoryWrapper<IMAGE_SECTION_HEADER> SectionHeaders = {
@@ -85,37 +87,37 @@ PE_Image::PE_Image(LPVOID lpBaseAddress, HANDLE hProcess, bool expanded) :
 	this->resources = new Resource_Section(PE_Section(*this, CreateVirtualHeader(".rsrc", dwResourceRVA, dwResourceSize, RVAToOffset(dwResourceRVA)), base, expanded));
 }
 
-PE_Image PE_Image::LoadTo(MemoryWrapper<> location, bool AvoidTargetChanges){
-	if(location.MemorySize < dwExpandSize){
-		return nullptr;
+std::optional<PE_Image> PE_Image::LoadTo(MemoryWrapper<> location, bool AvoidTargetChanges){
+	if(location.MemorySize < dwExpandSize || !ValidatePE()){
+		return std::nullopt;
 	} else {
 		if(AvoidTargetChanges){
-			ApplyLocalRelocations(reinterpret_cast<DWORD64>(location.address) - BaseAddress);
-			ParseLocalImports(location.process);
-			location.Write(base, dwHeaderSize, 0);
+			if(!ApplyLocalRelocations(reinterpret_cast<DWORD64>(location.address) - BaseAddress)) return std::nullopt;
+			if(!ParseLocalImports(location.process)) return std::nullopt;
+			if(!location.Write(base, dwHeaderSize, 0)) return std::nullopt;
 
 			for(auto section : sections){
-				location.Write(section.second.SectionContent, section.second.SectionContent.MemorySize, 0);
+				if(!location.Write(section.second.SectionContent, section.second.SectionContent.MemorySize, 0)) return std::nullopt;
 			}
 		} else {
-			location.Write(base, dwHeaderSize, 0);
+			if(!location.Write(base, dwHeaderSize, 0)) return std::nullopt;
 
 			for(auto section : sections){
-				location.Write(section.second.SectionContent, section.second.SectionContent.MemorySize, 0);
+				if(!location.Write(section.second.SectionContent, section.second.SectionContent.MemorySize, 0)) return std::nullopt;
 			}
 
-			ApplyTargetRelocations(location);
-			ParseTargetImports(location);
+			if(!ApplyTargetRelocations(location)) return std::nullopt;
+			if(!ParseTargetImports(location)) return std::nullopt;
 		}
 
-		ApplyProtections(location);
+		if(!ApplyProtections(location)) return std::nullopt;
 
-		return { location.address, location.process, true };
+		return std::optional<PE_Image>{PE_Image{ location.address, location.process, true }};
 	}
 }
 
 bool PE_Image::ApplyLocalRelocations(DWORD64 offset){
-	if(relocations->GetSignature() != L".reloc"){
+	if(!ValidatePE() || relocations->GetSignature() != L".reloc"){
 		return false;
 	}
 
@@ -174,22 +176,22 @@ bool PE_Image::ApplyTargetRelocations(MemoryWrapper<> TargetLocation) const {
 }
 
 bool PE_Image::ParseLocalImports(HandleWrapper process){
-	return imports->LoadAllImports(base, process, expanded);
+	return imports->LoadAllImports(process);
 }
 
 bool PE_Image::ParseTargetImports(MemoryWrapper<> TargetLocation) const {
-	return imports->LoadAllImports(TargetLocation, TargetLocation.process, true);
+	return imports->LoadAllImports(TargetLocation.process);
 }
 
 bool PE_Image::ApplyProtections(MemoryWrapper<> TargetLocation) const {
 	TargetLocation.Protect(PAGE_READONLY);
 
 	DWORD dwProtectionMap[8]{
-		PAGE_NOACCESS, PAGE_READONLY,
-		PAGE_READWRITE, PAGE_READWRITE,
+		PAGE_NOACCESS,           PAGE_READONLY,
+		PAGE_READWRITE,          PAGE_READWRITE,
 
-		PAGE_EXECUTE, PAGE_EXECUTE_READ,
-		PAGE_EXECUTE_WRITECOPY, PAGE_EXECUTE_READWRITE
+		PAGE_EXECUTE,            PAGE_EXECUTE_READ,
+		PAGE_EXECUTE_WRITECOPY,  PAGE_EXECUTE_READWRITE,
 	};
 
 	for(auto pair : sections){
