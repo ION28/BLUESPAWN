@@ -5,5 +5,5 @@ std::string Mitigation::getName() {
 }
 
 std::string Mitigation::getDescription() {
-	return this->description();
+	return this->description;
 }
