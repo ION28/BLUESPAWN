@@ -29,5 +29,11 @@
     <ClCompile Include="src\MitigationRegister.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Mitigation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Mitigations.props" />
   </ItemGroup>
 </Project>

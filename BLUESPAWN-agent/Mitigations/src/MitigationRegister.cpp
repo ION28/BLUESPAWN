@@ -1,5 +1,6 @@
 #include "mitigations/MitigationRegister.h"
-#iclude <iostream>
+#include <iostream>
+#include <string>
 
 void MitigationRegister::RegisterMitigation(Mitigation* mitigation) {
 	vRegisteredMitigations.emplace_back(mitigation);
@@ -12,7 +13,7 @@ void MitigationRegister::SetSecurityLevel(SecurityLevel securityLevel) {
 		if(!vRegisteredMitigations[i]->isEnforced(securityLevel)) {
 			std::string answer = "";
 			while(answer != "y" && answer != "n") {
-				std::wcout << "Enforce " << vRegisteredMitigations[i]->getName() << ": " << vRegisteredMitigations[i]->getDescription << "? [y][n]" << std::end;
+				std::cout << "Enforce " << vRegisteredMitigations[i]->getName() << ": " << vRegisteredMitigations[i]->getDescription() << "? [y][n]" << std::endl;
 				std::getline(std::cin, answer);
 			}
 			
