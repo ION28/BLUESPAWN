@@ -4,6 +4,7 @@
 #define NOMINMAX
 #endif
 
+#include <winsock2.h>
 #include <Windows.h>
 
 // The developer of this library is a bad developer who left warnings in his code.
@@ -21,6 +22,8 @@
 #include "logging/Log.h"
 #include "logging/CLISink.h"
 #include "configuration/Registry.h"
+
+#include "ETW\ETW_Wrapper.h"
 
 #include "hunts/Hunt.h"
 #include "hunts/HuntRegister.h"

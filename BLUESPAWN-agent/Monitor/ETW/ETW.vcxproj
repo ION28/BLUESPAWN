@@ -18,6 +18,15 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\ETW\ETW_Wrapper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ETW_Wrapper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BC9BC6AA-FFF3-4219-B712-E3DE2A5C4D82}</ProjectGuid>
     <RootNamespace>ETW</RootNamespace>
@@ -32,6 +41,15 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\Project Configurations\buildsettings.props" />
     <Import Project="..\..\Project Configurations\buildstructure.props" />
+    <Import Project="..\..\packages\Microsoft.O365.Security.Krabsetw.2.0.2\build\native\krabsetw.targets" Condition="Exists('..\..\packages\Microsoft.O365.Security.Krabsetw.2.0.2\build\native\krabsetw.targets')" />
+    <Import Project="..\..\packages\boost.1.71.0.0\build\boost.targets" Condition="Exists('..\..\packages\boost.1.71.0.0\build\boost.targets')" />
   </ImportGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\Microsoft.O365.Security.Krabsetw.2.0.2\build\native\krabsetw.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.O365.Security.Krabsetw.2.0.2\build\native\krabsetw.targets'))" />
+    <Error Condition="!Exists('..\..\packages\boost.1.71.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\boost.1.71.0.0\build\boost.targets'))" />
+  </Target>
 </Project>

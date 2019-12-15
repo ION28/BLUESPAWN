@@ -18,6 +18,30 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Link>
+      <AdditionalDependencies>$(ProjectDir)\..\artifacts\x86\Debug\ETW.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link>
+      <AdditionalDependencies>$(ProjectDir)\..\artifacts\x64\Debug\ETW.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Link>
+      <AdditionalDependencies>$(ProjectDir)\..\artifacts\x86\Release\ETW.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <AdditionalDependencies>$(ProjectDir)\..\artifacts\x64\Release\ETW.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommonLib\CommonLib.vcxproj">
       <Project>{25ae1d80-3e17-4e1d-bfb4-8afb375ebaf1}</Project>
@@ -57,10 +81,20 @@
     <Import Project="..\Logging\Logging.props" />
     <Import Project="..\Hunt\FileSystem\FileSystem.props" />
     <Import Project="..\Hunt\Configuration\Configuration.props" />
+    <Import Project="..\Monitor\ETW\ETW.props" />
     <Import Project="..\Hunt\Hunts\Hunts.props" />
     <Import Project="..\React\Reactions\reactions.props" />
     <Import Project="..\External Dependencies\cxxopt.props" />
     <Import Project="..\CommonLib\CommonLib.props" />
+	<Import Project="..\packages\Microsoft.O365.Security.Krabsetw.2.0.2\build\native\krabsetw.targets" Condition="Exists('..\packages\Microsoft.O365.Security.Krabsetw.2.0.2\build\native\krabsetw.targets')" />
+    <Import Project="..\packages\boost.1.71.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.71.0.0\build\boost.targets')" />
   </ImportGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.O365.Security.Krabsetw.2.0.2\build\native\krabsetw.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.O365.Security.Krabsetw.2.0.2\build\native\krabsetw.targets'))" />
+    <Error Condition="!Exists('..\packages\boost.1.71.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.71.0.0\build\boost.targets'))" />
+  </Target>
 </Project>
