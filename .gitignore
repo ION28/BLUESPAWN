@@ -1,6 +1,7 @@
 BLUESPAWN-agent/.vs/
 BLUESPAWN-agent/build/
 BLUESPAWN-agent/artifacts/
+BLUESPAWN-agent/packages/
 BLUESPAWN-server/.vs/
 BLUESPAWN-server/build/
 BLUESPAWN-server/artifacts/

@@ -16,6 +16,10 @@ int main(int argc, char* argv[])
 
 	print_banner();
 
+	// Create and initialize the ETW wrapper
+	ETW_Wrapper wrapper;
+	wrapper.init();
+
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
 	options.add_options()
