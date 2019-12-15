@@ -16,11 +16,11 @@ void ETW_Wrapper::addPowershellCallback(const std::function <void(const EVENT_RE
 	pshellProvider.add_on_event_callback(f);
 }
 
-void addFirewallCallback(const std::function <void(const EVENT_RECORD&)>& f) {
+void ETW_Wrapper::addFirewallCallback(const std::function <void(const EVENT_RECORD&)>& f) {
 	firewallProvider.add_on_event_callback(f);
 }
 
-void addGPCallback(const std::function <void(const EVENT_RECORD&)>& f) {
+void ETW_Wrapper::addGPCallback(const std::function <void(const EVENT_RECORD&)>& f) {
 	groupPolicyProvider.add_on_event_callback(f);
 }
 
