@@ -49,11 +49,11 @@ class Import_Library {
 public:
 	std::wstring sLibraryName{};
 	const PE_Image& image;
+	
+	Import_Library(const PE_Image& image, const IMPORT_DIRECTORY_TABLE& ImportDirectoryTable);
 
 	// A mapping from Imports to RVAs of the related Import Address Table entry.
 	std::vector<std::pair<Import, DWORD>> vImportToIAT{};
-	
-	Import_Library(const PE_Image& image, const IMPORT_DIRECTORY_TABLE& ImportDirectoryTable);
 
 	bool LoadImportLibrary(const HandleWrapper& context);
 };
@@ -62,9 +62,9 @@ class Import_Section : public PE_Section {
 public:
 	std::vector<Import_Library> imports;
 
-	bool LoadAllImports(const HandleWrapper& context);
-
 	Import_Section(const PE_Section& section);
 
-	std::set<std::wstring> GetRequiredLibraries();
+	bool LoadAllImports(const HandleWrapper& context);
+
+	std::set<std::wstring> GetRequiredLibraries() const;
 };

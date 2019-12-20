@@ -25,7 +25,7 @@ public:
 
 	Export_Section(const PE_Section& section);
 
-	DWORD64 GetExportAddress(std::string name);
-	DWORD64 GetExportAddress(WORD ordinal);
+	DWORD64 GetExportAddress(std::string name) const;
+	DWORD64 GetExportAddress(WORD ordinal) const;
 };
 

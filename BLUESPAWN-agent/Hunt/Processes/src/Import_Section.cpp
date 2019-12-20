@@ -136,7 +136,7 @@ bool Import_Section::LoadAllImports(const HandleWrapper& context){
 	return true;
 }
 
-std::set<std::wstring> Import_Section::GetRequiredLibraries(){
+std::set<std::wstring> Import_Section::GetRequiredLibraries() const {
 	std::set<std::wstring> names = {};
 	for(auto lib : imports){
 		names.emplace(lib.sLibraryName);

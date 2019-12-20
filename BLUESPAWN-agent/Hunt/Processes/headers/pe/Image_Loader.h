@@ -30,6 +30,10 @@ typedef struct _LDR_ENTRY32 {
 	USHORT LoadCount;
 	USHORT TlsIndex;
 	LIST_ENTRY32 HashLinks;
+	union {
+		ULONG TimeDateStamp;
+		DWORD LoadedImports;
+	};
 } LDR_ENTRY32, *PLDR_ENTRY32;
 
 typedef struct _LDR_DATA32 {
@@ -62,8 +66,12 @@ typedef struct _LDR_ENTRY64 {
 	ULONG Flags;
 	USHORT LoadCount;
 	USHORT TlsIndex;
-	LIST_ENTRY64 HashLinks;
-} LDR_ENTRY64, * PLDR_ENTRY64;
+	LIST_ENTRY64 HashLinks; 
+	union {
+		ULONG TimeDateStamp;
+		DWORD64 LoadedImports;
+	};
+} LDR_ENTRY64, *PLDR_ENTRY64;
 
 typedef struct _LDR_DATA64 {
 	ULONG Length;
@@ -89,8 +97,8 @@ struct Loaded_Image64 {
 	Loaded_Image64(const LDR_ENTRY64& entry, const HandleWrapper& process, bool imported = true);
 	Loaded_Image64(const PE_Image& image, bool importsFinished = true, const std::wstring& ImagePath = L"");
 
-	PE_Image GetImage();
-	LDR_ENTRY64 CreateLoaderEntry(PLIST_ENTRY64 before = nullptr, PLIST_ENTRY64 after = nullptr);
+	PE_Image GetImage() const;
+	LDR_ENTRY64 CreateLoaderEntry(PLIST_ENTRY64 before = nullptr, PLIST_ENTRY64 after = nullptr) const;
 };
 
 struct Loaded_Image32 {
@@ -105,8 +113,8 @@ struct Loaded_Image32 {
 	Loaded_Image32(const LDR_ENTRY32& entry, const HandleWrapper& process, bool imported = true);
 	Loaded_Image32(const PE_Image& image, bool importsFinished = true, const std::wstring& ImagePath = L"");
 
-	PE_Image GetImage();
-	LDR_ENTRY32 CreateLoaderEntry(PLIST_ENTRY32 before = nullptr, PLIST_ENTRY32 after = nullptr);
+	PE_Image GetImage() const;
+	LDR_ENTRY32 CreateLoaderEntry(PLIST_ENTRY32 before = nullptr, PLIST_ENTRY32 after = nullptr) const;
 };
 
 struct Loaded_Image {
@@ -119,7 +127,7 @@ struct Loaded_Image {
 	Loaded_Image(const LDR_ENTRY64& entry, const HandleWrapper& process, bool imported = true);
 	Loaded_Image(const PE_Image& image, bool importsFinished = true, const std::wstring& ImagePath = L"");
 
-	PE_Image GetImage();
+	PE_Image GetImage() const;
 };
 
 class Image_Loader {
@@ -127,17 +135,18 @@ public:
 	std::vector<Loaded_Image> LoadedImages;
 	Architecture arch;
 	const HandleWrapper& process;
+	DWORD64 address;
 
 	Image_Loader(const HandleWrapper& process = GetCurrentProcess());
 
 	bool AddImage(const Loaded_Image& image);
 
-	bool ContainsImage(const std::wstring& name);
+	bool ContainsImage(const std::wstring& name) const;
 
 	bool RemoveImage(const Loaded_Image& image);
 
 	bool MarkLoaded(const std::wstring& name);
 
-	std::optional<Loaded_Image> GetImageInfo(const std::wstring& name);
+	std::optional<Loaded_Image> GetImageInfo(const std::wstring& name) const;
 };
 
