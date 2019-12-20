@@ -1,17 +1,24 @@
 #include "bluespawn/bluespawn.h"
 #include "logging/HuntLogMessage.h"
 #include "logging/DebugSink.h"
+#include "common/DynamicLinker.h"
 
 #include <iostream>
 
 int main(int argc, char* argv[])
 {
+	Linker::LinkFunctions();
+
 	Log::DebugSink DebugOutput{};
 	Log::CLISink ConsoleOutput{};
 	Log::AddSink(DebugOutput);
 	Log::AddHuntSink(ConsoleOutput);
 
 	print_banner();
+
+	// Create and initialize the ETW wrapper
+	ETW_Wrapper wrapper;
+	wrapper.init();
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
@@ -74,8 +81,12 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 		aHuntLevel = Aggressiveness::Moderate;
 	} else if(sHuntLevelFlag == "Careful") {
 		aHuntLevel = Aggressiveness::Careful;
-	} else {
+	} else if (sHuntLevelFlag == "Aggressive") {
 		aHuntLevel = Aggressiveness::Aggressive;
+	} else {
+		std::cerr << "Error " << sHuntLevelFlag << " - Unknown hunt level. Please specify either Cursory, Moderate, Careful, or Aggressive" << std::endl;
+		std::cerr << "Will default to Moderate for this run." << std::endl;
+		aHuntLevel = Aggressiveness::Moderate;
 	}
 
 	HuntRegister record{};

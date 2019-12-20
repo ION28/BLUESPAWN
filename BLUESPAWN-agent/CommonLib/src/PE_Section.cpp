@@ -1,11 +1,14 @@
 #include "pe/PE_Section.h"
+#include "pe/PE_Image.h"
 
 #include <Windows.h>
 
 #include <string>
 
-PE_Section::PE_Section(PIMAGE_SECTION_HEADER SectionHeader, MemoryWrapper<> lpImageBase, bool expanded)
-	: SectionContent{ lpImageBase.GetOffset(expanded ? SectionHeader->VirtualAddress : SectionHeader->PointerToRawData) }{
+PE_Section::PE_Section(const PE_Image& image, PIMAGE_SECTION_HEADER SectionHeader, MemoryWrapper<> lpImageBase, bool expanded) : 
+	AssociatedImage{ image },
+	expanded{ expanded },
+	SectionContent{ lpImageBase.GetOffset(expanded ? SectionHeader->VirtualAddress : SectionHeader->PointerToRawData) }{
 	this->SectionHeader = *SectionHeader;
 
 	WCHAR signature[9]{};
@@ -19,28 +22,30 @@ PE_Section::PE_Section(PIMAGE_SECTION_HEADER SectionHeader, MemoryWrapper<> lpIm
 PE_Section::PE_Section(const PE_Section& copy) :
 	SectionHeader{ copy.SectionHeader },
 	SectionContent{ copy.SectionContent },
-	Signature{ copy.Signature }{}
+	Signature{ copy.Signature },
+	AssociatedImage{ copy.AssociatedImage },
+	expanded{ copy.expanded }{}
 
-bool PE_Section::ContainsOffset(DWORD offset){
+bool PE_Section::ContainsOffset(DWORD offset) const {
 	return offset >= SectionHeader.PointerToRawData && offset < SectionHeader.PointerToRawData + SectionHeader.SizeOfRawData;
 }
 
-bool PE_Section::ContainsRVA(DWORD rva){
+bool PE_Section::ContainsRVA(DWORD rva) const {
 	return rva >= SectionHeader.VirtualAddress && rva < SectionHeader.VirtualAddress + SectionHeader.SizeOfRawData;
 }
 
-DWORD PE_Section::ConvertOffsetToRVA(DWORD offset){
+DWORD PE_Section::ConvertOffsetToRVA(DWORD offset) const {
 	return ContainsOffset(offset) ? offset - SectionHeader.PointerToRawData + SectionHeader.VirtualAddress : 0;
 }
 
-DWORD PE_Section::ConvertRVAToOffset(DWORD offset){
+DWORD PE_Section::ConvertRVAToOffset(DWORD offset) const {
 	return ContainsRVA(offset) ? offset - SectionHeader.VirtualAddress + SectionHeader.SizeOfRawData : 0;
 }
 
-std::wstring PE_Section::GetSignature(){
+std::wstring PE_Section::GetSignature() const {
 	return Signature;
 }
 
-PE_Section::operator IMAGE_SECTION_HEADER(){
+PE_Section::operator IMAGE_SECTION_HEADER() const {
 	return SectionHeader;
 }
