@@ -130,7 +130,7 @@ public:
 		}
 	}
 	
-	bool Write(T* lpToWrite, SIZE_T nWriteSize = sizeof(T), SIZE_T offset = 0) const {
+	bool Write(const T* lpToWrite, SIZE_T nWriteSize = sizeof(T), SIZE_T offset = 0) const {
 		if(offset != 0){
 			return GetOffset(offset).Write(lpToWrite, nWriteSize);
 		}
