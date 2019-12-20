@@ -40,20 +40,20 @@ public:
 
 	PE_Image(LPVOID lpBaseAddress, HANDLE hProcess = GetCurrentProcess(), bool expanded = false);
 
-	bool ValidatePE();
+	bool ValidatePE() const;
 
-	DWORD RVAToOffset(DWORD rva);
-	DWORD OffsetToRVA(DWORD rva);
+	DWORD RVAToOffset(DWORD rva) const;
+	DWORD OffsetToRVA(DWORD rva) const;
 
 	PE_Image LoadTo(MemoryWrapper<> target, bool AvoidTargetChanges = false);
 
 	bool ApplyLocalRelocations(DWORD64 offset);
-	bool ApplyTargetRelocations(MemoryWrapper<> target);
+	bool ApplyTargetRelocations(MemoryWrapper<> target) const;
 
 	bool ParseLocalImports(HandleWrapper process);
-	bool ParseTargetImports(MemoryWrapper<> target);
+	bool ParseTargetImports(MemoryWrapper<> target) const;
 
-	bool ApplyProtections(MemoryWrapper<> target);
+	bool ApplyProtections(MemoryWrapper<> target) const;
 };
 
 #endif
