@@ -336,6 +336,7 @@
     <Import Project="..\Hunt\Hunts\Hunts.props" />
     <Import Project="..\Logging\Logging.props" />
     <Import Project="..\Logging\GRPC.props" />
+    <Import Project="..\CommonLib\CommonLib.props" />
   </ImportGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
