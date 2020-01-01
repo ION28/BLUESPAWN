@@ -27,23 +27,9 @@
     <ClInclude Include="headers\common\DynamicLinker.h" />
     <ClInclude Include="headers\common\StringUtils.h" />
     <ClInclude Include="headers\common\wrappers.hpp" />
-    <ClInclude Include="headers\pe\Export_Section.h" />
-    <ClInclude Include="headers\pe\Image_Loader.h" />
-    <ClInclude Include="headers\pe\Import_Section.h" />
-    <ClInclude Include="headers\pe\PE_Image.h" />
-    <ClInclude Include="headers\pe\PE_Section.h" />
-    <ClInclude Include="headers\pe\Relocation_Section.h" />
-    <ClInclude Include="headers\pe\Resource_Section.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DynamicLinker.cpp" />
-    <ClCompile Include="src\Export_Section.cpp" />
-    <ClCompile Include="src\Image_Loader.cpp" />
-    <ClCompile Include="src\Import_Section.cpp" />
-    <ClCompile Include="src\PE_Image.cpp" />
-    <ClCompile Include="src\PE_Section.cpp" />
-    <ClCompile Include="src\Relocation_Section.cpp" />
-    <ClCompile Include="src\Resource_Section.cpp" />
     <ClCompile Include="src\StringUtils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

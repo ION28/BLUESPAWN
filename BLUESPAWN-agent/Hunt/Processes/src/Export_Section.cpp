@@ -65,46 +65,43 @@ Export_Section::Export_Section(const PE_Section& section) :
 	}
 }
 
-LPVOID Export_Section::GetExportAddress(std::string name){
+DWORD64 Export_Section::GetExportAddress(std::string name){
 	for(auto dllExport : exports){
 		if(dllExport.name == name){
 			return GetExportAddress(dllExport.ordinal);
 		}
 	}
-	return nullptr;
+	return 0;
 }
 
-LPVOID Export_Section::GetExportAddress(WORD ordinal){
+DWORD64 Export_Section::GetExportAddress(WORD ordinal){
 	for(auto dllExport : exports){
 		if(dllExport.ordinal == ordinal){
 			if(dllExport.rva){
 				return AssociatedImage.base.GetOffset(AssociatedImage.RVAToOffset(dllExport.rva));
 			} else {
-				auto Process = AssociatedImage.base.process;
-				auto Loader = Image_Loader(Process);
+				auto hProcess = AssociatedImage.base.process;
+				auto Loader = Image_Loader(hProcess);
 				if(!Loader.ContainsImage(StringToWidestring(dllExport.name))){
-
-					// Assume the image is in System32
-					auto ImagePath = "%SystemRoot%\\System32\\" + dllExport.name;
-
-					HandleWrapper file = CreateFileA(ImagePath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
-					if(!file){
-						return nullptr;
+					PE_Image image = PE_Image(StringToWidestring(dllExport.name));
+					if(!image.ValidatePE()){
+						return 0;
 					}
-	
-					auto FileSize = GetFileSize(file, nullptr);
-					const MemoryAllocationWrapper<CHAR>& contents = { new CHAR[FileSize], FileSize };
-
-					PE_Image image = PE_Image(dynamic_cast<const MemoryWrapper<CHAR>&>(contents), Process, false);
-					image.LoadTo({ VirtualAllocEx(Process, nullptr, image.dwExpandSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE),
-						image.dwExpandSize, Process }, true);
+					if(!image.LoadTo({ VirtualAllocEx(hProcess, nullptr, image.dwExpandSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE),
+						image.dwExpandSize, hProcess }, true)){
+						return 0;
+					}
+					Loader.AddImage(Loaded_Image{ image, true, image.swzImagePath.has_value() ? *image.swzImagePath : L"" });
 				}
 
 				auto ImageInfo = Loader.GetImageInfo(StringToWidestring(dllExport.name));
-				auto Image = ImageInfo.GetImage();
+				if(!ImageInfo.has_value()){
+					return 0;
+				}
+				auto Image = ImageInfo->GetImage();
 				return Image.exports->GetExportAddress(ordinal);
 			}
 		}
 	}
-	return nullptr;
+	return 0;
 }

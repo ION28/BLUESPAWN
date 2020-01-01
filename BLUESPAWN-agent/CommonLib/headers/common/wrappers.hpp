@@ -42,7 +42,7 @@ public:
 		: freeResource{ copy.freeResource } { SetReference(copy.WrappedObject); }
 
 	GenericWrapper(GenericWrapper&& move)
-		: freeResource{ move.freeResource } { SetRefernce(move.WrappedObject); move.DestroyReference(); }
+		: freeResource{ move.freeResource } { SetReference(move.WrappedObject); move.DestroyReference(); }
 
 	GenericWrapper& operator=(const GenericWrapper& copy){ 
 		freeResource = copy.freeResource; 
@@ -130,7 +130,7 @@ public:
 		}
 	}
 	
-	bool Write(T* lpToWrite, SIZE_T nWriteSize = sizeof(T), SIZE_T offset = 0){
+	bool Write(const T* lpToWrite, SIZE_T nWriteSize = sizeof(T), SIZE_T offset = 0) const {
 		if(offset != 0){
 			return GetOffset(offset).Write(lpToWrite, nWriteSize);
 		}
