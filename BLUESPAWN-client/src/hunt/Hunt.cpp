@@ -4,6 +4,14 @@
 
 #include <iostream>
 
+HuntInfo::HuntInfo(const std::wstring& HuntName, Aggressiveness HuntAggressiveness, DWORD HuntTactics, DWORD HuntCategories, DWORD HuntDatasources, long HuntStartTime) :
+	HuntName{ HuntName },
+	HuntAggressiveness{ HuntAggressiveness },
+	HuntTactics{ HuntTactics },
+	HuntCategories{ HuntCategories },
+	HuntDatasources{ HuntDatasources },
+	HuntStartTime{ HuntStartTime }{}
+
 Hunt::Hunt(HuntRegister& record, const std::wstring& name) : 
 	name{ name }{
 	record.RegisterHunt(this);

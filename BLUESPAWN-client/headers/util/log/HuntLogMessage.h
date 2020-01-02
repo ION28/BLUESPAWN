@@ -50,7 +50,7 @@ namespace Log {
 		 * @param Hunt A HuntInfo struct containing information about the hunt.
 		 * @param sinks The sinks that this message will log itself to.
 		 */
-		HuntLogMessage(const HuntInfo& Hunt, std::vector<std::reference_wrapper<LogSink>> sinks);
+		HuntLogMessage(const HuntInfo& Hunt, const std::vector<std::reference_wrapper<LogSink>>& sinks);
 
 		/**
 		 * Creates a log message at a given level and with a sink.
