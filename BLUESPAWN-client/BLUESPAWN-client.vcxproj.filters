@@ -1,0 +1,327 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{5e3094ea-2888-4012-a455-300c784aa7ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hunt">
+      <UniqueIdentifier>{a678455f-744f-4663-b647-4b5709265150}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mitigation">
+      <UniqueIdentifier>{4c99cbae-4800-4703-a92a-ff3c2e107fcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\monitor">
+      <UniqueIdentifier>{bdfea10f-b8dd-43a8-9591-0aaa26a93d75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\user">
+      <UniqueIdentifier>{5f88fe29-b831-4cf6-aca3-4d664508f61a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hunt\hunts">
+      <UniqueIdentifier>{850789ea-d66b-4e64-acd8-b8f9ddae7992}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\configurations">
+      <UniqueIdentifier>{b21dcbf9-746e-482d-97c5-08b12caf291c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\filesystem">
+      <UniqueIdentifier>{d8dc0ca9-b1dd-47c4-9413-4b1e987e8369}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\log">
+      <UniqueIdentifier>{94361d57-7102-431b-88e6-d1c640d070c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\processes">
+      <UniqueIdentifier>{55466f29-9078-458e-9c9e-731465ceaedb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\reaction">
+      <UniqueIdentifier>{59d6c737-a765-4c58-99c3-94ae2fc6b1d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\pe">
+      <UniqueIdentifier>{be6f7dae-9441-44be-ac5d-d929cb68e4a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hunt">
+      <UniqueIdentifier>{5a7c46b3-caea-4289-bfcc-3f97a1277427}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mitigation">
+      <UniqueIdentifier>{e1e86a24-6625-4dbd-b023-de2182d32560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\monitor">
+      <UniqueIdentifier>{6f3b3ba6-87f7-461f-a9ca-95e5d976dc3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\user">
+      <UniqueIdentifier>{bb865992-8401-4892-837f-29746f11a9f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{d7e04114-31a5-49e8-ae0e-7f41d50aff4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hunt\hunt">
+      <UniqueIdentifier>{6b37472a-6262-46f5-95e9-697fc82223c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\configurations">
+      <UniqueIdentifier>{85fff8b5-a142-4782-9b2d-e56c775c2d65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\filesystem">
+      <UniqueIdentifier>{1e386e96-cfa2-4de5-8b9f-fb83d8a5e71a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\log">
+      <UniqueIdentifier>{c4cef2c0-25d4-4b68-9bee-1fed4b9032a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\pe">
+      <UniqueIdentifier>{b06b3f6c-529c-4b8f-95e1-825ba059521a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\processes">
+      <UniqueIdentifier>{5e5c0dd9-7f92-476e-a3ec-1f9b1f2bf622}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\reaction">
+      <UniqueIdentifier>{a5f16481-f90c-4fdf-815a-2e6cdc9a0546}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\hunt\hunts\HuntT1004.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1037.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1060.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1100.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1101.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1103.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1131.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1138.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1182.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\Hunt.h">
+      <Filter>Header Files\hunt</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\HuntInfo.h">
+      <Filter>Header Files\hunt</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\HuntRegister.h">
+      <Filter>Header Files\hunt</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\RegistryHunt.hpp">
+      <Filter>Header Files\hunt</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\Scope.h">
+      <Filter>Header Files\hunt</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\Mitigation.h">
+      <Filter>Header Files\mitigation</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\MitigationRegister.h">
+      <Filter>Header Files\mitigation</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\monitor\ETW_Wrapper.h">
+      <Filter>Header Files\monitor</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\user\banners.h">
+      <Filter>Header Files\user</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\user\bluespawn.h">
+      <Filter>Header Files\user</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\configurations\CollectInfo.h">
+      <Filter>Header Files\util\configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\configurations\Registry.h">
+      <Filter>Header Files\util\configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\configurations\ScheduledTasks.h">
+      <Filter>Header Files\util\configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\filesystem\FileSystem.h">
+      <Filter>Header Files\util\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\CLISink.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\DebugSink.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\HuntLogMessage.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\Log.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\Loggable.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\LogLevel.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\LogSink.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\ServerSink.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\processes\Analyzer.h">
+      <Filter>Header Files\util\processes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Export_Section.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Image_Loader.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Import_Section.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\PE_Image.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\PE_Section.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Relocation_Section.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Resource_Section.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\reaction\Detections.h">
+      <Filter>Header Files\util\reaction</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\reaction\Log.h">
+      <Filter>Header Files\util\reaction</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\reaction\Reaction.h">
+      <Filter>Header Files\util\reaction</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\hunt\Hunt.cpp">
+      <Filter>Source Files\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\HuntRegister.cpp">
+      <Filter>Source Files\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\Scope.cpp">
+      <Filter>Source Files\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1004.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1037.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1060.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1100.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1101.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1103.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1131.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1138.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1182.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\Mitigation.cpp">
+      <Filter>Source Files\mitigation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\MitigationRegister.cpp">
+      <Filter>Source Files\mitigation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">
+      <Filter>Source Files\monitor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\user\banners.cpp">
+      <Filter>Source Files\user</Filter>
+    </ClCompile>
+    <ClCompile Include="src\user\BLUESPAWN.cpp">
+      <Filter>Source Files\user</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\configurations\CollectInfo.cpp">
+      <Filter>Source Files\util\configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\configurations\Registry.cpp">
+      <Filter>Source Files\util\configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\filesystem\FileSystem.cpp">
+      <Filter>Source Files\util\filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\CLISink.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\DebugSink.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\HuntLogMessage.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\Log.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\LogLevel.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\ServerSink.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Export_Section.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Image_Loader.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Import_Section.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\PE_Image.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\PE_Section.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Relocation_Section.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Resource_Section.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\processes\Analyzer.cpp">
+      <Filter>Source Files\util\processes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\reaction\Reaction.cpp">
+      <Filter>Source Files\util\reaction</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\reaction\ReactLog.cpp">
+      <Filter>Source Files\util\reaction</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
