@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\hunt\Hunt.h" />
+    <ClInclude Include="headers\hunt\HuntInfo.h" />
+    <ClInclude Include="headers\hunt\HuntRegister.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1004.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1037.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1060.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1100.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1101.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1103.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1131.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1138.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
+    <ClInclude Include="headers\hunt\RegistryHunt.hpp" />
+    <ClInclude Include="headers\hunt\Scope.h" />
+    <ClInclude Include="headers\mitigation\Mitigation.h" />
+    <ClInclude Include="headers\mitigation\MitigationRegister.h" />
+    <ClInclude Include="headers\monitor\ETW_Wrapper.h" />
+    <ClInclude Include="headers\user\banners.h" />
+    <ClInclude Include="headers\user\bluespawn.h" />
+    <ClInclude Include="headers\util\configurations\CollectInfo.h" />
+    <ClInclude Include="headers\util\configurations\Registry.h" />
+    <ClInclude Include="headers\util\configurations\ScheduledTasks.h" />
+    <ClInclude Include="headers\util\filesystem\FileSystem.h" />
+    <ClInclude Include="headers\util\log\CLISink.h" />
+    <ClInclude Include="headers\util\log\DebugSink.h" />
+    <ClInclude Include="headers\util\log\HuntLogMessage.h" />
+    <ClInclude Include="headers\util\log\Log.h" />
+    <ClInclude Include="headers\util\log\Loggable.h" />
+    <ClInclude Include="headers\util\log\LogLevel.h" />
+    <ClInclude Include="headers\util\log\LogSink.h" />
+    <ClInclude Include="headers\util\log\ServerSink.h" />
+    <ClInclude Include="headers\util\pe\Export_Section.h" />
+    <ClInclude Include="headers\util\pe\Image_Loader.h" />
+    <ClInclude Include="headers\util\pe\Import_Section.h" />
+    <ClInclude Include="headers\util\pe\PE_Image.h" />
+    <ClInclude Include="headers\util\pe\PE_Section.h" />
+    <ClInclude Include="headers\util\pe\Relocation_Section.h" />
+    <ClInclude Include="headers\util\pe\Resource_Section.h" />
+    <ClInclude Include="headers\util\processes\Analyzer.h" />
+    <ClInclude Include="headers\util\reaction\Detections.h" />
+    <ClInclude Include="headers\util\reaction\Log.h" />
+    <ClInclude Include="headers\util\reaction\Reaction.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\hunt\Hunt.cpp" />
+    <ClCompile Include="src\hunt\HuntRegister.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1004.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1037.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1060.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1100.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1101.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1103.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1131.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1138.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
+    <ClCompile Include="src\hunt\Scope.cpp" />
+    <ClCompile Include="src\mitigation\Mitigation.cpp" />
+    <ClCompile Include="src\mitigation\MitigationRegister.cpp" />
+    <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp" />
+    <ClCompile Include="src\user\banners.cpp" />
+    <ClCompile Include="src\user\BLUESPAWN.cpp" />
+    <ClCompile Include="src\util\configurations\CollectInfo.cpp" />
+    <ClCompile Include="src\util\configurations\Registry.cpp" />
+    <ClCompile Include="src\util\filesystem\FileSystem.cpp" />
+    <ClCompile Include="src\util\log\CLISink.cpp" />
+    <ClCompile Include="src\util\log\DebugSink.cpp" />
+    <ClCompile Include="src\util\log\HuntLogMessage.cpp" />
+    <ClCompile Include="src\util\log\Log.cpp" />
+    <ClCompile Include="src\util\log\LogLevel.cpp" />
+    <ClCompile Include="src\util\log\ServerSink.cpp" />
+    <ClCompile Include="src\util\pe\Export_Section.cpp" />
+    <ClCompile Include="src\util\pe\Image_Loader.cpp" />
+    <ClCompile Include="src\util\pe\Import_Section.cpp" />
+    <ClCompile Include="src\util\pe\PE_Image.cpp" />
+    <ClCompile Include="src\util\pe\PE_Section.cpp" />
+    <ClCompile Include="src\util\pe\Relocation_Section.cpp" />
+    <ClCompile Include="src\util\pe\Resource_Section.cpp" />
+    <ClCompile Include="src\util\processes\Analyzer.cpp" />
+    <ClCompile Include="src\util\reaction\ReactLog.cpp" />
+    <ClCompile Include="src\util\reaction\Reaction.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BLUESPAWN-common\CommonLib.vcxproj">
+      <Project>{25ae1d80-3e17-4e1d-bfb4-8afb375ebaf1}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <BuildLog>
+      <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\krabsetw\krabs;$(SolutionDir)BLUESPAWN-client\external\cxxopts\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{159B2E72-9553-4E17-9BEC-CB92FCA8D0B0}</ProjectGuid>
+    <RootNamespace>CommonLib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\config\buildsettings.props" />
+    <Import Project="..\config\buildstructure.props" />
+    <Import Project="..\config\GRPC.props" />
+    <Import Project="..\BLUESPAWN-common\CommonLib.props" />
+  </ImportGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
