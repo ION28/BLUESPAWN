@@ -53,4 +53,5 @@ struct HuntInfo {
 	DWORD HuntCategories;
 	DWORD HuntDatasources;
 	long HuntStartTime;
+	HuntInfo(const std::wstring& HuntName, Aggressiveness HuntAggressiveness, DWORD HuntTactics, DWORD HuntCategories, DWORD HuntDatasources, long HuntStartTime);
 };

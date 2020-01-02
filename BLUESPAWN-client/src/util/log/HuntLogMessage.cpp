@@ -6,7 +6,7 @@ namespace Log {
 
 	std::vector<std::reference_wrapper<LogSink>> _LogHuntSinks{};
 
-	HuntLogMessage::HuntLogMessage(const HuntInfo& Hunt, std::vector<std::reference_wrapper<LogSink>> sinks) :
+	HuntLogMessage::HuntLogMessage(const HuntInfo& Hunt, const std::vector<std::reference_wrapper<LogSink>>& sinks) :
 		LogMessage(sinks, LogLevel::LogHunt),
 		HuntName{ Hunt },
 		Detections{}{}
@@ -65,8 +65,8 @@ namespace Log {
 	}
 
 	HuntLogMessage::HuntLogMessage(const HuntLogMessage& message) :
-		LogMessage{ message.Sinks, message.Level }
-	{
+		LogMessage{ message.Sinks, message.Level },
+		HuntName{ message.HuntName }{
 		this->InternalStream << message.InternalStream.str();
 		this->HuntName = message.HuntName;
 		this->Detections = message.Detections;

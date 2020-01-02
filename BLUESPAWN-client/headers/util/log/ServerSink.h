@@ -20,13 +20,11 @@ namespace Log {
 	private:
 		std::string MessagePrepends[4] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]" };
 
-		std::string& wstring_to_string(const std::wstring& str);
-
 		// Converting HuntInfo to gpb::HuntInfo
 		gpb::Aggressiveness HuntAggressivenessToGPB(const Aggressiveness& info);
-		std::vector<gpb::Tactic> HuntTacticsToGPB(const DWORD& info);
-		std::vector<gpb::Category> HuntCategoriesToGPB(const DWORD& info);
-		std::vector<gpb::DataSource> HuntDatasourcesToGPB(const DWORD& info);
+		std::vector<gpb::Tactic> HuntTacticsToGPB(DWORD info);
+		std::vector<gpb::Category> HuntCategoriesToGPB(DWORD info);
+		std::vector<gpb::DataSource> HuntDatasourcesToGPB(DWORD info);
 		gpb::HuntInfo HuntInfoToGPB(const HuntInfo& info);
 
 		std::vector<gpb::FileReactionData> GetFileReactions(const std::vector<std::shared_ptr<DETECTION>>& detections);
@@ -43,7 +41,7 @@ namespace Log {
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
 		 */
-		virtual void LogMessage(const LogLevel& level, const std::string& message, const HuntInfo& info = {}, 
+		virtual void LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info = std::nullopt, 
 			                    const std::vector<std::shared_ptr<DETECTION>>& detections = {}) override;
 
 		/**

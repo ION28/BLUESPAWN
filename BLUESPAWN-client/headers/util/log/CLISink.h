@@ -56,7 +56,7 @@ namespace Log {
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
 		 */
-		virtual void LogMessage(const LogLevel& level, const std::string& message, const HuntInfo& info = {}, 
+		virtual void LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info = std::nullopt,
 			                    const std::vector<std::shared_ptr<DETECTION>>& detections = {}) override;
 
 		/**

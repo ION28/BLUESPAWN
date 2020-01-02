@@ -145,6 +145,7 @@ bool Image_Loader::AddImage(const Loaded_Image& image){
 			entry = *MemoryWrapper<LDR_ENTRY32>{reinterpret_cast<LPVOID>(static_cast<ULONG_PTR>(entry.InLoadOrderModuleList.Flink)), sizeof(LDR_ENTRY32), process};
 		}
 	}
+	return false;
 }
 
 bool Image_Loader::RemoveImage(const Loaded_Image& image){

@@ -11,15 +11,15 @@ namespace Log {
 		return gpb::Aggressiveness();
 	}
 
-	std::vector<gpb::Tactic> ServerSink::HuntTacticsToGPB(const DWORD& info) {
+	std::vector<gpb::Tactic> ServerSink::HuntTacticsToGPB(DWORD info) {
 		return std::vector<gpb::Tactic>();
 	}
 
-	std::vector<gpb::Category> ServerSink::HuntCategoriesToGPB(const DWORD& info) {
+	std::vector<gpb::Category> ServerSink::HuntCategoriesToGPB(DWORD info) {
 		return std::vector<gpb::Category>();
 	}
 
-	std::vector<gpb::DataSource> ServerSink::HuntDatasourcesToGPB(const DWORD& info) {
+	std::vector<gpb::DataSource> ServerSink::HuntDatasourcesToGPB(DWORD info) {
 		return std::vector<gpb::DataSource>();
 	}
 
@@ -75,13 +75,13 @@ namespace Log {
 		return std::vector<gpb::ServiceReactionData>();
 	}
 
-	void ServerSink::LogMessage(const LogLevel& level, const std::string& message, const HuntInfo& info, 
+	void ServerSink::LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info, 
 		const std::vector<std::shared_ptr<DETECTION>>& detections){
 		if (!level.Enabled())
 			return;
 
 		gpb::HuntMessage huntMessage{};
-		huntMessage.set_allocated_info(&HuntInfoToGPB(info));
+		huntMessage.set_allocated_info(&HuntInfoToGPB(*info));
 		huntMessage.set_extramessage(message);
 	}
 

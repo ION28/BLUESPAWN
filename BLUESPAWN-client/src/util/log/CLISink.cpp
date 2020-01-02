@@ -11,15 +11,15 @@ namespace Log {
 		SetConsoleTextAttribute(hConsole, static_cast<WORD>(color));
 	}
 
-	void CLISink::LogMessage(const LogLevel& level, const std::string& message, const HuntInfo& info, const std::vector<std::shared_ptr<DETECTION>>& detections){
+	void CLISink::LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info, const std::vector<std::shared_ptr<DETECTION>>& detections){
 		if(level.Enabled()){
 			SetConsoleColor(CLISink::PrependColors[static_cast<WORD>(level.severity)]);
 
 			if(level.severity == Severity::LogHunt){
-				std::wstring aggressiveness = info.HuntAggressiveness == Aggressiveness::Aggressive ? L"Aggressive" :
-					info.HuntAggressiveness == Aggressiveness::Careful ? L"Careful" :
-					info.HuntAggressiveness == Aggressiveness::Moderate ? L"Moderate" : L"Cursory";
-				std::wcout << L"[" << info.HuntName << L": " << aggressiveness << L"] ";
+				std::wstring aggressiveness = info->HuntAggressiveness == Aggressiveness::Aggressive ? L"Aggressive" :
+					info->HuntAggressiveness == Aggressiveness::Careful ? L"Careful" :
+					info->HuntAggressiveness == Aggressiveness::Moderate ? L"Moderate" : L"Cursory";
+				std::wcout << L"[" << info->HuntName << L": " << aggressiveness << L"] ";
 				SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
 				std::wcout << L" - " << detections.size() << " detection" << (detections.size() == 1 ? L"" : L"s") << L"!" << std::endl;
 				for(auto detection : detections){

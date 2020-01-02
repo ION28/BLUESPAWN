@@ -4,12 +4,13 @@
 #include "hunt/HuntInfo.h"
 #include "util/log/huntlogmessage.h"
 
-namespace Reactions {
+#include <optional>
 
+namespace Reactions {
 
 	class LogReaction : public Reaction {
 	private:
-		Log::HuntLogMessage _HuntLogMessage;
+		std::optional<Log::HuntLogMessage> _HuntLogMessage;
 		bool HuntBegun = false;
 
 		void LogBeginHunt(const HuntInfo& info);
