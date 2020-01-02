@@ -1,3 +1,0 @@
-[submodule "BLUESPAWN/External Dependencies/cxxopts"]
-	path = BLUESPAWN-agent/External Dependencies/cxxopts
-	url = https://github.com/jarro2783/cxxopts
