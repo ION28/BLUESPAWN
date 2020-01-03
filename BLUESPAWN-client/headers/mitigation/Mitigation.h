@@ -14,6 +14,7 @@ class Mitigation {
 	public:
 		// Query if the mitigation is currently enforced on the host system
 		virtual bool isEnforced(SecurityLevel level);
+
 		// Enforce the system. Return if sucesful or not
 		virtual bool enforce(SecurityLevel level);
 		

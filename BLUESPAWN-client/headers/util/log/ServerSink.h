@@ -1,5 +1,9 @@
 #pragma once
 
+// Remove this once GRPC is fixed
+#define GRPC_BROKEN
+
+#ifndef GRPC_BROKEN
 #include <map>
 
 #include "LogSink.h"
@@ -56,3 +60,4 @@ namespace Log {
 		virtual bool operator==(const LogSink& sink) const;
 	};
 }
+#endif

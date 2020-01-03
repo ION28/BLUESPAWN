@@ -5,6 +5,8 @@
 #include "util/log/ServerSink.h"
 #include "common/StringUtils.h"
 
+#ifndef GRPC_BROKEN
+
 namespace Log {
 
 	gpb::Aggressiveness ServerSink::HuntAggressivenessToGPB(const Aggressiveness& info) {
@@ -89,3 +91,5 @@ namespace Log {
 		return (bool) dynamic_cast<const ServerSink*>(&sink);
 	}
 }
+
+#endif
