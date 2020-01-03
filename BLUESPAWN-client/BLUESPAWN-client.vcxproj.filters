@@ -1041,6 +1041,12 @@
     <ClInclude Include="grpc\generated\grpc\support\workaround_list.h">
       <Filter>Header Files\util\log\grpc</Filter>
     </ClInclude>
+    <ClInclude Include="headers\user\iobase.h">
+      <Filter>Header Files\user</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\user\CLI.h">
+      <Filter>Header Files\user</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\hunt\Hunt.cpp">
@@ -1162,6 +1168,9 @@
     </ClCompile>
     <ClCompile Include="grpc\generated\ServerServices.pb.cc">
       <Filter>Source Files\util\log\grpc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\user\CLI.cpp">
+      <Filter>Source Files\user</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
