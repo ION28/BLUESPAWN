@@ -9,6 +9,7 @@ void MitigationRegister::RegisterMitigation(Mitigation* mitigation) {
 void MitigationRegister::SetSecurityLevel(SecurityLevel securityLevel) {
 	for(int i=0; i < vRegisteredMitigations.size(); i++) {
 		
+		/*
 		// For each mitigation, if not enforced at the current security level ask if it should be
 		if(!vRegisteredMitigations[i]->isEnforced(securityLevel)) {
 			std::string answer = "";
@@ -21,5 +22,12 @@ void MitigationRegister::SetSecurityLevel(SecurityLevel securityLevel) {
 				vRegisteredMitigations[i]->enforce(securityLevel);
 			}
 		}
+		*/
+	}
+}
+
+void MitigationRegister::RunMitigationsAnalysis(const Reaction& reaction) {
+	for (auto name : vRegisteredMitigations) {
+		name->isEnforced(SecurityLevel::High, reaction);
 	}
 }
