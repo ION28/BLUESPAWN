@@ -36,6 +36,7 @@
     <ClInclude Include="headers\mitigation\Mitigation.h" />
     <ClInclude Include="headers\mitigation\MitigationRegister.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV72753.h" />
     <ClInclude Include="headers\monitor\ETW_Wrapper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -418,6 +419,7 @@
     <ClCompile Include="src\mitigation\Mitigation.cpp" />
     <ClCompile Include="src\mitigation\MitigationRegister.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV72753.cpp" />
     <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
