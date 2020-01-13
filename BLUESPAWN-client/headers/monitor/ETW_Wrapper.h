@@ -1,13 +1,16 @@
 #pragma once
+/*
 
 #include "krabs.hpp"
 #include <thread>
+*/
 
 /*
 Providers on a Windows machine can be found with
 cmd: logman.exe query providers
 or Powershell: Get-NetEventProvider -ShowInstalled | Select-Object Name,Guid | sort Name
 */
+/*
 namespace etw_guid {
 	static krabs::guid powershell = krabs::guid(L"{A0C1853B-5C40-4B15-8766-3CF1C58F985A}");
 	static krabs::guid firewall = krabs::guid(L"{E595F735-B42A-494B-AFCD-B68666945CD3}");
@@ -34,3 +37,4 @@ class ETW_Wrapper {
 		std::thread * traceThread;
 		void startUserTrace();
 };
+*/

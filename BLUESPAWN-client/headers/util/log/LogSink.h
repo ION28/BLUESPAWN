@@ -5,7 +5,7 @@
 #include <memory>
 #include <optional>
 
-#include "util/reaction/Detections.h"
+#include "hunt/reaction/Detections.h"
 #include "hunt/HuntInfo.h"
 
 #include "LogLevel.h"

@@ -2,8 +2,8 @@
 #include <Windows.h>
 
 #include "../Hunt.h"
-#include "util/reaction/Reaction.h"
-#include "util/reaction/Log.h"
+#include "hunt/reaction/Reaction.h"
+#include "hunt/reaction/Log.h"
 
 namespace Hunts {
 
