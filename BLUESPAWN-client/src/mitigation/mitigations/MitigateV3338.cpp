@@ -8,11 +8,17 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateV3338::MitigateV3338(MitigationRegister& record) : Mitigation(record, L"V-3338 - Unauthorized named pipes are accessible with anonymous credentials.") {
-		description = L"This is a High finding because of the potential for gaining unauthorized system access. Pipes are internal system communications processes. "
-			"They are identified internally by ID numbers that vary between systems. To make access to these processes easier, these pipes are given names that do not "
-			"vary between systems. This setting controls which of these pipes anonymous users may access.";
-	}
+	MitigateV3338::MitigateV3338(MitigationRegister& record) : 
+		Mitigation(
+			record,
+			L"V-3338 - Unauthorized named pipes are accessible with anonymous credentials.",
+			L"This is a High finding because of the potential for gaining unauthorized system access. Pipes are internal system communications processes. "
+				"They are identified internally by ID numbers that vary between systems. To make access to these processes easier, these pipes are given names "
+				"that do not vary between systems. This setting controls which of these pipes anonymous users may access.",
+			L"lanmanserver",
+			SoftwareAffected::ExposedService,
+			MitigationSeverity::High
+		) {}
 
 	bool MitigateV3338::MitigationIsEnforced(SecurityLevel level) {
 		LOG_INFO("Checking for presence of " << name);

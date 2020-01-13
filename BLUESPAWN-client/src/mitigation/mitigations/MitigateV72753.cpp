@@ -10,12 +10,16 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateV72753::MitigateV72753(MitigationRegister& record) : Mitigation(record, L"V-72753 - WDigest Authentication must be disabled.") {
-		description = L"When the WDigest Authentication protocol is enabled, plain text passwords are stored in the Local Security Authority"
-			"Subsystem Service (LSASS) exposing them to theft. This setting will prevent WDigest from storing credentials in memory.";
-		category = SoftwareAffected::OperatingSystem;
-		software = L"lsass";
-	}
+	MitigateV72753::MitigateV72753(MitigationRegister& record) : 
+		Mitigation(
+			record,
+			L"V-72753 - WDigest Authentication must be disabled.",
+			L"When the WDigest Authentication protocol is enabled, plain text passwords are stored in the Local Security Authority"
+			"Subsystem Service (LSASS) exposing them to theft. This setting will prevent WDigest from storing credentials in memory.",
+			L"lsa",
+			SoftwareAffected::OperatingSystem,
+			MitigationSeverity::High
+		) {}
 
 	bool MitigateV72753::MitigationIsEnforced(SecurityLevel level) {
 		LOG_INFO("Checking for presence of " << name);
