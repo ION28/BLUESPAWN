@@ -1,4 +1,4 @@
-name: BLUESPAWN agent build
+name: BLUESPAWN client build
 
 on:
   push:
@@ -32,4 +32,4 @@ jobs:
     - uses: actions/upload-artifact@master
       with:
         name: BLUESPAWN-client-${{ matrix.buildtype }}
-        path: BLUESPAWN-client\artifacts\x64\${{ matrix.buildtype }}\BLUESPAWN.exe
+        path: artifacts\x64\${{ matrix.buildtype }}\BLUESPAWN-client.exe
