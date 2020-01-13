@@ -56,7 +56,6 @@
     <ClInclude Include="headers\util\log\Loggable.h" />
     <ClInclude Include="headers\util\log\LogLevel.h" />
     <ClInclude Include="headers\util\log\LogSink.h" />
-    <ClInclude Include="headers\util\log\MitigationLogMessage.h" />
     <ClInclude Include="headers\util\log\ServerSink.h" />
     <ClInclude Include="headers\util\pe\Export_Section.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -101,9 +100,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="headers\util\processes\Analyzer.h" />
-    <ClInclude Include="headers\util\reaction\Detections.h" />
-    <ClInclude Include="headers\util\reaction\Log.h" />
-    <ClInclude Include="headers\util\reaction\Reaction.h" />
+    <ClInclude Include="headers\hunt\reaction\Detections.h" />
+    <ClInclude Include="headers\hunt\reaction\Log.h" />
+    <ClInclude Include="headers\hunt\reaction\Reaction.h" />
     <ClInclude Include="grpc\generated\grpc++\alarm.h" />
     <ClInclude Include="grpc\generated\grpc++\channel.h" />
     <ClInclude Include="grpc\generated\grpc++\client_context.h" />
@@ -436,7 +435,6 @@
     <ClCompile Include="src\util\log\HuntLogMessage.cpp" />
     <ClCompile Include="src\util\log\Log.cpp" />
     <ClCompile Include="src\util\log\LogLevel.cpp" />
-    <ClCompile Include="src\util\log\MitigationLogMessage.cpp" />
     <ClCompile Include="src\util\log\ServerSink.cpp" />
     <ClCompile Include="src\util\pe\Export_Section.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -481,8 +479,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\util\processes\Analyzer.cpp" />
-    <ClCompile Include="src\util\reaction\ReactLog.cpp" />
-    <ClCompile Include="src\util\reaction\Reaction.cpp" />
+    <ClCompile Include="src\hunt\reaction\ReactLog.cpp" />
+    <ClCompile Include="src\hunt\reaction\Reaction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BLUESPAWN-common\CommonLib.vcxproj">
@@ -517,13 +515,6 @@
     <Import Project="..\config\buildstructure.props" />
     <Import Project="..\config\GRPC.props" />
     <Import Project="..\BLUESPAWN-common\CommonLib.props" />
-    <Import Project="..\packages\boost.1.68.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.68.0.0\build\boost.targets')" />
   </ImportGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\boost.1.68.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.68.0.0\build\boost.targets'))" />
-  </Target>
 </Project>

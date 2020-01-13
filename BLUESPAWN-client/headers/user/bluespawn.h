@@ -41,6 +41,7 @@
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
 #include "mitigation/mitigations/MitigateV3338.h"
+#include "mitigation/mitigations/MitigateV72753.h"
 
 void print_help(cxxopts::ParseResult result, cxxopts::Options options);
 void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options);
