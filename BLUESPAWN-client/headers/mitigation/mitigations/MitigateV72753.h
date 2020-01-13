@@ -1,8 +1,8 @@
 #pragma once
 #include "../Mitigation.h"
 #include <mitigation\MitigationRegister.h>
-#include "util/reaction/Reaction.h"
-#include "util/reaction/Log.h"
+#include "hunt/reaction/Reaction.h"
+#include "hunt/reaction/Log.h"
 
 namespace Mitigations {
 
@@ -13,7 +13,8 @@ namespace Mitigations {
 	public:
 		MitigateV72753(MitigationRegister& record);
 
-		virtual bool isEnforced(SecurityLevel level, Reaction reaction) override;
-		virtual bool enforce(SecurityLevel level, Reaction reaction) override;
+		virtual bool MitigationIsEnforced(SecurityLevel level) override;
+		virtual bool EnforceMitigation(SecurityLevel level) override;
+		virtual bool MitigationApplies() override;
 	};
 }

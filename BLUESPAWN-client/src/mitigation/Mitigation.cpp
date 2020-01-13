@@ -1,24 +1,16 @@
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
-#include "util/reaction/Reaction.h"
+#include "hunt/reaction/Reaction.h"
 
-Mitigation::Mitigation(MitigationRegister& record, const std::string& name) :
+Mitigation::Mitigation(MitigationRegister& record, const std::wstring& name) :
 	name{ name } {
-	record.RegisterMitigation(this);
+	record.RegisterMitigation(std::shared_ptr<Mitigation>(this));
 }
 
-std::string Mitigation::getName() {
+std::wstring Mitigation::getName() {
 	return this->name;
 }
 
-std::string Mitigation::getDescription() {
+std::wstring Mitigation::getDescription() {
 	return this->description;
-}
-
-bool Mitigation::isEnforced(SecurityLevel level, Reaction reaction) {
-	return false;
-}
-
-bool Mitigation::enforce(SecurityLevel level, Reaction reaction) {
-	return false;
 }

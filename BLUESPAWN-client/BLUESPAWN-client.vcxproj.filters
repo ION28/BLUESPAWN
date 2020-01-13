@@ -43,7 +43,7 @@
     <Filter Include="Header Files\util\processes">
       <UniqueIdentifier>{55466f29-9078-458e-9c9e-731465ceaedb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\util\reaction">
+    <Filter Include="Header Files\hunt\reaction">
       <UniqueIdentifier>{59d6c737-a765-4c58-99c3-94ae2fc6b1d8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\util\pe">
@@ -82,7 +82,7 @@
     <Filter Include="Source Files\util\processes">
       <UniqueIdentifier>{5e5c0dd9-7f92-476e-a3ec-1f9b1f2bf622}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\util\reaction">
+    <Filter Include="Source Files\hunt\reaction">
       <UniqueIdentifier>{a5f16481-f90c-4fdf-815a-2e6cdc9a0546}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\util\log\grpc">
@@ -213,14 +213,14 @@
     <ClInclude Include="headers\util\pe\Resource_Section.h">
       <Filter>Header Files\util\pe</Filter>
     </ClInclude>
-    <ClInclude Include="headers\util\reaction\Detections.h">
-      <Filter>Header Files\util\reaction</Filter>
+    <ClInclude Include="headers\hunt\reaction\Detections.h">
+      <Filter>Header Files\hunt\reaction</Filter>
     </ClInclude>
-    <ClInclude Include="headers\util\reaction\Log.h">
-      <Filter>Header Files\util\reaction</Filter>
+    <ClInclude Include="headers\hunt\reaction\Log.h">
+      <Filter>Header Files\hunt\reaction</Filter>
     </ClInclude>
-    <ClInclude Include="headers\util\reaction\Reaction.h">
-      <Filter>Header Files\util\reaction</Filter>
+    <ClInclude Include="headers\hunt\reaction\Reaction.h">
+      <Filter>Header Files\hunt\reaction</Filter>
     </ClInclude>
     <ClInclude Include="grpc\generated\grpcpp\alarm.h">
       <Filter>Header Files\util\log\grpc</Filter>
@@ -1047,9 +1047,6 @@
     <ClInclude Include="headers\monitor\ETW_Wrapper.h">
       <Filter>Header Files\monitor</Filter>
     </ClInclude>
-    <ClInclude Include="headers\util\log\MitigationLogMessage.h">
-      <Filter>Header Files\util\log</Filter>
-    </ClInclude>
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h">
       <Filter>Header Files\mitigation\mitigations</Filter>
     </ClInclude>
@@ -1157,11 +1154,11 @@
     <ClCompile Include="src\util\processes\Analyzer.cpp">
       <Filter>Source Files\util\processes</Filter>
     </ClCompile>
-    <ClCompile Include="src\util\reaction\Reaction.cpp">
-      <Filter>Source Files\util\reaction</Filter>
+    <ClCompile Include="src\hunt\reaction\Reaction.cpp">
+      <Filter>Source Files\hunt\reaction</Filter>
     </ClCompile>
-    <ClCompile Include="src\util\reaction\ReactLog.cpp">
-      <Filter>Source Files\util\reaction</Filter>
+    <ClCompile Include="src\hunt\reaction\ReactLog.cpp">
+      <Filter>Source Files\hunt\reaction</Filter>
     </ClCompile>
     <ClCompile Include="grpc\generated\ReactionData.grpc.pb.cc">
       <Filter>Source Files\util\log\grpc</Filter>
@@ -1177,9 +1174,6 @@
     </ClCompile>
     <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">
       <Filter>Source Files\monitor</Filter>
-    </ClCompile>
-    <ClCompile Include="src\util\log\MitigationLogMessage.cpp">
-      <Filter>Source Files\util\log</Filter>
     </ClCompile>
     <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp">
       <Filter>Source Files\mitigation\mitigations</Filter>

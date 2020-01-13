@@ -1,6 +1,5 @@
 #include "user/bluespawn.h"
 #include "util/log/HuntLogMessage.h"
-#include "util/log/MitigationLogMessage.h"
 #include "util/log/DebugSink.h"
 #include "common/DynamicLinker.h"
 
@@ -119,7 +118,7 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options options) {
 	MitigationRegister record{};
 	Mitigations::MitigateV3338 v3338(record);
+	Mitigations::MitigateV72753 v72753(record);
 
-	Reaction reaction = Reactions::LogReaction();
-	record.RunMitigationsAnalysis(reaction);
+	record.ApplyMitigations(SecurityLevel::High);
 }

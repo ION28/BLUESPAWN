@@ -7,7 +7,7 @@
 #include "Scope.h"
 #include "HuntInfo.h"
 
-#include "util/reaction/Reaction.h"
+#include "hunt/reaction/Reaction.h"
 
 class HuntRegister;
 
