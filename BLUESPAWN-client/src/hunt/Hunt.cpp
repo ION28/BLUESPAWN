@@ -1,6 +1,6 @@
 #include "hunt/Hunt.h"
 #include "hunt/HuntRegister.h"
-#include "util/reaction/Reaction.h"
+#include "hunt/reaction/Reaction.h"
 
 #include <iostream>
 

@@ -16,9 +16,11 @@ int main(int argc, char* argv[])
 
 	print_banner();
 
+	/*
 	// Create and initialize the ETW wrapper
 	ETW_Wrapper wrapper;
 	wrapper.init();
+	*/
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
@@ -26,7 +28,8 @@ int main(int argc, char* argv[])
 		("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
 		("help", "Help Information. You can also specify a category for help on a specific module such as hunt"
 			, cxxopts::value<std::string>()->implicit_value("general"))
-			("example", "Perform the example hunt")
+		("m,mitigation", "Performs a Mitigations Analysis")
+		("example", "Perform the example hunt")
 		;
 
 	options.add_options("hunt")
@@ -42,6 +45,9 @@ int main(int argc, char* argv[])
 	}
 	else if (result.count("hunt")) {
 		dispatch_hunt(result, options);
+	}
+	else if (result.count("mitigation")) {
+		dispatch_mitigations_analysis(result, options);
 	}
 	else {
 		LOG_ERROR("Nothing to do. Use the -h or --hunt flags to launch a hunt");
@@ -106,4 +112,13 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	Scope scope{};
 	Reaction reaction = Reactions::LogReaction();
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+}
+
+
+void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options options) {
+	MitigationRegister record{};
+	Mitigations::MitigateV3338 v3338(record);
+	Mitigations::MitigateV72753 v72753(record);
+
+	record.ApplyMitigations(SecurityLevel::High);
 }

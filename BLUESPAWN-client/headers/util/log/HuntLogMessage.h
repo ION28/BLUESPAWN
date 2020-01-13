@@ -3,7 +3,7 @@
 #include "LogLevel.h"
 #include "LogSink.h"
 
-#include "util/reaction/detections.h"
+#include "hunt/reaction/detections.h"
 #include "hunt/huntinfo.h"
 
 #include <vector>
