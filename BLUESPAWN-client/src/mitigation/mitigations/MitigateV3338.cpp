@@ -2,7 +2,6 @@
 
 #include "util/configurations/Registry.h"
 #include "util/log/Log.h"
-#include <iostream>
 
 using namespace Registry;
 
