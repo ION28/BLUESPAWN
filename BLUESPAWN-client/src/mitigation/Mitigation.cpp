@@ -9,7 +9,7 @@ Mitigation::Mitigation(MitigationRegister& reg, const std::wstring& name, const 
 	software{ software },
 	category{ category },
 	severity{ severity } {
-	reg.RegisterMitigation(std::shared_ptr<Mitigation>(this));
+	reg.RegisterMitigation(this);
 }
 
 std::wstring Mitigation::getName() {

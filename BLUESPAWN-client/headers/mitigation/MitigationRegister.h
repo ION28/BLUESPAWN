@@ -6,11 +6,11 @@
 class MitigationRegister {
 
 public:
-	void RegisterMitigation(std::shared_ptr<Mitigation> mitigation);
+	void RegisterMitigation(Mitigation* mitigation);
 	void ApplyMitigations(SecurityLevel securityLevel);
 
 private:
-	std::vector<std::shared_ptr<Mitigation>> vRegisteredMitigations{};
+	std::vector<Mitigation*> vRegisteredMitigations{};
 
 };
 
