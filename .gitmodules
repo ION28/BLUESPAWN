@@ -1,3 +1,6 @@
-[submodule "BLUESPAWN/External Dependencies/cxxopts"]
-	path = BLUESPAWN-agent/External Dependencies/cxxopts
+[submodule "BLUESPAWN-client/external/cxxopts"]
+	path = BLUESPAWN-client/external/cxxopts
 	url = https://github.com/jarro2783/cxxopts
+[submodule "BLUESPAWN-client/external/krabsetw"]
+	path = BLUESPAWN-client/external/krabsetw
+	url = https://github.com/microsoft/krabsetw
