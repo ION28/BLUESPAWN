@@ -117,6 +117,7 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 
 void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options options) {
 	MitigationRegister record{};
+	Mitigations::MitigateV1152 v1152(record);
 	Mitigations::MitigateV3338 v3338(record);
 	Mitigations::MitigateV72753 v72753(record);
 

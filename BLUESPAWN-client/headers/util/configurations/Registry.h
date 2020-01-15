@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "util/log/Log.h"
+#include "util/configurations/SecurityInformation.h"
 
 namespace Registry {
 	typedef std::wstring REG_SZ_T;
@@ -193,6 +194,7 @@ namespace Registry {
 		std::vector<RegistryKey> Subkeys();
 
 		std::wstring GetPath();
+		Information::SecurityInformation GetSecurityInformation();
 
 		virtual std::wstring ToString();
 	};

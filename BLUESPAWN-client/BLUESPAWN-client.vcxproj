@@ -35,6 +35,7 @@
     <ClInclude Include="headers\hunt\Scope.h" />
     <ClInclude Include="headers\mitigation\Mitigation.h" />
     <ClInclude Include="headers\mitigation\MitigationRegister.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV1152.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV72753.h" />
     <ClInclude Include="headers\monitor\ETW_Wrapper.h">
@@ -48,6 +49,7 @@
     <ClInclude Include="headers\util\configurations\CollectInfo.h" />
     <ClInclude Include="headers\util\configurations\Registry.h" />
     <ClInclude Include="headers\util\configurations\ScheduledTasks.h" />
+    <ClInclude Include="headers\util\configurations\SecurityInformation.h" />
     <ClInclude Include="headers\util\filesystem\FileSystem.h" />
     <ClInclude Include="headers\util\log\CLISink.h" />
     <ClInclude Include="headers\util\log\DebugSink.h" />
@@ -417,6 +419,7 @@
     <ClCompile Include="src\hunt\Scope.cpp" />
     <ClCompile Include="src\mitigation\Mitigation.cpp" />
     <ClCompile Include="src\mitigation\MitigationRegister.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV1152.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV72753.cpp" />
     <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">
@@ -429,6 +432,7 @@
     <ClCompile Include="src\user\BLUESPAWN.cpp" />
     <ClCompile Include="src\util\configurations\CollectInfo.cpp" />
     <ClCompile Include="src\util\configurations\Registry.cpp" />
+    <ClCompile Include="src\util\configurations\SecurityInformation.cpp" />
     <ClCompile Include="src\util\filesystem\FileSystem.cpp" />
     <ClCompile Include="src\util\log\CLISink.cpp" />
     <ClCompile Include="src\util\log\DebugSink.cpp" />

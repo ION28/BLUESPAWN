@@ -192,7 +192,7 @@ namespace Registry {
 		return GetName();
 	}
 
-	inline bool RegistryKey::KeyExists() { return bKeyExists; }
+	bool RegistryKey::KeyExists() { return bKeyExists; }
 	bool RegistryKey::ValueExists() { return bValueExists; }
 
 	std::vector<RegistryKey> RegistryKey::KeyValues(){
@@ -254,5 +254,36 @@ namespace Registry {
 			}
 		}
 		return vSubKeys;
+	}
+
+	Information::SecurityInformation RegistryKey::GetSecurityInformation(){
+		if (!KeyExists()) {
+			LOG_VERBOSE(1, "Attempting to retrieve security information of nonexistent key " << GetName());
+			return NULL;
+		}
+
+		SECURITY_INFORMATION dwSecurityInfo = OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION;
+		DWORD dwSecurityDescriptorSize = 1;
+		DWORD dwClassLen = MAX_PATH;
+		SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES) };
+
+		LSTATUS status = RegOpenKeyEx(hive, path.c_str(), 0, READ_CONTROL | KEY_READ, &key);
+
+		LOG_VERBOSE(2, "Retrieving security descriptor for " << name << " under " << vHives[hive] << "\\" << path);
+
+		//First call sets Security Descriptor Size
+		status = RegGetKeySecurity(hive, dwSecurityInfo, NULL, &dwSecurityDescriptorSize);
+
+		PSECURITY_DESCRIPTOR pSecurityDescriptor = LocalAlloc(LMEM_FIXED, dwSecurityDescriptorSize);
+		status = RegGetKeySecurity(hive, dwSecurityInfo, pSecurityDescriptor, &dwSecurityDescriptorSize);
+		
+		if (status != ERROR_SUCCESS) {
+			LOG_ERROR("Unable to retrieve Security Information for " << GetName() << ".");
+			SetLastError(status);
+
+			return NULL;
+		}
+
+		return Information::SecurityInformation(pSecurityDescriptor);
 	}
 }
