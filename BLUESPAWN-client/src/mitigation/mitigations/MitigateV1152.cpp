@@ -28,10 +28,11 @@ namespace Mitigations {
 
 		if(key.KeyExists()){
 
-			Information::SecurityInformation sec_info = key.GetSecurityInformation();
+			Permissions::SecurityInformation sec_info = key.GetSecurityInformation();
 			std::wcout << sec_info.ToString() << std::endl;
 			std::wcout << sec_info.GetOwnerSid() << std::endl;
 			std::wcout << sec_info.GetOwnerUsername() << std::endl;
+			sec_info.GetDaclEntries();
 
 			return true;
 		}

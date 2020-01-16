@@ -256,7 +256,7 @@ namespace Registry {
 		return vSubKeys;
 	}
 
-	Information::SecurityInformation RegistryKey::GetSecurityInformation(){
+	Permissions::SecurityInformation RegistryKey::GetSecurityInformation(){
 		if (!KeyExists()) {
 			LOG_VERBOSE(1, "Attempting to retrieve security information of nonexistent key " << GetName());
 			return NULL;
@@ -284,6 +284,6 @@ namespace Registry {
 			return NULL;
 		}
 
-		return Information::SecurityInformation(pSecurityDescriptor);
+		return Permissions::SecurityInformation(pSecurityDescriptor);
 	}
 }

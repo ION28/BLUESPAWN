@@ -194,7 +194,7 @@ namespace Registry {
 		std::vector<RegistryKey> Subkeys();
 
 		std::wstring GetPath();
-		Information::SecurityInformation GetSecurityInformation();
+		Permissions::SecurityInformation GetSecurityInformation();
 
 		virtual std::wstring ToString();
 	};
