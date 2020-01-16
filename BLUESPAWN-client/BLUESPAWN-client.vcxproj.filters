@@ -1053,6 +1053,9 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateV72753.h">
       <Filter>Header Files\mitigation\mitigations</Filter>
     </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h">
+      <Filter>Header Files\mitigation\mitigations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\hunt\Hunt.cpp">
@@ -1179,6 +1182,9 @@
       <Filter>Source Files\mitigation\mitigations</Filter>
     </ClCompile>
     <ClCompile Include="src\mitigation\mitigations\MitigateV72753.cpp">
+      <Filter>Source Files\mitigation\mitigations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp">
       <Filter>Source Files\mitigation\mitigations</Filter>
     </ClCompile>
   </ItemGroup>
