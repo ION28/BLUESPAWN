@@ -12,12 +12,16 @@
 
 namespace Information {
 	class SecurityInformation {
+	private:
 		PSECURITY_DESCRIPTOR pSecurityDescriptor;
+
+		PSID GetSid();
 
 	public:
 		SecurityInformation(PSECURITY_DESCRIPTOR pSD);
 
 		std::wstring GetOwnerSid();
+		std::wstring GetOwnerUsername();
 
 		virtual std::wstring ToString();
 	};

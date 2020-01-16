@@ -24,21 +24,15 @@ namespace Mitigations {
 		LOG_INFO("Checking for presence of " << name);
 		
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\SecurePipeServers", L"winreg"};
+		//auto key = RegistryKey{ HKEY_CURRENT_USER, L"Software\\9bis.com", L"KiTTY"};
 
 		if(key.KeyExists()){
 
 			Information::SecurityInformation sec_info = key.GetSecurityInformation();
 			std::wcout << sec_info.ToString() << std::endl;
 			std::wcout << sec_info.GetOwnerSid() << std::endl;
+			std::wcout << sec_info.GetOwnerUsername() << std::endl;
 
-			//DACL Information
-			BOOL bDaclPresent = 0;
-			PACL pSourceDacl = nullptr;
-			BOOL bDaclDefaulted = 0;
-			//bool status = GetSecurityDescriptorDacl(pSecurityDescriptor, &bDaclPresent, &pSourceDacl, &bDaclDefaulted);
-
-			//Group Information
-			
 			return true;
 		}
 		else {
