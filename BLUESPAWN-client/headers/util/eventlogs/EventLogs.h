@@ -16,6 +16,5 @@ using namespace std;
 
 DWORD PrintResults(EVT_HANDLE hResults);
 DWORD PrintEvent(EVT_HANDLE hEvent); // Shown in the Rendering Events topic
-DWORD PrintEventSystemData(EVT_HANDLE hEvent);
 DWORD PrintEventValues(EVT_HANDLE hEvent);
 void queryevent(void);
