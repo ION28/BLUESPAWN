@@ -2,6 +2,7 @@
 #include "util/log/HuntLogMessage.h"
 #include "util/log/DebugSink.h"
 #include "common/DynamicLinker.h"
+#include "util/eventlogs/EventLogs.h"
 
 #include <iostream>
 
@@ -13,6 +14,8 @@ int main(int argc, char* argv[])
 	Log::CLISink ConsoleOutput{};
 	Log::AddSink(DebugOutput);
 	Log::AddHuntSink(ConsoleOutput);
+
+	queryevent();
 
 	print_banner();
 

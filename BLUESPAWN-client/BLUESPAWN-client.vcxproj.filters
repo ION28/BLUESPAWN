@@ -97,6 +97,12 @@
     <Filter Include="Header Files\mitigation\mitigations">
       <UniqueIdentifier>{9387c772-fdc7-45c9-a31f-d13558ffe430}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\util\eventlogs">
+      <UniqueIdentifier>{23120957-b2c7-4957-9951-0eabd2e5edf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\eventlogs">
+      <UniqueIdentifier>{7e223556-6f7d-4752-ae74-120962505e82}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\hunt\hunts\HuntT1004.h">
@@ -1053,6 +1059,9 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateV72753.h">
       <Filter>Header Files\mitigation\mitigations</Filter>
     </ClInclude>
+    <ClInclude Include="headers\util\eventlogs\EventLogs.h">
+      <Filter>Header Files\util\eventlogs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\hunt\Hunt.cpp">
@@ -1180,6 +1189,9 @@
     </ClCompile>
     <ClCompile Include="src\mitigation\mitigations\MitigateV72753.cpp">
       <Filter>Source Files\mitigation\mitigations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\eventlogs\EventLogs.cpp">
+      <Filter>Source Files\util\eventlogs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

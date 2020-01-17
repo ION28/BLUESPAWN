@@ -48,6 +48,7 @@
     <ClInclude Include="headers\util\configurations\CollectInfo.h" />
     <ClInclude Include="headers\util\configurations\Registry.h" />
     <ClInclude Include="headers\util\configurations\ScheduledTasks.h" />
+    <ClInclude Include="headers\util\eventlogs\EventLogs.h" />
     <ClInclude Include="headers\util\filesystem\FileSystem.h" />
     <ClInclude Include="headers\util\log\CLISink.h" />
     <ClInclude Include="headers\util\log\DebugSink.h" />
@@ -429,6 +430,7 @@
     <ClCompile Include="src\user\BLUESPAWN.cpp" />
     <ClCompile Include="src\util\configurations\CollectInfo.cpp" />
     <ClCompile Include="src\util\configurations\Registry.cpp" />
+    <ClCompile Include="src\util\eventlogs\EventLogs.cpp" />
     <ClCompile Include="src\util\filesystem\FileSystem.cpp" />
     <ClCompile Include="src\util\log\CLISink.cpp" />
     <ClCompile Include="src\util\log\DebugSink.cpp" />
