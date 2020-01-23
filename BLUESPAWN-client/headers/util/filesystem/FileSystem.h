@@ -55,7 +55,7 @@ namespace FileSystem {
 		*
 		* @return 1 if write successful, 0 if write unsuccessful
 		*/
-		short Write(IN const LPVOID value, IN const long offset, IN const bool insert = false);
+		short Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, IN const bool insert = false);
 
 		/**
 		* Function to read from arbitrary offset in the file
@@ -66,7 +66,7 @@ namespace FileSystem {
 		*
 		* @return 1 if write successful, 0 if write unsuccessful
 		*/
-		short Read(OUT LPVOID buffer, IN const long offset, IN const long amount);
+		short Read(OUT LPVOID buffer, IN const long offset, IN const unsigned long amount);
 
 		/**
 		* Function to compute the MD5 hash of the file
