@@ -1,5 +1,5 @@
-//#include "C:\\Users\\Will Mayes\\Documents\\Cyber Security\\BLUESPAWN\\BLUESPAWN-client\\headers\\util\\filesystem\\FileSystem.h"
-#include "util/filesystem/FileSystem.h"
+#include "C:\\Users\\Will Mayes\\Documents\\Cyber Security\\BLUESPAWN\\BLUESPAWN-client\\headers\\util\\filesystem\\FileSystem.h"
+//#include "util/filesystem/FileSystem.h"
 bool FileSystem::CheckFileExists(LPCWSTR filename) {
 	//Function from https://stackoverflow.com/a/4404259/3302799
 	GetFileAttributesW(filename);
@@ -33,13 +33,56 @@ FileSystem::File::File(IN const LPCWSTR path) {
 	}
 }
 
-short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN const bool insert) {
-	return 0;
+short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, IN const bool insert) {
+	//TODO: Add ability to insert and handle writing past end of file. 
+	if (!FileExists) return 0;
+	long lowerMask = 0xFFFFFFFF;
+	long upperMask = (long)0x7FFFFFFF << 32;
+	LONG lowerOffset = offset & lowerMask;
+	LONG upperOffset = offset & upperMask;
+	PLONG upper;
+	DWORD bytesWritten;
+	if (upperOffset) {
+		upper = &upperOffset;
+	}
+	else {
+		upper = NULL;
+	}
+	if (SetFilePointer(hFile, lowerOffset, upper, 0) == INVALID_SET_FILE_POINTER) {
+		return 0;
+	}
+	if (!WriteFile(hFile, value, length, &bytesWritten, NULL)) {
+		SetFilePointer(hFile, 0, 0, 0);
+		return 0;
+	}
+	SetFilePointer(hFile, 0, 0, 0);
+	return 1;
 }
 
-short FileSystem::File::Read(OUT LPVOID buffer, IN const long offset, IN const long amount) {
-	return 0;
-}
+short FileSystem::File::Read(OUT LPVOID buffer, IN const long offset, IN const unsigned long amount) {
+	if (!FileExists) return 0;
+	long lowerMask = 0xFFFFFFFF;
+	long upperMask = (long)0x7FFFFFFF << 32;
+	LONG lowerOffset = offset & lowerMask;
+	LONG upperOffset = offset & upperMask;
+	PLONG upper;
+	if (upperOffset) {
+		upper = &upperOffset;
+	}
+	else {
+		upper = NULL;
+	}
+	DWORD bytesRead;
+	if (SetFilePointer(hFile, lowerOffset, upper, 0) == INVALID_SET_FILE_POINTER) {
+		return 0;
+	}
+	if (!ReadFile(hFile, buffer, amount, &bytesRead, NULL)) {
+		SetFilePointer(hFile, 0, 0, 0);
+		return 0;
+	}
+	SetFilePointer(hFile, 0, 0, 0);
+	return 1;
+} 
 
 bool FileSystem::File::GetMD5Hash(OUT string& buffer) {
 	if (!FileExists) return false;
