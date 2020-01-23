@@ -14,7 +14,6 @@ bool FileSystem::CheckFileExists(LPCWSTR filename) {
 //bool HashFileMD5(LPCWSTR, string&);
 FileSystem::File::File(IN const LPCWSTR path) {
 	FilePath = path;
-	hFile = NULL;
 	hFile = CreateFileW(path, 
 		GENERIC_READ | GENERIC_WRITE, 
 		0, 
@@ -25,7 +24,7 @@ FileSystem::File::File(IN const LPCWSTR path) {
 	if (INVALID_HANDLE_VALUE == hFile)
 	{
 		DWORD dwStatus = GetLastError();
-		printf("Error opening file %s\nError: %d\n", path, dwStatus);
+		//printf("Error opening file %s\nError: %d\n", path, dwStatus);
 		FileExists = false;
 	}
 	else
@@ -43,6 +42,7 @@ short FileSystem::File::Read(OUT LPVOID buffer, IN const long offset, IN const l
 }
 
 bool FileSystem::File::GetMD5Hash(OUT string& buffer) {
+	if (!FileExists) return false;
 	//Function from Microsoft
 	//https://docs.microsoft.com/en-us/windows/desktop/SecCrypto/example-c-program--creating-an-md-5-hash-from-file-content
 	DWORD dwStatus = 0;
@@ -124,24 +124,48 @@ bool FileSystem::File::GetMD5Hash(OUT string& buffer) {
 }
 
 short FileSystem::File::MakeFile() {
-	return 0;
+	if (FileExists) return 0;
+	hFile = CreateFileW(FilePath,
+		GENERIC_READ | GENERIC_WRITE,
+		0,
+		NULL,
+		CREATE_NEW,
+		FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL,
+		NULL);
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		DWORD dwStatus = GetLastError();
+		//printf("Error opening file %s\nError: %d\n", FilePath, dwStatus);
+		FileExists = false;
+		return 0;
+	}
+	FileExists = true;
+	return 1;
 }
 
 short FileSystem::File::RemoveFile() {
-	return 0;
+	if (!FileExists) return 0;
+	CloseHandle(hFile);
+	if (!DeleteFileW(FilePath)) {
+		DWORD dwStatus = GetLastError();
+		//printf("Error removing file %s\nError: %d\n", FilePath, dwStatus);
+		hFile = CreateFileW(FilePath,
+			GENERIC_READ | GENERIC_WRITE,
+			0,
+			NULL,
+			CREATE_NEW,
+			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL,
+			NULL);
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			DWORD dwStatus = GetLastError();
+			//printf("Error opening file %s\nError: %d\n", FilePath, dwStatus);
+			FileExists = false;
+			return 0;
+		}
+		FileExists = true;
+		return 0;
+	}
+	FileExists = false;
+	return 1;
 }
-/*string GetFileContents(LPCWSTR filename) {
-	if (CheckFileExists(filename)) {
-		ifstream ifs(filename);
-		string content((std::istreambuf_iterator<char>(ifs)),
-			(std::istreambuf_iterator<char>()));
-		return content;
-	}
-	else {
-		return "";
-	}
-}*/
-
-/*bool HashFileMD5(LPCWSTR filename, string& out) {
-	
-}*/
