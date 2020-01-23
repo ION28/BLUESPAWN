@@ -25,7 +25,7 @@ namespace FileSystem {
 		//Whether or not this current file actually exists
 		bool FileExists; 
 		//Path to the file
-		wstring FilePath;
+		LPCWSTR FilePath;
 		//Handle for the file
 		HANDLE hFile;
 	public:
