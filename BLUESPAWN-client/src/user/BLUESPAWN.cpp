@@ -2,6 +2,7 @@
 #include "util/log/HuntLogMessage.h"
 #include "util/log/DebugSink.h"
 #include "common/DynamicLinker.h"
+#include "common/StringUtils.h"
 
 #include <iostream>
 
@@ -24,12 +25,15 @@ int main(int argc, char* argv[])
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
+	int verbose = 0;
+
 	options.add_options()
 		("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
 		("help", "Help Information. You can also specify a category for help on a specific module such as hunt"
 			, cxxopts::value<std::string>()->implicit_value("general"))
 		("m,mitigation", "Performs a Mitigations Analysis")
 		("example", "Perform the example hunt")
+		("v,verbose", "Verbosity", cxxopts::value(verbose)->default_value("0"))
 		;
 
 	options.add_options("hunt")
@@ -38,19 +42,24 @@ int main(int argc, char* argv[])
 		;
 
 	options.parse_positional({ "help", "level" });
-	auto result = options.parse(argc, argv);
+	try {
+		auto result = options.parse(argc, argv);
 
-	if (result.count("help")) {
-		print_help(result, options);
+		if (result.count("help")) {
+			print_help(result, options);
+		}
+		else if (result.count("hunt")) {
+			dispatch_hunt(result, options);
+		}
+		else if (result.count("mitigation")) {
+			dispatch_mitigations_analysis(result, options);
+		}
+		else {
+			LOG_ERROR("Nothing to do. Use the -h or --hunt flags to launch a hunt");
+		}
 	}
-	else if (result.count("hunt")) {
-		dispatch_hunt(result, options);
-	}
-	else if (result.count("mitigation")) {
-		dispatch_mitigations_analysis(result, options);
-	}
-	else {
-		LOG_ERROR("Nothing to do. Use the -h or --hunt flags to launch a hunt");
+	catch (cxxopts::OptionParseException e1) {
+		LOG_ERROR(StringToWidestring(e1.what()));
 	}
 }
 
