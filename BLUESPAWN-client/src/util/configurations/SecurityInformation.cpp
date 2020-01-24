@@ -84,6 +84,8 @@ namespace Permissions {
 			}
 			else if (GetLastError() == ERROR_NONE_MAPPED) {
 				lpwUsername = L"NO_ACCOUNT_MAPPED";
+				lpwDomainName = L"";
+				sDivider = L"";
 			}
 			else {
 				LOG_ERROR("Unable to convert SID to username.");
@@ -113,30 +115,23 @@ namespace Permissions {
 						char lpDomain[2048];
 						SID_NAME_USE SNU;
 
+						std::wcout << std::endl;
+						std::wcout << GetStringSid(sSID) << std::endl;
 						std::wcout << GetUsernameFromSid(sSID) << std::endl;
 
 						switch (ACE->Header.AceType) {
 						case ACCESS_ALLOWED_ACE_TYPE:
-							if (ACE->Mask & KEY_ALL_ACCESS) fprintf(stdout, ",Key All\n");
-							if (ACE->Mask & GENERIC_ALL) fprintf(stdout, ",Generic All\n");
-
-							if (ACE->Mask & KEY_CREATE_SUB_KEY) fprintf(stdout, ",Create sub key\n");
-
-							if (ACE->Mask & KEY_SET_VALUE) fprintf(stdout, ",Set value\n");
-
-							if (ACE->Mask & KEY_ENUMERATE_SUB_KEYS) fprintf(stdout, ",Enumerate sub keys\n");
-
-							if (ACE->Mask & KEY_EXECUTE) fprintf(stdout, ",Read key\n");
-							if (ACE->Mask & KEY_READ) fprintf(stdout, ",Read key and values\n");
-							if (ACE->Mask & KEY_NOTIFY) fprintf(stdout, ",Notify\n");
-							if (ACE->Mask & KEY_QUERY_VALUE) fprintf(stdout, ",Query values\n");
-
-							if (ACE->Mask & WRITE_DAC) fprintf(stdout, ",Change Permissions\n");
-
-							if (ACE->Mask & WRITE_OWNER) fprintf(stdout, ",Change Owner\n");
-
-							if (ACE->Mask & READ_CONTROL) fprintf(stdout, ",Read Control\n");
-							if (ACE->Mask & DELETE) fprintf(stdout, ",Delete\n");
+							if (ACE->Mask & SPECIFIC_RIGHTS_ALL) fprintf(stdout, "SPECIFIC_RIGHTS_ALL\n");
+							if (ACE->Mask & KEY_QUERY_VALUE) fprintf(stdout, "KEY_QUERY_VALUE\n");
+							if (ACE->Mask & KEY_SET_VALUE) fprintf(stdout, "KEY_SET_VALUE\n");
+							if (ACE->Mask & KEY_CREATE_SUB_KEY) fprintf(stdout, "KEY_CREATE_SUB_KEY\n");
+							if (ACE->Mask & KEY_ENUMERATE_SUB_KEYS) fprintf(stdout, "KEY_ENUMERATE_SUB_KEYS\n");
+							if (ACE->Mask & KEY_NOTIFY) fprintf(stdout, "KEY_NOTIFY\n");
+							if (ACE->Mask & KEY_CREATE_LINK) fprintf(stdout, "KEY_CREATE_LINK\n");
+							if (ACE->Mask & DELETE) fprintf(stdout, "DELETE\n");
+							if (ACE->Mask & WRITE_DAC) fprintf(stdout, "WRITE_DAC\n");
+							if (ACE->Mask & WRITE_OWNER) fprintf(stdout, "WRITE_OWNER\n");
+							if (ACE->Mask & READ_CONTROL) fprintf(stdout, "READ_CONTROL\n");
 
 						case ACCESS_DENIED_ACE_TYPE:
 							break;

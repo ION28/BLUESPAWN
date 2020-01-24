@@ -23,7 +23,7 @@ namespace Mitigations {
 	bool MitigateV1152::MitigationIsEnforced(SecurityLevel level) {
 		LOG_INFO("Checking for presence of " << name);
 		
-		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\SecurePipeServers", L"winreg"};
+		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\SecurePipeServers\\winreg",L"Description"};
 		//auto key = RegistryKey{ HKEY_CURRENT_USER, L"Software\\9bis.com", L"KiTTY"};
 
 		if(key.KeyExists()){
