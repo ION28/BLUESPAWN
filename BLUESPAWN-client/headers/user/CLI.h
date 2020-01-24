@@ -3,7 +3,6 @@
 #include "user/iobase.h"
 
 #include <map>
-
 /**
  * This class serves as a way for BLUESPAWN's modules to interact with the user through a command line interface.
  * This class acts as a pseudo-singleton, permitting only one instance per input-output handle pair.
@@ -16,28 +15,14 @@ private:
 
 	const HANDLE input;
 	const HANDLE output;
-
 	/**
 	 * Creates a new CLI object with a given input and output handle.
 	 *
-	 * @param output A handle to the file-like object to which output will be written. This is the console by default.
-	 * @param input A handle to the file-like object from which input will be read. This is the console by default.
 	 */
-	CLI(const HANDLE output, const HANDLE input);
+	CLI();
 
 public:
-
-	/**
-	 * Returns a reference to a CLI object for the given input and output handles. If one already exists, it will be returned.
-	 * Otherwise, a new instance will be created and returned.
-	 *
-	 * @param output A handle to the file-like object to which output will be written. This is the console by default.
-	 * @param input A handle to the file-like object from which input will be read. This is the console by default.
-	 *
-	 * @return A reference to a CLI object to be used for user IO.
-	 */
-	static const CLI& GetInstance(const HANDLE output = hDefaultOutput, const HANDLE input = hDefaultInput);
-
+		
 	/**
 	 * This method displays a prompt to the user and presents a number of options. The user may select from among the provided
 	 * options. If no valid option has been selected by the time the maximum delay is exceeded, an empty string will be returned.
@@ -50,7 +35,7 @@ public:
 	 *
 	 * @return The option that the user chose, or an empty string if no options were provided.
 	 */
-	virtual std::string GetUserSelection(const std::string& prompt, const std::set<std::string>& options,
+	virtual std::string GetUserSelection(const std::string& prompt, const std::vector<std::string>& options,
 		DWORD dwMaximumDelay = -1) const;
 
 	/**
@@ -70,7 +55,7 @@ public:
 	 *
 	 * @return True if the user acknowledged the message, false otherwise.
 	 */
-	virtual bool AlerUser(const std::string& information, DWORD dwMaximumDelay = -1) const;
+	virtual bool AlertUser(const std::string& information, DWORD dwMaximumDelay = -1) const;
 
 	/**
 	 * This method displays a confirmation message to the user. This will display the prompt and three options:
@@ -86,4 +71,21 @@ public:
 	 */
 	virtual DWORD GetUserConfirm(const std::string& prompt, DWORD dwMaximumDelay = -1) const;
 };
-
+enum class MessageColor {
+	BLACK = 0x0,
+	DARKBLUE = 0x1,
+	DARKGREEN = 0x2,
+	CYAN = 0x3,
+	DARKRED = 0x4,
+	DARKPINK = 0x5,
+	GOLD = 0x6,
+	LIGHTGREY = 0x7,
+	DARKGREY = 0x8,
+	BLUE = 0x9,
+	GREEN = 0xA,
+	LIGHTBLUE = 0xB,
+	RED = 0xC,
+	PINK = 0xD,
+	YELLOW = 0xE,
+	WHITE = 0xF
+};
