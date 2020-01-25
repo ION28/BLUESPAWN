@@ -43,11 +43,11 @@ std::string CLI::GetUserSelection(const std::string& prompt, const std::vector<s
 	int userIn;
 	while (true) {
 		cin >> userIn;
-		if (userIn > 0 && userIn <= options.size) {
+		if (userIn > 0 && userIn <= options.size()) {
 			return options[userIn-1];
 		}
 		else {
-			cout << "Please Enter a valid number between 1 and " << options.size <<endl;
+			cout << "Please Enter a valid number between 1 and " << options.size() <<endl;
 		}
 	}
 	return "";
