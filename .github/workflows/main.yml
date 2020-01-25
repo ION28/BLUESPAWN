@@ -1,4 +1,4 @@
-name: BLUESPAWN agent build
+name: BLUESPAWN client build
 
 on:
   push:
@@ -20,24 +20,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    
-    - name: Setup Nuget.exe
-      uses: warrenbuckley/Setup-Nuget@v1
 
     - name: Update submodules
       run: git submodule update --init --recursive
 
-    - name: Download Nuget packages
-      working-directory: BLUESPAWN-agent
-      run: nuget restore BLUESPAWN-agent.sln
-
-    - name: Build BLUESPAWN-agent
-      working-directory: BLUESPAWN-agent
+    - name: Build BLUESPAWN-client
       run: |
-        "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN-agent.sln /p:Configuration=${{ matrix.buildtype }}
+        "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN.sln /p:Configuration=${{ matrix.buildtype }}
       shell: cmd
 
     - uses: actions/upload-artifact@master
       with:
-        name: BLUESPAWN-agent-${{ matrix.buildtype }}
-        path: BLUESPAWN-agent\artifacts\x64\${{ matrix.buildtype }}\BLUESPAWN.exe
+        name: BLUESPAWN-client-${{ matrix.buildtype }}
+        path: artifacts\x64\${{ matrix.buildtype }}\BLUESPAWN-client.exe

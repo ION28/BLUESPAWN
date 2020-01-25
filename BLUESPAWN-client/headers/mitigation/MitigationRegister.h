@@ -5,12 +5,12 @@
 
 class MitigationRegister {
 
-	public:
-		void RegisterMitigation(Mitigation* mitigation);
-		void SetSecurityLevel(SecurityLevel securityLevel);
+public:
+	void RegisterMitigation(Mitigation* mitigation);
+	void ApplyMitigations(SecurityLevel securityLevel);
 
-	private:
-		std::vector<Mitigation*> vRegisteredMitigations{};
+private:
+	std::vector<Mitigation*> vRegisteredMitigations{};
 
 };
 
