@@ -1,3 +1,4 @@
+/*
 #include "monitor/ETW_Wrapper.h"
 #include <iostream>
 
@@ -42,3 +43,4 @@ void ETW_Wrapper::startUserTrace() {
 	// while this runs, you'll need to call this on another thread.
 	userTrace.start();
 }
+*/

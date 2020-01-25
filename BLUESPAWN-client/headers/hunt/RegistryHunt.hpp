@@ -1,6 +1,6 @@
 #pragma once
 #include "util/configurations/Registry.h"
-#include "util/reaction/Reaction.h"
+#include "hunt/reaction/Reaction.h"
 
 #include "util/log/HuntLogMessage.h"
 #include "util/log/Log.h"
