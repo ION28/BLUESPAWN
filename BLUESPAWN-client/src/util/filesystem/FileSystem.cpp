@@ -1,13 +1,16 @@
 //#include "C:\\Users\\Will Mayes\\Documents\\Cyber Security\\BLUESPAWN\\BLUESPAWN-client\\headers\\util\\filesystem\\FileSystem.h"
 #include "util/filesystem/FileSystem.h"
+#include "util/log/Log.h"
 bool FileSystem::CheckFileExists(LPCWSTR filename) {
 	//Function from https://stackoverflow.com/a/4404259/3302799
 	GetFileAttributesW(filename);
 	if (INVALID_FILE_ATTRIBUTES == GetFileAttributes(filename) &&
 		GetLastError() == ERROR_FILE_NOT_FOUND)
 	{
+		LOG_VERBOSE(3, "File " << filename << " does not exist.");
 		return false;
 	}
+	LOG_VERBOSE(3, "File " << filename << " exists");
 	return true;
 }
 
@@ -22,6 +25,7 @@ void FileSystem::File::TranslateLongToFilePointer(long val, LONG& lowerVal, LONG
 
 FileSystem::File::File(IN const LPCWSTR path) {
 	FilePath = path;
+	LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
 	hFile = CreateFileW(path, 
 		GENERIC_READ | GENERIC_WRITE, 
 		FILE_SHARE_READ,
@@ -32,17 +36,22 @@ FileSystem::File::File(IN const LPCWSTR path) {
 	if (INVALID_HANDLE_VALUE == hFile)
 	{
 		DWORD dwStatus = GetLastError();
-		//printf("Error opening file %s\nError: %d\n", path, dwStatus);
+		LOG_VERBOSE(2, "Couldn't open file " << path << ".");
 		FileExists = false;
 	}
 	else
 	{
+		LOG_VERBOSE(2, "File " << path << " opened.");
 		FileExists = true;
 	}
 }
 
 short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, IN const bool insert) {
-	if (!FileExists) return 0;
+	LOG_VERBOSE(2, "Writing to file " << FilePath << " at " << offset << ". Insert = " << insert);
+	if (!FileExists) {
+		LOG_ERROR("Can't write to file " << FilePath << ". File doesn't exist");
+		return 0;
+	}
 	//Calculate the offset into format needed for SetFilePointer
 	LONG lowerOffset;
 	LONG upperOffset;
@@ -51,6 +60,7 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 	DWORD bytesWritten;
 	//Point at the desired offset
 	if (SetFilePointer(hFile, lowerOffset, upper, 0) == INVALID_SET_FILE_POINTER) {
+		LOG_ERROR("Can't set file pointer to " << offset << " in file " << FilePath << ".");
 		return 0;
 	}
 	//Insert value into file at specified offset
@@ -59,7 +69,7 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 		long readOffset = offset;
 		long writeOffset = offset;
 		int i = 0;
-		int writeLen = length;
+		long writeLen = length;
 		LPVOID writeBuf = value;
 		PLONG writeUpper;
 		LONG writeLowerOffset;
@@ -67,15 +77,17 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 		File::TranslateLongToFilePointer(writeOffset, writeLowerOffset, writeUpperOffset, writeUpper);
 		//Read up to 1000000 bytes at a time until eof is reached, writing the last read chunk between each read. 
 		while (!readAll) {
-			LPVOID readBuf = calloc(writeLen + 1, 1);
+			LPVOID readBuf = calloc(writeLen + 1l, 1);
 			DWORD bytesRead;
 			long len = writeLen;
 			//Read to eof file or ~1000000 bytes
 			while (true) {
 				if (SetFilePointer(hFile, lowerOffset, upper, 0) == INVALID_SET_FILE_POINTER) {
+					LOG_ERROR("Can't set file pointer to " << readOffset << " in file " << FilePath << ".");
 					return 0;
 				}
 				if (!ReadFile(hFile, readBuf, len, &bytesRead, NULL)) {
+					LOG_ERROR("Reading from " << FilePath << " failed with error " << GetLastError());
 					free(readBuf);
 					SetFilePointer(hFile, 0, 0, 0);
 					return 0;
@@ -89,17 +101,18 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 				}
 				free(readBuf);
 				len *= 2;
-				readBuf = calloc(len * 2 + 1, 1);
+				readBuf = calloc(len * 2l + 1l, 1);
 				if (!readBuf) {
 					return 0;
 				}
-//				std::cout << "HERE " << len << std::endl;
 			}
 			//Write last read portion of the file
 			if (SetFilePointer(hFile, writeLowerOffset, writeUpper, 0) == INVALID_SET_FILE_POINTER) {
+				LOG_ERROR("Can't set file pointer to " << writeOffset << " in file " << FilePath << ".");
 				return 0;
 			}
 			if (!WriteFile(hFile, writeBuf, writeLen, &bytesWritten, NULL)) {
+				LOG_ERROR("Failed to write to " << FilePath << " at offset " << writeOffset << " with error " << GetLastError());
 				free(readBuf);
 				if (i > 0) free(writeBuf);
 				SetFilePointer(hFile, 0, 0, 0);
@@ -118,10 +131,12 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 			i++;
 		}
 		if (SetFilePointer(hFile, writeLowerOffset, writeUpper, 0) == INVALID_SET_FILE_POINTER) {
+			LOG_ERROR("Can't set FilePointer to " << writeOffset << " in file " << FilePath << ".");
 			free(writeBuf);
 			return 0;
 		}
 		if (!WriteFile(hFile, writeBuf, writeLen, &bytesWritten, NULL)) {
+			LOG_ERROR("Failed to write to " << FilePath << " at offset " << writeOffset << " with error " << GetLastError());
 			free(writeBuf);
 			SetFilePointer(hFile, 0, 0, 0);
 			return 0;
@@ -131,16 +146,22 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 	//Write value over file at specified offset
 	else {
 		if (!WriteFile(hFile, value, length, &bytesWritten, NULL)) {
+			LOG_ERROR("Failed to write to " << FilePath << " at offset " << offset << " with error " << GetLastError());
 			SetFilePointer(hFile, 0, 0, 0);
 			return 0;
 		}
 	}
 	SetFilePointer(hFile, 0, 0, 0);
+	LOG_VERBOSE(1, "Successfule wrote to " << FilePath << "at offset" << offset);
 	return 1;
 }
 
 short FileSystem::File::Read(OUT LPVOID buffer, IN const long offset, IN const unsigned long amount) {
-	if (!FileExists) return 0;
+	LOG_VERBOSE(2, "Attempting to read " << amount << " bytes from " << FilePath << " at offset " << offset);
+	if (!FileExists) {
+		LOG_ERROR("Can't write to " << FilePath << ". File doesn't exist.");
+		return 0;
+	}
 	//Calculate the offset into format needed for SetFilePointer
 	LONG lowerOffset;
 	LONG upperOffset;
@@ -148,18 +169,25 @@ short FileSystem::File::Read(OUT LPVOID buffer, IN const long offset, IN const u
 	File::TranslateLongToFilePointer(offset, lowerOffset, upperOffset, upper);
 	DWORD bytesRead;
 	if (SetFilePointer(hFile, lowerOffset, upper, 0) == INVALID_SET_FILE_POINTER) {
+		LOG_ERROR("Can't set file pointer to " << offset << " in file " << FilePath << ".");
 		return 0;
 	}
 	if (!ReadFile(hFile, buffer, amount, &bytesRead, NULL)) {
+		LOG_ERROR("Failed to read from " << FilePath << " at offset " << offset << " with error " << GetLastError());
 		SetFilePointer(hFile, 0, 0, 0);
 		return 0;
 	}
+	LOG_VERBOSE(1, "Successfully wrote " << amount << " bytes to " << FilePath);
 	SetFilePointer(hFile, 0, 0, 0);
 	return 1;
 } 
 
 bool FileSystem::File::GetMD5Hash(OUT string& buffer) {
-	if (!FileExists) return false;
+	LOG_VERBOSE(3, "Attempting to get MD5 hash of " << FilePath);
+	if (!FileExists) {
+		LOG_ERROR("Can't get MD5 hash of " << FilePath << ". File doesn't exist");
+		return false;
+	}
 	//Function from Microsoft
 	//https://docs.microsoft.com/en-us/windows/desktop/SecCrypto/example-c-program--creating-an-md-5-hash-from-file-content
 	DWORD dwStatus = 0;
@@ -180,14 +208,14 @@ bool FileSystem::File::GetMD5Hash(OUT string& buffer) {
 		CRYPT_VERIFYCONTEXT))
 	{
 		dwStatus = GetLastError();
-		printf("CryptAcquireContext failed: %d\n", dwStatus);
+		LOG_ERROR("CryptAcquireContext failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
 		return false;
 	}
 
 	if (!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash))
 	{
 		dwStatus = GetLastError();
-		printf("CryptAcquireContext failed: %d\n", dwStatus);
+		LOG_ERROR("CryptCreateHash failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
 		CryptReleaseContext(hProv, 0);
 		return false;
 	}
@@ -203,7 +231,7 @@ bool FileSystem::File::GetMD5Hash(OUT string& buffer) {
 		if (!CryptHashData(hHash, rgbFile, cbRead, 0))
 		{
 			dwStatus = GetLastError();
-			printf("CryptHashData failed: %d\n", dwStatus);
+			LOG_ERROR("CryptHashData failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
 			CryptReleaseContext(hProv, 0);
 			CryptDestroyHash(hHash);
 			return false;
@@ -213,7 +241,7 @@ bool FileSystem::File::GetMD5Hash(OUT string& buffer) {
 	if (!bResult)
 	{
 		dwStatus = GetLastError();
-		printf("ReadFile failed: %d\n", dwStatus);
+		LOG_ERROR("ReadFile failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
 		CryptReleaseContext(hProv, 0);
 		CryptDestroyHash(hHash);
 		return false;
@@ -232,16 +260,21 @@ bool FileSystem::File::GetMD5Hash(OUT string& buffer) {
 	else
 	{
 		dwStatus = GetLastError();
-		//printf("CryptGetHashParam failed: %d\n", dwStatus);
+		LOG_ERROR("CryptGetHashParam failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
 	}
 
 	CryptDestroyHash(hHash);
 	CryptReleaseContext(hProv, 0);
+	LOG_VERBOSE(3, "Successfully got MD5 Hash of " << FilePath);
 	return false;
 }
 
 short FileSystem::File::Create() {
-	if (FileExists) return 0;
+	LOG_VERBOSE(1, "Attempting to create file: " << FilePath);
+	if (FileExists) {
+		LOG_ERROR("Can't create " << FilePath << ". File already exists.");
+		return 0;
+	}
 	hFile = CreateFileW(FilePath,
 		GENERIC_READ | GENERIC_WRITE,
 		FILE_SHARE_READ,
@@ -252,20 +285,25 @@ short FileSystem::File::Create() {
 	if (INVALID_HANDLE_VALUE == hFile)
 	{
 		DWORD dwStatus = GetLastError();
-		//printf("Error opening file %s\nError: %d\n", FilePath, dwStatus);
+		LOG_ERROR("Error creating file " << FilePath << ". Error code = " << dwStatus);
 		FileExists = false;
 		return 0;
 	}
+	LOG_VERBOSE(1, FilePath << " successfully created.");
 	FileExists = true;
 	return 1;
 }
 
 short FileSystem::File::Delete() {
-	if (!FileExists) return 0;
+	LOG_VERBOSE(1, "Attempting to delete file " << FilePath);
+	if (!FileExists) { 
+		LOG_ERROR("Can't delete file " << FilePath << ". File doesn't exist");
+		return 0; 
+	}
 	CloseHandle(hFile);
 	if (!DeleteFileW(FilePath)) {
 		DWORD dwStatus = GetLastError();
-		//printf("Error removing file %s\nError: %d\n", FilePath, dwStatus);
+		LOG_ERROR("Deleting file " << FilePath << " failed with error " << dwStatus);
 		hFile = CreateFileW(FilePath,
 			GENERIC_READ | GENERIC_WRITE,
 			0,
@@ -276,25 +314,33 @@ short FileSystem::File::Delete() {
 		if (INVALID_HANDLE_VALUE == hFile)
 		{
 			DWORD dwStatus = GetLastError();
-			//printf("Error opening file %s\nError: %d\n", FilePath, dwStatus);
+			LOG_ERROR("Couldn't reopen " << FilePath << ". Error = " << dwStatus);
 			FileExists = false;
 			return 0;
 		}
 		FileExists = true;
 		return 0;
 	}
+	LOG_VERBOSE(1, FilePath << "deleted.");
 	FileExists = false;
 	return 1;
 }
 
 short FileSystem::File::ChangeFileLength(IN const long length) {
+	LOG_VERBOSE(2, "Attempting to change length of " << FilePath << " to " << length);
 	//Calculate the length into format needed for SetFilePointer
 	LONG lowerLen;
 	LONG upperLen;
 	PLONG upper;
 	File::TranslateLongToFilePointer(length, lowerLen, upperLen, upper);
-	if (!SetFilePointer(hFile, lowerLen, upper, 0)) return 0;
-	if (!SetEndOfFile(hFile)) return 0;
+	if (!SetFilePointer(hFile, lowerLen, upper, 0)) {
+		LOG_ERROR("Couldn't change file pointer to " << length << " in file " << FilePath);
+		return 0;
+	}
+	if (!SetEndOfFile(hFile)) {
+		LOG_ERROR("Couldn't change the length of file " << FilePath);
+		return 0;
+	}
+	LOG_VERBOSE(2, "Changed length of " << FilePath << " to " << length);
 	return 1;
-
 }
