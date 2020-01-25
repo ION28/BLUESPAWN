@@ -28,7 +28,7 @@ public:
 	 *
 	 * @return The option that the user chose, or an empty string if no options were provided.
 	 */
-	virtual std::string GetUserSelection(const std::string& prompt, const std::set<std::string>& options, 
+	virtual std::string GetUserSelection(const std::string& prompt, const std::vector<std::string>& options, 
 		DWORD dwMaximumDelay = -1) const = 0;
 
 	/**
@@ -48,7 +48,7 @@ public:
 	 *
 	 * @return True if the user acknowledged the message, false otherwise.
 	 */
-	virtual bool AlerUser(const std::string& information, DWORD dwMaximumDelay = -1) const = 0;
+	virtual bool AlertUser(const std::string& information, DWORD dwMaximumDelay = -1) const = 0;
 
 	/**
 	 * This method displays a confirmation message to the user. This will display the prompt and three options:
