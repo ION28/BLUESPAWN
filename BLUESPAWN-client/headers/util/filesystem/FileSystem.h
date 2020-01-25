@@ -28,6 +28,15 @@ namespace FileSystem {
 		LPCWSTR FilePath;
 		//Handle for the file
 		HANDLE hFile;
+		/**
+		* Function to get offsets in format needed by SetFilePointer
+		*
+		* @param val - value to be translated. Upper bit will be ignored
+		* @param lowerVal - variable to store lower value
+		* @param upperVal - variable to store upper value
+		* @param upper - variable to store pointer to upper value
+		*/
+		static void TranslateLongToFilePointer(long val, LONG& lowerVal, LONG& upperVal, PLONG& upper);
 	public:
 		/**
 		* Creates a file object with a given path
@@ -82,14 +91,23 @@ namespace FileSystem {
 		* 
 		* @return 1 if creation was successful, 0 if unsuccessful
 		*/
-		short MakeFile();
+		short Create();
 
 		/**
-		* Functio to delete the file
+		* Function to delete the file
 		*
 		* @return 1 if deletion was successful, 0 if unsuccessful
 		*/
-		short RemoveFile();
+		short Delete();
+
+		/**
+		* Function to truncate or extend file length
+		*
+		* @param length - new length of the file in bytes
+		*
+		* @return 1 if trucation or extension was successful, 0 if unsuccessful
+		*/
+		short ChangeFileLength(IN const long length);
 	};
 
 	class Folder : File {
