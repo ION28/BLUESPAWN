@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
-	int verbose = 0;
+	int iVerbosity = 0;
 
 	options.add_options()
 		("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
@@ -33,7 +33,8 @@ int main(int argc, char* argv[])
 			, cxxopts::value<std::string>()->implicit_value("general"))
 		("m,mitigation", "Performs a Mitigations Analysis")
 		("example", "Perform the example hunt")
-		("v,verbose", "Verbosity", cxxopts::value(verbose)->default_value("0"))
+		("v,verbose", "Verbosity", cxxopts::value(iVerbosity)->default_value("0"))
+		("debug", "Enable Debug Output", cxxopts::value<bool>())
 		;
 
 	options.add_options("hunt")
@@ -44,6 +45,22 @@ int main(int argc, char* argv[])
 	options.parse_positional({ "help", "level" });
 	try {
 		auto result = options.parse(argc, argv);
+
+		if (result.count("debug")) {
+			Log::AddSink(ConsoleOutput);
+		}
+
+		if (result.count("verbose")) {
+			if (iVerbosity >= 1) {
+				Log::LogLevel::LogVerbose1.Enable();
+			}
+			if (iVerbosity >= 2) {
+				Log::LogLevel::LogVerbose2.Enable();
+			}
+			if (iVerbosity >= 3) {
+				Log::LogLevel::LogVerbose3.Enable();
+			}
+		}
 
 		if (result.count("help")) {
 			print_help(result, options);
