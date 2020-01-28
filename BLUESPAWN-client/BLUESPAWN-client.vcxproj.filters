@@ -1,0 +1,1218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{5e3094ea-2888-4012-a455-300c784aa7ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hunt">
+      <UniqueIdentifier>{a678455f-744f-4663-b647-4b5709265150}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mitigation">
+      <UniqueIdentifier>{4c99cbae-4800-4703-a92a-ff3c2e107fcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\monitor">
+      <UniqueIdentifier>{bdfea10f-b8dd-43a8-9591-0aaa26a93d75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\user">
+      <UniqueIdentifier>{5f88fe29-b831-4cf6-aca3-4d664508f61a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hunt\hunts">
+      <UniqueIdentifier>{850789ea-d66b-4e64-acd8-b8f9ddae7992}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\configurations">
+      <UniqueIdentifier>{b21dcbf9-746e-482d-97c5-08b12caf291c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\filesystem">
+      <UniqueIdentifier>{d8dc0ca9-b1dd-47c4-9413-4b1e987e8369}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\log">
+      <UniqueIdentifier>{94361d57-7102-431b-88e6-d1c640d070c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\processes">
+      <UniqueIdentifier>{55466f29-9078-458e-9c9e-731465ceaedb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hunt\reaction">
+      <UniqueIdentifier>{59d6c737-a765-4c58-99c3-94ae2fc6b1d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\pe">
+      <UniqueIdentifier>{be6f7dae-9441-44be-ac5d-d929cb68e4a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hunt">
+      <UniqueIdentifier>{5a7c46b3-caea-4289-bfcc-3f97a1277427}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mitigation">
+      <UniqueIdentifier>{e1e86a24-6625-4dbd-b023-de2182d32560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\monitor">
+      <UniqueIdentifier>{6f3b3ba6-87f7-461f-a9ca-95e5d976dc3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\user">
+      <UniqueIdentifier>{bb865992-8401-4892-837f-29746f11a9f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{d7e04114-31a5-49e8-ae0e-7f41d50aff4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hunt\hunt">
+      <UniqueIdentifier>{6b37472a-6262-46f5-95e9-697fc82223c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\configurations">
+      <UniqueIdentifier>{85fff8b5-a142-4782-9b2d-e56c775c2d65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\filesystem">
+      <UniqueIdentifier>{1e386e96-cfa2-4de5-8b9f-fb83d8a5e71a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\log">
+      <UniqueIdentifier>{c4cef2c0-25d4-4b68-9bee-1fed4b9032a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\pe">
+      <UniqueIdentifier>{b06b3f6c-529c-4b8f-95e1-825ba059521a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\processes">
+      <UniqueIdentifier>{5e5c0dd9-7f92-476e-a3ec-1f9b1f2bf622}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hunt\reaction">
+      <UniqueIdentifier>{a5f16481-f90c-4fdf-815a-2e6cdc9a0546}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\log\grpc">
+      <UniqueIdentifier>{4db4c0a6-cc8a-4527-a287-b671a4752cbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\log\grpc">
+      <UniqueIdentifier>{e534504c-6874-44e1-a7ca-9db636a60d4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mitigation\mitigations">
+      <UniqueIdentifier>{2eaaa13d-752d-44e7-8668-16c86974d183}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mitigation\mitigations">
+      <UniqueIdentifier>{9387c772-fdc7-45c9-a31f-d13558ffe430}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\eventlogs">
+      <UniqueIdentifier>{23120957-b2c7-4957-9951-0eabd2e5edf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\eventlogs">
+      <UniqueIdentifier>{7e223556-6f7d-4752-ae74-120962505e82}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\hunt\hunts\HuntT1004.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1037.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1060.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1100.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1101.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1103.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1131.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1138.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1182.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\Hunt.h">
+      <Filter>Header Files\hunt</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\HuntInfo.h">
+      <Filter>Header Files\hunt</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\HuntRegister.h">
+      <Filter>Header Files\hunt</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\RegistryHunt.hpp">
+      <Filter>Header Files\hunt</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\Scope.h">
+      <Filter>Header Files\hunt</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\Mitigation.h">
+      <Filter>Header Files\mitigation</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\MitigationRegister.h">
+      <Filter>Header Files\mitigation</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\user\banners.h">
+      <Filter>Header Files\user</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\user\bluespawn.h">
+      <Filter>Header Files\user</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\configurations\CollectInfo.h">
+      <Filter>Header Files\util\configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\configurations\Registry.h">
+      <Filter>Header Files\util\configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\configurations\ScheduledTasks.h">
+      <Filter>Header Files\util\configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\filesystem\FileSystem.h">
+      <Filter>Header Files\util\filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\CLISink.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\DebugSink.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\HuntLogMessage.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\Log.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\Loggable.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\LogLevel.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\LogSink.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\log\ServerSink.h">
+      <Filter>Header Files\util\log</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\processes\Analyzer.h">
+      <Filter>Header Files\util\processes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Export_Section.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Image_Loader.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Import_Section.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\PE_Image.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\PE_Section.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Relocation_Section.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Resource_Section.h">
+      <Filter>Header Files\util\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\reaction\Detections.h">
+      <Filter>Header Files\hunt\reaction</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\reaction\Log.h">
+      <Filter>Header Files\hunt\reaction</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\reaction\Reaction.h">
+      <Filter>Header Files\hunt\reaction</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\alarm.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\alarm.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\alarm_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\alloc.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\async_generic_service.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\generic\async_generic_service.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\generic\async_generic_service.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\async_stream.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\async_stream.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\async_stream.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\async_stream.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\async_stream_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\async_stream_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\async_unary_call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\async_unary_call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\async_unary_call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\async_unary_call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\async_unary_call_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\async_unary_call_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\atm.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\atm.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\atm_gcc_atomic.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\atm_gcc_atomic.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\atm_gcc_sync.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\atm_gcc_sync.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\atm_windows.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\atm_windows.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\security\auth_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\security\auth_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\security\auth_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\security\auth_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\security\auth_metadata_processor.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\security\auth_metadata_processor.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\security\auth_metadata_processor_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\byte_buffer.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\byte_buffer.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\byte_buffer.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\byte_buffer.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\byte_buffer.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\byte_buffer.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\byte_buffer_reader.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\byte_buffer_reader.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\call_hook.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\call_hook.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\call_op_set.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\call_op_set_interface.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\callback_common.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\census.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\channel.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\channel.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\channel_argument_option.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\channel_argument_option.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\channel_arguments.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\channel_arguments.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\channel_arguments_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\channel_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\channel_interface.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\channel_interface.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\ext\channelz_service_plugin.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\ext\channelz_service_plugin_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\client_callback.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_callback.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_callback_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\client_callback_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\client_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\client_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\client_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_context_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\client_interceptor.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_interceptor.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\client_unary_call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\client_unary_call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_unary_call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\client_unary_call.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\completion_queue.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\completion_queue.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\completion_queue.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\completion_queue.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\completion_queue_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\completion_queue_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\completion_queue_tag.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\completion_queue_tag.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\compression.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\compression_types.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\config.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\config.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\config.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\config.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\config_protobuf.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\config_protobuf.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\connectivity_state.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\core_codegen.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\core_codegen.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\core_codegen_interface.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\core_codegen_interface.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\cpu.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\create_auth_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\create_auth_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\create_channel.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\create_channel.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\create_channel_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\create_channel_posix.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\create_channel_posix.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\create_channel_posix_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\security\credentials.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\security\credentials.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\security\credentials_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\error_details.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\error_details.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\error_details_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\fork.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\fork.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\generic\generic_stub.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\generic\generic_stub.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\generic\generic_stub_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\gpr_slice.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\gpr_types.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\grpc.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\grpc_cronet.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\grpc_library.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\grpc_library.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\grpc_library.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\grpc_library.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\grpc_posix.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\grpc_security.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\grpc_security_constants.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\grpc_types.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\grpc++.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\grpcpp.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\health_check_service_interface.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\health_check_service_interface.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\health_check_service_interface_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\ext\health_check_service_server_builder_option.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\ext\health_check_service_server_builder_option.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\intercepted_channel.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\interceptor.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\interceptor.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\interceptor_common.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\load_reporting.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\log.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\log.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\log_windows.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\message_allocator.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\message_allocator.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\metadata_map.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\metadata_map.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\method_handler_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\method_handler_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\method_handler_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\method_handler_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\port_platform.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\port_platform.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\propagation_bits.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\proto_buffer_reader.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\proto_buffer_reader.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\proto_buffer_writer.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\proto_buffer_writer.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\ext\proto_server_reflection_plugin.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\ext\proto_server_reflection_plugin.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\ext\proto_server_reflection_plugin_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\proto_utils.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\proto_utils.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\ReactionData.grpc.pb.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\ReactionData.pb.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\resource_quota.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\resource_quota.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\resource_quota_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\rpc_method.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\rpc_method.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\rpc_method.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\rpc_method.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\rpc_service_method.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\rpc_service_method.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\rpc_service_method.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\rpc_service_method.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\serialization_traits.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\serialization_traits.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\serialization_traits.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\serialization_traits.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\server.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\server.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\server_builder.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\server_builder.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\server_builder_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\server_builder_option.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\server_builder_option.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\server_builder_option_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\server_builder_plugin.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\server_builder_plugin.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\server_callback.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_callback.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_callback_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\server_callback_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\server_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\server_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\server_context.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_context_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\security\server_credentials.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\security\server_credentials.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\security\server_credentials_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\server_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\server_initializer.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\server_initializer.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\server_initializer_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_interceptor.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\server_interceptor.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\server_interface.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_interface.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\server_posix.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\server_posix.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\server_posix_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\ServerServices.grpc.pb.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\ServerServices.pb.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\service_type.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\service_type.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\service_type.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\service_type.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\slice.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\slice.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\slice.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\slice.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\slice.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\slice.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\slice_buffer.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\status.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\status.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\status.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\status.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\status.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\status.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\status_code_enum.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\status_code_enum.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\status_code_enum.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\status_code_enum.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\string_ref.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\string_ref.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\string_ref.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\string_ref.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\string_util.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\stub_options.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\stub_options.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\stub_options.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\stub_options.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\sync.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\sync.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\sync.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\sync_custom.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\sync_custom.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\sync_generic.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\sync_generic.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\sync_posix.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\sync_posix.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\sync_stream.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\sync_stream.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\sync_stream.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\sync_stream.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\sync_stream_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\sync_stream_impl.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\sync_windows.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\impl\codegen\sync_windows.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\thd_id.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\support\time.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\time.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\time.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc++\impl\codegen\time.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\time.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpcpp\support\validate_service_config.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="grpc\generated\grpc\support\workaround_list.h">
+      <Filter>Header Files\util\log\grpc</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\monitor\ETW_Wrapper.h">
+      <Filter>Header Files\monitor</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h">
+      <Filter>Header Files\mitigation\mitigations</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV72753.h">
+      <Filter>Header Files\mitigation\mitigations</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\eventlogs\EventLogs.h">
+      <Filter>Header Files\util\eventlogs</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h">
+      <Filter>Header Files\mitigation\mitigations</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\user\iobase.h">
+      <Filter>Header Files\user</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\user\CLI.h">
+      <Filter>Header Files\user</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1050.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\hunt\Hunt.cpp">
+      <Filter>Source Files\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\HuntRegister.cpp">
+      <Filter>Source Files\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\Scope.cpp">
+      <Filter>Source Files\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1004.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1037.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1060.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1100.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1101.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1103.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1131.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1138.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1182.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\Mitigation.cpp">
+      <Filter>Source Files\mitigation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\MitigationRegister.cpp">
+      <Filter>Source Files\mitigation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\user\banners.cpp">
+      <Filter>Source Files\user</Filter>
+    </ClCompile>
+    <ClCompile Include="src\user\BLUESPAWN.cpp">
+      <Filter>Source Files\user</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\configurations\CollectInfo.cpp">
+      <Filter>Source Files\util\configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\configurations\Registry.cpp">
+      <Filter>Source Files\util\configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\filesystem\FileSystem.cpp">
+      <Filter>Source Files\util\filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\CLISink.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\DebugSink.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\HuntLogMessage.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\Log.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\LogLevel.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log\ServerSink.cpp">
+      <Filter>Source Files\util\log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Export_Section.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Image_Loader.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Import_Section.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\PE_Image.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\PE_Section.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Relocation_Section.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Resource_Section.cpp">
+      <Filter>Source Files\util\pe</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\processes\Analyzer.cpp">
+      <Filter>Source Files\util\processes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\reaction\Reaction.cpp">
+      <Filter>Source Files\hunt\reaction</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\reaction\ReactLog.cpp">
+      <Filter>Source Files\hunt\reaction</Filter>
+    </ClCompile>
+    <ClCompile Include="grpc\generated\ReactionData.grpc.pb.cc">
+      <Filter>Source Files\util\log\grpc</Filter>
+    </ClCompile>
+    <ClCompile Include="grpc\generated\ReactionData.pb.cc">
+      <Filter>Source Files\util\log\grpc</Filter>
+    </ClCompile>
+    <ClCompile Include="grpc\generated\ServerServices.grpc.pb.cc">
+      <Filter>Source Files\util\log\grpc</Filter>
+    </ClCompile>
+    <ClCompile Include="grpc\generated\ServerServices.pb.cc">
+      <Filter>Source Files\util\log\grpc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">
+      <Filter>Source Files\monitor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp">
+      <Filter>Source Files\mitigation\mitigations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV72753.cpp">
+      <Filter>Source Files\mitigation\mitigations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\eventlogs\EventLogs.cpp">
+      <Filter>Source Files\util\eventlogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp">
+      <Filter>Source Files\mitigation\mitigations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\user\CLI.cpp">
+      <Filter>Source Files\user</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1050.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
