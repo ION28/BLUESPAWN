@@ -34,7 +34,6 @@ int main(int argc, char* argv[])
 		("help", "Help Information. You can also specify a category for help on a specific module such as hunt"
 			, cxxopts::value<std::string>()->implicit_value("general"))
 		("m,mitigation", "Performs a Mitigations Analysis")
-		("example", "Perform the example hunt")
 		("v,verbose", "Verbosity", cxxopts::value(iVerbosity)->default_value("0"))
 		("debug", "Enable Debug Output", cxxopts::value<bool>())
 		;
