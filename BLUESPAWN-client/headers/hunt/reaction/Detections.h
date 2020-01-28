@@ -12,7 +12,8 @@ enum class DetectionType {
 	File,
 	Registry,
 	Service,
-	Process
+	Process,
+	Event
 };
 
 struct DETECTION {
@@ -89,7 +90,37 @@ struct PROCESS_DETECTION : public DETECTION {
 		method{ method },
 		AllocationStart{}{}
 };
-
 typedef std::function<void(std::shared_ptr<PROCESS_DETECTION>)> DetectProcess;
+
+enum class ServiceType {
+	kernelModeDriver,
+	userModeService
+};
+
+enum class ServiceStartType {
+	systemStart,
+	autoStart,
+	demandStart
+};
+
+/// A struct containing information about a event identified in a hunt
+struct EVENT_DETECTION : public DETECTION {
+	unsigned int eventID;
+	unsigned int eventRecordID;
+	std::wstring timeCreated;
+	std::wstring channel;
+	std::wstring rawXML;
+	std::unordered_map<std::wstring, std::wstring> params;
+	
+	EVENT_DETECTION(unsigned int eventID, unsigned int eventRecordID, std::wstring timeCreated, std::wstring channel, std::wstring rawXML) :
+		DETECTION{ DetectionType::Event },
+		eventID{ eventID },
+		eventRecordID{ eventRecordID },
+		timeCreated{ timeCreated },
+		channel{ channel },
+		rawXML{ rawXML }{}
+};
+typedef std::function<void(std::shared_ptr<EVENT_DETECTION>)> DetectEvent;
+
 typedef std::function<void(const HuntInfo&)> HuntStart;
 typedef std::function<void()> HuntEnd;
