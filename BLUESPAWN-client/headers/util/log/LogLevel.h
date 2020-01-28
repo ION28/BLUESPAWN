@@ -28,7 +28,7 @@ namespace Log {
 		const Severity severity;
 
 		// Default logging levels available, though custom ones can be created
-		static const LogLevel
+		static LogLevel
 			LogHunt,     // Intended for logging hunts
 			LogError,    // Intended for logging errors
 			LogWarn,     // Intended for logging warnings
