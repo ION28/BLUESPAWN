@@ -6,6 +6,7 @@
 #include <sddl.h>
 #include <stdio.h>
 #include <winevt.h>
+#include "hunt/reaction/Reaction.h"
 
 using namespace std;
 
@@ -17,4 +18,5 @@ using namespace std;
 DWORD PrintResults(EVT_HANDLE hResults);
 DWORD PrintEvent(EVT_HANDLE hEvent); // Shown in the Rendering Events topic
 DWORD PrintEventValues(EVT_HANDLE hEvent);
-void queryevent(void);
+
+int QueryEvents(const wchar_t* channel, unsigned int id, Reaction reaction);
