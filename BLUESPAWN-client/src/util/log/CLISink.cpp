@@ -35,7 +35,20 @@ namespace Log {
 					} else if(detection->Type == DetectionType::Registry){
 						auto lpRegistryDetection = std::static_pointer_cast<REGISTRY_DETECTION>(detection);
 						std::wcout << L"\tPotentially malicious registry key detected - " << lpRegistryDetection->wsRegistryKeyPath << (lpRegistryDetection->wsRegistryKeyValue.length() ? L": " : L"") << lpRegistryDetection->wsRegistryKeyValue << std::endl;
-					} else {
+					}
+					else if (detection->Type == DetectionType::Event) {
+						auto lpEvtDet = std::static_pointer_cast<EVENT_DETECTION>(detection);
+						std::wcout << L"\tPotentially malicious event detected:" << std::endl;
+						std::wcout << "\t\tChannel: " << lpEvtDet->channel << std::endl;
+						std::wcout << "\t\tEvent ID: " << lpEvtDet->eventID << std::endl;
+						std::wcout << "\t\tEvent Record ID: " << lpEvtDet->eventRecordID << std::endl;
+						std::wcout << "\t\tTime Created: " << lpEvtDet->timeCreated << std::endl;
+						for (auto iter = lpEvtDet->params.begin(); iter != lpEvtDet->params.end(); ++iter) {
+							std::wcout << "\t\t" << iter->first << ": " << iter->second << std::endl;
+						}
+
+					}
+					else {
 						std::wcout << L"\tUnknown detection type!" << std::endl;
 					}
 				}
