@@ -36,6 +36,7 @@
     <ClInclude Include="headers\hunt\Scope.h" />
     <ClInclude Include="headers\mitigation\Mitigation.h" />
     <ClInclude Include="headers\mitigation\MitigationRegister.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV72753.h" />
     <ClInclude Include="headers\monitor\ETW_Wrapper.h">
@@ -422,6 +423,7 @@
     <ClCompile Include="src\hunt\Scope.cpp" />
     <ClCompile Include="src\mitigation\Mitigation.cpp" />
     <ClCompile Include="src\mitigation\MitigationRegister.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV72753.cpp" />
     <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">

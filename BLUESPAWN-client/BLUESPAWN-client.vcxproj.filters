@@ -1053,6 +1053,9 @@
     <ClInclude Include="headers\monitor\ETW_Wrapper.h">
       <Filter>Header Files\monitor</Filter>
     </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h">
+      <Filter>Header Files\mitigation\mitigations</Filter>
+    </ClInclude>
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h">
       <Filter>Header Files\mitigation\mitigations</Filter>
     </ClInclude>
@@ -1191,6 +1194,9 @@
     </ClCompile>
     <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">
       <Filter>Source Files\monitor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp">
+      <Filter>Source Files\mitigation\mitigations</Filter>
     </ClCompile>
     <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp">
       <Filter>Source Files\mitigation\mitigations</Filter>
