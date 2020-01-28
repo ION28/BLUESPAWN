@@ -19,10 +19,11 @@ namespace Hunts {
 
 		int identified = 0;
 
-		identified += QueryEvents(L"Microsoft-Windows-Sysmon/Operational", 5, reaction);
+		identified += QueryEvents(L"System", 7045, std::set<std::wstring>({L"Event/EventData/Data[@Name='ServiceName']", 
+			L"Event/EventData/Data[@Name='ImagePath']", L"Event/EventData/Data[@Name='ServiceType']", L"Event/EventData/Data[@Name='StartType']" }), reaction);
 
 		if (identified == -1) {
-			LOG_ERROR("Hunting for T1050 - Event Query for 7045 invalid");
+			LOG_ERROR("Hunting for T1050 - Event Query for 7045 failed.");
 			identified = 0;
 		}
 
