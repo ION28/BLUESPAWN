@@ -15,14 +15,14 @@ private:
 
 	const HANDLE input;
 	const HANDLE output;
+
+public:	
 	/**
 	 * Creates a new CLI object with a given input and output handle.
 	 *
 	 */
 	CLI();
 
-public:
-		
 	/**
 	 * This method displays a prompt to the user and presents a number of options. The user may select from among the provided
 	 * options. If no valid option has been selected by the time the maximum delay is exceeded, an empty string will be returned.
@@ -35,7 +35,7 @@ public:
 	 *
 	 * @return The option that the user chose, or an empty string if no options were provided.
 	 */
-	virtual std::string GetUserSelection(const std::string& prompt, const std::vector<std::string>& options,
+	virtual std::wstring GetUserSelection(const std::wstring& prompt, const std::vector<std::wstring>& options,
 		DWORD dwMaximumDelay = -1) const;
 
 	/**
@@ -43,7 +43,7 @@ public:
 	 *
 	 * @param information The message to be displayed to the user.
 	 */
-	virtual void InformUser(const std::string& information) const;
+	virtual void InformUser(const std::wstring& information) const;
 
 	/**
 	 * This method displays a message to the user. This will not return until the user acknowledges the message or
@@ -55,7 +55,7 @@ public:
 	 *
 	 * @return True if the user acknowledged the message, false otherwise.
 	 */
-	virtual bool AlertUser(const std::string& information, DWORD dwMaximumDelay = -1) const;
+	virtual bool AlertUser(const std::wstring& information, DWORD dwMaximumDelay = -1) const;
 
 	/**
 	 * This method displays a confirmation message to the user. This will display the prompt and three options:
@@ -69,7 +69,7 @@ public:
 	 * @return If a timeout occurs or the user chooses cancel, -1 will be returned. If the user responds no, 0 is
 	 * returned. If the user responds yes, 1 is returned.
 	 */
-	virtual DWORD GetUserConfirm(const std::string& prompt, DWORD dwMaximumDelay = -1) const;
+	virtual DWORD GetUserConfirm(const std::wstring& prompt, DWORD dwMaximumDelay = -1) const;
 };
 enum class MessageColor {
 	BLACK = 0x0,

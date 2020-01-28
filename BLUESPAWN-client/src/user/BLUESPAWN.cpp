@@ -17,6 +17,8 @@ int main(int argc, char* argv[])
 	Log::AddSink(DebugOutput);
 	Log::AddHuntSink(ConsoleOutput);
 
+	IOBase& io = CLI();
+
 	print_banner();
 
 	/*
@@ -27,14 +29,12 @@ int main(int argc, char* argv[])
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
-	int iVerbosity = 0;
-
 	options.add_options()
 		("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
+		("m,mitigate", "Mitigates vulnerabilities by applying security settings. Available options are audit and enforce.", cxxopts::value<std::string>()->implicit_value("audit"))
 		("help", "Help Information. You can also specify a category for help on a specific module such as hunt"
 			, cxxopts::value<std::string>()->implicit_value("general"))
-		("m,mitigation", "Performs a Mitigations Analysis")
-		("v,verbose", "Verbosity", cxxopts::value(iVerbosity)->default_value("0"))
+		("v,verbose", "Verbosity", cxxopts::value<int>()->default_value("0"))
 		("debug", "Enable Debug Output", cxxopts::value<bool>())
 		;
 
@@ -43,7 +43,12 @@ int main(int argc, char* argv[])
 			cxxopts::value<std::string>())
 		;
 
-	options.parse_positional({ "help", "level" });
+	options.add_options("mitigate")
+		("force", "Use this option to forcibly apply mitigations with no prompt",
+			cxxopts::value<bool>())
+		;
+
+	options.parse_positional({ "level" });
 	try {
 		auto result = options.parse(argc, argv);
 
@@ -52,13 +57,13 @@ int main(int argc, char* argv[])
 		}
 
 		if (result.count("verbose")) {
-			if (iVerbosity >= 1) {
+			if (result["verbose"].as<int>() >= 1) {
 				Log::LogLevel::LogVerbose1.Enable();
 			}
-			if (iVerbosity >= 2) {
+			if (result["verbose"].as<int>() >= 2) {
 				Log::LogLevel::LogVerbose2.Enable();
 			}
-			if (iVerbosity >= 3) {
+			if (result["verbose"].as<int>() >= 3) {
 				Log::LogLevel::LogVerbose3.Enable();
 			}
 		}
@@ -69,8 +74,8 @@ int main(int argc, char* argv[])
 		else if (result.count("hunt")) {
 			dispatch_hunt(result, options);
 		}
-		else if (result.count("mitigation")) {
-			dispatch_mitigations_analysis(result, options);
+		else if (result.count("mitigate")) {
+			dispatch_mitigations_analysis(result, options, io);
 		}
 		else {
 			LOG_ERROR("Nothing to do. Use the -h or --hunt flags to launch a hunt");
@@ -143,11 +148,24 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 }
 
 
-void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options options) {
-	MitigationRegister record{};
+void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io) {
+	bool bForceEnforce = false;
+	if (result.count("force")) {
+		bForceEnforce = true;
+	}
+
+	MitigationRegister record{io};
+
 	Mitigations::MitigateV1093 v1093(record);
 	Mitigations::MitigateV3338 v3338(record);
 	Mitigations::MitigateV72753 v72753(record);
 
-	record.ApplyMitigations(SecurityLevel::High);
+	if (result["mitigate"].as<std::string>() == "e" || result["mitigate"].as<std::string>() == "enforce") {
+		io.InformUser(L"Enforcing Mitigations");
+		record.EnforceMitigations(SecurityLevel::High, bForceEnforce);
+	}
+	else {
+		io.InformUser(L"Auditing Mitigations");
+		record.AuditMitigations(SecurityLevel::High);
+	}
 }
