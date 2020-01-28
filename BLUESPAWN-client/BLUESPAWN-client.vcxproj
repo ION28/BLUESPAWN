@@ -46,6 +46,8 @@
     </ClInclude>
     <ClInclude Include="headers\user\banners.h" />
     <ClInclude Include="headers\user\bluespawn.h" />
+    <ClInclude Include="headers\user\CLI.h" />
+    <ClInclude Include="headers\user\iobase.h" />
     <ClInclude Include="headers\util\configurations\CollectInfo.h" />
     <ClInclude Include="headers\util\configurations\Registry.h" />
     <ClInclude Include="headers\util\configurations\ScheduledTasks.h" />
@@ -430,6 +432,7 @@
     </ClCompile>
     <ClCompile Include="src\user\banners.cpp" />
     <ClCompile Include="src\user\BLUESPAWN.cpp" />
+    <ClCompile Include="src\user\CLI.cpp" />
     <ClCompile Include="src\util\configurations\CollectInfo.cpp" />
     <ClCompile Include="src\util\configurations\Registry.cpp" />
     <ClCompile Include="src\util\eventlogs\EventLogs.cpp" />
