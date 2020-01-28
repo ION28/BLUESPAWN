@@ -43,6 +43,14 @@ namespace Reactions {
 			LOG_ERROR("Potentially malicious service " << detection->wsServiceName << " detected outside of a hunt!");
 		}
 	}
+	void LogReaction::LogEventIdentified(std::shared_ptr<EVENT_DETECTION> detection) {
+		if (HuntBegun) {
+			_HuntLogMessage->AddDetection(std::static_pointer_cast<DETECTION>(detection));
+		}
+		else {
+			//LOG_ERROR("Potentially malicious service " << detection->wsServiceName << " detected outside of a hunt!");
+		}
+	}
 
 	LogReaction::LogReaction() : 
 		_HuntLogMessage{ std::nullopt }{
@@ -52,5 +60,6 @@ namespace Reactions {
 		vFileReactions.emplace_back(    std::bind(&LogReaction::LogFileIdentified,        this, std::placeholders::_1));
 		vProcessReactions.emplace_back( std::bind(&LogReaction::LogProcessIdentified,     this, std::placeholders::_1));
 		vServiceReactions.emplace_back( std::bind(&LogReaction::LogServiceIdentified,     this, std::placeholders::_1));
+		vEventReactions.emplace_back(	std::bind(&LogReaction::LogEventIdentified,		  this, std::placeholders::_1));
 	}
 }
