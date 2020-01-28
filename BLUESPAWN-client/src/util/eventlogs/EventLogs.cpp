@@ -1,139 +1,11 @@
 #include "util/eventlogs/EventLogs.h"
 #include "common/StringUtils.h"
+#include "hunt/reaction/Detections.h"
+#include "util/log/Log.h"
 
 const int SIZE_DATA = 4096;
-TCHAR XMLDataCurrent[SIZE_DATA];
 
-int QueryEvents(const wchar_t* channel, unsigned int id, Reaction reaction)
-{
-	DWORD status = ERROR_SUCCESS;
-	EVT_HANDLE hResults = NULL;
-
-	auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
-	auto wquery = query.c_str();
-
-	hResults = EvtQuery(NULL, channel, wquery, EvtQueryChannelPath | EvtQueryReverseDirection);
-	if (NULL == hResults)
-	{
-		status = GetLastError();
-
-		if (ERROR_EVT_CHANNEL_NOT_FOUND == status)
-			wprintf(L"The channel was not found.\n");
-		else if (ERROR_EVT_INVALID_QUERY == status)
-			// You can call the EvtGetExtendedStatus function to try to get 
-			// additional information as to what is wrong with the query.
-			wprintf(L"The query is not valid.\n");
-		else
-			wprintf(L"EvtQuery failed with %lu.\n", status);
-
-		goto cleanup;
-	}
-
-	PrintResults(hResults);
-
-cleanup:
-
-	if (hResults)
-		EvtClose(hResults);
-
-	return 5;
-
-}
-
-// Enumerate all the events in the result set. 
-DWORD PrintResults(EVT_HANDLE hResults)
-{
-	DWORD status = ERROR_SUCCESS;
-	EVT_HANDLE hEvents[ARRAY_SIZE];
-	DWORD dwReturned = 0;
-
-	while (true)
-	{
-		// Get a block of events from the result set.
-		if (!EvtNext(hResults, ARRAY_SIZE, hEvents, INFINITE, 0, &dwReturned))
-		{
-			if (ERROR_NO_MORE_ITEMS != (status = GetLastError()))
-			{
-				wprintf(L"EvtNext failed with %lu\n", status);
-			}
-
-			goto cleanup;
-		}
-
-		// For each event, call the PrintEvent function which renders the
-		// event for display. PrintEvent is shown in RenderingEvents.
-		for (DWORD i = 0; i < dwReturned; i++)
-		{
-			//if (ERROR_SUCCESS == (status = PrintEvent(hEvents[i])))
-			//if (ERROR_SUCCESS == (status = PrintEventSystemData(hEvents[i])))
-			if (ERROR_SUCCESS == (status = PrintEventValues(hEvents[i])))
-			{
-				EvtClose(hEvents[i]);
-				hEvents[i] = NULL;
-			}
-			else
-			{
-				goto cleanup;
-			}
-		}
-	}
-
-cleanup:
-
-	for (DWORD i = 0; i < dwReturned; i++)
-	{
-		if (NULL != hEvents[i])
-			EvtClose(hEvents[i]);
-	}
-
-	return status;
-}
-
-DWORD PrintEvent(EVT_HANDLE hEvent)
-{
-	DWORD status = ERROR_SUCCESS;
-	DWORD dwBufferSize = 0;
-	DWORD dwBufferUsed = 0;
-	DWORD dwPropertyCount = 0;
-	LPWSTR pRenderedContent = NULL;
-
-	// The EvtRenderEventXml flag tells EvtRender to render the event as an XML string.
-	if (!EvtRender(NULL, hEvent, EvtRenderEventXml, dwBufferSize, pRenderedContent, &dwBufferUsed, &dwPropertyCount))
-	{
-		if (ERROR_INSUFFICIENT_BUFFER == (status = GetLastError()))
-		{
-			dwBufferSize = dwBufferUsed;
-			pRenderedContent = (LPWSTR)malloc(dwBufferSize);
-			if (pRenderedContent)
-			{
-				EvtRender(NULL, hEvent, EvtRenderEventXml, dwBufferSize, pRenderedContent, &dwBufferUsed, &dwPropertyCount);
-			}
-			else
-			{
-				wprintf(L"malloc failed\n");
-				status = ERROR_OUTOFMEMORY;
-				goto cleanup;
-			}
-		}
-
-		if (ERROR_SUCCESS != (status = GetLastError()))
-		{
-			wprintf(L"EvtRender failed with %d\n", GetLastError());
-			goto cleanup;
-		}
-	}
-
-	wprintf(L"\n\n%s", pRenderedContent);
-
-cleanup:
-
-	if (pRenderedContent)
-		free(pRenderedContent);
-
-	return status;
-}
-
-DWORD PrintEventValues(EVT_HANDLE hEvent)
+DWORD GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param)
 {
 	DWORD status = ERROR_SUCCESS;
 	EVT_HANDLE hContext = NULL;
@@ -141,21 +13,92 @@ DWORD PrintEventValues(EVT_HANDLE hEvent)
 	DWORD dwBufferUsed = 0;
 	DWORD dwPropertyCount = 0;
 	PEVT_VARIANT pRenderedValues = NULL;
-	LPWSTR ppValues[] = { L"Event/System/Computer" };
+	LPWSTR queryParam = (LPWSTR)(param.c_str());
+	LPWSTR ppValues[] = { queryParam };
 	DWORD count = sizeof(ppValues) / sizeof(LPWSTR);
-	LPWSTR pRenderedContent = NULL;
 
 	// Identify the components of the event that you want to render. In this case,
 	// render the provider's name and channel from the system section of the event.
 	// To get user data from the event, you can specify an expression such as
 	// L"Event/EventData/Data[@Name=\"<data name goes here>\"]".
-	//hContext = EvtCreateRenderContext(count, (LPCWSTR*)ppValues, EvtRenderContextValues);
-	//hContext = EvtCreateRenderContext(count, (LPCWSTR*)ppValues, EvtRenderContextValues);
-	/*if (NULL == hContext)
+	hContext = EvtCreateRenderContext(count, (LPCWSTR*)ppValues, EvtRenderContextValues);
+	if (NULL == hContext)
 	{
-		wprintf(L"EvtCreateRenderContext failed with %lu\n", status = GetLastError());
+		status = GetLastError();
+		std::wcout << "EvtCreateRenderContext failed with " + status << std::endl;
 		goto cleanup;
-	}*/
+	}
+
+	// The function returns an array of variant values for each element or attribute that
+	// you want to retrieve from the event. The values are returned in the same order as 
+	// you requested them.
+	if (!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
+	{
+		if (ERROR_INSUFFICIENT_BUFFER == (status = GetLastError()))
+		{
+			dwBufferSize = dwBufferUsed;
+			pRenderedValues = (PEVT_VARIANT)malloc(dwBufferSize);
+			if (pRenderedValues)
+			{
+				EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount);
+			}
+			else
+			{
+				std::wcout << "malloc failed" << std::endl;
+				status = ERROR_OUTOFMEMORY;
+				goto cleanup;
+			}
+		}
+
+		if (ERROR_SUCCESS != (status = GetLastError()))
+		{
+			std::wcout << "EvtRender failed with " << status << std::endl;
+			goto cleanup;
+		}
+	}
+
+	/*
+	Table of variant members found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ns-winevt-evt_variant
+	Table of type values found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ne-winevt-evt_variant_type
+	*/
+	if (pRenderedValues[0].Type == EvtVarTypeString)
+		*value  = std::wstring(pRenderedValues[0].StringVal);
+	else if (pRenderedValues[0].Type == EvtVarTypeFileTime) {
+		wchar_t ar[30];
+		_ui64tow(pRenderedValues[0].FileTimeVal, ar, 10);
+		*value = std::wstring(ar);
+	}
+	else if (pRenderedValues[0].Type == EvtVarTypeUInt16) {
+		*value = std::to_wstring(pRenderedValues[0].UInt16Val);
+	}
+	else if (pRenderedValues[0].Type == EvtVarTypeUInt64) {
+		*value = std::to_wstring(pRenderedValues[0].UInt64Val);
+	}
+	else if(pRenderedValues[0].Type == EvtVarTypeNull)
+		*value = std::wstring(L"NULL");
+	else {
+		*value = std::wstring(L"Unknown VARIANT: " + std::to_wstring(pRenderedValues[0].Type));
+	}
+			
+
+cleanup:
+
+	if (hContext)
+		EvtClose(hContext);
+
+	if (pRenderedValues)
+		free(pRenderedValues);
+
+	return status;
+}
+
+DWORD GetEventXML(EVT_HANDLE hEvent, std::wstring * data)
+{
+	DWORD status = ERROR_SUCCESS;
+	DWORD dwBufferSize = 0;
+	DWORD dwBufferUsed = 0;
+	DWORD dwPropertyCount = 0;
+	LPWSTR pRenderedContent = NULL;
 
 	// The function returns an array of variant values for each element or attribute that
 	// you want to retrieve from the event. The values are returned in the same order as 
@@ -185,20 +128,128 @@ DWORD PrintEventValues(EVT_HANDLE hEvent)
 		}
 	}
 
-	// Print the selected values.
-	//wprintf(L"\nProvider Name: %s\n", pRenderedValues[0].StringVal);
-	ZeroMemory(XMLDataCurrent, SIZE_DATA);
-	lstrcpyW(XMLDataCurrent, pRenderedContent);
-
-	wprintf(L"EvtRender data %s\n", XMLDataCurrent);
+	*data = std::wstring(pRenderedContent);
 
 cleanup:
 
-	if (hContext)
-		EvtClose(hContext);
-
-	if (pRenderedValues)
-		free(pRenderedValues);
-
 	return status;
+}
+
+// Enumerate all the events in the result set. 
+DWORD ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std::set<std::wstring> &params)
+{
+	DWORD status = ERROR_SUCCESS;
+	EVT_HANDLE hEvents[ARRAY_SIZE];
+	DWORD dwReturned = 0;
+
+	while (true)
+	{
+		// Get a block of events from the result set.
+		if (!EvtNext(hResults, ARRAY_SIZE, hEvents, INFINITE, 0, &dwReturned))
+		{
+			if (ERROR_NO_MORE_ITEMS != (status = GetLastError()))
+			{
+				wprintf(L"EvtNext failed with %lu\n", status);
+			}
+
+			goto cleanup;
+		}
+
+		// For each event, call the PrintEvent function which renders the
+		// event for display. PrintEvent is shown in RenderingEvents.
+		std::wstring eventIDStr;
+		std::wstring eventRecordIDStr;
+		std::wstring timeCreated;
+		std::wstring channel;
+		std::wstring rawXML;
+		for (DWORD i = 0; i < dwReturned; i++)
+		{
+			if (ERROR_SUCCESS != (status = GetEventParam(hEvents[i], &eventIDStr, L"Event/System/EventID")))
+				goto cleanup;
+			if (ERROR_SUCCESS != (status = GetEventParam(hEvents[i], &eventRecordIDStr, L"Event/System/EventRecordID")))
+				goto cleanup;
+			if (ERROR_SUCCESS != (status = GetEventParam(hEvents[i], &timeCreated, L"Event/System/TimeCreated/@SystemTime")))
+				goto cleanup;
+			if (ERROR_SUCCESS != (status = GetEventParam(hEvents[i], &channel, L"Event/System/Channel")))
+				goto cleanup;
+			if (ERROR_SUCCESS != (status = GetEventXML(hEvents[i], &rawXML)))
+				goto cleanup;
+
+			// Specify extra parameters
+			std::unordered_map<std::wstring, std::wstring> extraParams;
+			for (std::wstring key : params) {
+				std::wstring val;
+				if (ERROR_SUCCESS != (status = GetEventParam(hEvents[i], &val, key))) {
+					std::wcout << "Failed query parameter " << key << " with code " << status << std::endl;
+					goto cleanup;
+				}
+
+				extraParams.insert({ key, val });
+			}
+
+			EVENT_DETECTION detect(std::stoul(eventIDStr), std::stoul(eventRecordIDStr), timeCreated, channel, rawXML);
+			detect.params = extraParams;
+			reaction.EventIdentified(std::make_shared<EVENT_DETECTION>(detect));
+
+			(*numFound) += 1;
+			EvtClose(hEvents[i]);
+			hEvents[i] = NULL;
+
+		}
+	}
+
+cleanup:
+
+	for (DWORD i = 0; i < dwReturned; i++)
+	{
+		if (NULL != hEvents[i])
+			EvtClose(hEvents[i]);
+	}
+
+	if (status == ERROR_NO_MORE_ITEMS)
+		return ERROR_SUCCESS;
+	return status;
+}
+
+int QueryEvents(const wchar_t* channel, unsigned int id, Reaction& reaction)
+{
+	return QueryEvents(channel, id, std::set<std::wstring>(), reaction);
+}
+
+int QueryEvents(const wchar_t* channel, unsigned int id, std::set<std::wstring>& params, Reaction& reaction)
+{
+	DWORD status = ERROR_SUCCESS;
+	EVT_HANDLE hResults = NULL;
+
+	auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
+	auto wquery = query.c_str();
+
+	hResults = EvtQuery(NULL, channel, wquery, EvtQueryChannelPath | EvtQueryReverseDirection);
+	if (NULL == hResults)
+	{
+		status = GetLastError();
+
+		if (ERROR_EVT_CHANNEL_NOT_FOUND == status)
+			wprintf(L"The channel was not found.\n");
+		else if (ERROR_EVT_INVALID_QUERY == status)
+			// You can call the EvtGetExtendedStatus function to try to get 
+			// additional information as to what is wrong with the query.
+			wprintf(L"The query is not valid.\n");
+		else
+			wprintf(L"EvtQuery failed with %lu.\n", status);
+
+		goto cleanup;
+	}
+
+	int numFound = 0;
+	status = ProcessResults(hResults, reaction, &numFound, params);
+
+cleanup:
+
+	if (hResults)
+		EvtClose(hResults);
+
+	if (status == ERROR_SUCCESS)
+		return numFound;
+	return -1;
 }

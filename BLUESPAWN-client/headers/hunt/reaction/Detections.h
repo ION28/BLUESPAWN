@@ -90,6 +90,7 @@ struct PROCESS_DETECTION : public DETECTION {
 		method{ method },
 		AllocationStart{}{}
 };
+typedef std::function<void(std::shared_ptr<PROCESS_DETECTION>)> DetectProcess;
 
 enum class ServiceType {
 	kernelModeDriver,
@@ -104,19 +105,22 @@ enum class ServiceStartType {
 
 /// A struct containing information about a event identified in a hunt
 struct EVENT_DETECTION : public DETECTION {
-	unsigned int id;
+	unsigned int eventID;
+	unsigned int eventRecordID;
 	std::wstring timeCreated;
-	std::wstring providerName;
+	std::wstring channel;
 	std::wstring rawXML;
+	std::unordered_map<std::wstring, std::wstring> params;
 	
-	EVENT_DETECTION(unsigned int id, std::wstring timeCreated, std::wstring providerName, std::wstring rawXML) :
+	EVENT_DETECTION(unsigned int eventID, unsigned int eventRecordID, std::wstring timeCreated, std::wstring channel, std::wstring rawXML) :
 		DETECTION{ DetectionType::Event },
-		id{ id },
+		eventID{ eventID },
+		eventRecordID{ eventRecordID },
 		timeCreated{ timeCreated },
-		providerName{ providerName },
+		channel{ channel },
 		rawXML{ rawXML }{}
 };
+typedef std::function<void(std::shared_ptr<EVENT_DETECTION>)> DetectEvent;
 
-typedef std::function<void(std::shared_ptr<PROCESS_DETECTION>)> DetectProcess;
 typedef std::function<void(const HuntInfo&)> HuntStart;
 typedef std::function<void()> HuntEnd;
