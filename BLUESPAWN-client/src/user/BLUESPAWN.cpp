@@ -3,6 +3,8 @@
 #include "util/log/HuntLogMessage.h"
 #include "util/log/DebugSink.h"
 #include "common/DynamicLinker.h"
+#include "common/StringUtils.h"
+#include "util/eventlogs/EventLogs.h"
 
 #include <iostream>
 
@@ -25,12 +27,16 @@ int main(int argc, char* argv[])
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
+	int iVerbosity = 0;
+
 	options.add_options()
 		("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
 		("help", "Help Information. You can also specify a category for help on a specific module such as hunt"
 			, cxxopts::value<std::string>()->implicit_value("general"))
 		("m,mitigation", "Performs a Mitigations Analysis")
 		("example", "Perform the example hunt")
+		("v,verbose", "Verbosity", cxxopts::value(iVerbosity)->default_value("0"))
+		("debug", "Enable Debug Output", cxxopts::value<bool>())
 		;
 
 	options.add_options("hunt")
@@ -39,19 +45,40 @@ int main(int argc, char* argv[])
 		;
 
 	options.parse_positional({ "help", "level" });
-	auto result = options.parse(argc, argv);
+	try {
+		auto result = options.parse(argc, argv);
 
-	if (result.count("help")) {
-		print_help(result, options);
+		if (result.count("debug")) {
+			Log::AddSink(ConsoleOutput);
+		}
+
+		if (result.count("verbose")) {
+			if (iVerbosity >= 1) {
+				Log::LogLevel::LogVerbose1.Enable();
+			}
+			if (iVerbosity >= 2) {
+				Log::LogLevel::LogVerbose2.Enable();
+			}
+			if (iVerbosity >= 3) {
+				Log::LogLevel::LogVerbose3.Enable();
+			}
+		}
+
+		if (result.count("help")) {
+			print_help(result, options);
+		}
+		else if (result.count("hunt")) {
+			dispatch_hunt(result, options);
+		}
+		else if (result.count("mitigation")) {
+			dispatch_mitigations_analysis(result, options);
+		}
+		else {
+			LOG_ERROR("Nothing to do. Use the -h or --hunt flags to launch a hunt");
+		}
 	}
-	else if (result.count("hunt")) {
-		dispatch_hunt(result, options);
-	}
-	else if (result.count("mitigation")) {
-		dispatch_mitigations_analysis(result, options);
-	}
-	else {
-		LOG_ERROR("Nothing to do. Use the -h or --hunt flags to launch a hunt");
+	catch (cxxopts::OptionParseException e1) {
+		LOG_ERROR(StringToWidestring(e1.what()));
 	}
 }
 
@@ -99,6 +126,7 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	HuntRegister record{};
 	Hunts::HuntT1004 t1004(record);
 	Hunts::HuntT1037 t1037(record);
+	Hunts::HuntT1050 t1050(record);
 	Hunts::HuntT1060 t1060(record);
 	Hunts::HuntT1100 t1100(record);
 	Hunts::HuntT1101 t1101(record);

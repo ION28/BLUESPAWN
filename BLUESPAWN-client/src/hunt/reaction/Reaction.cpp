@@ -31,6 +31,11 @@ void Reaction::ServiceIdentified(std::shared_ptr<SERVICE_DETECTION> info){
 		reaction(info);
 	}
 }
+void Reaction::EventIdentified(std::shared_ptr<EVENT_DETECTION> info) {
+	for (auto reaction : vEventReactions) {
+		reaction(info);
+	}
+}
 
 void Reaction::AddHuntBegin(HuntStart start){
 	vStartHuntProcs.emplace_back(start);
@@ -51,6 +56,9 @@ void Reaction::AddProcessReaction(DetectProcess handler){
 void Reaction::AddServiceReaction(DetectService handler){
 	vServiceReactions.emplace_back(handler);
 }
+void Reaction::AddEventReaction(DetectEvent handler) {
+	vEventReactions.emplace_back(handler);
+}
 
 Reaction Reaction::Combine(const Reaction& reaction) const {
 	Reaction combined{};
@@ -68,6 +76,8 @@ Reaction Reaction::Combine(const Reaction& reaction) const {
 		combined.vProcessReactions.emplace_back(function);
 	for(auto function : vServiceReactions)
 		combined.vServiceReactions.emplace_back(function);
+	for (auto function : vEventReactions)
+		combined.vEventReactions.emplace_back(function);
 
 
 	for(auto function : reaction.vStartHuntProcs)
@@ -83,6 +93,8 @@ Reaction Reaction::Combine(const Reaction& reaction) const {
 		combined.vProcessReactions.emplace_back(function);
 	for(auto function : reaction.vServiceReactions)
 		combined.vServiceReactions.emplace_back(function);
+	for (auto function : reaction.vEventReactions)
+		combined.vEventReactions.emplace_back(function);
 
 	return combined;
 }
@@ -103,6 +115,8 @@ Reaction Reaction::Combine(Reaction&& reaction) const {
 		combined.vProcessReactions.emplace_back(function);
 	for(auto function : vServiceReactions)
 		combined.vServiceReactions.emplace_back(function);
+	for (auto function : vEventReactions)
+		combined.vEventReactions.emplace_back(function);
 
 
 	for(auto function : reaction.vStartHuntProcs)
@@ -118,6 +132,8 @@ Reaction Reaction::Combine(Reaction&& reaction) const {
 		combined.vProcessReactions.emplace_back(function);
 	for(auto function : reaction.vServiceReactions)
 		combined.vServiceReactions.emplace_back(function);
+	for (auto function : reaction.vEventReactions)
+		combined.vEventReactions.emplace_back(function);
 
 	return combined;
 }
