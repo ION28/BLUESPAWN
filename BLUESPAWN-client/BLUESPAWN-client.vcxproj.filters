@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -96,6 +96,12 @@
     </Filter>
     <Filter Include="Header Files\mitigation\mitigations">
       <UniqueIdentifier>{9387c772-fdc7-45c9-a31f-d13558ffe430}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\eventlogs">
+      <UniqueIdentifier>{23120957-b2c7-4957-9951-0eabd2e5edf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\eventlogs">
+      <UniqueIdentifier>{7e223556-6f7d-4752-ae74-120962505e82}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1047,14 +1053,25 @@
     <ClInclude Include="headers\monitor\ETW_Wrapper.h">
       <Filter>Header Files\monitor</Filter>
     </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h">
+      <Filter>Header Files\mitigation\mitigations</Filter>
+    </ClInclude>
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h">
       <Filter>Header Files\mitigation\mitigations</Filter>
     </ClInclude>
     <ClInclude Include="headers\mitigation\mitigations\MitigateV72753.h">
       <Filter>Header Files\mitigation\mitigations</Filter>
     </ClInclude>
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h">
-      <Filter>Header Files\mitigation\mitigations</Filter>
+    <ClInclude Include="headers\user\CLI.h">
+      <Filter>Header Files\user</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\user\iobase.h">
+      <Filter>Header Files\user</Filter>
+    <ClInclude Include="headers\util\eventlogs\EventLogs.h">
+      <Filter>Header Files\util\eventlogs</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1050.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1178,14 +1195,22 @@
     <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">
       <Filter>Source Files\monitor</Filter>
     </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp">
+      <Filter>Source Files\mitigation\mitigations</Filter>
+    </ClCompile>
     <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp">
       <Filter>Source Files\mitigation\mitigations</Filter>
     </ClCompile>
     <ClCompile Include="src\mitigation\mitigations\MitigateV72753.cpp">
       <Filter>Source Files\mitigation\mitigations</Filter>
     </ClCompile>
-    <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp">
-      <Filter>Source Files\mitigation\mitigations</Filter>
+    <ClCompile Include="src\user\CLI.cpp">
+      <Filter>Source Files\user</Filter>
+    <ClCompile Include="src\util\eventlogs\EventLogs.cpp">
+      <Filter>Source Files\util\eventlogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1050.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

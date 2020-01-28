@@ -21,6 +21,7 @@ protected:
 	std::vector<DetectRegistry> vRegistryReactions;
 	std::vector<DetectService> vServiceReactions;
 	std::vector<DetectProcess> vProcessReactions;
+	std::vector<DetectEvent> vEventReactions;
 	
 	/// Handlers for startting and beginning hunts
 	std::vector<HuntStart> vStartHuntProcs;
@@ -36,6 +37,7 @@ public:
 	void RegistryKeyIdentified(std::shared_ptr<REGISTRY_DETECTION>);
 	void ProcessIdentified(std::shared_ptr<PROCESS_DETECTION>);
 	void ServiceIdentified(std::shared_ptr<SERVICE_DETECTION>);
+	void EventIdentified(std::shared_ptr<EVENT_DETECTION>);
 
 	/// These functions add handlers for beginning and ending hunts
 	void AddHuntBegin(HuntStart handler);
@@ -46,6 +48,7 @@ public:
 	void AddRegistryReaction(DetectRegistry handler);
 	void AddProcessReaction(DetectProcess handler);
 	void AddServiceReaction(DetectService handler);
+	void AddEventReaction(DetectEvent handler);
 
 	/// Combines two reactions, returning a new reaction object that has the handlers present in both
 	Reaction Combine(const Reaction& reaction) const;
