@@ -24,57 +24,57 @@ void SetConsoleColor(MessageColor color) {
 	SetConsoleTextAttribute(hConsole, static_cast<WORD>(color));
 }
 
-std::string CLI::GetUserSelection(const std::string& prompt, const std::vector<std::string>& options,
+std::wstring CLI::GetUserSelection(const std::wstring& prompt, const std::vector<std::wstring>& options,
 	DWORD dwMaximumDelay) const {
 	SetConsoleColor(MessageColor::BLUE);
-	cout << "[?] ";
+	wcout << L"[?] ";
 	SetConsoleColor(MessageColor::WHITE);
 
-	stringstream stream;
+	wstringstream stream;
 	stream << prompt << endl;
 	int i = 1;
 
 	for (auto str : options) {
-		stream << i << ". " << str << endl;
+		stream << i << L". " << str << endl;
 		i++;
 	}
-	cout << stream.str() << endl;
+	wcout << stream.str() << endl;
 	
 	int userIn;
 	while (true) {
-		cin >> userIn;
+		wcin >> userIn;
 		if (userIn > 0 && userIn <= options.size()) {
 			return options[userIn-1];
 		}
 		else {
-			cout << "Please Enter a valid number between 1 and " << options.size() <<endl;
+			wcout << L"Please Enter a valid number between 1 and " << options.size() <<endl;
 		}
 	}
-	return "";
+	return L"";
 }
 
-void CLI::InformUser(const std::string& information) const {
+void CLI::InformUser(const std::wstring& information) const {
 	SetConsoleColor(MessageColor::BLUE);
-	cout << "[*] ";
+	wcout << L"[*] ";
 	SetConsoleColor(MessageColor::WHITE);
 
-	cout << information << endl;
+	wcout << information << endl;
 }
-bool CLI::AlertUser(const std::string& information, DWORD dwMaximumDelay) const { 
+bool CLI::AlertUser(const std::wstring& information, DWORD dwMaximumDelay) const { 
 	SetConsoleColor(MessageColor::BLUE);
-	cout << "[!] ";
+	wcout << L"[!] ";
 	SetConsoleColor(MessageColor::WHITE);
-	cout << information << endl;
-	cin.ignore(numeric_limits<streamsize>::max(),'\n');
+	wcout << information << endl;
+	wcin.ignore(numeric_limits<streamsize>::max(),'\n');
 	return true;
 }
-const set<string> affirmativeOptions = { "yes", "y"};
-const set<string> negativeOptions = { "no", "n" };
-const set<string> cancelOptions = { "cancel" };
-DWORD CLI::GetUserConfirm(const std::string& prompt, DWORD dwMaximumDelay) const {
-	string result;
-	cout << prompt << endl;
-	cin >> result;
+const set<wstring> affirmativeOptions = { L"yes", L"y"};
+const set<wstring> negativeOptions = { L"no", L"n" };
+const set<wstring> cancelOptions = { L"cancel" };
+DWORD CLI::GetUserConfirm(const std::wstring& prompt, DWORD dwMaximumDelay) const {
+	wstring result;
+	wcout << prompt << endl;
+	wcin >> result;
 	result = ToLowerCase(result);
 	if (affirmativeOptions.find(result)!=affirmativeOptions.end()) {
 		return 1;

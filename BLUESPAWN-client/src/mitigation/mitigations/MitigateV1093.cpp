@@ -10,7 +10,7 @@ namespace Mitigations {
 	MitigateV1093::MitigateV1093(MitigationRegister& record) :
 		Mitigation(
 			record,
-			L"V-1093 - Anonymous enumeration of shares must be restricted.",
+			L"V-1093 - Anonymous enumeration of shares must be restricted",
 			L"This is a High finding because allowing anonymous logon users (null session connections) to list all"
 				"account names and enumerate all shared resources can provide a map of potential points to attack the system.",
 			L"lsa",
