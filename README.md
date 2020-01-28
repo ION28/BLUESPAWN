@@ -1,6 +1,6 @@
 # BLUESPAWN
 
-[![Actions Status](https://github.com/ION28/BLUESPAWN/workflows/BLUESPAWN%20agent%20build/badge.svg)](https://github.com/ION28/BLUESPAWN/actions) ![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN)
+[![BLUESPAWN client build](https://github.com/ION28/BLUESPAWN/workflows/BLUESPAWN%20client%20build/badge.svg)](https://github.com/ION28/BLUESPAWN/actions) ![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN)
 
 ## Our Mission
 BLUESPAWN helps blue teams monitor Windows systems in real-time against active attackers by detecting anomalous activity
@@ -42,22 +42,18 @@ Set-ItemProperty "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\" 
 ![BLUESPAWN in Action](https://user-images.githubusercontent.com/3931697/65073414-d11df500-d960-11e9-9516-7e310996d889.png)
 
 ## Lines of Effort
-BLUESPAWN consists of 5 major modules as listed below. Several of these modules have submodules (which may not be created in the codebase yet) as listed below and all are in varying stages of planning, research, and development.
-* Hunt
-    * Configuration & Settings
+BLUESPAWN consists of 3 major modes as listed below. Several of these modules have submodules (which may not be created in the codebase yet) as listed below and all are in varying stages of planning, research, and development. Additionally, they are supported by a number of other modules.
+* **Hunt** (Hunts for evidence of malicious behavior)
+* **Mitigate** (Mitigates vulnerabilities by applying security settings)
+* **Monitor** (Continuously monitors the system for potentially malicious behavior)
+* **User** (Contains program main, IOBase, and other similar functions)
+* **Util** (Contains a collection of modules that support core operations)
+    * Configurations
+    * Event Logs
     * File System
-    * Hunts
+    * Log
+    * PEs
     * Processes
-* Monitor
-    * ETW
-    * File Monitor
-    * Process Monitor
-    * Registry Monitor
-    * User Hooking
-* React
-    * Reactions
-* BLUESPAWN (Program main)
-* Logging
 
 ## Project Authors
 Made with :heart: by the UVA Cyber Defense Team Windows Group
@@ -65,16 +61,17 @@ Made with :heart: by the UVA Cyber Defense Team Windows Group
 * Calvin Krist ([Github](https://github.com/CalvinKrist), [Twitter](https://twitter.com/CalvinKrist))
 * Jack McDowell ([Github](https://github.com/jnmcd/))
 * Will Mayes ([Github](https://github.com/wtm99), [Twitter](https://twitter.com/will_mayes99))
+* Grant Matteo ([Github](https://github.com/GrantMatteo))
 
 ## Contributors
 Thanks to all of the folks listed below for their contributions to BLUESPAWN!
-* Your name here!
+* Alexander Kluth ([Github](https://github.com/alexclooze))
 
 Want to help? Take a look at the current issues, add ideas for new features, write some code, and create a pull request!
 
 ## Special Thanks
 We would like to provide a special thank you to the following projects that have helped us to build BLUESPAWN:
+* Microsoft's documentation and examples on the Windows API
 * The [MITRE's ATT&CK Project](https://attack.mitre.org/) which has put together an amazing framework for which to consider, document, and categorize attacker tradercraft
 * Red Canary's [Atomic Red Team Project](https://github.com/redcanaryco/atomic-red-team) which has been incredibly useful in helping to test the detections we are building
-* Microsoft's documentation and examples on the Windows API
 * The Japan Computer Emergency Response Team (JPCERT)'s [Tool Analysis Result Sheet](https://jpcertcc.github.io/ToolAnalysisResultSheet/) for its documentation of attacker behavior and correlation with detection opportunities
