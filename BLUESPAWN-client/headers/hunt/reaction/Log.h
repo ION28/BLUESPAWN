@@ -21,6 +21,7 @@ namespace Reactions {
 		void LogRegistryKeyIdentified(std::shared_ptr<REGISTRY_DETECTION> detection);
 		void LogProcessIdentified(std::shared_ptr<PROCESS_DETECTION> detection);
 		void LogServiceIdentified(std::shared_ptr<SERVICE_DETECTION> detection);
+		void LogEventIdentified(std::shared_ptr<EVENT_DETECTION> detection);
 
 	public:
 		LogReaction();
