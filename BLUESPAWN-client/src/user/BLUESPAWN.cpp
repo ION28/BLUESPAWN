@@ -3,6 +3,7 @@
 #include "util/log/DebugSink.h"
 #include "common/DynamicLinker.h"
 #include "common/StringUtils.h"
+#include "util/eventlogs/EventLogs.h"
 
 #include <iostream>
 
@@ -124,6 +125,7 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	HuntRegister record{};
 	Hunts::HuntT1004 t1004(record);
 	Hunts::HuntT1037 t1037(record);
+	Hunts::HuntT1050 t1050(record);
 	Hunts::HuntT1060 t1060(record);
 	Hunts::HuntT1100 t1100(record);
 	Hunts::HuntT1101 t1101(record);

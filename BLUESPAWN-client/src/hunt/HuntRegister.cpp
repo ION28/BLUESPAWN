@@ -1,4 +1,5 @@
 #include "hunt/HuntRegister.h"
+#include <iostream>
 
 void HuntRegister::RegisterHunt(Hunt* hunt){
 	// The actual hunt itself is stored in the vector here!
