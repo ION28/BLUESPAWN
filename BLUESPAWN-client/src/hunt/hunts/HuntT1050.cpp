@@ -18,7 +18,6 @@ namespace Hunts {
 		reaction.BeginHunt(GET_INFO());
 
 		int identified = 0;
-
 		identified += QueryEvents(L"System", 7045, std::set<std::wstring>({L"Event/EventData/Data[@Name='ServiceName']", 
 			L"Event/EventData/Data[@Name='ImagePath']", L"Event/EventData/Data[@Name='ServiceType']", L"Event/EventData/Data[@Name='StartType']" }), reaction);
 

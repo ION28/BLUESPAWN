@@ -25,7 +25,7 @@ DWORD GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param)
 	if (NULL == hContext)
 	{
 		status = GetLastError();
-		std::wcout << "EvtCreateRenderContext failed with " + status << std::endl;
+		LOG_ERROR("EvtCreateRenderContext failed with " + std::to_string(status));
 		goto cleanup;
 	}
 
@@ -44,7 +44,7 @@ DWORD GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param)
 			}
 			else
 			{
-				std::wcout << "malloc failed" << std::endl;
+				LOG_ERROR("GetEventParam malloc failed");
 				status = ERROR_OUTOFMEMORY;
 				goto cleanup;
 			}
@@ -52,7 +52,7 @@ DWORD GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param)
 
 		if (ERROR_SUCCESS != (status = GetLastError()))
 		{
-			std::wcout << "EvtRender failed with " << status << std::endl;
+			LOG_ERROR("EvtRender in GetEventParam failed with " + std::to_string(status));
 			goto cleanup;
 		}
 	}
@@ -115,7 +115,7 @@ DWORD GetEventXML(EVT_HANDLE hEvent, std::wstring * data)
 			}
 			else
 			{
-				wprintf(L"malloc failed\n");
+				LOG_ERROR("GetEventXML malloc failed");
 				status = ERROR_OUTOFMEMORY;
 				goto cleanup;
 			}
@@ -123,7 +123,7 @@ DWORD GetEventXML(EVT_HANDLE hEvent, std::wstring * data)
 
 		if (ERROR_SUCCESS != (status = GetLastError()))
 		{
-			wprintf(L"EvtRender failed with %d\n", GetLastError());
+			LOG_ERROR("EvtRender in GetEventXML failed with " + std::to_string(GetLastError()));
 			goto cleanup;
 		}
 	}
@@ -149,7 +149,7 @@ DWORD ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std
 		{
 			if (ERROR_NO_MORE_ITEMS != (status = GetLastError()))
 			{
-				wprintf(L"EvtNext failed with %lu\n", status);
+				LOG_ERROR("EvtNext failed with " + std::to_string(status));
 			}
 
 			goto cleanup;
@@ -180,7 +180,7 @@ DWORD ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std
 			for (std::wstring key : params) {
 				std::wstring val;
 				if (ERROR_SUCCESS != (status = GetEventParam(hEvents[i], &val, key))) {
-					std::wcout << "Failed query parameter " << key << " with code " << status << std::endl;
+					LOG_ERROR(L"Failed query parameter " + key + L" with code " + std::to_wstring(status));
 					goto cleanup;
 				}
 
@@ -230,13 +230,13 @@ int QueryEvents(const wchar_t* channel, unsigned int id, std::set<std::wstring>&
 		status = GetLastError();
 
 		if (ERROR_EVT_CHANNEL_NOT_FOUND == status)
-			wprintf(L"The channel was not found.\n");
+			LOG_ERROR("The channel was not found.");
 		else if (ERROR_EVT_INVALID_QUERY == status)
 			// You can call the EvtGetExtendedStatus function to try to get 
 			// additional information as to what is wrong with the query.
-			wprintf(L"The query is not valid.\n");
+			LOG_ERROR(L"The query " + query + L" is not valid.");
 		else
-			wprintf(L"EvtQuery failed with %lu.\n", status);
+			LOG_ERROR("EvtQuery failed with " + std::to_string(status));
 
 		goto cleanup;
 	}
