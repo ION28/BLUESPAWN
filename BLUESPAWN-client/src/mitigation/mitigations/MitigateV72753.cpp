@@ -13,7 +13,7 @@ namespace Mitigations {
 	MitigateV72753::MitigateV72753(MitigationRegister& record) : 
 		Mitigation(
 			record,
-			L"V-72753 - WDigest Authentication must be disabled.",
+			L"V-72753 - WDigest Authentication must be disabled",
 			L"When the WDigest Authentication protocol is enabled, plain text passwords are stored in the Local Security Authority"
 			"Subsystem Service (LSASS) exposing them to theft. This setting will prevent WDigest from storing credentials in memory.",
 			L"lsa",
