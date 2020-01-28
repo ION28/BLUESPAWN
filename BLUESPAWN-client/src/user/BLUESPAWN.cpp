@@ -15,8 +15,6 @@ int main(int argc, char* argv[])
 	Log::AddSink(DebugOutput);
 	Log::AddHuntSink(ConsoleOutput);
 
-	queryevent();
-
 	print_banner();
 
 	/*
@@ -101,6 +99,7 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	HuntRegister record{};
 	Hunts::HuntT1004 t1004(record);
 	Hunts::HuntT1037 t1037(record);
+	Hunts::HuntT1050 t1050(record);
 	Hunts::HuntT1060 t1060(record);
 	Hunts::HuntT1100 t1100(record);
 	Hunts::HuntT1101 t1101(record);

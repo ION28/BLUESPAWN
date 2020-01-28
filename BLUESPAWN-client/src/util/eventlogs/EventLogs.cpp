@@ -1,14 +1,18 @@
 #include "util/eventlogs/EventLogs.h"
+#include "common/StringUtils.h"
 
 const int SIZE_DATA = 4096;
 TCHAR XMLDataCurrent[SIZE_DATA];
 
-void queryevent(void)
+int QueryEvents(const wchar_t* channel, unsigned int id, Reaction reaction)
 {
 	DWORD status = ERROR_SUCCESS;
 	EVT_HANDLE hResults = NULL;
 
-	hResults = EvtQuery(NULL, L"Microsoft-Windows-Sysmon/Operational", L"Event/System[EventID=5]", EvtQueryChannelPath | EvtQueryReverseDirection);
+	auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
+	auto wquery = query.c_str();
+
+	hResults = EvtQuery(NULL, channel, wquery, EvtQueryChannelPath | EvtQueryReverseDirection);
 	if (NULL == hResults)
 	{
 		status = GetLastError();
@@ -31,6 +35,8 @@ cleanup:
 
 	if (hResults)
 		EvtClose(hResults);
+
+	return 5;
 
 }
 
