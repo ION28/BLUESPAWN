@@ -141,9 +141,6 @@
     <ClInclude Include="headers\hunt\HuntRegister.h">
       <Filter>Header Files\hunt</Filter>
     </ClInclude>
-    <ClInclude Include="headers\hunt\RegistryHunt.hpp">
-      <Filter>Header Files\hunt</Filter>
-    </ClInclude>
     <ClInclude Include="headers\hunt\Scope.h">
       <Filter>Header Files\hunt</Filter>
     </ClInclude>
@@ -1074,6 +1071,12 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1050.h">
       <Filter>Header Files\hunt\hunts</Filter>
     </ClInclude>
+	<ClInclude Include="headers\hunt\RegistryHunt.h">
+      <Filter>Header Files\hunt</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\configurations\RegistryValue.h">
+      <Filter>Header Files\util\configurations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\hunt\Hunt.cpp">
@@ -1125,9 +1128,6 @@
       <Filter>Source Files\user</Filter>
     </ClCompile>
     <ClCompile Include="src\util\configurations\CollectInfo.cpp">
-      <Filter>Source Files\util\configurations</Filter>
-    </ClCompile>
-    <ClCompile Include="src\util\configurations\Registry.cpp">
       <Filter>Source Files\util\configurations</Filter>
     </ClCompile>
     <ClCompile Include="src\util\filesystem\FileSystem.cpp">
@@ -1213,6 +1213,15 @@
     </ClCompile>
     <ClCompile Include="src\hunt\hunts\HuntT1050.cpp">
       <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+	<ClCompile Include="src\util\configurations\RegistryKey.cpp">
+      <Filter>Source Files\util\configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\RegistryHunt.cpp">
+      <Filter>Source Files\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\configurations\RegistryValue.cpp">
+      <Filter>Source Files\util\configurations</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
