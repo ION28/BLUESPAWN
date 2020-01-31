@@ -1,6 +1,9 @@
 //#include "C:\\Users\\Will Mayes\\Documents\\Cyber Security\\BLUESPAWN\\BLUESPAWN-client\\headers\\util\\filesystem\\FileSystem.h"
+
+//#include "C:\\Users\\Will Mayes\\Documents\\Cyber Security\\BLUESPAWN\\BLUESPAWN-client\\headers\\util\\log\Log.h"
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
+using namespace FileSystem; 
 bool FileSystem::CheckFileExists(LPCWSTR filename) {
 	//Function from https://stackoverflow.com/a/4404259/3302799
 	GetFileAttributesW(filename);
@@ -46,7 +49,7 @@ FileSystem::File::File(IN const LPCWSTR path) {
 	}
 }
 
-short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, IN const bool insert) {
+short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, IN const bool truncate, IN const bool insert) {
 	LOG_VERBOSE(2, "Writing to file " << FilePath << " at " << offset << ". Insert = " << insert);
 	if (!FileExists) {
 		LOG_ERROR("Can't write to file " << FilePath << ". File doesn't exist");
@@ -64,7 +67,7 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 		return 0;
 	}
 	//Insert value into file at specified offset
-	if (insert) {
+	if (insert && !truncate) {
 		bool readAll = false;
 		long readOffset = offset;
 		long writeOffset = offset;
@@ -151,12 +154,18 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 			return 0;
 		}
 	}
+	if (truncate) {
+		if (!SetEndOfFile(hFile)) {
+			LOG_ERROR("Couldn't truncate file " << FilePath);
+			return 0;
+		}
+	}
 	SetFilePointer(hFile, 0, 0, 0);
 	LOG_VERBOSE(1, "Successfule wrote to " << FilePath << "at offset" << offset);
 	return 1;
 }
 
-short FileSystem::File::Read(OUT LPVOID buffer, IN const long offset, IN const unsigned long amount) {
+short FileSystem::File::Read(OUT LPVOID buffer, IN const long offset, IN const unsigned long amount, OUT DWORD& amountRead) {
 	LOG_VERBOSE(2, "Attempting to read " << amount << " bytes from " << FilePath << " at offset " << offset);
 	if (!FileExists) {
 		LOG_ERROR("Can't write to " << FilePath << ". File doesn't exist.");
@@ -167,12 +176,11 @@ short FileSystem::File::Read(OUT LPVOID buffer, IN const long offset, IN const u
 	LONG upperOffset;
 	PLONG upper;
 	File::TranslateLongToFilePointer(offset, lowerOffset, upperOffset, upper);
-	DWORD bytesRead;
 	if (SetFilePointer(hFile, lowerOffset, upper, 0) == INVALID_SET_FILE_POINTER) {
 		LOG_ERROR("Can't set file pointer to " << offset << " in file " << FilePath << ".");
 		return 0;
 	}
-	if (!ReadFile(hFile, buffer, amount, &bytesRead, NULL)) {
+	if (!ReadFile(hFile, buffer, amount, &amountRead, NULL)) {
 		LOG_ERROR("Failed to read from " << FilePath << " at offset " << offset << " with error " << GetLastError());
 		SetFilePointer(hFile, 0, 0, 0);
 		return 0;
@@ -343,4 +351,111 @@ short FileSystem::File::ChangeFileLength(IN const long length) {
 	}
 	LOG_VERBOSE(2, "Changed length of " << FilePath << " to " << length);
 	return 1;
+}
+
+FileSystem::Folder::Folder(LPCWSTR path) {
+	FolderPath = path;
+	FolderExists = true;
+	hCurFile = FindFirstFile(path, &ffd);
+	if (hCurFile == INVALID_HANDLE_VALUE) {
+		LOG_ERROR("Couldn't open folder " << path);
+		FolderExists = false;
+	}
+	if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+		std::cout << "IN " << std::endl;
+		IsFile = false;
+	}
+	else {
+		IsFile = true;
+	}
+}
+
+short FileSystem::Folder::moveToNextFile() {
+	if (FindNextFileW(hCurFile, &ffd) != 0) {
+		if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			IsFile = false;
+		}
+		else {
+			IsFile = true;
+		}
+		return 1;
+	}
+	std::cout << (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) << std::endl;
+	std::cout << ffd.cFileName << " " << GetLastError() << std::endl;
+	return 0;
+}
+
+short FileSystem::Folder::moveToBeginning() {
+	hCurFile = FindFirstFileW(FolderPath, &ffd);
+	if (hCurFile == INVALID_HANDLE_VALUE) {
+		LOG_ERROR("Couldn't open folder " << FolderPath);
+		return 0;
+	}
+	if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+		IsFile = false;
+	}
+	else {
+		IsFile = true;
+	}
+	return 1;
+}
+
+bool FileSystem::Folder::getCurIsFile() {
+	return IsFile;
+}
+
+short FileSystem::Folder::Open(OUT File*& file) {
+	wstring fileName = ffd.cFileName;
+	wstring filePath = FolderPath + fileName;
+	file = new File(filePath.c_str());
+	if (file->getFileExists()) return 1;
+	return 0;
+}
+
+short FileSystem::Folder::EnterDir(OUT Folder*& folder) {
+	wstring folderName = FolderPath;
+	folderName += ffd.cFileName;
+	folder = new Folder(folderName.c_str());
+	if (folder->getFolderExists()) return 1;
+	return 0;
+}
+
+bool FileSystem::Folder::getFolderExists() {
+	return FolderExists;
+}
+
+std::vector<File*>* FileSystem::Folder::GetFiles(IN FileAttribs* attribs, IN int recurDepth) {
+	if (moveToBeginning() == 0) {
+		std::cout << "Couldn't get to beginning of folder " << FolderPath << std::endl;
+		LOG_ERROR("Couldn't get to beginning of folder " << FolderPath);
+		return NULL;
+	}
+	std::vector<File*>* toRet = new std::vector<File*>();
+	do {
+		if (getCurIsFile()) {
+			File* file;
+			Open(file);
+			if (!attribs) {
+				toRet->emplace_back(file);
+			}
+		}
+		else if(recurDepth != 0){
+			std::vector<File*>* temp = NULL;
+			Folder* folder = NULL;
+			EnterDir(folder);
+			if (recurDepth == -1) {
+				temp = folder->GetFiles(attribs, recurDepth);
+			}
+			else {
+				temp = folder->GetFiles(attribs, recurDepth - 1);
+			}
+			while (temp && !temp->empty()) {
+				File* file = temp->at(temp->size() - 1);
+				temp->pop_back();
+				toRet->emplace_back(file);
+			}
+		}
+		std::cout << "HERE" << std::endl;
+	} while (moveToNextFile());
+	return toRet;
 }
