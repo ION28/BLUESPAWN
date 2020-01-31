@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <functional>
+#include <iostream>
 
 namespace Linker {
 	std::vector<std::function<bool()>> LoadCalls = {};
