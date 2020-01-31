@@ -7,7 +7,7 @@ namespace Hunts {
 	HuntT1100::HuntT1100(HuntRegister& record) : Hunt(record, L"T1100 - Web Shells") {
 		smatch match_index;
 
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory | (DWORD) Aggressiveness::Moderate;
+		dwSupportedScans = (DWORD) Aggressiveness::Cursory | (DWORD) Aggressiveness::Normal;
 		dwCategoriesAffected = (DWORD) Category::Files;
 		dwSourcesInvolved = (DWORD) DataSource::FileSystem;
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
@@ -21,7 +21,7 @@ namespace Hunts {
 			asp_indicators.assign(R"(\bcmd.exe\b|\bpowershell.exe\b|\bwscript.shell\b|\bprocessstartinfo\b|createobject\("scripting.filesystemobject"\))");
 			jsp_indicators.assign(R"(\bcmd.exe\b|\bpowershell.exe\b)");
 		}
-		else if (aLevel == Aggressiveness::Moderate) {
+		else if (aLevel == Aggressiveness::Normal) {
 			asp_indicators.assign(R"(\bcmd.exe\b|\bpowershell.exe\b|\bwscript.shell\b|\bprocessstartinfo\b|\bcreatenowindow\b|\bcmd\b|\beval request\b|\bexecute request\b|\boscriptnet\b|createobject\("scripting.filesystemobject"\))");
 			jsp_indicators.assign(R"(\bcmd.exe\b|\bpowershell.exe\b|\bgetruntime\(\)\.exec\b)");
 		}
@@ -72,10 +72,10 @@ namespace Hunts {
 		return identified;
 	}
 
-	int HuntT1100::ScanModerate(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for T1100 - Web Shells at level Moderate");
+	int HuntT1100::ScanNormal(const Scope& scope, Reaction reaction){
+		LOG_INFO("Hunting for T1100 - Web Shells at level Normal");
 		reaction.BeginHunt(GET_INFO());
-		SetRegexAggressivenessLevel(Aggressiveness::Moderate);
+		SetRegexAggressivenessLevel(Aggressiveness::Normal);
 
 		int identified = 0;
 

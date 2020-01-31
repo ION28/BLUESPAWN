@@ -9,9 +9,8 @@ namespace Log {
 		const std::vector<std::shared_ptr<DETECTION>>& detections){
 		if(level.Enabled()){
 			if(level.severity == Severity::LogHunt){
-				std::wstring aggressiveness = info->HuntAggressiveness == Aggressiveness::Aggressive ? L"Aggressive" :
-					info->HuntAggressiveness == Aggressiveness::Careful ? L"Careful" :
-					info->HuntAggressiveness == Aggressiveness::Moderate ? L"Moderate" : L"Cursory";
+				std::wstring aggressiveness = info->HuntAggressiveness == Aggressiveness::Intensive ? L"Intensive" :
+					info->HuntAggressiveness == Aggressiveness::Normal ? L"Normal" : L"Cursory";
 				std::wstring sLogHeader = L"[" + info->HuntName + L": " + aggressiveness + L"] - ";
 				OutputDebugStringW((sLogHeader + std::to_wstring(detections.size()) + L" detection" + (detections.size() == 1 ? L"!" : L"s!")).c_str());
 				for(auto detection : detections){
