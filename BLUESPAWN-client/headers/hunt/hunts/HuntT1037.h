@@ -11,9 +11,8 @@ namespace Hunts {
 	 * HuntT1037 examines the registry for logon scripts
 	 * 
 	 * @scans Cursory checks the value of the UserInitMprLogonScript key for scripts
-	 * @scans Moderate Scan not supported.
-	 * @scans Careful Scan not supported.
-	 * @scans Aggressive Scan not supported.
+	 * @scans Normal Scan not supported.
+	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1037 : public Hunt {
 	public:

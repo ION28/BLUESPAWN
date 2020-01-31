@@ -14,9 +14,8 @@ namespace Hunts {
 	 * webshells.
 	 * 
 	 * @scans Cursory Checks for obvious bad functions that indicate a webshell
-	 * @scans Moderate Adds more suspicious indicators in the regex to look for
-	 * @scans Careful Scan not supported.
-	 * @scans Aggressive Scan not supported.
+	 * @scans Normal Adds more suspicious indicators in the regex to look for
+	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1100 : public Hunt {
 	private:
@@ -36,6 +35,6 @@ namespace Hunts {
 		void AddFileExtensionToSearch(const std::string& sFileExtension);
 
 		virtual int ScanCursory(const Scope& scope, Reaction reaction = Reactions::LogReaction());
-		virtual int ScanModerate(const Scope& scope, Reaction reaction = Reactions::LogReaction());
+		virtual int ScanNormal(const Scope& scope, Reaction reaction = Reactions::LogReaction());
 	};
 }

@@ -13,9 +13,8 @@ namespace Hunts {
 	 * HuntT1101 examines Security Support Providers (SSPs) on the system
 	 * 
 	 * @scans Cursory checks the names of the SSPs on the system.
-	 * @scans Moderate Scan not supported.
-	 * @scans Careful Scan not supported.
-	 * @scans Aggressive Scan not supported.
+	 * @scans Normal Scan not supported.
+	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1101 : public Hunt {
 	private:

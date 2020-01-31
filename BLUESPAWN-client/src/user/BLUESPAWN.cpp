@@ -38,7 +38,7 @@ int main(int argc, char* argv[]){
 		;
 
 	options.add_options("hunt")
-		("l,level", "Aggressiveness of Hunt. Either Cursory, Moderate, Careful, or Aggressive",
+		("l,level", "Aggressiveness of Hunt. Either Cursory, Normal, or Intensive",
 			cxxopts::value<std::string>())
 		;
 
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]){
 			print_help(result, options);
 		}
 		else if (result.count("hunt")) {
-			dispatch_hunt(result, options);
+			dispatch_hunt(result, options, io);
 		}
 		else if (result.count("mitigate")) {
 			dispatch_mitigations_analysis(result, options, io);
@@ -102,31 +102,29 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 	}
 }
 
-void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
-	std::string sHuntLevelFlag = "Moderate";
+void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io) {
+	std::string sHuntLevelFlag = "Normal";
 	Aggressiveness aHuntLevel;
 	if(result.count("level")) {
 		try {
 			sHuntLevelFlag = result["level"].as < std::string >();
 		} catch(int e) {
-			std::cerr << "Error " << e << " - Unknown hunt level. Please specify either Cursory, Moderate, Careful, or Aggressive" << std::endl;
+			std::cerr << "Error " << e << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive" << std::endl;
 		}
 	}
 	if(sHuntLevelFlag == "Cursory") {
 		aHuntLevel = Aggressiveness::Cursory;
-	} else if(sHuntLevelFlag == "Moderate") {
-		aHuntLevel = Aggressiveness::Moderate;
-	} else if(sHuntLevelFlag == "Careful") {
-		aHuntLevel = Aggressiveness::Careful;
-	} else if (sHuntLevelFlag == "Aggressive") {
-		aHuntLevel = Aggressiveness::Aggressive;
+	} else if(sHuntLevelFlag == "Normal") {
+		aHuntLevel = Aggressiveness::Normal;
+	} else if (sHuntLevelFlag == "Intensive") {
+		aHuntLevel = Aggressiveness::Intensive;
 	} else {
-		std::cerr << "Error " << sHuntLevelFlag << " - Unknown hunt level. Please specify either Cursory, Moderate, Careful, or Aggressive" << std::endl;
-		std::cerr << "Will default to Moderate for this run." << std::endl;
-		aHuntLevel = Aggressiveness::Moderate;
+		std::cerr << "Error " << sHuntLevelFlag << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive" << std::endl;
+		std::cerr << "Will default to Normal for this run." << std::endl;
+		aHuntLevel = Aggressiveness::Normal;
 	}
 
-	HuntRegister record{};
+	HuntRegister record{io};
 	Hunts::HuntT1004 t1004(record);
 	Hunts::HuntT1037 t1037(record);
 	Hunts::HuntT1050 t1050(record);
@@ -143,6 +141,7 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
 	Reaction reaction = Reactions::LogReaction();
+	io.InformUser(L"Starting a Hunt");
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
 }
 

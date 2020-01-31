@@ -1,7 +1,9 @@
 #include "hunt/HuntRegister.h"
 #include <iostream>
 
-void HuntRegister::RegisterHunt(Hunt* hunt){
+HuntRegister::HuntRegister(IOBase& io) : io(io) {}
+
+void HuntRegister::RegisterHunt(Hunt* hunt) {
 	// The actual hunt itself is stored in the vector here!
 	// Make sure that all internal references to it are referencing
 	// the copy in vRegisteredHunts and not the argument to this function.
@@ -25,36 +27,53 @@ void HuntRegister::RegisterHunt(Hunt* hunt){
 
 void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction){
 	for (auto name : vRegisteredHunts) {
-		switch (aggressiveness) {
-		case Aggressiveness::Cursory:
+		if (aggressiveness == Aggressiveness::Intensive) {
+			if (name->SupportsScan(Aggressiveness::Intensive)) {
+				name->ScanIntensive(scope, reaction);
+			}
+			else if (name->SupportsScan(Aggressiveness::Normal)) {
+				name->ScanNormal(scope, reaction);
+			}
+			else {
+				name->ScanCursory(scope, reaction);
+			}
+		}
+		else if (aggressiveness == Aggressiveness::Normal) {
+			if (name->SupportsScan(Aggressiveness::Normal)) {
+				name->ScanNormal(scope, reaction);
+			}
+			else {
+				name->ScanCursory(scope, reaction);
+			}
+		}
+		else {
 			name->ScanCursory(scope, reaction);
-			break;
-		case Aggressiveness::Moderate:
-			name->ScanModerate(scope, reaction);
-			break;
-		case Aggressiveness::Careful:
-			name->ScanCareful(scope, reaction);
-			break;
-		case Aggressiveness::Aggressive:
-			name->ScanAggressive(scope, reaction);
-			break;
 		}
 	}
+	io.InformUser(L"Successfully ran " + std::to_wstring(vRegisteredHunts.size()) + L" hunts.");
 }
 
 void HuntRegister::RunHunt(Hunt& name, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction){
-	switch(aggressiveness) {
-	case Aggressiveness::Cursory:
+	if (aggressiveness == Aggressiveness::Intensive) {
+		if (name.SupportsScan(Aggressiveness::Intensive)) {
+			name.ScanIntensive(scope, reaction);
+		}
+		else if (name.SupportsScan(Aggressiveness::Normal)) {
+			name.ScanNormal(scope, reaction);
+		}
+		else {
+			name.ScanCursory(scope, reaction);
+		}
+	}
+	else if (aggressiveness == Aggressiveness::Normal) {
+		if (name.SupportsScan(Aggressiveness::Normal)) {
+			name.ScanNormal(scope, reaction);
+		}
+		else {
+			name.ScanCursory(scope, reaction);
+		}
+	}
+	else {
 		name.ScanCursory(scope, reaction);
-		break;
-	case Aggressiveness::Moderate:
-		name.ScanModerate(scope, reaction);
-		break;
-	case Aggressiveness::Careful:
-		name.ScanCareful(scope, reaction);
-		break;
-	case Aggressiveness::Aggressive:
-		name.ScanAggressive(scope, reaction);
-		break;
 	}
 }
