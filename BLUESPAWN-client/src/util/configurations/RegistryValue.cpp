@@ -12,7 +12,7 @@ namespace Registry {
 		type{ type },
 		dwData{ dwData }{}
 
-	RegistryValue::RegistryValue(std::wstring wValueName, RegistryType type, MemoryWrapper<> lpData) :
+	RegistryValue::RegistryValue(std::wstring wValueName, RegistryType type, AllocationWrapper lpData) :
 		wValueName{ wValueName },
 		type{ type },
 		lpData{ lpData }{}
@@ -38,14 +38,14 @@ namespace Registry {
 			}
 			return string.substr(0, string.length() - 3) + L"\"]";
 		} else {
-			if(!lpData.address){
+			if(!lpData){
 				return L"(null)";
 			}
 
 			std::wstring string = L"";
-			for(auto* byte = lpData.address; byte < lpData.address + lpData.MemorySize; byte++){
+			for(auto i = 0; i < lpData.GetSize(); i++){
 				wchar_t buf[3];
-				wsprintf(buf, L"%02x", *byte);
+				wsprintf(buf, L"%02x", lpData[i]);
 				string += buf;
 				string += L" ";
 			}

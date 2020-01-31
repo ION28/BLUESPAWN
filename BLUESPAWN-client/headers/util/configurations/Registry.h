@@ -106,10 +106,10 @@ namespace Registry {
 		/**
 		 * Reads the raw bytes present in a given value. 
 		 *
-		 * @return A MemoryWrapper object pointing to the bytes read if the value is present, or
+		 * @return A AllocationWrapper object pointing to the bytes read if the value is present, or
 		 *	       an empty memory wrapper if the value is not present. The memory must be freed.
 		 */
-		MemoryWrapper<BYTE> GetRawValue(std::wstring wsValueName) const;
+		AllocationWrapper GetRawValue(std::wstring wsValueName) const;
 
 		/**
 		 * Writes bytes to a given value under the key referenced by this object.
@@ -120,7 +120,7 @@ namespace Registry {
 		 *
 		 * @return True if the value was successfully set; false otherwise
 		 */
-		bool SetRawValue(std::wstring name, MemoryWrapper<BYTE> bytes, DWORD type = REG_BINARY) const;
+		bool SetRawValue(std::wstring name, AllocationWrapper bytes, DWORD type = REG_BINARY) const;
 
 		/**
 		 * Reads data from the specified value and handles conversion to common types.

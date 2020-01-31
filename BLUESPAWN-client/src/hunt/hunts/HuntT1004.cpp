@@ -31,7 +31,7 @@ namespace Hunts {
 		auto HKLMWinlogonWoW64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" };
 		keys.emplace(HKLMWinlogonWoW64, CheckValues(HKLMWinlogonWoW64, {
 			{ L"Shell", RegistryType::REG_SZ_T, L"explorer\\.exe,?", true, CheckSzRegexMatch },
-			{ L"UserInit", RegistryType::REG_SZ_T, L"((U|u)(SERINIT|serinit)\\.(exe|EXE),?)?", false, CheckSzRegexMatch }
+			{ L"UserInit", RegistryType::REG_SZ_T, L"C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\(U|u)(SERINIT|serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch }
 		}));
 
 		auto HKCUWinlogon = RegistryKey{ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" };
