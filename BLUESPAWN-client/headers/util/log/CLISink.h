@@ -32,7 +32,7 @@ namespace Log {
 			RED       = 0xC,
 			PINK      = 0xD,
 			YELLOW    = 0xE,
-			WHITE     = 0xF
+			WHITE     = 0xF,
 		};
 		std::string MessagePrepends[4] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]" };
 		MessageColor PrependColors[5] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, MessageColor::GREEN, MessageColor::GOLD };
