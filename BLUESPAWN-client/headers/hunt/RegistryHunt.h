@@ -19,7 +19,7 @@ namespace Registry {
 
 	typedef std::function<bool(const std::wstring&, const std::wstring&)> REG_SZ_CHECK;
 	typedef std::function<bool(DWORD, DWORD)> REG_DWORD_CHECK;
-	typedef std::function<bool(LPVOID, LPVOID)> REG_BINARY_CHECK;
+	typedef std::function<bool(AllocationWrapper, AllocationWrapper)> REG_BINARY_CHECK;
 	typedef std::function<bool(const std::vector<std::wstring>&, const std::vector<std::wstring>&)> REG_MULTI_SZ_CHECK;
 
 	extern REG_SZ_CHECK CheckSzEqual;
@@ -55,15 +55,10 @@ namespace Registry {
 			REG_SZ_CHECK check = CheckSzEqual);
 		RegistryCheck(std::wstring wValueName, RegistryType type, DWORD dwData, bool MissingBad = false,
 			REG_DWORD_CHECK check = CheckDwordEqual);
-		RegistryCheck(std::wstring wValueName, RegistryType type, MemoryWrapper<> lpData, bool MissingBad = false,
+		RegistryCheck(std::wstring wValueName, RegistryType type, AllocationWrapper lpData, bool MissingBad = false,
 			REG_BINARY_CHECK check = CheckBinaryEqual);
 		RegistryCheck(std::wstring wValueName, RegistryType type, std::vector<std::wstring> wData, bool MissingBad = false,
 			REG_MULTI_SZ_CHECK check = CheckMultiSzSubset);
-
-		RegistryCheck(const RegistryCheck& copy);
-		RegistryCheck operator=(const RegistryCheck& copy);
-
-		~RegistryCheck();
 
 		RegistryType GetType() const;
 	};

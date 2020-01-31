@@ -207,7 +207,7 @@ namespace Registry {
 		return false;
 	}
 
-	MemoryWrapper<BYTE> RegistryKey::GetRawValue(std::wstring ValueName) const {
+	AllocationWrapper RegistryKey::GetRawValue(std::wstring ValueName) const {
 		if(!Exists()){
 			SetLastError(FILE_DOES_NOT_EXIST);
 			return { nullptr, 0 };
@@ -261,10 +261,7 @@ namespace Registry {
 	template<class T>
 	std::optional<T> RegistryKey::GetValue(std::wstring wsValueName) const {
 		if(ValueExists(wsValueName)){
-			auto memory = GetRawValue(wsValueName).Convert<T>();
-			auto retval = *memory;
-			delete memory.address;
-			return retval;
+			return GetRawValue(wsValueName).Dereference<T>();
 		}
 		return std::nullopt;
 	}
@@ -274,10 +271,7 @@ namespace Registry {
 	template<>
 	std::optional<std::wstring> RegistryKey::GetValue(std::wstring wsValueName) const {
 		if(ValueExists(wsValueName)){
-			auto memory = reinterpret_cast<LPWSTR>(GetRawValue(wsValueName).address);
-			auto retval = std::wstring{ memory };
-			delete memory;
-			return retval;
+			return GetRawValue(wsValueName).ReadWString();
 		}
 		return std::nullopt;
 	}
@@ -288,7 +282,7 @@ namespace Registry {
 			std::vector<std::wstring> strings{};
 			std::wstring wsLogString{};
 
-			LPCWSTR data = reinterpret_cast<LPCWSTR>(GetRawValue(wsValueName).address);
+			LPCWSTR data = reinterpret_cast<LPCWSTR>(GetRawValue(wsValueName).Copy());
 			auto tmp = data;
 
 			while(*data){
@@ -307,12 +301,19 @@ namespace Registry {
 		return std::nullopt;
 	}
 
-	bool RegistryKey::SetRawValue(std::wstring name, MemoryWrapper<BYTE> bytes, DWORD dwType) const {
+	bool RegistryKey::SetRawValue(std::wstring name, AllocationWrapper bytes, DWORD dwType) const {
 		if(!Exists()){
 			return false;
 		}
 
-		LSTATUS status = RegSetValueEx(hkBackingKey, name.c_str(), 0, dwType, bytes, bytes.MemorySize);
+		auto copy = bytes.Copy();
+		if(!copy){
+			SetLastError(ERROR_INVALID_PARAMETER);
+			return false;
+		}
+
+		LSTATUS status = RegSetValueEx(hkBackingKey, name.c_str(), 0, dwType, reinterpret_cast<BYTE*>(copy), bytes.GetSize());
+		delete[] copy;
 		if(status != ERROR_SUCCESS){
 			SetLastError(status);
 			return false;
@@ -323,24 +324,24 @@ namespace Registry {
 
 	template<class T>
 	bool RegistryKey::SetValue(std::wstring name, T value, DWORD size, DWORD type) const {
-		return SetRawValue(name, reinterpret_cast<BYTE*>(value), size, type);
+		return SetRawValue(name, { reinterpret_cast<BYTE*>(value), size, AllocationWrapper::STACK_ALLOC }, type);
 	}
 
 	template<>
 	bool RegistryKey::SetValue(std::wstring name, LPCWSTR value, DWORD size, DWORD type) const {
-		return RegistryKey::SetRawValue(name, { PBYTE(value), wcslen(value) }, type);
+		return RegistryKey::SetRawValue(name, { PBYTE(value), wcslen(value), AllocationWrapper::STACK_ALLOC }, type);
 	}
 	template bool RegistryKey::SetValue<LPCWSTR>(std::wstring name, LPCWSTR value, DWORD size, DWORD type) const;
 
 	template<>
 	bool RegistryKey::SetValue(std::wstring name, LPCSTR value, DWORD size, DWORD type) const {
-		return RegistryKey::SetRawValue(name, { PBYTE(value), strlen(value) }, type);
+		return RegistryKey::SetRawValue(name, { PBYTE(value), strlen(value), AllocationWrapper::STACK_ALLOC }, type);
 	}
 	template bool RegistryKey::SetValue<LPCSTR>(std::wstring name, LPCSTR value, DWORD size, DWORD type) const;
 
 	template<>
 	bool RegistryKey::SetValue(std::wstring name, DWORD value, DWORD size, DWORD type) const {
-		return SetRawValue(name, { reinterpret_cast<BYTE*>(&value), 4 }, REG_DWORD);
+		return SetRawValue(name, { reinterpret_cast<BYTE*>(&value), 4, AllocationWrapper::STACK_ALLOC }, REG_DWORD);
 	}
 	template bool RegistryKey::SetValue<DWORD>(std::wstring name, DWORD value, DWORD size, DWORD type) const;
 
@@ -381,7 +382,7 @@ namespace Registry {
 			data[ptr] = { static_cast<WCHAR>(0) };
 		}
 
-		bool succeeded = SetRawValue(name, { reinterpret_cast<BYTE*>(data), static_cast<DWORD>(size * sizeof(WCHAR)) }, REG_MULTI_SZ);
+		bool succeeded = SetRawValue(name, AllocationWrapper{ data, static_cast<DWORD>(size * sizeof(WCHAR)), AllocationWrapper::CPP_ARRAY_ALLOC }, REG_MULTI_SZ);
 
 		delete[] data;
 
