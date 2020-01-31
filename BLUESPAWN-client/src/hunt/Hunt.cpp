@@ -23,29 +23,21 @@ Hunt::Hunt(HuntRegister& record, const std::wstring& name) :
 }
 
 int Hunt::ScanCursory(const Scope& scope, Reaction reaction){
-	std::wcout << L"Running hunt handler for " << name << std::endl;
 	if(!(dwSupportedScans & (DWORD) Aggressiveness::Cursory)){
 		return -1;
 	}
 	return 0;
 }
 
-int Hunt::ScanModerate(const Scope& scope, Reaction reaction){
-	if(!(dwSupportedScans & (DWORD) Aggressiveness::Moderate)){
+int Hunt::ScanNormal(const Scope& scope, Reaction reaction){
+	if(!(dwSupportedScans & (DWORD) Aggressiveness::Normal)){
 		return -1;
 	}
 	return 0;
 }
 
-int Hunt::ScanCareful(const Scope& scope, Reaction reaction){
-	if(!(dwSupportedScans & (DWORD) Aggressiveness::Careful)){
-		return -1;
-	}
-	return 0;
-}
-
-int Hunt::ScanAggressive(const Scope& scope, Reaction reaction){
-	if(!(dwSupportedScans & (DWORD) Aggressiveness::Aggressive)){
+int Hunt::ScanIntensive(const Scope& scope, Reaction reaction){
+	if(!(dwSupportedScans & (DWORD) Aggressiveness::Intensive)){
 		return -1;
 	}
 	return 0;

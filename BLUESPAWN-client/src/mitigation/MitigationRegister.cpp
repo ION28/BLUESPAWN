@@ -1,7 +1,7 @@
 #include "mitigation/MitigationRegister.h"
 #include "util/log/Log.h"
 
-MitigationRegister::MitigationRegister(IOBase& oIo) : io(oIo) {}
+MitigationRegister::MitigationRegister(IOBase& io) : io(io) {}
 
 void MitigationRegister::RegisterMitigation(Mitigation* mitigation) {
 	vRegisteredMitigations.emplace_back(mitigation);
