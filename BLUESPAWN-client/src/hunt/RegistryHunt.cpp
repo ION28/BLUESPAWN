@@ -17,13 +17,13 @@ namespace Registry {
 	REG_DWORD_CHECK CheckDwordEqual = [](DWORD d1, DWORD d2){ return d1 == d2; };
 	REG_DWORD_CHECK CheckDwordNotEqual = [](DWORD d1, DWORD d2){ return d1 != d2; };
 
-	REG_BINARY_CHECK CheckBinaryEqual = [](MemoryWrapper<> s1, MemoryWrapper<> s2){ 
-		return s1.MemorySize == s2.MemorySize && !memcmp(s1.address, s2.address, s1.MemorySize);
+	REG_BINARY_CHECK CheckBinaryEqual = [](AllocationWrapper s1, AllocationWrapper s2){
+		return s1.CompareMemory(s2);
 	};
-	REG_BINARY_CHECK CheckBinaryNotEqual = [](MemoryWrapper<> s1, MemoryWrapper<> s2){
-		return s1.MemorySize != s2.MemorySize || memcmp(s1.address, s2.address, s1.MemorySize);
+	REG_BINARY_CHECK CheckBinaryNotEqual = [](AllocationWrapper s1, AllocationWrapper s2){
+		return !s1.CompareMemory(s2);
 	};
-	REG_BINARY_CHECK CheckBinaryNull = [](MemoryWrapper<> s1, MemoryWrapper<> s2){ return s1.address == nullptr; };
+	REG_BINARY_CHECK CheckBinaryNull = [](AllocationWrapper s1, AllocationWrapper s2){ return !s1; };
 
 	REG_MULTI_SZ_CHECK CheckMultiSzSubset = [](std::vector<std::wstring> s1, std::vector<std::wstring> s2){
 		std::unordered_set<std::wstring> vals = { s2.begin(), s2.end() };
@@ -59,7 +59,7 @@ namespace Registry {
 		MissingBad{ MissingBad },
 		dwCheck{ check }{}
 
-	RegistryCheck::RegistryCheck(std::wstring wValueName, RegistryType type, MemoryWrapper<> lpData,
+	RegistryCheck::RegistryCheck(std::wstring wValueName, RegistryType type, AllocationWrapper lpData,
 		bool MissingBad, REG_BINARY_CHECK check) :
 		value{ wValueName, type, lpData },
 		MissingBad{ MissingBad },
@@ -70,35 +70,6 @@ namespace Registry {
 		value{ wValueName, type, vData },
 		MissingBad{ MissingBad },
 		vCheck{ check }{}
-
-	RegistryCheck::RegistryCheck(const RegistryCheck& copy) :
-		value{ copy.value },
-		MissingBad{ copy.MissingBad }{
-		if(copy.value.type == RegistryType::REG_BINARY_T){
-			lpCheck = copy.lpCheck;
-		} else if(copy.value.type == RegistryType::REG_SZ_T || copy.value.type == RegistryType::REG_EXPAND_SZ_T){
-			wCheck = copy.wCheck;
-		} else if(copy.value.type == RegistryType::REG_MULTI_SZ_T){
-			vCheck = copy.vCheck;
-		} else {
-			dwCheck = copy.dwCheck;
-		}
-	}
-
-	RegistryCheck RegistryCheck::operator=(const RegistryCheck& copy){
-		value = copy.value;
-		MissingBad = copy.MissingBad;
-		if(copy.value.type == RegistryType::REG_BINARY_T){
-			lpCheck = copy.lpCheck;
-		} else if(copy.value.type == RegistryType::REG_SZ_T || copy.value.type == RegistryType::REG_EXPAND_SZ_T){
-			wCheck = copy.wCheck;
-		} else if(copy.value.type == RegistryType::REG_MULTI_SZ_T){
-			vCheck = copy.vCheck;
-		} else {
-			dwCheck = copy.dwCheck;
-		}
-		return *this;
-	}
 
 	RegistryType RegistryCheck::GetType() const {
 		return value.type;
@@ -148,38 +119,19 @@ namespace Registry {
 				}
 			} else if(check.GetType() == RegistryType::REG_BINARY_T){
 				auto data = key.GetRawValue(check.value.wValueName);
-				if(data.address == nullptr){
+				if(!data){
 					if(check.MissingBad){
 						LOG_INFO("Under key " << key << ", desired value " << check.value.wValueName << " was missing.");
-						vIdentifiedValues.emplace_back(RegistryValue{ check.value.wValueName, check.GetType(), MemoryWrapper<>{ nullptr, 0 }});
+						vIdentifiedValues.emplace_back(RegistryValue{ check.value.wValueName, check.GetType(), AllocationWrapper{ nullptr, 0 }});
 					}
 				} else if(!check.lpCheck(data, check.value.lpData)){
-					auto value = RegistryValue{ check.value.wValueName, check.GetType(), *data };
+					auto value = RegistryValue{ check.value.wValueName, check.GetType(), data };
 					LOG_INFO("Under key " << key << ", value " << check.value.wValueName << " had potentially malicious data " << value);
 					vIdentifiedValues.emplace_back(value);
 				}
 			}
 		}
 		return vIdentifiedValues;
-	}
-
-	RegistryCheck::~RegistryCheck(){
-		switch(value.type){
-		case RegistryType::REG_SZ_T:
-		case RegistryType::REG_EXPAND_SZ_T:
-			wCheck.~function();
-			break;
-		case RegistryType::REG_BINARY_T:
-			lpCheck.~function();
-			break;
-		case RegistryType::REG_DWORD_T:
-			dwCheck.~function();
-			break;
-		case RegistryType::REG_MULTI_SZ_T:
-			vCheck.~function();
-			break;
-		}
-		value.~RegistryValue();
 	}
 
 	std::vector<RegistryValue> CheckKeyValues(const RegistryKey& key){
