@@ -1,5 +1,6 @@
 #include "mitigation/mitigations/MitigateV1093.h"
 #include "hunt/RegistryHunt.h"
+
 #include "util/configurations/Registry.h"
 #include "util/log/Log.h"
 
@@ -22,7 +23,7 @@ namespace Mitigations {
 		std::map<RegistryKey, std::vector<RegistryValue>> keys;
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Lsa" };
 
-		keys.emplace(CheckValues(key, {
+		keys.emplace(key, CheckValues(key, {
 			{ L"RestrictAnonymous", RegistryType::REG_DWORD_T, 1, true, CheckDwordEqual },
 		}));
 
@@ -32,20 +33,16 @@ namespace Mitigations {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
-	bool MitigateV1093::EnforceMitigation(SecurityLevel level) {		
-		std::map<RegistryKey, std::vector<RegistryValue>> keys;
-
+	bool MitigateV1093::EnforceMitigation(SecurityLevel level) {
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Lsa" };
-		if (!key.ValueExists(L"RestrictAnonymous")) {
-			DWORD value = 1;
-			return key.Create(&value, 4, REG_DWORD);
-		}
+		std::wstring value = L"restrictanonymous";
+		DWORD data = 1;
 
-		return key.Set<DWORD>(1);
+		return key.SetValue<DWORD>(L"restrictanonymous", data);
 	}
 
 	bool MitigateV1093::MitigationApplies(){

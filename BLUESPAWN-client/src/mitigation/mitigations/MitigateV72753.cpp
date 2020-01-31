@@ -25,18 +25,19 @@ namespace Mitigations {
 		LOG_INFO("Checking for presence of " << name);
 
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\Wdigest" };
+		std::wstring value = L"UseLogonCredential";
 
-		if(IsWindows8Point1OrGreater()){
-			if(!key.ValueExists(L"UseLogonCredential")){
+		if(IsWindowsVersionOrGreater(6, 2, 0)){ // Win 8.1+
+			if(!key.ValueExists(value)){
 				return true;
 			}
-		} else if(!key.ValueExists(L"UseLogonCredential")){
+		} else if(!key.ValueExists(value)){
 			return false;
 		}
 
-		if(key.GetValue<DWORD>(L"UseLogonCredential") == 1){
+		if(key.GetValue<DWORD>(value) == 1){
 			if(level == SecurityLevel::Low){
-				LOG_INFO("[V-72753 - WDigest Authentication must be disabled] Mitigation is not being enforced due to low security level.");
+				LOG_INFO(L"[" + name + L"] Mitigation is not being enforced due to low security level.");
 				return true;
 			}
 			return false;
@@ -46,15 +47,17 @@ namespace Mitigations {
 
 	bool MitigateV72753::EnforceMitigation(SecurityLevel level) {
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\Wdigest" };
-		if(!IsWindows8Point1OrGreater() && !key.ValueExists(L"UseLogonCredential")){
-			DWORD value = 0;
-			return key.SetValue<DWORD>(L"UseLogonCredential", 0);
+		std::wstring value = L"UseLogonCredential";
+		DWORD data = 0;
+
+		if (!IsWindowsVersionOrGreater(6, 2, 0) || key.ValueExists(value)) {
+			return key.SetValue<DWORD>(value, data);
 		}
 
 		return true;
 	}
 
 	bool MitigateV72753::MitigationApplies(){
-		return IsWindows7OrGreater();
+		return IsWindowsVersionOrGreater(6, 0, 0); // Win 7+
 	}
 }
