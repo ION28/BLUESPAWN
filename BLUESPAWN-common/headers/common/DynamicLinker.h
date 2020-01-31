@@ -10,13 +10,9 @@
     typedef retval(convention *name##_type)(__VA_ARGS__); \
     namespace Linker { extern name##_type name##; }
 
-#define LINK_FUNCTION(name, dll)                                                                \
-    namespace Linker {                                                                          \
-        name##_type name##;                                                                     \
-        auto res_##name = LoadCalls.emplace_back(std::bind([](name##_type* param){              \
-            *param = reinterpret_cast<name##_type>(GetProcAddress(LoadLibraryW(L#dll), #name)); \
-		    return *param == nullptr;                                                           \
-        }, &name));                                                                             \
+#define LINK_FUNCTION(name, dll)                                                                        \
+    namespace Linker {                                                                                  \
+        name##_type name## = reinterpret_cast<name##_type>(GetProcAddress(LoadLibraryW(L#dll), #name)); \
     }
 
 namespace Linker {

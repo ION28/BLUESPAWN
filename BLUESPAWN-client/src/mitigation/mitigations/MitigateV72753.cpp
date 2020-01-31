@@ -1,5 +1,5 @@
 #include "mitigation/mitigations/MitigateV72753.h"
-#include "hunt/RegistryHunt.hpp"
+#include "hunt/RegistryHunt.h"
 
 #include "util/configurations/Registry.h"
 #include "util/log/Log.h"
@@ -24,19 +24,20 @@ namespace Mitigations {
 	bool MitigateV72753::MitigationIsEnforced(SecurityLevel level) {
 		LOG_INFO("Checking for presence of " << name);
 
-		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\Wdigest", L"UseLogonCredential" };
+		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\Wdigest" };
+		std::wstring value = L"UseLogonCredential";
 
-		if(IsWindows8Point1OrGreater()){
-			if(!key.ValueExists()){
+		if(IsWindowsVersionOrGreater(6, 2, 0)){ // Win 8.1+
+			if(!key.ValueExists(value)){
 				return true;
 			}
-		} else if(!key.ValueExists()){
+		} else if(!key.ValueExists(value)){
 			return false;
 		}
 
-		if(key.Get<DWORD>() == 1){
+		if(key.GetValue<DWORD>(value) == 1){
 			if(level == SecurityLevel::Low){
-				LOG_INFO("[V-72753 - WDigest Authentication must be disabled] Mitigation is not being enforced due to low security level.");
+				LOG_INFO(L"[" + name + L"] Mitigation is not being enforced due to low security level.");
 				return true;
 			}
 			return false;
@@ -45,16 +46,18 @@ namespace Mitigations {
 	}
 
 	bool MitigateV72753::EnforceMitigation(SecurityLevel level) {
-		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\Wdigest", L"UseLogonCredential" };
-		if(!IsWindows8Point1OrGreater() && !key.ValueExists()){
-			DWORD value = 0;
-			return key.Create(&value, 4, REG_DWORD);
+		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\Wdigest" };
+		std::wstring value = L"UseLogonCredential";
+		DWORD data = 0;
+
+		if (!IsWindowsVersionOrGreater(6, 2, 0) || key.ValueExists(value)) {
+			return key.SetValue<DWORD>(value, data);
 		}
 
-		return key.Set<DWORD>(0);
+		return true;
 	}
 
 	bool MitigateV72753::MitigationApplies(){
-		return IsWindows7OrGreater();
+		return IsWindowsVersionOrGreater(6, 0, 0); // Win 7+
 	}
 }

@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "hunt/HuntInfo.h"
+#include "util/configurations/RegistryValue.h"
 
 enum class DetectionType {
 	File,
@@ -36,12 +37,10 @@ typedef std::function<void(std::shared_ptr<FILE_DETECTION>)> DetectFile;
 /// A struct containing information about a registry key value identified in a hunt
 struct REGISTRY_DETECTION : public DETECTION {
 	std::wstring wsRegistryKeyPath;
-	std::wstring wsRegistryKeyValue;
-	BYTE* contents;
-	REGISTRY_DETECTION(const std::wstring& wsRegistryKeyPath, const std::wstring& wsRegistryKeyValue, BYTE* contents) :
+	Registry::RegistryValue contents;
+	REGISTRY_DETECTION(const std::wstring& wsRegistryKeyPath, const Registry::RegistryValue& contents) :
 		DETECTION{ DetectionType::Registry },
 		wsRegistryKeyPath{ wsRegistryKeyPath },
-		wsRegistryKeyValue{ wsRegistryKeyValue },
 		contents{ contents }{}
 };
 typedef std::function<void(std::shared_ptr<REGISTRY_DETECTION>)> DetectRegistry;

@@ -17,8 +17,7 @@ void OutputComputerInformation() {
 }
 
 std::wstring GetOSVersion() {
-	auto key = Registry::RegistryKey(L"HKLM\\SOFTWARE\\Microsoft\\WIndows NT\\CurrentVersion", L"ProductName");
-	return key.Get<std::wstring>();
+	return *Registry::RegistryKey(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\WIndows NT\\CurrentVersion").GetValue<std::wstring>(L"ProductName");
 }
 
 std::wstring GetComputerDNSName() {

@@ -1,5 +1,5 @@
 #include "hunt/hunts/HuntT1138.h"
-#include "hunt/RegistryHunt.hpp"
+#include "hunt/RegistryHunt.h"
 
 #include "util/log/Log.h"
 #include "util/configurations/Registry.h"
@@ -18,13 +18,24 @@ namespace Hunts {
 		LOG_INFO("Hunting for T1138 - Application Shimming at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
-		int identified = 0;
+		std::map<RegistryKey, std::vector<RegistryValue>> keys;
 
-		identified += CheckForSubkeys({ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB"}, reaction);
-		identified += CheckForSubkeys({ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom"}, reaction);
-		
+		auto SDB = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB" };
+		keys.emplace(SDB, CheckKeyValues(SDB));
+
+		auto Custom = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Customs" };
+		keys.emplace(Custom, CheckKeyValues(Custom));
+
+		int detections = 0;
+		for(const auto& key : keys){
+			for(const auto& value : key.second){
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
+				detections++;
+			}
+		}
+
 		reaction.EndHunt();
-		return identified;
+		return detections;
 	}
 
 }
