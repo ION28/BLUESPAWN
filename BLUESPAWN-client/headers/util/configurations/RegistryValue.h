@@ -32,12 +32,12 @@ namespace Registry {
 		// Only one of these will be valid data; which one will be indicated by `type`
 		std::wstring wData = {};
 		DWORD dwData = {};
-		MemoryWrapper<> lpData = { nullptr, 0 };
+		AllocationWrapper lpData = { nullptr, 0 };
 		std::vector<std::wstring> vData = {};
 
 		RegistryValue(std::wstring wValueName, RegistryType type, std::wstring wData);
 		RegistryValue(std::wstring wValueName, RegistryType type, DWORD dwData);
-		RegistryValue(std::wstring wValueName, RegistryType type, MemoryWrapper<> lpData);
+		RegistryValue(std::wstring wValueName, RegistryType type, AllocationWrapper lpData);
 		RegistryValue(std::wstring wValueName, RegistryType type, std::vector<std::wstring> wData);
 
 		RegistryType GetType() const;
