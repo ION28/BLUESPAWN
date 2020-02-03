@@ -38,6 +38,7 @@
 #include "hunt/hunts/HuntT1131.h"
 #include "hunt/hunts/HuntT1138.h"
 #include "hunt/hunts/HuntT1182.h"
+#include "hunt/hunts/HuntT1183.h"
 
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"

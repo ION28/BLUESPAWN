@@ -135,6 +135,7 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase
 	Hunts::HuntT1131 t1131(record);
 	Hunts::HuntT1138 t1138(record);
 	Hunts::HuntT1182 t1182(record);
+	Hunts::HuntT1183 t1183(record);
 
 	DWORD tactics = UINT_MAX;
 	DWORD dataSources = UINT_MAX;

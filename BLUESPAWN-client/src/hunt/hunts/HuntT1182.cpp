@@ -22,8 +22,7 @@ namespace Hunts {
 
 		auto SessMan = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager" };
 
-		auto LSA = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
-		keys.emplace(LSA, CheckValues(LSA, {
+		keys.emplace(SessMan, CheckValues(SessMan, {
 			{ L"AppCertDLLs", RegistryType::REG_MULTI_SZ_T, std::vector<std::wstring>{}, false, CheckMultiSzEmpty },
 		}));
 
