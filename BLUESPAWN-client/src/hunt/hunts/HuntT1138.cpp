@@ -26,6 +26,12 @@ namespace Hunts {
 		auto Custom = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Customs" };
 		keys.emplace(Custom, CheckKeyValues(Custom));
 
+		auto SDBWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB" };
+		keys.emplace(SDBWow64, CheckKeyValues(SDBWow64));
+
+		auto CustomWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Customs" };
+		keys.emplace(CustomWow64, CheckKeyValues(CustomWow64));
+
 		int detections = 0;
 		for(const auto& key : keys){
 			for(const auto& value : key.second){
@@ -37,5 +43,4 @@ namespace Hunts {
 		reaction.EndHunt();
 		return detections;
 	}
-
 }
