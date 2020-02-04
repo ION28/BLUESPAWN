@@ -7,6 +7,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonLib", "BLUESPAWN-comm
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BLUESPAWN-client", "BLUESPAWN-client\BLUESPAWN-client.vcxproj", "{159B2E72-9553-4E17-9BEC-CB92FCA8D0B0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pe-sieve", "BLUESPAWN-client\external\pe-sieve\pe-sieve.vcxproj", "{44C7208B-2DE0-307E-AB9E-3B007EBFCA22}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpeconv", "BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\libpeconv.vcxproj", "{8740F8CE-0B1F-3EAE-B159-58AE3ECA7B28}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZERO_CHECK", "BLUESPAWN-client\external\pe-sieve\ZERO_CHECK.vcxproj", "{88DD01C1-35E8-3311-BB62-D160BF014F8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +37,24 @@ Global
 		{159B2E72-9553-4E17-9BEC-CB92FCA8D0B0}.Release|x64.Build.0 = Release|x64
 		{159B2E72-9553-4E17-9BEC-CB92FCA8D0B0}.Release|x86.ActiveCfg = Release|Win32
 		{159B2E72-9553-4E17-9BEC-CB92FCA8D0B0}.Release|x86.Build.0 = Release|Win32
+		{44C7208B-2DE0-307E-AB9E-3B007EBFCA22}.Debug|x64.ActiveCfg = Debug|x64
+		{44C7208B-2DE0-307E-AB9E-3B007EBFCA22}.Debug|x64.Build.0 = Debug|x64
+		{44C7208B-2DE0-307E-AB9E-3B007EBFCA22}.Debug|x86.ActiveCfg = Debug|x64
+		{44C7208B-2DE0-307E-AB9E-3B007EBFCA22}.Release|x64.ActiveCfg = Release|x64
+		{44C7208B-2DE0-307E-AB9E-3B007EBFCA22}.Release|x64.Build.0 = Release|x64
+		{44C7208B-2DE0-307E-AB9E-3B007EBFCA22}.Release|x86.ActiveCfg = Release|x64
+		{8740F8CE-0B1F-3EAE-B159-58AE3ECA7B28}.Debug|x64.ActiveCfg = Debug|x64
+		{8740F8CE-0B1F-3EAE-B159-58AE3ECA7B28}.Debug|x64.Build.0 = Debug|x64
+		{8740F8CE-0B1F-3EAE-B159-58AE3ECA7B28}.Debug|x86.ActiveCfg = Debug|x64
+		{8740F8CE-0B1F-3EAE-B159-58AE3ECA7B28}.Release|x64.ActiveCfg = Release|x64
+		{8740F8CE-0B1F-3EAE-B159-58AE3ECA7B28}.Release|x64.Build.0 = Release|x64
+		{8740F8CE-0B1F-3EAE-B159-58AE3ECA7B28}.Release|x86.ActiveCfg = Release|x64
+		{88DD01C1-35E8-3311-BB62-D160BF014F8D}.Debug|x64.ActiveCfg = Debug|x64
+		{88DD01C1-35E8-3311-BB62-D160BF014F8D}.Debug|x64.Build.0 = Debug|x64
+		{88DD01C1-35E8-3311-BB62-D160BF014F8D}.Debug|x86.ActiveCfg = Debug|x64
+		{88DD01C1-35E8-3311-BB62-D160BF014F8D}.Release|x64.ActiveCfg = Release|x64
+		{88DD01C1-35E8-3311-BB62-D160BF014F8D}.Release|x64.Build.0 = Release|x64
+		{88DD01C1-35E8-3311-BB62-D160BF014F8D}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

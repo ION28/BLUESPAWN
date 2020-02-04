@@ -130,6 +130,7 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options) {
 	Hunts::HuntT1004 t1004(record);
 	Hunts::HuntT1037 t1037(record);
 	Hunts::HuntT1050 t1050(record);
+	Hunts::HuntT1055 t1055(record);
 	Hunts::HuntT1060 t1060(record);
 	Hunts::HuntT1100 t1100(record);
 	Hunts::HuntT1101 t1101(record);
