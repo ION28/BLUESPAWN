@@ -4,14 +4,14 @@
 #include "hunt/reaction/Reaction.h"
 #include "hunt/reaction/Log.h"
 
-namespace Mitigations {
+namespace Mitigations{
 
 	/**
-	 * MitigateV72753 looks for Wdigest authentication to be disabled. (V-72753).
+	 * MitigateV73519 looks for SMBv1 to be disabled. (V-73519).
 	 */
-	class MitigateV72753 : public Mitigation {
+	class MitigateV73519 : public Mitigation {
 	public:
-		MitigateV72753(MitigationRegister& record);
+		MitigateV73519(MitigationRegister& record);
 
 		virtual bool MitigationIsEnforced(SecurityLevel level) override;
 		virtual bool EnforceMitigation(SecurityLevel level) override;
