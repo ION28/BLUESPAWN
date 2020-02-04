@@ -74,4 +74,5 @@ We would like to provide a special thank you to the following projects that have
 * Microsoft's documentation and examples on the Windows API
 * The [MITRE's ATT&CK Project](https://attack.mitre.org/) which has put together an amazing framework for which to consider, document, and categorize attacker tradercraft
 * Red Canary's [Atomic Red Team Project](https://github.com/redcanaryco/atomic-red-team) which has been incredibly useful in helping to test the detections we are building
+* [@op7ic](https://github.com/op7ic)'s [EDR-Testing-Script](https://github.com/op7ic/EDR-Testing-Script) Project
 * The Japan Computer Emergency Response Team (JPCERT)'s [Tool Analysis Result Sheet](https://jpcertcc.github.io/ToolAnalysisResultSheet/) for its documentation of attacker behavior and correlation with detection opportunities
