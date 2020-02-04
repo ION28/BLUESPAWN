@@ -1,0 +1,8 @@
+﻿  dll_main.cpp
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\dll_main.cpp(11,1): warning C4273: 'PESieve_scan': inconsistent dll linkage
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include\pe_sieve_api.h(15,42): message : see previous definition of 'PESieve_scan'
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\dll_main.cpp(25,1): warning C4273: 'PESieve_help': inconsistent dll linkage
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include\pe_sieve_api.h(13,29): message : see previous definition of 'PESieve_help'
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\dll_main.cpp(33,1): warning C4273: 'PESieve_version': inconsistent dll linkage
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include\pe_sieve_api.h(14,30): message : see previous definition of 'PESieve_version'
+  pe-sieve.vcxproj -> C:\Users\Jack\source\repos\BLUESPAWN\PESieve\Release\pe-sieve.dll

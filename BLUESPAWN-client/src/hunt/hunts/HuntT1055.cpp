@@ -7,7 +7,13 @@
 #include "util/log/HuntLogMessage.h"
 
 #include "pe_sieve_types.h"
-#include "pe_sieve_api.h"
+
+extern "C" {
+	void __stdcall PESieve_help(void);
+	DWORD __stdcall PESieve_version(void);
+	pesieve::t_report __stdcall PESieve_scan(pesieve::t_params args);
+};
+
 
 namespace Hunts{
 

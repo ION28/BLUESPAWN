@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Jack\source\repos\BLUESPAWN\PESieve\CMakeFiles\100f24e81dc938e76140c07832326c33\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{33CA65CC-A83E-3E55-8CB4-C3709E1116D8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
