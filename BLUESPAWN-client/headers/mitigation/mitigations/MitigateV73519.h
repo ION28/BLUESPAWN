@@ -7,7 +7,7 @@
 namespace Mitigations{
 
 	/**
-	 * MitigateV72753 looks for Wdigest authentication to be disabled. (V-72753).
+	 * MitigateV73519 looks for SMBv1 to be disabled. (V-73519).
 	 */
 	class MitigateV73519 : public Mitigation {
 	public:
