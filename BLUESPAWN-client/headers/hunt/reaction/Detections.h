@@ -62,11 +62,12 @@ struct SERVICE_DETECTION : public DETECTION {
 typedef std::function<void(std::shared_ptr<SERVICE_DETECTION>)> DetectService;
 
 enum class ProcessDetectionMethod {
-	NotImageBacked,
-	BackingImageMismatch,
-	NotInLoader,
-	NotSigned,
-	Other
+	Replaced       = 1,
+	HeaderModified = 2,
+	Detached       = 4,
+	Hooked         = 8,
+	Implanted      = 16,
+	Other          = 32
 };
 
 /// A struct containing information about a process identified in a hunt
@@ -77,10 +78,10 @@ struct PROCESS_DETECTION : public DETECTION {
 	std::wstring wsCmdline;
 	int PID;
 	int TID;
-	ProcessDetectionMethod method;
+	DWORD method;
 	BYTE AllocationStart[512];      // This member is intended to be used for signaturing purposes
 	PROCESS_DETECTION(const std::wstring& wsImageName, const std::wstring& wsImagePath, const std::wstring& wsCmdLine,
-		const int& PID, const int& TID, ProcessDetectionMethod method) :
+		const int& PID, const int& TID, DWORD method) :
 		DETECTION{ DetectionType::Process },
 		wsImageName{ wsImageName },
 		wsImagePath{ wsCmdLine },

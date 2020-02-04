@@ -198,9 +198,6 @@
     <ClInclude Include="headers\util\pe\Export_Section.h">
       <Filter>Header Files\util\pe</Filter>
     </ClInclude>
-    <ClInclude Include="headers\util\pe\Image_Loader.h">
-      <Filter>Header Files\util\pe</Filter>
-    </ClInclude>
     <ClInclude Include="headers\util\pe\Import_Section.h">
       <Filter>Header Files\util\pe</Filter>
     </ClInclude>
@@ -1071,11 +1068,26 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1050.h">
       <Filter>Header Files\hunt\hunts</Filter>
     </ClInclude>
-	<ClInclude Include="headers\hunt\RegistryHunt.h">
+    <ClInclude Include="headers\hunt\RegistryHunt.h">
       <Filter>Header Files\hunt</Filter>
     </ClInclude>
     <ClInclude Include="headers\util\configurations\RegistryValue.h">
       <Filter>Header Files\util\configurations</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\processes\ProcessUtils.h">
+      <Filter>Header Files\util\processes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\processes\ProcessChecker.h">
+      <Filter>Header Files\util\processes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Image_Loader.h">
+      <Filter>Header Files\util\processes</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1055.h">
+      <Filter>Header Files\hunt\hunts</Filter>
+    </ClInclude>
+    <ClInclude Include="external\pe-sieve\include\pe_sieve_types.h">
+      <Filter>Header Files\util\processes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1154,9 +1166,6 @@
     <ClCompile Include="src\util\pe\Export_Section.cpp">
       <Filter>Source Files\util\pe</Filter>
     </ClCompile>
-    <ClCompile Include="src\util\pe\Image_Loader.cpp">
-      <Filter>Source Files\util\pe</Filter>
-    </ClCompile>
     <ClCompile Include="src\util\pe\Import_Section.cpp">
       <Filter>Source Files\util\pe</Filter>
     </ClCompile>
@@ -1214,7 +1223,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1050.cpp">
       <Filter>Source Files\hunt\hunt</Filter>
     </ClCompile>
-	<ClCompile Include="src\util\configurations\RegistryKey.cpp">
+    <ClCompile Include="src\util\configurations\RegistryKey.cpp">
       <Filter>Source Files\util\configurations</Filter>
     </ClCompile>
     <ClCompile Include="src\hunt\RegistryHunt.cpp">
@@ -1222,6 +1231,15 @@
     </ClCompile>
     <ClCompile Include="src\util\configurations\RegistryValue.cpp">
       <Filter>Source Files\util\configurations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\processes\ProcessUtils.cpp">
+      <Filter>Source Files\util\processes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Image_Loader.cpp">
+      <Filter>Source Files\util\processes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1055.cpp">
+      <Filter>Source Files\hunt\hunt</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
