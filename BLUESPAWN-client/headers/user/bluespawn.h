@@ -45,6 +45,7 @@
 #include "mitigation/mitigations/MitigateV1093.h"
 #include "mitigation/mitigations/MitigateV3338.h"
 #include "mitigation/mitigations/MitigateV72753.h"
+#include "mitigation/mitigations/MitigateV73519.h"
 
 void print_help(cxxopts::ParseResult result, cxxopts::Options options);
 void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io);

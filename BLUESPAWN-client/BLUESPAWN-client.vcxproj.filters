@@ -1080,6 +1080,9 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h">
       <Filter>Header Files\hunt\hunts</Filter>
     </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV73519.h">
+      <Filter>Header Files\mitigation\mitigations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\hunt\Hunt.cpp">
@@ -1228,6 +1231,9 @@
     </ClCompile>
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp">
       <Filter>Source Files\hunt\hunt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV73519.cpp">
+      <Filter>Source Files\mitigation\mitigations</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
