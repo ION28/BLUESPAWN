@@ -1,0 +1,81 @@
+﻿  Building Custom Rule C:/Users/Jack/source/repos/BLUESPAWN/BLUESPAWN-client/external/pe-sieve/libpeconv/libpeconv/CMakeLists.txt
+  pe_hdrs_helper.cpp
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\pe_hdrs_helper.cpp(591,16): warning C4244: 'return': conversion from 'SIZE_T' to 'DWORD', possible loss of data
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\pe_hdrs_helper.cpp(601,12): warning C4244: 'return': conversion from 'SIZE_T' to 'DWORD', possible loss of data
+  pe_mode_detector.cpp
+  pe_raw_to_virtual.cpp
+  pe_virtual_to_raw.cpp
+  relocate.cpp
+  buffer_util.cpp
+  remote_pe_reader.cpp
+  imports_loader.cpp
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\imports_loader.cpp(60,1): warning C4311: 'reinterpret_cast': pointer truncation from 'FARPROC' to 'T_FIELD'
+          with
+          [
+              T_FIELD=DWORD
+          ]
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\imports_loader.cpp(24): message : see reference to function template instantiation 'bool FillImportThunks::processThunks_tpl<DWORD,IMAGE_THUNK_DATA32>(LPSTR,T_IMAGE_THUNK_DATA *,T_FIELD *,T_FIELD)' being compiled
+          with
+          [
+              T_IMAGE_THUNK_DATA=IMAGE_THUNK_DATA32,
+              T_FIELD=DWORD
+          ]
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\imports_loader.cpp(60,1): warning C4302: 'reinterpret_cast': truncation from 'FARPROC' to 'T_FIELD'
+          with
+          [
+              T_FIELD=DWORD
+          ]
+  delayed_imports_loader.cpp
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\delayed_imports_loader.cpp(87,1): warning C4311: 'type cast': pointer truncation from 'FARPROC' to 'T_FIELD'
+          with
+          [
+              T_FIELD=DWORD
+          ]
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\delayed_imports_loader.cpp(146): message : see reference to function template instantiation 'bool parse_delayed_desc<DWORD,IMAGE_THUNK_DATA32>(BYTE *,const size_t,const ULONGLONG,LPSTR,const T_FIELD,IMAGE_DELAYLOAD_DESCRIPTOR *,peconv::t_function_resolver *)' being compiled
+          with
+          [
+              T_FIELD=DWORD
+          ]
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\delayed_imports_loader.cpp(87,1): warning C4302: 'type cast': truncation from 'FARPROC' to 'T_FIELD'
+          with
+          [
+              T_FIELD=DWORD
+          ]
+  fix_imports.cpp
+  pe_loader.cpp
+  pe_dumper.cpp
+  exports_lookup.cpp
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\exports_lookup.cpp(114,85): warning C4311: 'reinterpret_cast': pointer truncation from 'LPSTR' to 'DWORD'
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\exports_lookup.cpp(114,85): warning C4302: 'reinterpret_cast': truncation from 'LPSTR' to 'DWORD'
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\exports_lookup.cpp(158,96): warning C4311: 'reinterpret_cast': pointer truncation from 'LPSTR' to 'DWORD'
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\exports_lookup.cpp(158,96): warning C4302: 'reinterpret_cast': truncation from 'LPSTR' to 'DWORD'
+  function_resolver.cpp
+  hooks.cpp
+  exported_func.cpp
+  exports_mapper.cpp
+  resource_parser.cpp
+  file_util.cpp
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\file_util.cpp(85,8): warning C4267: 'argument': conversion from 'size_t' to 'DWORD', possible loss of data
+  resource_util.cpp
+  Generating Code...
+  Compiling...
+  imports_uneraser.cpp
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\imports_uneraser.cpp(155,34): warning C4244: '=': conversion from 'const DWORD' to 'WORD', possible loss of data
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\imports_uneraser.cpp(213): message : see reference to function template instantiation 'bool peconv::ImportsUneraser::writeFoundFunction<FIELD_T,IMAGE_THUNK_DATA_T>(IMAGE_THUNK_DATA_T *,const FIELD_T,const peconv::ExportedFunc &)' being compiled
+          with
+          [
+              FIELD_T=DWORD,
+              IMAGE_THUNK_DATA_T=IMAGE_THUNK_DATA32
+          ]
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\imports_uneraser.cpp(229): message : see reference to function template instantiation 'bool peconv::ImportsUneraser::fillImportNames<DWORD,IMAGE_THUNK_DATA32>(IMAGE_IMPORT_DESCRIPTOR *,const FIELD_T,std::map<ULONGLONG,std::set<peconv::ExportedFunc,std::less<peconv::ExportedFunc>,std::allocator<peconv::ExportedFunc>>,std::less<ULONGLONG>,std::allocator<std::pair<const ULONGLONG,std::set<peconv::ExportedFunc,std::less<peconv::ExportedFunc>,std::allocator<peconv::ExportedFunc>>>>> &)' being compiled
+          with
+          [
+              FIELD_T=DWORD
+          ]
+  load_config_util.cpp
+  caves.cpp
+  util.cpp
+  fix_dot_net_ep.cpp
+C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\fix_dot_net_ep.cpp(67,28): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
+  libpeconv.vcxproj -> C:\Users\Jack\source\repos\BLUESPAWN\PESieve\libpeconv\libpeconv\Release\libpeconv.lib

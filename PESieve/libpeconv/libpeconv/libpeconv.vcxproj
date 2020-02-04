@@ -1,0 +1,335 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C9D09618-1DE6-3323-AED8-9B885AC8D9F3}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>libpeconv</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jack\source\repos\BLUESPAWN\PESieve\libpeconv\libpeconv\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">libpeconv.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">libpeconv</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Jack\source\repos\BLUESPAWN\PESieve\libpeconv\libpeconv\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">libpeconv.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">libpeconv</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Jack\source\repos\BLUESPAWN\PESieve\libpeconv\libpeconv\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">libpeconv.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">libpeconv</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Jack\source\repos\BLUESPAWN\PESieve\libpeconv\libpeconv\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">libpeconv.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">libpeconv</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\include;C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/Jack/source/repos/BLUESPAWN/BLUESPAWN-client/external/pe-sieve/libpeconv/libpeconv/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Jack/source/repos/BLUESPAWN/BLUESPAWN-client/external/pe-sieve -BC:/Users/Jack/source/repos/BLUESPAWN/PESieve --check-stamp-file C:/Users/Jack/source/repos/BLUESPAWN/PESieve/libpeconv/libpeconv/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Jack\source\repos\BLUESPAWN\PESieve\libpeconv\libpeconv\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/Jack/source/repos/BLUESPAWN/BLUESPAWN-client/external/pe-sieve/libpeconv/libpeconv/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Jack/source/repos/BLUESPAWN/BLUESPAWN-client/external/pe-sieve -BC:/Users/Jack/source/repos/BLUESPAWN/PESieve --check-stamp-file C:/Users/Jack/source/repos/BLUESPAWN/PESieve/libpeconv/libpeconv/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Jack\source\repos\BLUESPAWN\PESieve\libpeconv\libpeconv\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/Jack/source/repos/BLUESPAWN/BLUESPAWN-client/external/pe-sieve/libpeconv/libpeconv/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Jack/source/repos/BLUESPAWN/BLUESPAWN-client/external/pe-sieve -BC:/Users/Jack/source/repos/BLUESPAWN/PESieve --check-stamp-file C:/Users/Jack/source/repos/BLUESPAWN/PESieve/libpeconv/libpeconv/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Jack\source\repos\BLUESPAWN\PESieve\libpeconv\libpeconv\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/Jack/source/repos/BLUESPAWN/BLUESPAWN-client/external/pe-sieve/libpeconv/libpeconv/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Jack/source/repos/BLUESPAWN/BLUESPAWN-client/external/pe-sieve -BC:/Users/Jack/source/repos/BLUESPAWN/PESieve --check-stamp-file C:/Users/Jack/source/repos/BLUESPAWN/PESieve/libpeconv/libpeconv/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Jack\source\repos\BLUESPAWN\PESieve\libpeconv\libpeconv\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_hdrs_helper.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_mode_detector.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_raw_to_virtual.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_virtual_to_raw.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\relocate.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\util.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\buffer_util.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\remote_pe_reader.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\imports_loader.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\delayed_imports_loader.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\fix_imports.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_loader.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_dumper.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\exports_lookup.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\function_resolver.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\hooks.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\exported_func.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\exports_mapper.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\resource_parser.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\file_util.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\resource_util.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\imports_uneraser.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\load_config_util.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\load_config_defs.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\caves.h" />
+    <ClInclude Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\fix_dot_net_ep.h" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\pe_hdrs_helper.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\pe_mode_detector.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\pe_raw_to_virtual.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\pe_virtual_to_raw.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\relocate.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\buffer_util.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\remote_pe_reader.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\imports_loader.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\delayed_imports_loader.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\fix_imports.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\pe_loader.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\pe_dumper.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\exports_lookup.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\function_resolver.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\hooks.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\exported_func.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\exports_mapper.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\resource_parser.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\file_util.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\resource_util.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\imports_uneraser.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\load_config_util.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\caves.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\util.cpp" />
+    <ClCompile Include="C:\Users\Jack\source\repos\BLUESPAWN\BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\src\fix_dot_net_ep.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\Jack\source\repos\BLUESPAWN\PESieve\ZERO_CHECK.vcxproj">
+      <Project>{24088C44-179B-3139-980C-CA84E7DCB013}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
