@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="external\pe-sieve\include\pe_sieve_types.h" />
     <ClInclude Include="headers\hunt\Hunt.h" />
     <ClInclude Include="headers\hunt\HuntInfo.h" />
     <ClInclude Include="headers\hunt\HuntRegister.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1004.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1037.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1050.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1055.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1060.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1100.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1101.h" />
@@ -73,12 +75,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="headers\util\pe\Image_Loader.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="headers\util\pe\Image_Loader.h" />
     <ClInclude Include="headers\util\pe\Import_Section.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -387,6 +384,8 @@
     <ClInclude Include="grpc\generated\ReactionData.pb.h" />
     <ClInclude Include="grpc\generated\ServerServices.grpc.pb.h" />
     <ClInclude Include="grpc\generated\ServerServices.pb.h" />
+    <ClInclude Include="headers\util\processes\ProcessChecker.h" />
+    <ClInclude Include="headers\util\processes\ProcessUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="grpc\generated\ReactionData.grpc.pb.cc">
@@ -418,6 +417,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1004.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1037.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1050.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1055.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1060.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1100.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1101.cpp" />
@@ -462,12 +462,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\util\pe\Image_Loader.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="src\util\pe\Image_Loader.cpp" />
     <ClCompile Include="src\util\pe\Import_Section.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -501,10 +496,14 @@
     <ClCompile Include="src\util\processes\Analyzer.cpp" />
     <ClCompile Include="src\hunt\reaction\ReactLog.cpp" />
     <ClCompile Include="src\hunt\reaction\Reaction.cpp" />
+    <ClCompile Include="src\util\processes\ProcessUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BLUESPAWN-common\CommonLib.vcxproj">
       <Project>{25ae1d80-3e17-4e1d-bfb4-8afb375ebaf1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\PESieve\pe-sieve.vcxproj">
+      <Project>{bec01f8e-5892-3f6f-a741-5bbd1d0f4ef9}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemDefinitionGroup>
@@ -512,7 +511,7 @@
       <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\krabsetw\krabs;$(SolutionDir)BLUESPAWN-client\external\cxxopts\include;$(SolutionDir)BLUESPAWN-client\external\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-client\external\krabsetw\krabs;$(SolutionDir)BLUESPAWN-client\external\cxxopts\include;$(SolutionDir)BLUESPAWN-client\external\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;%(AdditionalDependencies)</AdditionalDependencies>

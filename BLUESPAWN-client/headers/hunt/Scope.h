@@ -10,24 +10,24 @@
  */
 class Scope {
 public:
-	virtual bool FileIsInScope(LPCSTR sFileName);
-	virtual bool FileIsInScope(HANDLE hFile);
-	virtual std::vector<HANDLE> GetScopedFileHandles();
-	virtual std::vector<LPCSTR> GetScopedFileNames();
+	virtual bool FileIsInScope(LPCSTR sFileName) const;
+	virtual bool FileIsInScope(HANDLE hFile) const;
+	virtual std::vector<HANDLE> GetScopedFileHandles() const;
+	virtual std::vector<LPCSTR> GetScopedFileNames() const;
 
-	virtual bool RegistryKeyIsInScope(LPCSTR sKeyPath);
-	virtual bool RegistryKeyIsInScope(HKEY key);
-	virtual std::vector<HKEY> GetScopedKHEYs();
-	virtual std::vector<LPCSTR> GetScopedRegKeyNames();
+	virtual bool RegistryKeyIsInScope(LPCSTR sKeyPath) const;
+	virtual bool RegistryKeyIsInScope(HKEY key) const;
+	virtual std::vector<HKEY> GetScopedKHEYs() const;
+	virtual std::vector<LPCSTR> GetScopedRegKeyNames() const;
 
-	virtual bool ProcessIsInScope(LPCSTR sProcessName);
-	virtual bool ProcessIsInScope(HANDLE hProcess);
-	virtual std::vector<HANDLE> GetScopedProcessHandles();
-	virtual std::vector<LPCSTR> GetScopedProcessNames();
+	virtual bool ProcessIsInScope(DWORD pid) const;
+	virtual bool ProcessIsInScope(HANDLE hProcess) const;
+	virtual std::vector<HANDLE> GetScopedProcessHandles() const;
+	virtual std::vector<DWORD> GetScopedProcessPIDs() const;
 
-	virtual bool ServiceIsInScope(LPCSTR sServiceName);
-	virtual bool ServiceIsInScope(SC_HANDLE hService);
-	virtual std::vector<SC_HANDLE> GetScopedServiceHandles();
-	virtual std::vector<LPCSTR> GetScopedServiceNames();
+	virtual bool ServiceIsInScope(LPCSTR sServiceName) const;
+	virtual bool ServiceIsInScope(SC_HANDLE hService) const;
+	virtual std::vector<SC_HANDLE> GetScopedServiceHandles() const;
+	virtual std::vector<LPCSTR> GetScopedServiceNames() const;
 };
 

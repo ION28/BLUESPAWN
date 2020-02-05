@@ -72,6 +72,7 @@ Want to help? Take a look at the current issues, add ideas for new features, wri
 ## Special Thanks
 We would like to provide a special thank you to the following projects that have helped us to build BLUESPAWN:
 * Microsoft's documentation and examples on the Windows API
+* hasherezade's PE Sieve (https://github.com/hasherezade/pe-sieve), which currently manages our process analytics
 * The [MITRE's ATT&CK Project](https://attack.mitre.org/) which has put together an amazing framework for which to consider, document, and categorize attacker tradercraft
 * Red Canary's [Atomic Red Team Project](https://github.com/redcanaryco/atomic-red-team) which has been incredibly useful in helping to test the detections we are building
 * [@op7ic](https://github.com/op7ic)'s [EDR-Testing-Script](https://github.com/op7ic/EDR-Testing-Script) Project
