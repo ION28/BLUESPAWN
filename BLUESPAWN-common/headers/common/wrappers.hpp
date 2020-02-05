@@ -69,9 +69,13 @@ public:
 	DWORD GetReferenceCount(){ return mReferenceCounts[WrappedObject]; }
 };
 
+class HandleWrapper : public GenericWrapper<HANDLE> {
+public:
+	HandleWrapper(HANDLE handle) :
+		GenericWrapper(handle, (void(*)(HANDLE)) CloseHandle, INVALID_HANDLE_VALUE){};
+};
 
 class AllocationWrapper {
-	
 	std::optional<std::shared_ptr<char[]>> Memory;
 	SIZE_T AllocationSize;
 
@@ -188,10 +192,133 @@ public:
 	}
 };
 
-class HandleWrapper : public GenericWrapper<HANDLE> {
+template<class T = CHAR>
+class MemoryWrapper {
+	T LocalCopy{};
+
 public:
-	HandleWrapper(HANDLE handle) : 
-		GenericWrapper(handle, (void(*)(HANDLE)) CloseHandle, INVALID_HANDLE_VALUE){};
+	T* address;
+	HandleWrapper process;
+	SIZE_T MemorySize;
+
+	MemoryWrapper(LPVOID lpMemoryBase, SIZE_T size = sizeof(T), HANDLE process = GetCurrentProcess())
+		: address{ reinterpret_cast<T*>(lpMemoryBase) }, process{ process }, MemorySize{ size } {}
+
+	T Dereference() const {
+		if(!process){
+			return *address;
+		} else {
+			T mem = {};
+			ReadProcessMemory(process, address, &mem, MemorySize, nullptr);
+			return mem;
+		}
+	}
+
+	T operator *() const {
+		return Dereference();
+	}
+	T** operator &() const {
+		return &(address);
+	}
+	operator T* () const {
+		return (address);
+	}
+	T* operator->(){
+		if(!process){
+			return address;
+		} else {
+			LocalCopy = {};
+			if(ReadProcessMemory(process, address, &LocalCopy, MemorySize, nullptr)){
+				return &LocalCopy;
+			} else {
+				return nullptr;
+			}
+		}
+	}
+
+	template<class V>
+	MemoryWrapper<V> Convert() const {
+		return { reinterpret_cast<V*>(address), MemorySize, process };
+	}
+
+	MemoryWrapper<T> GetOffset(SIZE_T offset) const {
+		if(offset > MemorySize){
+			return { nullptr, 0, process };
+		} else {
+			return { reinterpret_cast<T*>(PCHAR(address) + offset), MemorySize - offset, process };
+		}
+	}
+
+	bool CompareMemory(MemoryWrapper<T> memory) const {
+		auto data1 = Dereference();
+		auto data2 = memory.Dereference();
+		return !memcmp(&data1, &data2, min(memory.MemorySize, MemorySize));
+	}
+
+	bool Protect(DWORD protections, SIZE_T size = -1){
+		if(size == -1) size = MemorySize;
+		DWORD dwOldProtections{};
+		if(!process){
+			return VirtualProtect(address, size, protections, &dwOldProtections);
+		} else {
+			return VirtualProtectEx(process, address, size, protections, &dwOldProtections);
+		}
+	}
+
+	std::string ReadString(){
+		if(!process){
+			return std::string{ reinterpret_cast<char*>(address) };
+		} else {
+			int idx = 0;
+			int maxIdx = 10;
+			char* memory = new char[maxIdx * 2];
+			bool valid = false;
+			while(!valid && !ReadProcessMemory(process, address, memory, maxIdx = min(maxIdx * 2, MemorySize), nullptr)){
+				for(; idx < maxIdx; idx++){
+					if(memory[idx] == 0){
+						valid = true;
+						break;
+					}
+					delete[] memory;
+					memory = new char[maxIdx * 2];
+				}
+			}
+			if(valid){
+				return std::string{ memory };
+			} else {
+				return std::string{};
+			}
+		}
+	}
+
+	std::wstring ReadWstring(){
+		if(!process){
+			return std::wstring{ reinterpret_cast<WCHAR*>(address) };
+		} else {
+			int idx = 0;
+			int maxIdx = 10;
+			wchar_t* memory = new wchar_t[maxIdx * 2];
+			bool valid = false;
+			while(!valid && !ReadProcessMemory(process, address, memory, (maxIdx = min(maxIdx * 2, MemorySize / sizeof(WCHAR))) * sizeof(WCHAR), nullptr)){
+				for(; idx < maxIdx; idx++){
+					if(memory[idx] == 0){
+						valid = true;
+						break;
+					}
+				}
+				delete[] memory;
+				memory = new wchar_t[maxIdx * 2];
+			}
+			if(valid){
+				return std::wstring{ memory };
+			} else {
+				return std::wstring{};
+			}
+		}
+	}
+
+	operator bool() const { return address; }
+	bool operator !() const { return !address; }
 };
 
 #define WRAP(type, name, value, function) \

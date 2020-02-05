@@ -1,53 +1,53 @@
 #include "hunt/Scope.h"
 
-bool Scope::FileIsInScope(LPCSTR sFileName){
+bool Scope::FileIsInScope(LPCSTR sFileName) const {
 	return true;
 }
-bool Scope::FileIsInScope(HANDLE hFile){
+bool Scope::FileIsInScope(HANDLE hFile) const {
 	return true;
 }
-std::vector<HANDLE> Scope::GetScopedFileHandles(){
+std::vector<HANDLE> Scope::GetScopedFileHandles() const {
 	return std::vector<HANDLE>();
 }
-std::vector<LPCSTR> Scope::GetScopedFileNames(){
+std::vector<LPCSTR> Scope::GetScopedFileNames() const {
 	return std::vector<LPCSTR>();
 }
 
-bool Scope::RegistryKeyIsInScope(LPCSTR sKeyPath){
+bool Scope::RegistryKeyIsInScope(LPCSTR pid) const {
 	return true;
 }
-bool Scope::RegistryKeyIsInScope(HKEY key){
+bool Scope::RegistryKeyIsInScope(HKEY key) const {
 	return true;
 }
-std::vector<HKEY> Scope::GetScopedKHEYs(){
+std::vector<HKEY> Scope::GetScopedKHEYs() const {
 	return std::vector<HKEY>();
 }
-std::vector<LPCSTR> Scope::GetScopedRegKeyNames(){
+std::vector<LPCSTR> Scope::GetScopedRegKeyNames() const {
 	return std::vector<LPCSTR>();
 }
 
-bool Scope::ProcessIsInScope(LPCSTR sProcessName){
+bool Scope::ProcessIsInScope(DWORD sProcessName) const {
 	return true;
 }
-bool Scope::ProcessIsInScope(HANDLE hProcess){
+bool Scope::ProcessIsInScope(HANDLE hProcess) const {
 	return true;
 }
-std::vector<HANDLE> Scope::GetScopedProcessHandles(){
+std::vector<HANDLE> Scope::GetScopedProcessHandles() const {
 	return std::vector<HANDLE>();
 }
-std::vector<LPCSTR> Scope::GetScopedProcessNames(){
-	return std::vector<LPCSTR>();
+std::vector<DWORD> Scope::GetScopedProcessPIDs() const {
+	return std::vector<DWORD>();
 }
 
-bool Scope::ServiceIsInScope(LPCSTR sServiceName){
+bool Scope::ServiceIsInScope(LPCSTR sServiceName) const {
 	return true;
 }
-bool Scope::ServiceIsInScope(SC_HANDLE hService){
+bool Scope::ServiceIsInScope(SC_HANDLE hService) const {
 	return true;
 }
-std::vector<SC_HANDLE> Scope::GetScopedServiceHandles(){
+std::vector<SC_HANDLE> Scope::GetScopedServiceHandles() const {
 	return std::vector<SC_HANDLE>();
 }
-std::vector<LPCSTR> Scope::GetScopedServiceNames(){
+std::vector<LPCSTR> Scope::GetScopedServiceNames() const {
 	return std::vector<LPCSTR>();
 }
