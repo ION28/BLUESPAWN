@@ -21,6 +21,6 @@ namespace Hunts {
 	public:
 		HuntT1055(HuntRegister& record);
 
-		virtual int ScanCursory(const Scope& scope, Reaction reaction) override;
+		virtual int ScanNormal(const Scope& scope, Reaction reaction) override;
 	};
 }

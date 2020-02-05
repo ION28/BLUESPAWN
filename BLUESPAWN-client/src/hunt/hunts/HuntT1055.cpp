@@ -19,7 +19,7 @@ namespace Hunts{
 
 	HuntT1055::HuntT1055(HuntRegister& record) : Hunt(record, L"T1055 - Process Injection") {
 		// TODO: update these categories
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
+		dwSupportedScans = (DWORD) Aggressiveness::Normal;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
@@ -83,8 +83,8 @@ namespace Hunts{
 		return false;
 	}
 
-	int HuntT1055::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for T1055 - Process Injection");
+	int HuntT1055::ScanNormal(const Scope& scope, Reaction reaction){
+		LOG_INFO("Hunting for T1055 - Process Injection at level Normal");
 		reaction.BeginHunt(GET_INFO());
 
 		int identified = 0;
