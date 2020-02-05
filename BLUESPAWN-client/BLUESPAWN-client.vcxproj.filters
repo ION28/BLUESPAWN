@@ -1089,6 +1089,9 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63597.h">
       <Filter>Header Files\mitigation\mitigations</Filter>
     </ClInclude>
+    <ClInclude Include="headers\util\eventlogs\EventSubscription.h">
+      <Filter>Header Files\util\eventlogs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\hunt\Hunt.cpp">
@@ -1246,6 +1249,9 @@
     </ClCompile>
     <ClCompile Include="src\mitigation\mitigations\MitigateV63597.cpp">
       <Filter>Source Files\mitigation\mitigations</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\eventlogs\EventSubscription.cpp">
+      <Filter>Source Files\util\eventlogs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

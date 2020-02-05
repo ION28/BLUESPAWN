@@ -5,8 +5,17 @@
 
 const int SIZE_DATA = 4096;
 
-DWORD GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param)
-{
+EventLogs* EventLogs::logs = NULL;
+
+/**
+The callback function directly called by event subscriptions.
+In turn it calls the EventSubscription::SubscriptionCallback of a specific class instance.
+*/
+DWORD WINAPI CallbackWrapper(EVT_SUBSCRIBE_NOTIFY_ACTION Action, PVOID UserContext, EVT_HANDLE Event) {
+	return reinterpret_cast<EventSubscription*>(UserContext)->SubscriptionCallback(Action, Event);
+}
+
+DWORD EventLogs::GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param) {
 	DWORD status = ERROR_SUCCESS;
 	EVT_HANDLE hContext = NULL;
 	DWORD dwBufferSize = 0;
@@ -92,7 +101,7 @@ cleanup:
 	return status;
 }
 
-DWORD GetEventXML(EVT_HANDLE hEvent, std::wstring * data)
+DWORD EventLogs::GetEventXML(EVT_HANDLE hEvent, std::wstring * data)
 {
 	DWORD status = ERROR_SUCCESS;
 	DWORD dwBufferSize = 0;
@@ -136,7 +145,7 @@ cleanup:
 }
 
 // Enumerate all the events in the result set. 
-DWORD ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std::set<std::wstring> &params)
+DWORD EventLogs::ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std::set<std::wstring> &params)
 {
 	DWORD status = ERROR_SUCCESS;
 	EVT_HANDLE hEvents[ARRAY_SIZE];
@@ -211,12 +220,12 @@ cleanup:
 	return status;
 }
 
-int QueryEvents(const wchar_t* channel, unsigned int id, Reaction& reaction)
+int EventLogs::QueryEvents(const wchar_t* channel, unsigned int id, Reaction& reaction)
 {
 	return QueryEvents(channel, id, std::set<std::wstring>(), reaction);
 }
 
-int QueryEvents(const wchar_t* channel, unsigned int id, std::set<std::wstring>& params, Reaction& reaction)
+int EventLogs::QueryEvents(const wchar_t* channel, unsigned int id, std::set<std::wstring>& params, Reaction& reaction)
 {
 	DWORD status = ERROR_SUCCESS;
 	EVT_HANDLE hResults = NULL;
@@ -252,4 +261,35 @@ cleanup:
 	if (status == ERROR_SUCCESS)
 		return numFound;
 	return -1;
+}
+
+DWORD EventLogs::subscribe(LPWSTR pwsPath, unsigned int id, Reaction& reaction) {
+	DWORD status = ERROR_SUCCESS;
+	EVT_HANDLE hSubscription = NULL;
+
+	auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
+	auto wquery = query.c_str();
+
+	auto eventSub = EventSubscription(reaction);
+	subscriptionList.push_back(eventSub);
+
+	// Subscribe to events beginning with the oldest event in the channel. The subscription
+	// will return all current events in the channel and any future events that are raised
+	// while the application is active.
+	hSubscription = EvtSubscribe(NULL, NULL, pwsPath, wquery, NULL, reinterpret_cast<void*>(&eventSub),
+		CallbackWrapper, EvtSubscribeStartAtOldestRecord);
+
+	if (hSubscription != NULL)
+		return status;
+
+	// Cleanup a failed subscription
+	status = GetLastError();
+
+	if (ERROR_EVT_CHANNEL_NOT_FOUND == status)
+		wprintf(L"Channel %s was not found.\n", pwsPath);
+	else if (ERROR_EVT_INVALID_QUERY == status)
+		// You can call EvtGetExtendedStatus to get information as to why the query is not valid.
+		wprintf(L"The query \"%s\" is not valid.\n", wquery);
+	else
+		wprintf(L"EvtSubscribe failed with %lu.\n", status);
 }
