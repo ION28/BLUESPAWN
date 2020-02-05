@@ -142,6 +142,7 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
 	Reaction reaction = Reactions::LogReaction();
+	subscribe(L"Security", L"Event/System[EventID=4720]", reaction);
 	io.InformUser(L"Starting a Hunt");
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
 }
