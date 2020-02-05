@@ -28,6 +28,7 @@
     </BuildLog>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <UndefinePreprocessorDefinitions>UNICODE</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;%(AdditionalDependencies)</AdditionalDependencies>
