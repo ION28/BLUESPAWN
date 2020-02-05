@@ -502,7 +502,7 @@
     <ProjectReference Include="..\BLUESPAWN-common\CommonLib.vcxproj">
       <Project>{25ae1d80-3e17-4e1d-bfb4-8afb375ebaf1}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\PESieve\pe-sieve.vcxproj">
+    <ProjectReference Include="pe-sieve.vcxproj">
       <Project>{bec01f8e-5892-3f6f-a741-5bbd1d0f4ef9}</Project>
     </ProjectReference>
   </ItemGroup>
