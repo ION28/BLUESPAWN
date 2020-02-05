@@ -1,7 +1,0 @@
-C:/Users/Jack/source/repos/BLUESPAWN/PESieve/CMakeFiles/pe-sieve.dir
-C:/Users/Jack/source/repos/BLUESPAWN/PESieve/CMakeFiles/INSTALL.dir
-C:/Users/Jack/source/repos/BLUESPAWN/PESieve/CMakeFiles/ALL_BUILD.dir
-C:/Users/Jack/source/repos/BLUESPAWN/PESieve/CMakeFiles/ZERO_CHECK.dir
-C:/Users/Jack/source/repos/BLUESPAWN/PESieve/libpeconv/libpeconv/CMakeFiles/libpeconv.dir
-C:/Users/Jack/source/repos/BLUESPAWN/PESieve/libpeconv/libpeconv/CMakeFiles/INSTALL.dir
-C:/Users/Jack/source/repos/BLUESPAWN/PESieve/libpeconv/libpeconv/CMakeFiles/ALL_BUILD.dir
