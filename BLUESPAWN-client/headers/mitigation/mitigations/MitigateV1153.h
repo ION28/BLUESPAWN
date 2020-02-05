@@ -5,8 +5,7 @@
 namespace Mitigations{
 
 	/**
-	 * MitigateV1153 ensures NTLMv2 is used
-	 * (V-1093, CCI-001090).
+	 * MitigateV1153 ensures NTLMv2 is used (V-1153).
 	 */
 	class MitigateV1153 : public Mitigation {
 	public:
