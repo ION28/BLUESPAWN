@@ -30,6 +30,7 @@ int main(int argc, char* argv[]){
 
 	options.add_options()
 		("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
+		("n,monitor", "Monitor the System for Malicious Activity. Available options are Cursory, Normal, or Intensive.", cxxopts::value<std::string>()->implicit_value("Normal"))
 		("m,mitigate", "Mitigates vulnerabilities by applying security settings. Available options are audit and enforce.", cxxopts::value<std::string>()->implicit_value("audit"))
 		("help", "Help Information. You can also specify a category for help on a specific module such as hunt"
 			, cxxopts::value<std::string>()->implicit_value("general"))
@@ -73,6 +74,9 @@ int main(int argc, char* argv[]){
 		else if (result.count("hunt")) {
 			dispatch_hunt(result, options, io);
 		}
+		else if (result.count("monitor")) {
+			monitor_system(result, options, io);
+		}
 		else if (result.count("mitigate")) {
 			dispatch_mitigations_analysis(result, options, io);
 		}
@@ -105,20 +109,24 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io) {
 	std::string sHuntLevelFlag = "Normal";
 	Aggressiveness aHuntLevel;
-	if(result.count("level")) {
+	if (result.count("level")) {
 		try {
 			sHuntLevelFlag = result["level"].as < std::string >();
-		} catch(int e) {
+		}
+		catch (int e) {
 			std::cerr << "Error " << e << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive" << std::endl;
 		}
 	}
-	if(sHuntLevelFlag == "Cursory") {
+	if (sHuntLevelFlag == "Cursory") {
 		aHuntLevel = Aggressiveness::Cursory;
-	} else if(sHuntLevelFlag == "Normal") {
+	}
+	else if (sHuntLevelFlag == "Normal") {
 		aHuntLevel = Aggressiveness::Normal;
-	} else if (sHuntLevelFlag == "Intensive") {
+	}
+	else if (sHuntLevelFlag == "Intensive") {
 		aHuntLevel = Aggressiveness::Intensive;
-	} else {
+	}
+	else {
 		std::cerr << "Error " << sHuntLevelFlag << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive" << std::endl;
 		std::cerr << "Will default to Normal for this run." << std::endl;
 		aHuntLevel = Aggressiveness::Normal;
@@ -146,7 +154,6 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
 }
 
-
 void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io) {
 	bool bForceEnforce = false;
 	if (result.count("force")) {
@@ -170,4 +177,33 @@ void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options
 		io.InformUser(L"Auditing Mitigations");
 		record.AuditMitigations(SecurityLevel::High);
 	}
+}
+
+void monitor_system(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io) {
+	std::string sHuntLevelFlag = "Normal";
+	Aggressiveness aHuntLevel;
+	if (result.count("monitor")) {
+		try {
+			sHuntLevelFlag = result["monitor"].as < std::string >();
+		}
+		catch (int e) {
+			std::cerr << "Error " << e << " - Unknown monitor level. Please specify either Cursory, Normal, or Intensive" << std::endl;
+		}
+	}
+	if (sHuntLevelFlag == "Cursory") {
+		aHuntLevel = Aggressiveness::Cursory;
+	}
+	else if (sHuntLevelFlag == "Normal") {
+		aHuntLevel = Aggressiveness::Normal;
+	}
+	else if (sHuntLevelFlag == "Intensive") {
+		aHuntLevel = Aggressiveness::Intensive;
+	}
+	else {
+		std::cerr << "Error " << sHuntLevelFlag << " - Unknown monitor level. Please specify either Cursory, Normal, or Intensive" << std::endl;
+		std::cerr << "Will default to Normal." << std::endl;
+		aHuntLevel = Aggressiveness::Normal;
+	}
+
+	
 }

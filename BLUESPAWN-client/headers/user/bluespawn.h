@@ -51,3 +51,4 @@
 void print_help(cxxopts::ParseResult result, cxxopts::Options options);
 void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io);
 void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io);
+void monitor_system(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io);
