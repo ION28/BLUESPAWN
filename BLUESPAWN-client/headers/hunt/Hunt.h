@@ -29,6 +29,8 @@ protected:
 public:
 	Hunt(HuntRegister& hr, const std::wstring& name);
 
+	std::wstring GetName();
+
 	bool UsesTactics(DWORD tactics);
 	bool UsesSources(DWORD sources);
 	bool AffectsCategory(DWORD category);
