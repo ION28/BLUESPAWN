@@ -103,13 +103,14 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 }
 
 void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io) {
-	std::string sHuntLevelFlag = "Normal";
+	std::string sHuntLevelFlag = "Cursory";
 	Aggressiveness aHuntLevel;
 	if(result.count("level")) {
 		try {
 			sHuntLevelFlag = result["level"].as < std::string >();
 		} catch(int e) {
-			std::cerr << "Error " << e << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive" << std::endl;
+			LOG_ERROR("Error " << e << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
+			io.InformUser(L"Error " + std::to_wstring(e) + L" - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
 		}
 	}
 	if(sHuntLevelFlag == "Cursory") {
@@ -119,9 +120,11 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase
 	} else if (sHuntLevelFlag == "Intensive") {
 		aHuntLevel = Aggressiveness::Intensive;
 	} else {
-		std::cerr << "Error " << sHuntLevelFlag << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive" << std::endl;
-		std::cerr << "Will default to Normal for this run." << std::endl;
-		aHuntLevel = Aggressiveness::Normal;
+		LOG_ERROR("Error " << sHuntLevelFlag << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
+		LOG_ERROR("Will default to Cursory for this run.");
+		io.InformUser(L"Error " + StringToWidestring(sHuntLevelFlag) + L" - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
+		io.InformUser(L"Will default to Cursory for this run.");
+		aHuntLevel = Aggressiveness::Cursory;
 	}
 
 	HuntRegister record{io};
@@ -143,7 +146,6 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
 	Reaction reaction = Reactions::LogReaction();
-	io.InformUser(L"Starting a Hunt");
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
 }
 
