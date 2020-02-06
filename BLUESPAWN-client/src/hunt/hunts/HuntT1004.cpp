@@ -9,7 +9,7 @@ using namespace Registry;
 
 namespace Hunts {
 
-	HuntT1004::HuntT1004(HuntRegister& record) : Hunt(record, L"T1004 - Winlogon Helper DLL") {
+	HuntT1004::HuntT1004() : Hunt(L"T1004 - Winlogon Helper DLL") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;

@@ -20,7 +20,7 @@ namespace Hunts {
 		std::vector<std::wstring> okAuthPackages = { L"msv1_0", L"SshdPinAuthLsa" };
 		std::vector<std::wstring> okNotifPackages = { L"scecli" };
 	public:
-		HuntT1131(HuntRegister& record);
+		HuntT1131();
 
 		virtual int ScanCursory(const Scope& scope, Reaction reaction);
 	};

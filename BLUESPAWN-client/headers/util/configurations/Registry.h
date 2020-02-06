@@ -94,7 +94,7 @@ namespace Registry {
 		 *
 		 * @return true if the referenced key has the given value; false otherwise
 		 */
-		bool ValueExists(std::wstring wsValueName) const;
+		bool ValueExists(const std::wstring& wsValueName) const;
 
 		/**
 		 * If the registry key referenced by this instance doesn't exist, this will create it.
@@ -109,7 +109,7 @@ namespace Registry {
 		 * @return A AllocationWrapper object pointing to the bytes read if the value is present, or
 		 *	       an empty memory wrapper if the value is not present. The memory must be freed.
 		 */
-		AllocationWrapper GetRawValue(std::wstring wsValueName) const;
+		AllocationWrapper GetRawValue(const std::wstring& wsValueName) const;
 
 		/**
 		 * Writes bytes to a given value under the key referenced by this object.
@@ -120,7 +120,7 @@ namespace Registry {
 		 *
 		 * @return True if the value was successfully set; false otherwise
 		 */
-		bool SetRawValue(std::wstring name, AllocationWrapper bytes, DWORD type = REG_BINARY) const;
+		bool SetRawValue(const std::wstring& name, AllocationWrapper bytes, DWORD type = REG_BINARY) const;
 
 		/**
 		 * Reads data from the specified value and handles conversion to common types.
@@ -134,7 +134,7 @@ namespace Registry {
 		 *		   occured or the value does exist.
 		 */
 		template<class T>
-		std::optional<T> GetValue(std::wstring wsValueName) const;
+		std::optional<T> GetValue(const std::wstring& wsValueName) const;
 
 		/**
 		 * Returns the type of a value under the currently referenced registry key.
@@ -145,7 +145,7 @@ namespace Registry {
 		 * @return An optional containing the registry type, or nullopt if the value does not exist or
 		 *		   an error ocurred.
 		 */
-		std::optional<RegistryType> GetValueType(std::wstring wsValueName) const;
+		std::optional<RegistryType> GetValueType(const std::wstring& wsValueName) const;
 
 		/**
 		 * Sets data for a specified value under the referenced key and handles conversions from
@@ -163,7 +163,7 @@ namespace Registry {
 		 * @return True if the value was successfully set; false otherwise.
 		 */
 		template<class T>
-		bool SetValue(std::wstring name, T value, DWORD size = sizeof(T), DWORD type = REG_BINARY) const;
+		bool SetValue(const std::wstring&, T value, DWORD size = sizeof(T), DWORD type = REG_BINARY) const;
 
 		/**
 		 * Returns a list of values present under the currently referenced registry key.
@@ -186,7 +186,22 @@ namespace Registry {
 		 */
 		std::wstring GetName() const;
 
+		/**
+		 * Returns the full path of the referenced registry key.
+		 *
+		 * @return the full path of the referenced registry key.
+		 */
 		virtual std::wstring ToString() const;
-		bool operator<(RegistryKey key) const;
+
+		/**
+		 * Override the < operator so registry keys can be used in sets, maps, and trees.
+		 *
+		 * @param key The key to compare
+		 *
+		 * @return true or false
+		 */
+		bool operator<(const RegistryKey& key) const;
+
+		bool RemoveValue(const std::wstring& wsValueName) const;
 	};
 }

@@ -7,7 +7,7 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1101::HuntT1101(HuntRegister& record) : Hunt(record, L"T1101 - Security Support Provider") {
+	HuntT1101::HuntT1101() : Hunt(L"T1101 - Security Support Provider") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
