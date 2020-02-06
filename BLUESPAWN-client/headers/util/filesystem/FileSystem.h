@@ -30,6 +30,10 @@ namespace FileSystem {
 		wstring extension;
 	};
 
+	struct FileSearchAttribs {
+		std::vector<wstring> extensions;
+	};
+
 	class File {
 		//Whether or not this current file actually exists
 		bool FileExists; 
@@ -210,7 +214,7 @@ namespace FileSystem {
 		*
 		* @return all files that match the given parameters
 		*/
-		std::vector<File*>* GetFiles(IN FileAttribs* attribs = NULL, IN int recurDepth = 0);
+		std::vector<File*>* GetFiles(IN FileSearchAttribs* attribs = NULL, IN int recurDepth = 0);
 		~Folder();
 	};
 }
