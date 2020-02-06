@@ -2,6 +2,7 @@
 
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
+#include "common/StringUtils.h"
 
 namespace Hunts {
 	HuntT1100::HuntT1100(HuntRegister& record) : Hunt(record, L"T1100 - Web Shells") {
@@ -50,7 +51,7 @@ namespace Hunts {
 			for (const auto& entry : *files) {
 				long offset = 0;
 				long targetAmount = 1000000;
-				CHAR* read = (CHAR *)calloc(targetAmount + 1, 1);
+				CHAR* read = (CHAR *)calloc(targetAmount + 1L, 1);
 				DWORD amountRead = 0;
 				wstring file_ext = entry->GetFileAttribs().extension;
 				do {
@@ -60,18 +61,18 @@ namespace Hunts {
 					transform(sus_file.begin(), sus_file.end(), sus_file.begin(), ::tolower);
 					if (file_ext.compare(L".php") == 0) {
 						if (regex_search(sus_file, match_index, php_vuln_functions)) {
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry->GetFilePath())<< " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					else if (file_ext.substr(0, 4).compare(L".jsp") == 0) {
 						if (regex_search(sus_file, match_index, jsp_indicators)) {
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry->GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					else if (file_ext.substr(0, 3).compare(L".as") == 0) {
 						if (regex_search(sus_file, match_index, asp_indicators)) {
 							identified++;
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry->GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					offset += amountRead - 1000;
@@ -118,20 +119,20 @@ namespace Hunts {
 					if (file_ext.compare(L".php") == 0) {
 						if (regex_search(sus_file, match_index, php_vuln_functions)) {
 							identified++;
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry->GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					else if (file_ext.substr(0, 4).compare(L".jsp") == 0) {
 						if (regex_search(sus_file, match_index, jsp_indicators)) {
 							identified++;
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry->GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 
 					else if (file_ext.substr(0, 3).compare(L".as") == 0) {
 						if (regex_search(sus_file, match_index, asp_indicators)) {
 							identified++;
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry->GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}					offset += amountRead - 1000;
 				} while (targetAmount <= amountRead);
