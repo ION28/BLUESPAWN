@@ -1092,6 +1092,9 @@
     <ClInclude Include="headers\util\eventlogs\EventSubscription.h">
       <Filter>Header Files\util\eventlogs</Filter>
     </ClInclude>
+    <ClInclude Include="headers\hunt\reaction\HuntTrigger.h">
+      <Filter>Header Files\hunt\reaction</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\hunt\Hunt.cpp">
@@ -1252,6 +1255,9 @@
     </ClCompile>
     <ClCompile Include="src\util\eventlogs\EventSubscription.cpp">
       <Filter>Source Files\util\eventlogs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\reaction\HuntTrigger.cpp">
+      <Filter>Source Files\hunt\reaction</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

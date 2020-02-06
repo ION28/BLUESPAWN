@@ -28,4 +28,7 @@ public:
 	void RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
 
 	void RegisterHunt(Hunt* hunt);
+
+	void SetupMonitoring(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
+
 };

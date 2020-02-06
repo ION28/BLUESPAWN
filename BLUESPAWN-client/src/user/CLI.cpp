@@ -17,7 +17,7 @@ CLI::CLI() :
 	input{ input },
 	output{ output }
 {
-	instances.emplace(std::pair(input, output), *this);
+	//instances.emplace(std::pair(input, output), *this);
 }
 void SetConsoleColor(MessageColor color) {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);

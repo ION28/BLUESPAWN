@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <winevt.h>
 #include "hunt/reaction/Reaction.h"
+#include "hunt/reaction/HuntTrigger.h"
 #include <set>
 #include "util/eventlogs/EventSubscription.h"
 
@@ -42,7 +43,9 @@ class EventLogs {
 		DWORD GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param);
 		DWORD GetEventXML(EVT_HANDLE hEvent, std::wstring* data);
 
-		DWORD subscribe(LPWSTR pwsPath, unsigned int id, Reaction& reaction);
+		DWORD EventToDetection(EVT_HANDLE hEvent, EVENT_DETECTION * pDetection, std::set<std::wstring>& params);
+
+		DWORD subscribe(LPWSTR pwsPath, unsigned int id, std::shared_ptr<Reactions::HuntTriggerReaction> reaction);
 
 	private:
 		DWORD ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std::set<std::wstring>& params);
@@ -50,5 +53,5 @@ class EventLogs {
 		EventLogs() {};
 		static EventLogs* logs;
 
-		std::vector<EventSubscription> subscriptionList;
+		std::vector<std::shared_ptr<EventSubscription>> subscriptionList;
 };

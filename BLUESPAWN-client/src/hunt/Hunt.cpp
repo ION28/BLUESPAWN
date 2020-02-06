@@ -43,6 +43,8 @@ int Hunt::ScanIntensive(const Scope& scope, Reaction reaction){
 	return 0;
 }
 
+void Hunt::SetupMonitoring(HuntRegister& record, const Scope& scope, Aggressiveness level, Reaction reaction) {}
+
 bool Hunt::AffectsCategory(DWORD dwStuff){
 	return (dwStuff && dwCategoriesAffected) == dwStuff;
 }

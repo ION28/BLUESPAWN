@@ -8,6 +8,69 @@
 
 #include <iostream>
 
+IOBase& Bluespawn::io = CLI();
+HuntRegister Bluespawn::huntRecord{ io };
+MitigationRegister Bluespawn::mitigationRecord{ io };
+
+Bluespawn::Bluespawn() {
+	using namespace Hunts;
+
+	HuntT1004* t1004 = new HuntT1004(huntRecord);
+	HuntT1037* t1037 = new HuntT1037(huntRecord);
+	HuntT1050* t1050 = new HuntT1050(huntRecord);
+	HuntT1060* t1060 = new HuntT1060(huntRecord);
+	HuntT1100* t1100 = new HuntT1100(huntRecord);
+	HuntT1101* t1101 = new HuntT1101(huntRecord);
+	HuntT1103* t1103 = new HuntT1103(huntRecord);
+	HuntT1131* t1131 = new HuntT1131(huntRecord);
+	HuntT1138* t1138 = new HuntT1138(huntRecord);
+	HuntT1182* t1182 = new HuntT1182(huntRecord);
+	HuntT1183* t1183 = new HuntT1183(huntRecord);
+
+	using namespace Mitigations;
+	MitigateV1093* v1093 = new MitigateV1093(mitigationRecord);
+	MitigateV1153* v1153 = new MitigateV1153(mitigationRecord);
+	MitigateV3338* v3338 = new MitigateV3338(mitigationRecord);
+	MitigateV63597* v63597 = new MitigateV63597(mitigationRecord);
+	MitigateV72753* v72753 = new MitigateV72753(mitigationRecord);
+	MitigateV73519* v73519 = new MitigateV73519(mitigationRecord);
+}
+
+void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
+	DWORD tactics = UINT_MAX;
+	DWORD dataSources = UINT_MAX;
+	DWORD affectedThings = UINT_MAX;
+	Scope scope{};
+	Reaction reaction = Reactions::LogReaction();
+
+	io.InformUser(L"Starting a Hunt");
+	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+}
+
+void Bluespawn::dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce) {
+	if (mode == MitigationMode::Enforce) {
+		io.InformUser(L"Enforcing Mitigations");
+		mitigationRecord.EnforceMitigations(SecurityLevel::High, bForceEnforce);
+	}
+	else {
+		io.InformUser(L"Auditing Mitigations");
+		mitigationRecord.AuditMitigations(SecurityLevel::High);
+	}
+}
+
+void Bluespawn::monitor_system(Aggressiveness aHuntLevel) {
+	DWORD tactics = UINT_MAX;
+	DWORD dataSources = UINT_MAX;
+	DWORD affectedThings = UINT_MAX;
+	Scope scope{};
+	Reaction reaction = Reactions::LogReaction();
+
+	io.InformUser(L"Monitoring the system");
+	huntRecord.SetupMonitoring(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+
+	while (true) {}
+}
+
 int main(int argc, char* argv[]){
 	Linker::LinkFunctions();
 
@@ -16,15 +79,9 @@ int main(int argc, char* argv[]){
 	Log::AddSink(DebugOutput);
 	Log::AddHuntSink(ConsoleOutput);
 
-	IOBase& io = CLI();
+	Bluespawn bluespawn;
 
 	print_banner();
-
-	/*
-	// Create and initialize the ETW wrapper
-	ETW_Wrapper wrapper;
-	wrapper.init();
-	*/
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
@@ -71,14 +128,57 @@ int main(int argc, char* argv[]){
 		if (result.count("help")) {
 			print_help(result, options);
 		}
-		else if (result.count("hunt")) {
-			dispatch_hunt(result, options, io);
-		}
-		else if (result.count("monitor")) {
-			monitor_system(result, options, io);
+		else if (result.count("hunt") || result.count("monitor")) {
+			// Parse the hunt level
+			std::string sHuntLevelFlag = "Normal";
+			Aggressiveness aHuntLevel;
+			if (result.count("monitor")) {
+				try {
+					sHuntLevelFlag = result["monitor"].as < std::string >();
+				}
+				catch (int e) {
+					std::cerr << "Error " << e << " - Unknown monitor level. Please specify either Cursory, Normal, or Intensive" << std::endl;
+				}
+			} else if (result.count("level")) {
+				try {
+					sHuntLevelFlag = result["level"].as < std::string >();
+				}
+				catch (int e) {
+					std::cerr << "Error " << e << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive" << std::endl;
+				}
+			}
+
+			if (sHuntLevelFlag == "Cursory") {
+				aHuntLevel = Aggressiveness::Cursory;
+			}
+			else if (sHuntLevelFlag == "Normal") {
+				aHuntLevel = Aggressiveness::Normal;
+			}
+			else if (sHuntLevelFlag == "Intensive") {
+				aHuntLevel = Aggressiveness::Intensive;
+			}
+			else {
+				std::cerr << "Error " << sHuntLevelFlag << " - Unknown level. Please specify either Cursory, Normal, or Intensive" << std::endl;
+				std::cerr << "Will default to Normal." << std::endl;
+				aHuntLevel = Aggressiveness::Normal;
+			}
+			
+			if (result.count("hunt"))
+				bluespawn.dispatch_hunt(aHuntLevel);
+			else if (result.count("monitor"))
+				bluespawn.monitor_system(aHuntLevel);
+
 		}
 		else if (result.count("mitigate")) {
-			dispatch_mitigations_analysis(result, options, io);
+			bool bForceEnforce = false;
+			if (result.count("force"))
+				bForceEnforce = true;
+
+			MitigationMode mode = MitigationMode::Audit;
+			if (result["mitigate"].as<std::string>() == "e" || result["mitigate"].as<std::string>() == "enforce")
+				mode = MitigationMode::Enforce;
+
+			bluespawn.dispatch_mitigations_analysis(mode, bForceEnforce);
 		}
 		else {
 			LOG_ERROR("Nothing to do. Use the -h or --hunt flags to launch a hunt");
@@ -104,106 +204,4 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 	else {
 		std::cerr << ("Unknown help category") << std::endl;
 	}
-}
-
-void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io) {
-	std::string sHuntLevelFlag = "Normal";
-	Aggressiveness aHuntLevel;
-	if (result.count("level")) {
-		try {
-			sHuntLevelFlag = result["level"].as < std::string >();
-		}
-		catch (int e) {
-			std::cerr << "Error " << e << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive" << std::endl;
-		}
-	}
-	if (sHuntLevelFlag == "Cursory") {
-		aHuntLevel = Aggressiveness::Cursory;
-	}
-	else if (sHuntLevelFlag == "Normal") {
-		aHuntLevel = Aggressiveness::Normal;
-	}
-	else if (sHuntLevelFlag == "Intensive") {
-		aHuntLevel = Aggressiveness::Intensive;
-	}
-	else {
-		std::cerr << "Error " << sHuntLevelFlag << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive" << std::endl;
-		std::cerr << "Will default to Normal for this run." << std::endl;
-		aHuntLevel = Aggressiveness::Normal;
-	}
-
-	HuntRegister record{io};
-	Hunts::HuntT1004 t1004(record);
-	Hunts::HuntT1037 t1037(record);
-	Hunts::HuntT1050 t1050(record);
-	Hunts::HuntT1060 t1060(record);
-	Hunts::HuntT1100 t1100(record);
-	Hunts::HuntT1101 t1101(record);
-	Hunts::HuntT1103 t1103(record);
-	Hunts::HuntT1131 t1131(record);
-	Hunts::HuntT1138 t1138(record);
-	Hunts::HuntT1182 t1182(record);
-	Hunts::HuntT1183 t1183(record);
-
-	DWORD tactics = UINT_MAX;
-	DWORD dataSources = UINT_MAX;
-	DWORD affectedThings = UINT_MAX;
-	Scope scope{};
-	Reaction reaction = Reactions::LogReaction();
-	io.InformUser(L"Starting a Hunt");
-	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
-}
-
-void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io) {
-	bool bForceEnforce = false;
-	if (result.count("force")) {
-		bForceEnforce = true;
-	}
-
-	MitigationRegister record{io};
-
-	Mitigations::MitigateV1093 v1093(record);
-	Mitigations::MitigateV1093 v1153(record);
-	Mitigations::MitigateV3338 v3338(record);
-	Mitigations::MitigateV63597 v63597(record);
-	Mitigations::MitigateV72753 v72753(record);
-	Mitigations::MitigateV73519 v73519(record);
-
-	if (result["mitigate"].as<std::string>() == "e" || result["mitigate"].as<std::string>() == "enforce") {
-		io.InformUser(L"Enforcing Mitigations");
-		record.EnforceMitigations(SecurityLevel::High, bForceEnforce);
-	}
-	else {
-		io.InformUser(L"Auditing Mitigations");
-		record.AuditMitigations(SecurityLevel::High);
-	}
-}
-
-void monitor_system(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io) {
-	std::string sHuntLevelFlag = "Normal";
-	Aggressiveness aHuntLevel;
-	if (result.count("monitor")) {
-		try {
-			sHuntLevelFlag = result["monitor"].as < std::string >();
-		}
-		catch (int e) {
-			std::cerr << "Error " << e << " - Unknown monitor level. Please specify either Cursory, Normal, or Intensive" << std::endl;
-		}
-	}
-	if (sHuntLevelFlag == "Cursory") {
-		aHuntLevel = Aggressiveness::Cursory;
-	}
-	else if (sHuntLevelFlag == "Normal") {
-		aHuntLevel = Aggressiveness::Normal;
-	}
-	else if (sHuntLevelFlag == "Intensive") {
-		aHuntLevel = Aggressiveness::Intensive;
-	}
-	else {
-		std::cerr << "Error " << sHuntLevelFlag << " - Unknown monitor level. Please specify either Cursory, Normal, or Intensive" << std::endl;
-		std::cerr << "Will default to Normal." << std::endl;
-		aHuntLevel = Aggressiveness::Normal;
-	}
-
-	
 }

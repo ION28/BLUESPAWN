@@ -7,7 +7,7 @@
 DWORD WINAPI EventSubscription::SubscriptionCallback(EVT_SUBSCRIBE_NOTIFY_ACTION action, EVT_HANDLE hEvent) {
 	DWORD status = ERROR_SUCCESS;
 
-	std::wstring data;
+	EVENT_DETECTION detect(0, 0, L"", L"", L"");
 
 	switch (action)
 	{
@@ -26,11 +26,10 @@ DWORD WINAPI EventSubscription::SubscriptionCallback(EVT_SUBSCRIBE_NOTIFY_ACTION
 		break;
 
 	case EvtSubscribeActionDeliver:
-		if (ERROR_SUCCESS != (status = EventLogs::getLogs()->GetEventXML(hEvent, &data)))
-		{
+		if (ERROR_SUCCESS != (status = EventLogs::getLogs()->EventToDetection(hEvent, &detect, std::set<std::wstring>())))
 			goto cleanup;
-		}
-		std::wcout << data << std::endl;
+		reaction->EventIdentified(std::make_shared< EVENT_DETECTION>(detect));
+
 		break;
 
 	default:
@@ -48,4 +47,4 @@ cleanup:
 	return status; // The service ignores the returned status.
 }
 
-EventSubscription::EventSubscription(Reaction& reaction) : reaction(reaction) {}
+EventSubscription::EventSubscription(std::shared_ptr<Reactions::HuntTriggerReaction> reaction) : reaction(reaction) {}

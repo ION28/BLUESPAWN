@@ -24,8 +24,7 @@ void HuntRegister::RegisterHunt(Hunt* hunt) {
 	}*/
 }
 
-
-void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction){
+void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction) {
 	for (auto name : vRegisteredHunts) {
 		if (aggressiveness == Aggressiveness::Intensive) {
 			if (name->SupportsScan(Aggressiveness::Intensive)) {
@@ -53,7 +52,7 @@ void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffecte
 	io.InformUser(L"Successfully ran " + std::to_wstring(vRegisteredHunts.size()) + L" hunts.");
 }
 
-void HuntRegister::RunHunt(Hunt& name, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction){
+void HuntRegister::RunHunt(Hunt& name, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction) {
 	if (aggressiveness == Aggressiveness::Intensive) {
 		if (name.SupportsScan(Aggressiveness::Intensive)) {
 			name.ScanIntensive(scope, reaction);
@@ -75,5 +74,11 @@ void HuntRegister::RunHunt(Hunt& name, const Scope& scope, Aggressiveness aggres
 	}
 	else {
 		name.ScanCursory(scope, reaction);
+	}
+}
+
+void HuntRegister::SetupMonitoring(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction) {
+	for (auto name : vRegisteredHunts) {
+		name->SetupMonitoring(*this, scope, aggressiveness, reaction);
 	}
 }

@@ -8,6 +8,11 @@ enum class SecurityLevel {
 	High
 };
 
+enum class MitigationMode {
+	Audit,
+	Enforce
+};
+
 enum class MitigationSeverity {
 	Low,     // Corresponds to a CVSS score of <= 4 or a low severity item on a STIG
 	Medium,  // Corresponds to a CVSS score of <= 7 or a medium severity item on a STIG

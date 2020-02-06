@@ -43,12 +43,24 @@
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
 #include "mitigation/mitigations/MitigateV1093.h"
+#include "mitigation/mitigations/MitigateV1153.h"
 #include "mitigation/mitigations/MitigateV3338.h"
 #include "mitigation/mitigations/MitigateV63597.h"
 #include "mitigation/mitigations/MitigateV72753.h"
 #include "mitigation/mitigations/MitigateV73519.h"
 
+class Bluespawn {
+	public:
+		Bluespawn();
+
+		void dispatch_hunt(Aggressiveness aHuntLevel);
+		void dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce);
+		void monitor_system(Aggressiveness aHuntLevel);
+
+	private:
+		static HuntRegister huntRecord;
+		static MitigationRegister mitigationRecord;
+		static IOBase& io;
+};
+
 void print_help(cxxopts::ParseResult result, cxxopts::Options options);
-void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io);
-void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io);
-void monitor_system(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io);
