@@ -1,6 +1,6 @@
 # BLUESPAWN
 
-[![BLUESPAWN client build](https://github.com/ION28/BLUESPAWN/workflows/BLUESPAWN%20client%20build/badge.svg)](https://github.com/ION28/BLUESPAWN/actions) ![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN)
+[![BLUESPAWN client build](https://github.com/ION28/BLUESPAWN/workflows/BLUESPAWN%20client%20build/badge.svg)](https://github.com/ION28/BLUESPAWN/actions) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d070613d09404e14b47f69147a99064e)](https://www.codacy.com/manual/ION28/BLUESPAWN?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ION28/BLUESPAWN&amp;utm_campaign=Badge_Grade) ![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN)
 
 ## Our Mission
 BLUESPAWN helps blue teams monitor Windows systems in real-time against active attackers by detecting anomalous activity
