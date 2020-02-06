@@ -387,7 +387,7 @@ FileSystem::Folder::Folder(LPCWSTR path) {
 	}
 }
 
-short FileSystem::Folder::moveToNextFile() {
+short FileSystem::Folder::MoveToNextFile() {
 	if (FindNextFileW(hCurFile, &ffd) != 0) {
 		if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 			IsFile = false;
@@ -400,7 +400,7 @@ short FileSystem::Folder::moveToNextFile() {
 	return 0;
 }
 
-short FileSystem::Folder::moveToBeginning() {
+short FileSystem::Folder::MoveToBeginning() {
 	wstring searchName = FolderPath;
 	searchName += L"\\*";
 	hCurFile = FindFirstFileW(searchName.c_str(), &ffd);
@@ -417,7 +417,7 @@ short FileSystem::Folder::moveToBeginning() {
 	return 1;
 }
 
-bool FileSystem::Folder::getCurIsFile() {
+bool FileSystem::Folder::GetCurIsFile() {
 	return IsFile;
 }
 
@@ -428,7 +428,7 @@ short FileSystem::Folder::Open(OUT File*& file) {
 		filePath += wstring(L"\\") + fileName;
 		LPCWSTR out = filePath.c_str();
 		file = new FileSystem::File(out);
-		if (file->getFileExists()) {
+		if (file->GetFileExists()) {
 			return 1;
 		}
 	}
@@ -441,7 +441,7 @@ short FileSystem::Folder::EnterDir(OUT Folder*& folder) {
 		folderName += L"\\";
 		folderName += ffd.cFileName;
 		folder = new Folder(folderName.c_str());
-		if (folder->getFolderExists()) return 1;
+		if (folder->GetFolderExists()) return 1;
 	}
 	return 0;
 }
@@ -451,7 +451,7 @@ short FileSystem::Folder::AddFile(IN LPCWSTR fileName, OUT File*& file) {
 	wstring fName = fileName;
 	filePath += L"\\" + fName;
 	file = new File(filePath.c_str());
-	if (file->getFileExists()) {
+	if (file->GetFileExists()) {
 		return 1;
 	}
 	if (file->Create()) {
@@ -461,10 +461,10 @@ short FileSystem::Folder::AddFile(IN LPCWSTR fileName, OUT File*& file) {
 }
 
 short FileSystem::Folder::RemoveFile() {
-	if (getCurIsFile()) {
+	if (GetCurIsFile()) {
 		File* file;
 		if (Open(file)) {
-			if (file->getFileExists()) {
+			if (file->GetFileExists()) {
 				if (file->Delete()){
 					delete file;
 					return 1;
@@ -476,18 +476,18 @@ short FileSystem::Folder::RemoveFile() {
 	return 0;
 }
 
-bool FileSystem::Folder::getFolderExists() {
+bool FileSystem::Folder::GetFolderExists() {
 	return FolderExists;
 }
 
 std::vector<File*>* FileSystem::Folder::GetFiles(IN FileSearchAttribs* attribs, IN int recurDepth) {
-	if (moveToBeginning() == 0) {
+	if (MoveToBeginning() == 0) {
 		LOG_ERROR("Couldn't get to beginning of folder " << FolderPath);
 		return NULL;
 	}
 	std::vector<File*>* toRet = new std::vector<File*>();
 	do {
-		if (getCurIsFile()) {
+		if (GetCurIsFile()) {
 			File* file;
 			Open(file);
 			if (!attribs) {
@@ -515,7 +515,7 @@ std::vector<File*>* FileSystem::Folder::GetFiles(IN FileSearchAttribs* attribs, 
 				toRet->emplace_back(file);
 			}
 		}
-	} while (moveToNextFile());
+	} while (MoveToNextFile());
 	return toRet;
 }
 
