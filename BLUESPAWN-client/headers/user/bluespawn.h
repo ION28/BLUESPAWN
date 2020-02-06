@@ -26,6 +26,7 @@
 
 #include "hunt/Hunt.h"
 #include "hunt/HuntRegister.h"
+
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
 

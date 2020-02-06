@@ -20,6 +20,10 @@ Hunt::Hunt(HuntRegister& record, const std::wstring& name) :
 	dwSupportedScans = 0;
 }
 
+std::wstring Hunt::GetName() {
+	return name;
+}
+
 int Hunt::ScanCursory(const Scope& scope, Reaction reaction){
 	if(!(dwSupportedScans & (DWORD) Aggressiveness::Cursory)){
 		return -1;

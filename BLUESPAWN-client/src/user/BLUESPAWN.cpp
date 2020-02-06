@@ -5,9 +5,11 @@
 #include "common/DynamicLinker.h"
 #include "common/StringUtils.h"
 #include "util/eventlogs/EventLogs.h"
+
 #include "hunt/hunts/HuntT1004.h"
 #include "hunt/hunts/HuntT1037.h"
 #include "hunt/hunts/HuntT1050.h"
+#include "hunt/hunts/HuntT1055.h"
 #include "hunt/hunts/HuntT1060.h"
 #include "hunt/hunts/HuntT1100.h"
 #include "hunt/hunts/HuntT1101.h"
@@ -19,10 +21,15 @@
 
 #include "monitor/ETW_Wrapper.h"
 
+#include "mitigation/mitigations/MitigateM1042-LLMNR.h"
+#include "mitigation/mitigations/MitigateM1042-WSH.h"
 #include "mitigation/mitigations/MitigateV1093.h"
 #include "mitigation/mitigations/MitigateV1153.h"
 #include "mitigation/mitigations/MitigateV3338.h"
 #include "mitigation/mitigations/MitigateV63597.h"
+#include "mitigation/mitigations/MitigateV63817.h"
+#include "mitigation/mitigations/MitigateV63825.h"
+#include "mitigation/mitigations/MitigateV63829.h"
 #include "mitigation/mitigations/MitigateV72753.h"
 #include "mitigation/mitigations/MitigateV73519.h"
 
@@ -38,6 +45,7 @@ Bluespawn::Bluespawn() {
 	HuntT1004* t1004 = new HuntT1004(huntRecord);
 	HuntT1037* t1037 = new HuntT1037(huntRecord);
 	HuntT1050* t1050 = new HuntT1050(huntRecord);
+  HuntT1055* t1055 = new HuntT1055(huntRecord);
 	HuntT1060* t1060 = new HuntT1060(huntRecord);
 	HuntT1100* t1100 = new HuntT1100(huntRecord);
 	HuntT1101* t1101 = new HuntT1101(huntRecord);
@@ -48,10 +56,16 @@ Bluespawn::Bluespawn() {
 	HuntT1183* t1183 = new HuntT1183(huntRecord);
 
 	using namespace Mitigations;
+   
+  MitigateM1042LLMNR* m1042llmnr = new MitigateM1042LLMNR(mitigationRecord);
+	MitigateM1042WSH* m1042wsh = new MitigateM1042WSH(mitigationRecord);
 	MitigateV1093* v1093 = new MitigateV1093(mitigationRecord);
 	MitigateV1153* v1153 = new MitigateV1153(mitigationRecord);
 	MitigateV3338* v3338 = new MitigateV3338(mitigationRecord);
 	MitigateV63597* v63597 = new MitigateV63597(mitigationRecord);
+  MitigateV63817* v63817 = new MitigateV63817(mitigationRecord);
+	MitigateV63825* v63825 = new MitigateV63825(mitigationRecord);
+	MitigateV63829* v63829 = new MitigateV63829(mitigationRecord);
 	MitigateV72753* v72753 = new MitigateV72753(mitigationRecord);
 	MitigateV73519* v73519 = new MitigateV73519(mitigationRecord);
 }
@@ -157,14 +171,16 @@ int main(int argc, char* argv[]){
 					sHuntLevelFlag = result["monitor"].as < std::string >();
 				}
 				catch (int e) {
-					std::cerr << "Error " << e << " - Unknown monitor level. Please specify either Cursory, Normal, or Intensive" << std::endl;
+					LOG_ERROR("Error " << e << " - Unknown monitor level. Please specify either Cursory, Normal, or Intensive");
+			    io.InformUser(L"Error " + std::to_wstring(e) + L" - Unknown monitor level. Please specify either Cursory, Normal, or Intensive");
 				}
 			} else if (result.count("level")) {
 				try {
 					sHuntLevelFlag = result["level"].as < std::string >();
 				}
 				catch (int e) {
-					std::cerr << "Error " << e << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive" << std::endl;
+					LOG_ERROR("Error " << e << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
+			    io.InformUser(L"Error " + std::to_wstring(e) + L" - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
 				}
 			}
 
@@ -178,9 +194,11 @@ int main(int argc, char* argv[]){
 				aHuntLevel = Aggressiveness::Intensive;
 			}
 			else {
-				std::cerr << "Error " << sHuntLevelFlag << " - Unknown level. Please specify either Cursory, Normal, or Intensive" << std::endl;
-				std::cerr << "Will default to Normal." << std::endl;
-				aHuntLevel = Aggressiveness::Normal;
+				LOG_ERROR("Error " << sHuntLevelFlag << " - Unknown level. Please specify either Cursory, Normal, or Intensive");
+		    LOG_ERROR("Will default to Cursory for this run.");
+		    io.InformUser(L"Error " + StringToWidestring(sHuntLevelFlag) + L" - Unknown level. Please specify either Cursory, Normal, or Intensive");
+		    io.InformUser(L"Will default to Cursory.");
+				aHuntLevel = Aggressiveness::Cursory;
 			}
 			
 			if (result.count("hunt"))

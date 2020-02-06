@@ -92,13 +92,8 @@ struct Loaded_Image64 {
 	DWORD ImageSize;
 	DWORD64 ImageAddress;
 	DWORD64 EntryPoint;
-	bool ImportsParsed;
 
-	Loaded_Image64(const LDR_ENTRY64& entry, const HandleWrapper& process, bool imported = true);
-	Loaded_Image64(const PE_Image& image, bool importsFinished = true, const std::wstring& ImagePath = L"");
-
-	PE_Image GetImage() const;
-	LDR_ENTRY64 CreateLoaderEntry(PLIST_ENTRY64 before = nullptr, PLIST_ENTRY64 after = nullptr) const;
+	Loaded_Image64(const LDR_ENTRY64& entry, const HandleWrapper& process);
 };
 
 struct Loaded_Image32 {
@@ -108,13 +103,8 @@ struct Loaded_Image32 {
 	DWORD ImageSize;
 	DWORD ImageAddress;
 	DWORD EntryPoint;
-	bool ImportsParsed;
 
-	Loaded_Image32(const LDR_ENTRY32& entry, const HandleWrapper& process, bool imported = true);
-	Loaded_Image32(const PE_Image& image, bool importsFinished = true, const std::wstring& ImagePath = L"");
-
-	PE_Image GetImage() const;
-	LDR_ENTRY32 CreateLoaderEntry(PLIST_ENTRY32 before = nullptr, PLIST_ENTRY32 after = nullptr) const;
+	Loaded_Image32(const LDR_ENTRY32& entry, const HandleWrapper& process);
 };
 
 struct Loaded_Image {
@@ -123,11 +113,10 @@ struct Loaded_Image {
 	std::optional<Loaded_Image32> image32;
 	std::optional<Loaded_Image64> image64;
 
-	Loaded_Image(const LDR_ENTRY32& entry, const HandleWrapper& process, bool imported = true);
-	Loaded_Image(const LDR_ENTRY64& entry, const HandleWrapper& process, bool imported = true);
-	Loaded_Image(const PE_Image& image, bool importsFinished = true, const std::wstring& ImagePath = L"");
-
-	PE_Image GetImage() const;
+	Loaded_Image(const LDR_ENTRY32& entry, const HandleWrapper& process);
+	Loaded_Image(const LDR_ENTRY64& entry, const HandleWrapper& process);
+	
+	std::wstring GetName();
 };
 
 class Image_Loader {
@@ -139,14 +128,10 @@ public:
 
 	Image_Loader(const HandleWrapper& process = GetCurrentProcess());
 
-	bool AddImage(const Loaded_Image& image);
-
 	bool ContainsImage(const std::wstring& name) const;
 
-	bool RemoveImage(const Loaded_Image& image);
-
-	bool MarkLoaded(const std::wstring& name);
-
 	std::optional<Loaded_Image> GetImageInfo(const std::wstring& name) const;
+
+	std::optional<Loaded_Image> GetAssociatedImage(LPVOID address) const;
 };
 

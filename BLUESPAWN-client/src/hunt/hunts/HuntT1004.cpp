@@ -52,6 +52,24 @@ namespace Hunts {
 			}
 		}
 
+		for(const auto& subkey : CheckSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" })){
+			if(subkey.ValueExists(L"DllName")){
+				keys.emplace(subkey, std::vector<RegistryValue>{ { L"DllName", RegistryType::REG_SZ_T, * subkey.GetValue<std::wstring>(L"DllName") }});
+			}
+		}
+
+		for(const auto& subkey : CheckSubkeys({ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" })){
+			if(subkey.ValueExists(L"DllName")){
+				keys.emplace(subkey, std::vector<RegistryValue>{ { L"DllName", RegistryType::REG_SZ_T, * subkey.GetValue<std::wstring>(L"DllName") }});
+			}
+		}
+
+		for(const auto& subkey : CheckSubkeys({ HKEY_CURRENT_USER, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" })){
+			if(subkey.ValueExists(L"DllName")){
+				keys.emplace(subkey, std::vector<RegistryValue>{ { L"DllName", RegistryType::REG_SZ_T, * subkey.GetValue<std::wstring>(L"DllName") }});
+			}
+		}
+
 		int detections = 0;
 		for(const auto& key : keys){
 			for(const auto& value : key.second){

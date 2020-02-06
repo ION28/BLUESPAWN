@@ -1,6 +1,6 @@
 # BLUESPAWN
 
-[![BLUESPAWN client build](https://github.com/ION28/BLUESPAWN/workflows/BLUESPAWN%20client%20build/badge.svg)](https://github.com/ION28/BLUESPAWN/actions) ![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN)
+[![BLUESPAWN client build](https://github.com/ION28/BLUESPAWN/workflows/BLUESPAWN%20client%20build/badge.svg)](https://github.com/ION28/BLUESPAWN/actions) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d070613d09404e14b47f69147a99064e)](https://www.codacy.com/manual/ION28/BLUESPAWN?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ION28/BLUESPAWN&amp;utm_campaign=Badge_Grade) ![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN)
 
 ## Our Mission
 BLUESPAWN helps blue teams monitor Windows systems in real-time against active attackers by detecting anomalous activity
@@ -72,7 +72,10 @@ Want to help? Take a look at the current issues, add ideas for new features, wri
 ## Special Thanks
 We would like to provide a special thank you to the following projects that have helped us to build BLUESPAWN:
 * Microsoft's documentation and examples on the Windows API
+* The Department of Defense's Defense Information Systems Agency (DISA) for their great work in publishing STIGs and various other technical security guidance for Windows.
+* [@hasherezade](https://github.com/hasherezade)'s [PE Sieve](https://github.com/hasherezade/pe-sieve), which currently manages our process analytics
 * The [MITRE's ATT&CK Project](https://attack.mitre.org/) which has put together an amazing framework for which to consider, document, and categorize attacker tradercraft
+* [Sean Metcalf](https://twitter.com/PyroTek3)'s Active Directory Security blog [ADSecurity](https://adsecurity.org/)
 * Red Canary's [Atomic Red Team Project](https://github.com/redcanaryco/atomic-red-team) which has been incredibly useful in helping to test the detections we are building
 * [@op7ic](https://github.com/op7ic)'s [EDR-Testing-Script](https://github.com/op7ic/EDR-Testing-Script) Project
 * The Japan Computer Emergency Response Team (JPCERT)'s [Tool Analysis Result Sheet](https://jpcertcc.github.io/ToolAnalysisResultSheet/) for its documentation of attacker behavior and correlation with detection opportunities

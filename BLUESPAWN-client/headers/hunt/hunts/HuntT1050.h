@@ -18,7 +18,7 @@ namespace Hunts {
 	public:
 		HuntT1050(HuntRegister& record);
 
-		virtual int ScanCursory(const Scope& scope, Reaction reaction) override;
+		virtual int ScanIntensive(const Scope& scope, Reaction reaction) override;
 		virtual void SetupMonitoring(HuntRegister& record, const Scope& scope, Aggressiveness level, Reaction reaction) override;
 
 	private:
