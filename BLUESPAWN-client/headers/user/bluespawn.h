@@ -47,6 +47,9 @@
 #include "mitigation/mitigations/MitigateV1153.h"
 #include "mitigation/mitigations/MitigateV3338.h"
 #include "mitigation/mitigations/MitigateV63597.h"
+#include "mitigation/mitigations/MitigateV63817.h"
+#include "mitigation/mitigations/MitigateV63825.h"
+#include "mitigation/mitigations/MitigateV63829.h"
 #include "mitigation/mitigations/MitigateV72753.h"
 #include "mitigation/mitigations/MitigateV73519.h"
 
