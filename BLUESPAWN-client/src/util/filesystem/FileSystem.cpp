@@ -1,7 +1,7 @@
-#include "C:\\Users\\Will Mayes\\Documents\\Cyber Security\\BLUESPAWN\\BLUESPAWN-client\\headers\\util\\filesystem\\FileSystem.h"
+//#include "C:\\Users\\Will Mayes\\Documents\\Cyber Security\\BLUESPAWN\\BLUESPAWN-client\\headers\\util\\filesystem\\FileSystem.h"
 
-//#include "util/filesystem/FileSystem.h"
-//#include "util/log/Log.h"
+#include "util/filesystem/FileSystem.h"
+#include "util/log/Log.h"
 using namespace FileSystem; 
 bool FileSystem::CheckFileExists(LPCWSTR filename) {
 	//Function from https://stackoverflow.com/a/4404259/3302799
@@ -480,7 +480,7 @@ bool FileSystem::Folder::getFolderExists() {
 	return FolderExists;
 }
 
-std::vector<File*>* FileSystem::Folder::GetFiles(IN FileAttribs* attribs, IN int recurDepth) {
+std::vector<File*>* FileSystem::Folder::GetFiles(IN FileSearchAttribs* attribs, IN int recurDepth) {
 	if (moveToBeginning() == 0) {
 		LOG_ERROR("Couldn't get to beginning of folder " << FolderPath);
 		return NULL;
@@ -494,12 +494,12 @@ std::vector<File*>* FileSystem::Folder::GetFiles(IN FileAttribs* attribs, IN int
 				toRet->emplace_back(file);
 			}
 			else {
-				if (attribs->extension == file->GetFileAttribs().extension) {
+				if (std::count(attribs->extensions.begin(), attribs->extensions.end(), (file->GetFileAttribs().extension))) {
 					toRet->emplace_back(file);
 				}
 			}
 		}
-		else if(recurDepth != 0){
+		else if(recurDepth != 0 && ffd.cFileName != L"." && ffd.cFileName != L".."){
 			std::vector<File*>* temp = NULL;
 			Folder* folder = NULL;
 			EnterDir(folder);
