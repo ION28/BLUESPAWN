@@ -58,9 +58,6 @@
     <Filter Include="Source Files\monitor">
       <UniqueIdentifier>{6f3b3ba6-87f7-461f-a9ca-95e5d976dc3a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\user">
-      <UniqueIdentifier>{bb865992-8401-4892-837f-29746f11a9f7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\util">
       <UniqueIdentifier>{d7e04114-31a5-49e8-ae0e-7f41d50aff4a}</UniqueIdentifier>
     </Filter>
@@ -96,6 +93,9 @@
     </Filter>
     <Filter Include="Header Files\mitigation\mitigations">
       <UniqueIdentifier>{9387c772-fdc7-45c9-a31f-d13558ffe430}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\monitor\user">
+      <UniqueIdentifier>{bb865992-8401-4892-837f-29746f11a9f7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1098,10 +1098,10 @@
       <Filter>Source Files\mitigation</Filter>
     </ClCompile>
     <ClCompile Include="src\user\banners.cpp">
-      <Filter>Source Files\user</Filter>
+      <Filter>Source Files\monitor\user</Filter>
     </ClCompile>
     <ClCompile Include="src\user\BLUESPAWN.cpp">
-      <Filter>Source Files\user</Filter>
+      <Filter>Source Files\monitor\user</Filter>
     </ClCompile>
     <ClCompile Include="src\util\configurations\CollectInfo.cpp">
       <Filter>Source Files\util\configurations</Filter>
