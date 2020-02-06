@@ -524,7 +524,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-client\external\krabsetw\krabs;$(SolutionDir)BLUESPAWN-client\external\cxxopts\include;$(SolutionDir)BLUESPAWN-client\external\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">
