@@ -27,7 +27,7 @@ jobs:
 
     - name: Build BLUESPAWN-client
       run: |
-        "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN.sln /p:Configuration=${{ matrix.buildtype }} /p:PlatformTarget=${{ matrix.buildarch }}
+        "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN.sln /p:Configuration=${{ matrix.buildtype }} /p:Platform=${{ matrix.buildarch }}
       shell: cmd
 
     - uses: actions/upload-artifact@master
