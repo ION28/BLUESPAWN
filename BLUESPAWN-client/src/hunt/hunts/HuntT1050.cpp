@@ -17,10 +17,9 @@ namespace Hunts {
 		LOG_INFO("Hunting for T1050 - New Service at level Intensive");
 		reaction.BeginHunt(GET_INFO());
 
-		EventLogs* logs = logs->getLogs();
 
 		int identified = 0;
-		identified += logs->QueryEvents(L"System", 7045, std::set<std::wstring>({L"Event/EventData/Data[@Name='ServiceName']",
+		identified += EventLogs::getLogs()->QueryEvents(L"System", 7045, std::set<std::wstring>({L"Event/EventData/Data[@Name='ServiceName']",
 			L"Event/EventData/Data[@Name='ImagePath']", L"Event/EventData/Data[@Name='ServiceType']", L"Event/EventData/Data[@Name='StartType']" }), reaction);
 
 		if (identified == -1) {

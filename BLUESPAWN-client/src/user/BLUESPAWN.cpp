@@ -45,7 +45,7 @@ Bluespawn::Bluespawn() {
 	HuntT1004* t1004 = new HuntT1004(huntRecord);
 	HuntT1037* t1037 = new HuntT1037(huntRecord);
 	HuntT1050* t1050 = new HuntT1050(huntRecord);
-  HuntT1055* t1055 = new HuntT1055(huntRecord);
+	HuntT1055* t1055 = new HuntT1055(huntRecord);
 	HuntT1060* t1060 = new HuntT1060(huntRecord);
 	HuntT1100* t1100 = new HuntT1100(huntRecord);
 	HuntT1101* t1101 = new HuntT1101(huntRecord);
@@ -57,13 +57,13 @@ Bluespawn::Bluespawn() {
 
 	using namespace Mitigations;
    
-  MitigateM1042LLMNR* m1042llmnr = new MitigateM1042LLMNR(mitigationRecord);
+	MitigateM1042LLMNR* m1042llmnr = new MitigateM1042LLMNR(mitigationRecord);
 	MitigateM1042WSH* m1042wsh = new MitigateM1042WSH(mitigationRecord);
 	MitigateV1093* v1093 = new MitigateV1093(mitigationRecord);
 	MitigateV1153* v1153 = new MitigateV1153(mitigationRecord);
 	MitigateV3338* v3338 = new MitigateV3338(mitigationRecord);
 	MitigateV63597* v63597 = new MitigateV63597(mitigationRecord);
-  MitigateV63817* v63817 = new MitigateV63817(mitigationRecord);
+	MitigateV63817* v63817 = new MitigateV63817(mitigationRecord);
 	MitigateV63825* v63825 = new MitigateV63825(mitigationRecord);
 	MitigateV63829* v63829 = new MitigateV63829(mitigationRecord);
 	MitigateV72753* v72753 = new MitigateV72753(mitigationRecord);
@@ -77,17 +77,17 @@ void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
 	Scope scope{};
 	Reaction reaction = Reactions::LogReaction();
 
-	io.InformUser(L"Starting a Hunt");
+	Bluespawn::io.InformUser(L"Starting a Hunt");
 	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
 }
 
 void Bluespawn::dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce) {
 	if (mode == MitigationMode::Enforce) {
-		io.InformUser(L"Enforcing Mitigations");
+		Bluespawn::io.InformUser(L"Enforcing Mitigations");
 		mitigationRecord.EnforceMitigations(SecurityLevel::High, bForceEnforce);
 	}
 	else {
-		io.InformUser(L"Auditing Mitigations");
+		Bluespawn::io.InformUser(L"Auditing Mitigations");
 		mitigationRecord.AuditMitigations(SecurityLevel::High);
 	}
 }
@@ -99,7 +99,7 @@ void Bluespawn::monitor_system(Aggressiveness aHuntLevel) {
 	Scope scope{};
 	Reaction reaction = Reactions::LogReaction();
 
-	io.InformUser(L"Monitoring the system");
+	Bluespawn::io.InformUser(L"Monitoring the system");
 	huntRecord.SetupMonitoring(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
 
 	while (true) {}
@@ -163,26 +163,17 @@ int main(int argc, char* argv[]){
 			print_help(result, options);
 		}
 		else if (result.count("hunt") || result.count("monitor")) {
+			std::string flag("level");
+			if (result.count("monitor"))
+				flag = "monitor";
+
 			// Parse the hunt level
 			std::string sHuntLevelFlag = "Normal";
 			Aggressiveness aHuntLevel;
-			if (result.count("monitor")) {
-				try {
-					sHuntLevelFlag = result["monitor"].as < std::string >();
-				}
-				catch (int e) {
-					LOG_ERROR("Error " << e << " - Unknown monitor level. Please specify either Cursory, Normal, or Intensive");
-			    io.InformUser(L"Error " + std::to_wstring(e) + L" - Unknown monitor level. Please specify either Cursory, Normal, or Intensive");
-				}
-			} else if (result.count("level")) {
-				try {
-					sHuntLevelFlag = result["level"].as < std::string >();
-				}
-				catch (int e) {
-					LOG_ERROR("Error " << e << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
-			    io.InformUser(L"Error " + std::to_wstring(e) + L" - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
-				}
+			try {
+				sHuntLevelFlag = result[flag].as < std::string >();
 			}
+			catch (int e) {}
 
 			if (sHuntLevelFlag == "Cursory") {
 				aHuntLevel = Aggressiveness::Cursory;
@@ -195,9 +186,9 @@ int main(int argc, char* argv[]){
 			}
 			else {
 				LOG_ERROR("Error " << sHuntLevelFlag << " - Unknown level. Please specify either Cursory, Normal, or Intensive");
-		    LOG_ERROR("Will default to Cursory for this run.");
-		    io.InformUser(L"Error " + StringToWidestring(sHuntLevelFlag) + L" - Unknown level. Please specify either Cursory, Normal, or Intensive");
-		    io.InformUser(L"Will default to Cursory.");
+				LOG_ERROR("Will default to Cursory for this run.");
+				Bluespawn::io.InformUser(L"Error " + StringToWidestring(sHuntLevelFlag) + L" - Unknown level. Please specify either Cursory, Normal, or Intensive");
+				Bluespawn::io.InformUser(L"Will default to Cursory.");
 				aHuntLevel = Aggressiveness::Cursory;
 			}
 			

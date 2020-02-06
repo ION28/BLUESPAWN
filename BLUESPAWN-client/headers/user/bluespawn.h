@@ -38,7 +38,6 @@ class Bluespawn {
 		void dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce);
 		void monitor_system(Aggressiveness aHuntLevel);
 
-	private:
 		static HuntRegister huntRecord;
 		static MitigationRegister mitigationRecord;
 		static IOBase& io;

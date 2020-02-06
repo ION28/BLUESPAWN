@@ -223,7 +223,7 @@ DWORD EventLogs::EventToDetection(EVT_HANDLE hEvent, EVENT_DETECTION* pDetection
 	pDetection->eventID = std::stoul(eventIDStr);
 	pDetection->eventRecordID = std::stoul(eventRecordIDStr);
 	pDetection->timeCreated = timeCreated;
-	pDetection->timeCreated = channel;
+	pDetection->channel = channel;
 	pDetection->rawXML = rawXML;
 	pDetection->params = extraParams;
 
