@@ -15,6 +15,7 @@ jobs:
     strategy:
       matrix:
         buildtype: [Release, Debug]
+        buildarch: [x64, x86]
 
     runs-on: windows-2019
 
@@ -26,10 +27,10 @@ jobs:
 
     - name: Build BLUESPAWN-client
       run: |
-        "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN.sln /p:Configuration=${{ matrix.buildtype }}
+        "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN.sln /p:Configuration=${{ matrix.buildtype }};PlatformTarget=${{ matrix.buildarch }}
       shell: cmd
 
     - uses: actions/upload-artifact@master
       with:
-        name: BLUESPAWN-client-${{ matrix.buildtype }}
-        path: artifacts\x64\${{ matrix.buildtype }}\BLUESPAWN-client.exe
+        name: BLUESPAWN-client-${{ matrix.buildtype }}-${{ matrix.buildtype }}
+        path: artifacts\${{ matrix.buildtype }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe
