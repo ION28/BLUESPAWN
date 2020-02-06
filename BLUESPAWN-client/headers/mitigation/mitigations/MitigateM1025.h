@@ -7,7 +7,7 @@
 namespace Mitigations{
 
 	/**
-	 * MitigateM1042-LLMNR looks for LSA to be run as a protected process light,
+	 * MitigateM1025 looks for LSA to be run as a protected process light,
 	 * which requires all loaded DLLs to be properly signed and prevents other processes
 	 * from interfering with LSA.
 	 */
