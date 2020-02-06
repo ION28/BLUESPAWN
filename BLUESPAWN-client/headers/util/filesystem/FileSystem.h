@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <fileapi.h>
 #include <vector>
+#include <Shlwapi.h>
 #define LOG_VERBOSE(x, __VAR_ARGS)
 #define LOG_ERROR(__VAR_ARGS)
 #define BUFSIZE 1024
@@ -23,9 +24,10 @@ namespace FileSystem {
 	bool CheckFileExists(LPCWSTR);
 	
 	struct FileAttribs {
-		long size;
-		long permissions;
-		bool hidden;
+		//long size;
+		//long permissions;
+		//bool hidden;
+		wstring extension;
 	};
 
 	class File {
@@ -35,6 +37,8 @@ namespace FileSystem {
 		LPCWSTR FilePath;
 		//Handle for the file
 		HANDLE hFile;
+		//Attributes of the file
+		FileAttribs Attribs;
 		/**
 		* Function to get offsets in format needed by SetFilePointer
 		*
@@ -45,6 +49,12 @@ namespace FileSystem {
 		*/
 		static void TranslateLongToFilePointer(long val, LONG& lowerVal, LONG& upperVal, PLONG& upper);
 	public:
+		/**
+		* Function to get the file attributes
+		*
+		* @return the attributes struct
+		*/
+		FileAttribs GetFileAttribs();
 		/**
 		* Creates a file object with a given path
 		* If the file already exists, opens a handle to it

@@ -25,8 +25,15 @@ void FileSystem::File::TranslateLongToFilePointer(long val, LONG& lowerVal, LONG
 	upper = &upperVal;
 }
 
+std::string WidestringToString(const std::wstring& wstr) {
+	int size = 0;
+	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), static_cast<int>(wstr.length()), nullptr, 0, nullptr, &size);
+	CHAR* str = new CHAR[size];
+	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), static_cast<int>(wstr.length()), str, size, nullptr, nullptr);
+	return str;
+}
+
 FileSystem::File::File(IN const LPCWSTR path) {
-	std::cout << "HERE HERE HERE" << std::endl;
 	FilePath = path;
 	LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
 	hFile = CreateFileW(path, 
@@ -47,6 +54,11 @@ FileSystem::File::File(IN const LPCWSTR path) {
 		LOG_VERBOSE(2, "File " << path << " opened.");
 		FileExists = true;
 	}
+	Attribs.extension = PathFindExtension(path);
+}
+
+FileAttribs FileSystem::File::GetFileAttribs() {
+	return Attribs;
 }
 
 short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, IN const bool truncate, IN const bool insert) {
@@ -308,12 +320,10 @@ short FileSystem::File::Delete() {
 		LOG_ERROR("Can't delete file " << FilePath << ". File doesn't exist");
 		return 0; 
 	}
-	std::wcout << FilePath << std::endl;
 	CloseHandle(hFile);
 	if (!DeleteFileW(FilePath)) {
 		DWORD dwStatus = GetLastError();
 		LOG_ERROR("Deleting file " << FilePath << " failed with error " << dwStatus);
-		std::cout << "Deleting file " << FilePath << " failed with error " << dwStatus << std::endl;;
 		hFile = CreateFileW(FilePath,
 			GENERIC_READ | GENERIC_WRITE,
 			0,
@@ -472,7 +482,6 @@ bool FileSystem::Folder::getFolderExists() {
 
 std::vector<File*>* FileSystem::Folder::GetFiles(IN FileAttribs* attribs, IN int recurDepth) {
 	if (moveToBeginning() == 0) {
-		std::cout << "FAIL " << FolderPath << std::endl;
 		LOG_ERROR("Couldn't get to beginning of folder " << FolderPath);
 		return NULL;
 	}
@@ -483,6 +492,11 @@ std::vector<File*>* FileSystem::Folder::GetFiles(IN FileAttribs* attribs, IN int
 			Open(file);
 			if (!attribs) {
 				toRet->emplace_back(file);
+			}
+			else {
+				if (attribs->extension == file->GetFileAttribs().extension) {
+					toRet->emplace_back(file);
+				}
 			}
 		}
 		else if(recurDepth != 0){
