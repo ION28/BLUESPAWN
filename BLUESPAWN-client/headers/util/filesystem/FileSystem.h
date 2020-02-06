@@ -18,14 +18,10 @@
 #define MD5LEN  16
 
 using namespace std;
-//namespace fs = std::experimental::filesystem::v1;
 namespace FileSystem {
 	bool CheckFileExists(std::wstring);
 	
 	struct FileAttribs {
-		//long size;
-		//long permissions;
-		//bool hidden;
 		wstring extension;
 	};
 
@@ -34,7 +30,7 @@ namespace FileSystem {
 	};
 
 	class File {
-		//Whether or not this current file actually exists
+		//Whether or not this current file actually exists on the filesystem
 		bool FileExists; 
 		//Path to the file
 		std::wstring FilePath;
@@ -53,12 +49,6 @@ namespace FileSystem {
 		static void TranslateLongToFilePointer(long val, LONG& lowerVal, LONG& upperVal, PLONG& upper);
 	public:
 		/**
-		* Function to get the file attributes
-		*
-		* @return the attributes struct
-		*/
-		FileAttribs GetFileAttribs();
-		/**
 		* Creates a file object with a given path
 		* If the file already exists, opens a handle to it
 		* 
@@ -74,7 +64,15 @@ namespace FileSystem {
 		}
 
 		/**
-		* Function to check if a file exists
+		* Function to get the file attributes
+		*
+		* @return the attributes struct for the file
+		*/
+		FileAttribs GetFileAttribs() {
+			return Attribs;
+		}
+		/**
+		* Function to get whether the file exists
 		*
 		* return true if file exists, false otherwise
 		*/
