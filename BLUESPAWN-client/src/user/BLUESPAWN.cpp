@@ -158,6 +158,8 @@ void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options
 
 	MitigationRegister record{io};
 
+	Mitigations::MitigateM1042LLMNR m1042llmnr(record);
+	Mitigations::MitigateM1042WSH m1042wsh(record);
 	Mitigations::MitigateV1093 v1093(record);
 	Mitigations::MitigateV1153 v1153(record);
 	Mitigations::MitigateV3338 v3338(record);
