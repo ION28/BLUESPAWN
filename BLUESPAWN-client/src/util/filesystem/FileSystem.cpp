@@ -1,8 +1,7 @@
-//#include "C:\\Users\\Will Mayes\\Documents\\Cyber Security\\BLUESPAWN\\BLUESPAWN-client\\headers\\util\\filesystem\\FileSystem.h"
+#include "C:\\Users\\Will Mayes\\Documents\\Cyber Security\\BLUESPAWN\\BLUESPAWN-client\\headers\\util\\filesystem\\FileSystem.h"
 
-//#include "C:\\Users\\Will Mayes\\Documents\\Cyber Security\\BLUESPAWN\\BLUESPAWN-client\\headers\\util\\log\Log.h"
-#include "util/filesystem/FileSystem.h"
-#include "util/log/Log.h"
+//#include "util/filesystem/FileSystem.h"
+//#include "util/log/Log.h"
 using namespace FileSystem; 
 bool FileSystem::CheckFileExists(LPCWSTR filename) {
 	//Function from https://stackoverflow.com/a/4404259/3302799
@@ -27,6 +26,7 @@ void FileSystem::File::TranslateLongToFilePointer(long val, LONG& lowerVal, LONG
 }
 
 FileSystem::File::File(IN const LPCWSTR path) {
+	std::cout << "HERE HERE HERE" << std::endl;
 	FilePath = path;
 	LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
 	hFile = CreateFileW(path, 
@@ -308,10 +308,12 @@ short FileSystem::File::Delete() {
 		LOG_ERROR("Can't delete file " << FilePath << ". File doesn't exist");
 		return 0; 
 	}
+	std::wcout << FilePath << std::endl;
 	CloseHandle(hFile);
 	if (!DeleteFileW(FilePath)) {
 		DWORD dwStatus = GetLastError();
 		LOG_ERROR("Deleting file " << FilePath << " failed with error " << dwStatus);
+		std::cout << "Deleting file " << FilePath << " failed with error " << dwStatus << std::endl;;
 		hFile = CreateFileW(FilePath,
 			GENERIC_READ | GENERIC_WRITE,
 			0,
@@ -353,16 +355,21 @@ short FileSystem::File::ChangeFileLength(IN const long length) {
 	return 1;
 }
 
+FileSystem::File::~File() {
+	CloseHandle(hFile);
+}
+
 FileSystem::Folder::Folder(LPCWSTR path) {
 	FolderPath = path;
+	wstring searchName = FolderPath;
+	searchName += L"\\*";
 	FolderExists = true;
-	hCurFile = FindFirstFile(path, &ffd);
+	hCurFile = FindFirstFile(searchName.c_str(), &ffd);
 	if (hCurFile == INVALID_HANDLE_VALUE) {
 		LOG_ERROR("Couldn't open folder " << path);
 		FolderExists = false;
 	}
 	if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-		std::cout << "IN " << std::endl;
 		IsFile = false;
 	}
 	else {
@@ -380,13 +387,13 @@ short FileSystem::Folder::moveToNextFile() {
 		}
 		return 1;
 	}
-	std::cout << (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) << std::endl;
-	std::cout << ffd.cFileName << " " << GetLastError() << std::endl;
 	return 0;
 }
 
 short FileSystem::Folder::moveToBeginning() {
-	hCurFile = FindFirstFileW(FolderPath, &ffd);
+	wstring searchName = FolderPath;
+	searchName += L"\\*";
+	hCurFile = FindFirstFileW(searchName.c_str(), &ffd);
 	if (hCurFile == INVALID_HANDLE_VALUE) {
 		LOG_ERROR("Couldn't open folder " << FolderPath);
 		return 0;
@@ -405,18 +412,57 @@ bool FileSystem::Folder::getCurIsFile() {
 }
 
 short FileSystem::Folder::Open(OUT File*& file) {
-	wstring fileName = ffd.cFileName;
-	wstring filePath = FolderPath + fileName;
-	file = new File(filePath.c_str());
-	if (file->getFileExists()) return 1;
+	if (IsFile) {
+		wstring fileName(ffd.cFileName);
+		wstring filePath(FolderPath);
+		filePath += wstring(L"\\") + fileName;
+		LPCWSTR out = filePath.c_str();
+		file = new FileSystem::File(out);
+		if (file->getFileExists()) {
+			return 1;
+		}
+	}
 	return 0;
 }
 
 short FileSystem::Folder::EnterDir(OUT Folder*& folder) {
-	wstring folderName = FolderPath;
-	folderName += ffd.cFileName;
-	folder = new Folder(folderName.c_str());
-	if (folder->getFolderExists()) return 1;
+	if (!IsFile) {
+		wstring folderName = FolderPath;
+		folderName += L"\\";
+		folderName += ffd.cFileName;
+		folder = new Folder(folderName.c_str());
+		if (folder->getFolderExists()) return 1;
+	}
+	return 0;
+}
+
+short FileSystem::Folder::AddFile(IN LPCWSTR fileName, OUT File*& file) {
+	wstring filePath = FolderPath;
+	wstring fName = fileName;
+	filePath += L"\\" + fName;
+	file = new File(filePath.c_str());
+	if (file->getFileExists()) {
+		return 1;
+	}
+	if (file->Create()) {
+		return 1;
+	}
+	return 0;
+}
+
+short FileSystem::Folder::RemoveFile() {
+	if (getCurIsFile()) {
+		File* file;
+		if (Open(file)) {
+			if (file->getFileExists()) {
+				if (file->Delete()){
+					delete file;
+					return 1;
+				}
+			}
+		}
+		delete file;
+	}
 	return 0;
 }
 
@@ -426,7 +472,7 @@ bool FileSystem::Folder::getFolderExists() {
 
 std::vector<File*>* FileSystem::Folder::GetFiles(IN FileAttribs* attribs, IN int recurDepth) {
 	if (moveToBeginning() == 0) {
-		std::cout << "Couldn't get to beginning of folder " << FolderPath << std::endl;
+		std::cout << "FAIL " << FolderPath << std::endl;
 		LOG_ERROR("Couldn't get to beginning of folder " << FolderPath);
 		return NULL;
 	}
@@ -455,7 +501,10 @@ std::vector<File*>* FileSystem::Folder::GetFiles(IN FileAttribs* attribs, IN int
 				toRet->emplace_back(file);
 			}
 		}
-		std::cout << "HERE" << std::endl;
 	} while (moveToNextFile());
 	return toRet;
+}
+
+FileSystem::Folder:: ~Folder() {
+	CloseHandle(hCurFile);
 }
