@@ -47,10 +47,6 @@ FileSystem::File::File(IN const std::wstring path) {
 	Attribs.extension = PathFindExtension(path.c_str());
 }
 
-FileAttribs FileSystem::File::GetFileAttribs() {
-	return Attribs;
-}
-
 bool FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, IN const bool truncate, IN const bool insert) {
 	LOG_VERBOSE(2, "Writing to file " << FilePath << " at " << offset << ". Insert = " << insert);
 	if (!FileExists) {
