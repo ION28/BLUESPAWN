@@ -1,5 +1,3 @@
-//#include "C:\\Users\\Will Mayes\\Documents\\Cyber Security\\BLUESPAWN\\BLUESPAWN-client\\headers\\util\\filesystem\\FileSystem.h"
-
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
 using namespace FileSystem; 
