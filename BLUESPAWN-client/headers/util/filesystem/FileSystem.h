@@ -13,13 +13,14 @@
 #include <fileapi.h>
 #include <vector>
 #include <Shlwapi.h>
+#include "common/wrappers.hpp"
 #define BUFSIZE 1024
 #define MD5LEN  16
 
 using namespace std;
 //namespace fs = std::experimental::filesystem::v1;
 namespace FileSystem {
-	bool CheckFileExists(LPCWSTR);
+	bool CheckFileExists(std::wstring);
 	
 	struct FileAttribs {
 		//long size;
@@ -36,7 +37,7 @@ namespace FileSystem {
 		//Whether or not this current file actually exists
 		bool FileExists; 
 		//Path to the file
-		LPCWSTR FilePath;
+		std::wstring FilePath;
 		//Handle for the file
 		HANDLE hFile;
 		//Attributes of the file
@@ -63,13 +64,13 @@ namespace FileSystem {
 		* 
 		* @param path The path to the file to be opened
 		*/
-		File(IN const LPCWSTR path);
+		File(IN const std::wstring path);
 
 		/**
 		* Return the path to the file
 		*/
-		wstring GetFilePath(){
-			return wstring(FilePath);
+		std::wstring GetFilePath(){
+			return FilePath;
 		}
 
 		/**
@@ -86,61 +87,61 @@ namespace FileSystem {
 		* 
 		* @param value The value to be written
 		* @param offset The offset to write to 
+		* @param truncate If true truncate the file after the write
 		* @param insert If true insert the value at the offset. If false, overwrite the bytes at that location in the file
 		*
-		* @return 1 if write successful, 0 if write unsuccessful
+		* @return true if write successful, false if write unsuccessful
 		*/
-		short Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, IN const bool truncate = false, IN const bool insert = false);
+		bool Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, IN const bool truncate = false, IN const bool insert = false);
 
 		/**
 		* Function to read from arbitrary offset in the file
 		* 
 		* @param buffer The buffer to read to
 		* @param offset The offset to read from
-		* @param amount	How many bytes to read. Ammount should be less than the size of the buffer - 1
+		* @param amount	How many bytes to read. Amount should be less than or equal to the size of the buffer - 1
+		* @param amountRead How many bytes were successfully read
 		*
-		* @return 1 if write successful, 0 if write unsuccessful
+		* @return true if read successful, false if read unsuccessful
 		*/
-		short Read(OUT LPVOID buffer, IN const long offset, IN const unsigned long amount, OUT DWORD& amountRead);
+		bool Read(OUT LPVOID buffer, IN const long offset, IN const unsigned long amount, OUT DWORD& amountRead);
 
 		/**
 		* Function to compute the MD5 hash of the file
 		* 
 		* @param buffer The buffer to write the hash to
 		*
-		* @return 1 if hashing successful, 0 if hashing unsuccessful
+		* @return true if hashing successful, false if hashing unsuccessful
 		*/
 		bool GetMD5Hash(OUT string& buffer);
 
 		/**
 		* Function to create the file if it doesn't exist
 		* 
-		* @return 1 if creation was successful, 0 if unsuccessful
+		* @return true if creation was successful, false if unsuccessful
 		*/
-		short Create();
+		bool Create();
 
 		/**
 		* Function to delete the file
 		*
-		* @return 1 if deletion was successful, 0 if unsuccessful
+		* @return true if deletion was successful, false if unsuccessful
 		*/
-		short Delete();
+		bool Delete();
 
 		/**
 		* Function to truncate or extend file length
 		*
 		* @param length - new length of the file in bytes
 		*
-		* @return 1 if trucation or extension was successful, 0 if unsuccessful
+		* @return true if trucation or extension was successful, false if unsuccessful
 		*/
-		short ChangeFileLength(IN const long length);
-
-		~File();
+		bool ChangeFileLength(IN const long length);
 	};
 
 	class Folder {
 		//Path to the current folder
-		LPCWSTR FolderPath;
+		std::wstring FolderPath;
 		//Whether or not the current folder exists
 		bool FolderExists;
 		//Handle to current file or directory
@@ -155,62 +156,61 @@ namespace FileSystem {
 		* 
 		* @param path - the path to the folder
 		*/
-		Folder(LPCWSTR path);
+		Folder(std::wstring path);
 		
 		/**
 		* Function to move to the next file
 		*
-		* @return 1 if successfully moved to next file 0 if no next file exists
+		* @return true if successfully moved to next file false if no next file exists
 		*/
-		short MoveToNextFile();
+		bool MoveToNextFile();
 		/**
 		* Function to move to the beginnning of the directory
 		* 
-		* @return 1 if successful, 0 otherwise
+		* @return true if successful, false otherwise
 		*/
-		short MoveToBeginning();
+		bool MoveToBeginning();
 		/**
 		* Function to check if the folder exists
 		* 
 		* @return whether or not the folder exists.
 		*/
-		bool GetFolderExists();
+		bool GetFolderExists() {
+			return FolderExists;
+		}
 		/**
 		* Function to check if current handle is directory or file
 		*
 		* @return true if current is a file, false otherwise. 
 		*/
-		bool GetCurIsFile();
+		bool GetCurIsFile() {
+			return IsFile;
+		}
 		/**
 		* Function to enter the current directory
 		*
-		* @return 1 if the directory was successfully entered, 0 otherwise
+		* @return a folder object representing the currently pointed to directory if successful
 		*/
-		short EnterDir(OUT Folder*& folder);
+		std::optional<Folder> EnterDir();
 		/**
 		* Function to open the current file for reading and writing
 		*
-		* @param file - a pointer where the function will store the opened file
-		* 
-		* @return 1 if the function was successful, 0 otherwise
+		* @return The file if found, otherwise nothing
 		*/
-		short Open(OUT File*& file);
+		std::optional<File> Open();
 		/**
 		* Function to add a file to the directory
-		* 
-		* @param fileName - the name of the file
-		* @param file - a pointer to store the created file
 		*
-		* @return 1 if the function is successful or file already exists, 0 otherwise
+		* @return The file if successfully created
 		*/
-		short AddFile(IN LPCWSTR fileName, OUT File*& file);
+		std::optional<File> AddFile(IN std::wstring fileName);
 		/**
 		* Function to remove current file and move to next handle
 		*
-		* @return 1 if the file was removed, 0 otherwise
+		* @return true if the file was removed, false otherwise
 		* TODO: Add support for deleting folders
 		*/
-		short RemoveFile();
+		bool RemoveFile();
 		/**
 		* Function to return all files matching some attributes 
 		*
@@ -220,7 +220,6 @@ namespace FileSystem {
 		*
 		* @return all files that match the given parameters
 		*/
-		std::vector<File*>* GetFiles(IN FileSearchAttribs* attribs = NULL, IN int recurDepth = 0);
-		~Folder();
+		std::vector<File> GetFiles(IN FileSearchAttribs* attribs = NULL, IN int recurDepth = 0);
 	};
 }

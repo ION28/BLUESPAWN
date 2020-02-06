@@ -1,10 +1,11 @@
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
+#include "common/StringUtils.h"
 using namespace FileSystem; 
-bool FileSystem::CheckFileExists(LPCWSTR filename) {
+bool FileSystem::CheckFileExists(std::wstring filename) {
 	//Function from https://stackoverflow.com/a/4404259/3302799
-	GetFileAttributesW(filename);
-	if (INVALID_FILE_ATTRIBUTES == GetFileAttributes(filename) &&
+	GetFileAttributesW(filename.c_str());
+	if (INVALID_FILE_ATTRIBUTES == GetFileAttributes(filename.c_str()) &&
 		GetLastError() == ERROR_FILE_NOT_FOUND)
 	{
 		LOG_VERBOSE(3, "File " << filename << " does not exist.");
@@ -23,18 +24,10 @@ void FileSystem::File::TranslateLongToFilePointer(long val, LONG& lowerVal, LONG
 	upper = &upperVal;
 }
 
-std::string WidestringToString(const std::wstring& wstr) {
-	int size = 0;
-	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), static_cast<int>(wstr.length()), nullptr, 0, nullptr, &size);
-	CHAR* str = new CHAR[size];
-	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), static_cast<int>(wstr.length()), str, size, nullptr, nullptr);
-	return str;
-}
-
-FileSystem::File::File(IN const LPCWSTR path) {
+FileSystem::File::File(IN const std::wstring path) {
 	FilePath = path;
 	LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
-	hFile = CreateFileW(path, 
+	hFile = CreateFileW(path.c_str(), 
 		GENERIC_READ | GENERIC_WRITE, 
 		FILE_SHARE_READ,
 		NULL, 
@@ -43,7 +36,6 @@ FileSystem::File::File(IN const LPCWSTR path) {
 		NULL);
 	if (INVALID_HANDLE_VALUE == hFile)
 	{
-		DWORD dwStatus = GetLastError();
 		LOG_VERBOSE(2, "Couldn't open file " << path << ".");
 		FileExists = false;
 	}
@@ -52,18 +44,18 @@ FileSystem::File::File(IN const LPCWSTR path) {
 		LOG_VERBOSE(2, "File " << path << " opened.");
 		FileExists = true;
 	}
-	Attribs.extension = PathFindExtension(path);
+	Attribs.extension = PathFindExtension(path.c_str());
 }
 
 FileAttribs FileSystem::File::GetFileAttribs() {
 	return Attribs;
 }
 
-short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, IN const bool truncate, IN const bool insert) {
+bool FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, IN const bool truncate, IN const bool insert) {
 	LOG_VERBOSE(2, "Writing to file " << FilePath << " at " << offset << ". Insert = " << insert);
 	if (!FileExists) {
 		LOG_ERROR("Can't write to file " << FilePath << ". File doesn't exist");
-		return 0;
+		return false;
 	}
 	//Calculate the offset into format needed for SetFilePointer
 	LONG lowerOffset;
@@ -74,7 +66,7 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 	//Point at the desired offset
 	if (SetFilePointer(hFile, lowerOffset, upper, 0) == INVALID_SET_FILE_POINTER) {
 		LOG_ERROR("Can't set file pointer to " << offset << " in file " << FilePath << ".");
-		return 0;
+		return false;
 	}
 	//Insert value into file at specified offset
 	if (insert && !truncate) {
@@ -97,13 +89,13 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 			while (true) {
 				if (SetFilePointer(hFile, lowerOffset, upper, 0) == INVALID_SET_FILE_POINTER) {
 					LOG_ERROR("Can't set file pointer to " << readOffset << " in file " << FilePath << ".");
-					return 0;
+					return false;
 				}
 				if (!ReadFile(hFile, readBuf, len, &bytesRead, NULL)) {
 					LOG_ERROR("Reading from " << FilePath << " failed with error " << GetLastError());
 					free(readBuf);
 					SetFilePointer(hFile, 0, 0, 0);
-					return 0;
+					return false;
 				}
 				if (bytesRead < len) {
 					readAll = true;
@@ -116,20 +108,20 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 				len *= 2;
 				readBuf = calloc(len * 2l + 1l, 1);
 				if (!readBuf) {
-					return 0;
+					return false;
 				}
 			}
 			//Write last read portion of the file
 			if (SetFilePointer(hFile, writeLowerOffset, writeUpper, 0) == INVALID_SET_FILE_POINTER) {
 				LOG_ERROR("Can't set file pointer to " << writeOffset << " in file " << FilePath << ".");
-				return 0;
+				return false;
 			}
 			if (!WriteFile(hFile, writeBuf, writeLen, &bytesWritten, NULL)) {
 				LOG_ERROR("Failed to write to " << FilePath << " at offset " << writeOffset << " with error " << GetLastError());
 				free(readBuf);
 				if (i > 0) free(writeBuf);
 				SetFilePointer(hFile, 0, 0, 0);
-				return 0;
+				return false;
 			}
 			//Free last write unless it was the given buffer
 			if(i > 0) free(writeBuf);
@@ -146,13 +138,13 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 		if (SetFilePointer(hFile, writeLowerOffset, writeUpper, 0) == INVALID_SET_FILE_POINTER) {
 			LOG_ERROR("Can't set FilePointer to " << writeOffset << " in file " << FilePath << ".");
 			free(writeBuf);
-			return 0;
+			return false;
 		}
 		if (!WriteFile(hFile, writeBuf, writeLen, &bytesWritten, NULL)) {
 			LOG_ERROR("Failed to write to " << FilePath << " at offset " << writeOffset << " with error " << GetLastError());
 			free(writeBuf);
 			SetFilePointer(hFile, 0, 0, 0);
-			return 0;
+			return false;
 		}
 		free(writeBuf);
 	}
@@ -161,25 +153,25 @@ short FileSystem::File::Write(IN const LPVOID value, IN const long offset, IN co
 		if (!WriteFile(hFile, value, length, &bytesWritten, NULL)) {
 			LOG_ERROR("Failed to write to " << FilePath << " at offset " << offset << " with error " << GetLastError());
 			SetFilePointer(hFile, 0, 0, 0);
-			return 0;
+			return false;
 		}
 	}
 	if (truncate) {
 		if (!SetEndOfFile(hFile)) {
 			LOG_ERROR("Couldn't truncate file " << FilePath);
-			return 0;
+			return false;
 		}
 	}
 	SetFilePointer(hFile, 0, 0, 0);
 	LOG_VERBOSE(1, "Successfule wrote to " << FilePath << "at offset" << offset);
-	return 1;
+	return true;
 }
 
-short FileSystem::File::Read(OUT LPVOID buffer, IN const long offset, IN const unsigned long amount, OUT DWORD& amountRead) {
+bool FileSystem::File::Read(OUT LPVOID buffer, IN const long offset, IN const unsigned long amount, OUT DWORD& amountRead) {
 	LOG_VERBOSE(2, "Attempting to read " << amount << " bytes from " << FilePath << " at offset " << offset);
 	if (!FileExists) {
 		LOG_ERROR("Can't write to " << FilePath << ". File doesn't exist.");
-		return 0;
+		return false;
 	}
 	//Calculate the offset into format needed for SetFilePointer
 	LONG lowerOffset;
@@ -188,16 +180,16 @@ short FileSystem::File::Read(OUT LPVOID buffer, IN const long offset, IN const u
 	File::TranslateLongToFilePointer(offset, lowerOffset, upperOffset, upper);
 	if (SetFilePointer(hFile, lowerOffset, upper, 0) == INVALID_SET_FILE_POINTER) {
 		LOG_ERROR("Can't set file pointer to " << offset << " in file " << FilePath << ".");
-		return 0;
+		return false;
 	}
 	if (!ReadFile(hFile, buffer, amount, &amountRead, NULL)) {
 		LOG_ERROR("Failed to read from " << FilePath << " at offset " << offset << " with error " << GetLastError());
 		SetFilePointer(hFile, 0, 0, 0);
-		return 0;
+		return false;
 	}
 	LOG_VERBOSE(1, "Successfully wrote " << amount << " bytes to " << FilePath);
 	SetFilePointer(hFile, 0, 0, 0);
-	return 1;
+	return true;
 } 
 
 bool FileSystem::File::GetMD5Hash(OUT string& buffer) {
@@ -287,13 +279,13 @@ bool FileSystem::File::GetMD5Hash(OUT string& buffer) {
 	return false;
 }
 
-short FileSystem::File::Create() {
+bool FileSystem::File::Create() {
 	LOG_VERBOSE(1, "Attempting to create file: " << FilePath);
 	if (FileExists) {
 		LOG_ERROR("Can't create " << FilePath << ". File already exists.");
-		return 0;
+		return false;
 	}
-	hFile = CreateFileW(FilePath,
+	hFile = CreateFileW(FilePath.c_str(),
 		GENERIC_READ | GENERIC_WRITE,
 		FILE_SHARE_READ,
 		NULL,
@@ -305,24 +297,24 @@ short FileSystem::File::Create() {
 		DWORD dwStatus = GetLastError();
 		LOG_ERROR("Error creating file " << FilePath << ". Error code = " << dwStatus);
 		FileExists = false;
-		return 0;
+		return false;
 	}
 	LOG_VERBOSE(1, FilePath << " successfully created.");
 	FileExists = true;
-	return 1;
+	return true;
 }
 
-short FileSystem::File::Delete() {
+bool FileSystem::File::Delete() {
 	LOG_VERBOSE(1, "Attempting to delete file " << FilePath);
 	if (!FileExists) { 
 		LOG_ERROR("Can't delete file " << FilePath << ". File doesn't exist");
-		return 0; 
+		return false; 
 	}
 	CloseHandle(hFile);
-	if (!DeleteFileW(FilePath)) {
+	if (!DeleteFileW(FilePath.c_str())) {
 		DWORD dwStatus = GetLastError();
 		LOG_ERROR("Deleting file " << FilePath << " failed with error " << dwStatus);
-		hFile = CreateFileW(FilePath,
+		hFile = CreateFileW(FilePath.c_str(),
 			GENERIC_READ | GENERIC_WRITE,
 			0,
 			NULL,
@@ -334,17 +326,17 @@ short FileSystem::File::Delete() {
 			DWORD dwStatus = GetLastError();
 			LOG_ERROR("Couldn't reopen " << FilePath << ". Error = " << dwStatus);
 			FileExists = false;
-			return 0;
+			return false;
 		}
 		FileExists = true;
-		return 0;
+		return false;
 	}
 	LOG_VERBOSE(1, FilePath << "deleted.");
 	FileExists = false;
-	return 1;
+	return true;
 }
 
-short FileSystem::File::ChangeFileLength(IN const long length) {
+bool FileSystem::File::ChangeFileLength(IN const long length) {
 	LOG_VERBOSE(2, "Attempting to change length of " << FilePath << " to " << length);
 	//Calculate the length into format needed for SetFilePointer
 	LONG lowerLen;
@@ -353,26 +345,22 @@ short FileSystem::File::ChangeFileLength(IN const long length) {
 	File::TranslateLongToFilePointer(length, lowerLen, upperLen, upper);
 	if (!SetFilePointer(hFile, lowerLen, upper, 0)) {
 		LOG_ERROR("Couldn't change file pointer to " << length << " in file " << FilePath);
-		return 0;
+		return false;
 	}
 	if (!SetEndOfFile(hFile)) {
 		LOG_ERROR("Couldn't change the length of file " << FilePath);
-		return 0;
+		return false;
 	}
 	LOG_VERBOSE(2, "Changed length of " << FilePath << " to " << length);
-	return 1;
+	return true;
 }
 
-FileSystem::File::~File() {
-	CloseHandle(hFile);
-}
-
-FileSystem::Folder::Folder(LPCWSTR path) {
+FileSystem::Folder::Folder(std::wstring path) {
 	FolderPath = path;
-	wstring searchName = FolderPath;
+	std::wstring searchName = FolderPath;
 	searchName += L"\\*";
 	FolderExists = true;
-	hCurFile = FindFirstFile(searchName.c_str(), &ffd);
+	hCurFile = HandleWrapper(FindFirstFile(searchName.c_str(), &ffd));
 	if (hCurFile == INVALID_HANDLE_VALUE) {
 		LOG_ERROR("Couldn't open folder " << path);
 		FolderExists = false;
@@ -385,7 +373,7 @@ FileSystem::Folder::Folder(LPCWSTR path) {
 	}
 }
 
-short FileSystem::Folder::MoveToNextFile() {
+bool FileSystem::Folder::MoveToNextFile() {
 	if (FindNextFileW(hCurFile, &ffd) != 0) {
 		if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 			IsFile = false;
@@ -393,18 +381,18 @@ short FileSystem::Folder::MoveToNextFile() {
 		else {
 			IsFile = true;
 		}
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-short FileSystem::Folder::MoveToBeginning() {
+bool FileSystem::Folder::MoveToBeginning() {
 	wstring searchName = FolderPath;
 	searchName += L"\\*";
 	hCurFile = FindFirstFileW(searchName.c_str(), &ffd);
 	if (hCurFile == INVALID_HANDLE_VALUE) {
 		LOG_ERROR("Couldn't open folder " << FolderPath);
-		return 0;
+		return false;
 	}
 	if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 		IsFile = false;
@@ -412,111 +400,102 @@ short FileSystem::Folder::MoveToBeginning() {
 	else {
 		IsFile = true;
 	}
-	return 1;
+	return true;
 }
 
-bool FileSystem::Folder::GetCurIsFile() {
-	return IsFile;
-}
-
-short FileSystem::Folder::Open(OUT File*& file) {
+std::optional<File> FileSystem::Folder::Open() {
 	if (IsFile) {
 		wstring fileName(ffd.cFileName);
 		wstring filePath(FolderPath);
 		filePath += wstring(L"\\") + fileName;
-		LPCWSTR out = filePath.c_str();
-		file = new FileSystem::File(out);
-		if (file->GetFileExists()) {
-			return 1;
+		std::wstring out = filePath.c_str();
+		File file = FileSystem::File(out);
+		if (file.GetFileExists()) {
+			return file;
 		}
 	}
-	return 0;
+	return std::nullopt;
 }
 
-short FileSystem::Folder::EnterDir(OUT Folder*& folder) {
+std::optional<Folder> FileSystem::Folder::EnterDir() {
 	if (!IsFile) {
 		wstring folderName = FolderPath;
 		folderName += L"\\";
 		folderName += ffd.cFileName;
-		folder = new Folder(folderName.c_str());
-		if (folder->GetFolderExists()) return 1;
+		Folder folder = Folder(folderName.c_str());
+		if (folder.GetFolderExists()) return folder;
 	}
-	return 0;
+	return std::nullopt;
 }
 
-short FileSystem::Folder::AddFile(IN LPCWSTR fileName, OUT File*& file) {
+std::optional<File> FileSystem::Folder::AddFile(IN std::wstring fileName) {
 	wstring filePath = FolderPath;
 	wstring fName = fileName;
 	filePath += L"\\" + fName;
-	file = new File(filePath.c_str());
-	if (file->GetFileExists()) {
-		return 1;
+	File file = File(filePath.c_str());
+	if (file.GetFileExists()) {
+		return file;
 	}
-	if (file->Create()) {
-		return 1;
+	if (file.Create()) {
+		return file;
 	}
-	return 0;
+	return std::nullopt;
 }
 
-short FileSystem::Folder::RemoveFile() {
+bool FileSystem::Folder::RemoveFile() {
 	if (GetCurIsFile()) {
-		File* file;
-		if (Open(file)) {
-			if (file->GetFileExists()) {
-				if (file->Delete()){
-					delete file;
-					return 1;
+		std::optional<File> f = Open();
+		if (f) {
+			File file = f.value;
+			if (file.GetFileExists()) {
+				if (file.Delete()){
+					return true;
 				}
 			}
 		}
-		delete file;
 	}
-	return 0;
+	return false;
 }
 
-bool FileSystem::Folder::GetFolderExists() {
-	return FolderExists;
-}
-
-std::vector<File*>* FileSystem::Folder::GetFiles(IN FileSearchAttribs* attribs, IN int recurDepth) {
+std::vector<File> FileSystem::Folder::GetFiles(IN FileSearchAttribs* attribs, IN int recurDepth) {
 	if (MoveToBeginning() == 0) {
 		LOG_ERROR("Couldn't get to beginning of folder " << FolderPath);
-		return NULL;
+		return std::vector<File>();
 	}
-	std::vector<File*>* toRet = new std::vector<File*>();
+	std::vector<File> toRet = std::vector<File>();
 	do {
 		if (GetCurIsFile()) {
-			File* file;
-			Open(file);
-			if (!attribs) {
-				toRet->emplace_back(file);
-			}
-			else {
-				if (std::count(attribs->extensions.begin(), attribs->extensions.end(), (file->GetFileAttribs().extension))) {
-					toRet->emplace_back(file);
+			std::optional<File> f = Open();
+			if (f) {
+				File file = f.value;
+				if (!attribs) {
+					toRet.emplace_back(file);
+				}
+				else {
+					if (std::count(attribs->extensions.begin(), attribs->extensions.end(), (file.GetFileAttribs().extension))) {
+						toRet.emplace_back(file);
+					}
 				}
 			}
 		}
 		else if(recurDepth != 0 && ffd.cFileName != L"." && ffd.cFileName != L".."){
-			std::vector<File*>* temp = NULL;
-			Folder* folder = NULL;
-			EnterDir(folder);
-			if (recurDepth == -1) {
-				temp = folder->GetFiles(attribs, recurDepth);
-			}
-			else {
-				temp = folder->GetFiles(attribs, recurDepth - 1);
-			}
-			while (temp && !temp->empty()) {
-				File* file = temp->at(temp->size() - 1);
-				temp->pop_back();
-				toRet->emplace_back(file);
+			std::vector<File> temp;
+			std::optional<Folder> f = EnterDir();
+			if (f) {
+				Folder folder = f.value;
+				if (recurDepth == -1) {
+					temp = folder.GetFiles(attribs, recurDepth);
+				}
+				else {
+					temp = folder.GetFiles(attribs, recurDepth - 1);
+				}
+				while (!temp.empty()) {
+					File file = temp.at(temp.size() - 1);
+					temp.pop_back();
+					toRet.emplace_back(file);
+				}
 			}
 		}
 	} while (MoveToNextFile());
 	return toRet;
-}
-
-FileSystem::Folder:: ~Folder() {
-	CloseHandle(hCurFile);
 }
