@@ -43,6 +43,8 @@
 
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
+#include "mitigation/mitigations/MitigateM1042-LLMNR.h"
+#include "mitigation/mitigations/MitigateM1042-WSH.h"
 #include "mitigation/mitigations/MitigateV1093.h"
 #include "mitigation/mitigations/MitigateV1153.h"
 #include "mitigation/mitigations/MitigateV3338.h"
