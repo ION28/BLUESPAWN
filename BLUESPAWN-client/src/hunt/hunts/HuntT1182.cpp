@@ -7,7 +7,7 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1182::HuntT1182(HuntRegister& record) : Hunt(record, L"T1182 - AppCert DLLs") {
+	HuntT1182::HuntT1182() : Hunt(L"T1182 - AppCert DLLs") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;

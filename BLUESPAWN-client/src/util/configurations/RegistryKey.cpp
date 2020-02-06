@@ -117,14 +117,11 @@ namespace Registry {
 	}
 	
 	RegistryKey::RegistryKey(std::wstring name){
-		name = ToLowerCase(name);
+		name = ToUpperCase(name);
 
-		SIZE_T fSlash = name.find(L"/");
-		SIZE_T bSlash = name.find(L"\\");
+		SIZE_T slash = name.find_first_of(L"/\\");
 
-		SIZE_T slash = fSlash == -1 ? (bSlash == -1 ? name.length() : bSlash) : (fSlash > bSlash ? fSlash : bSlash);
-
-		std::wstring HiveName = name.substr(0, slash);
+		std::wstring HiveName = slash == std::wstring::npos ? name : name.substr(0, slash);
 
 		if(vHiveNames.find(HiveName) == vHiveNames.end()){
 			this->bKeyExists = false;
@@ -175,7 +172,7 @@ namespace Registry {
 		return bKeyExists;
 	}
 
-	bool RegistryKey::ValueExists(std::wstring wsValueName) const {
+	bool RegistryKey::ValueExists(const std::wstring& wsValueName) const {
 		return ERROR_SUCCESS == RegQueryValueExW(hkBackingKey, wsValueName.c_str(), nullptr, nullptr, nullptr, nullptr);
 	}
 
@@ -207,7 +204,7 @@ namespace Registry {
 		return false;
 	}
 
-	AllocationWrapper RegistryKey::GetRawValue(std::wstring ValueName) const {
+	AllocationWrapper RegistryKey::GetRawValue(const std::wstring& ValueName) const {
 		if(!Exists()){
 			SetLastError(FILE_DOES_NOT_EXIST);
 			return { nullptr, 0 };
@@ -231,7 +228,7 @@ namespace Registry {
 		return { lpbValue, dwDataSize };
 	}
 
-	std::optional<RegistryType> RegistryKey::GetValueType(std::wstring ValueName) const {
+	std::optional<RegistryType> RegistryKey::GetValueType(const std::wstring& ValueName) const {
 		if(!Exists()){
 			SetLastError(FILE_DOES_NOT_EXIST);
 			return std::nullopt;
@@ -259,17 +256,17 @@ namespace Registry {
 	}
 
 	template<class T>
-	std::optional<T> RegistryKey::GetValue(std::wstring wsValueName) const {
+	std::optional<T> RegistryKey::GetValue(const std::wstring& wsValueName) const {
 		if(ValueExists(wsValueName)){
 			return GetRawValue(wsValueName).Dereference<T>();
 		}
 		return std::nullopt;
 	}
 
-	template std::optional<DWORD> RegistryKey::GetValue(std::wstring wsValueName) const;
+	template std::optional<DWORD> RegistryKey::GetValue(const std::wstring& wsValueName) const;
 
 	template<>
-	std::optional<std::wstring> RegistryKey::GetValue(std::wstring wsValueName) const {
+	std::optional<std::wstring> RegistryKey::GetValue(const std::wstring& wsValueName) const {
 		if(ValueExists(wsValueName)){
 			return GetRawValue(wsValueName).ReadWString();
 		}
@@ -277,7 +274,7 @@ namespace Registry {
 	}
 
 	template<>
-	std::optional<std::vector<std::wstring>> RegistryKey::GetValue(std::wstring wsValueName) const {
+	std::optional<std::vector<std::wstring>> RegistryKey::GetValue(const std::wstring& wsValueName) const {
 		if(ValueExists(wsValueName)){
 			std::vector<std::wstring> strings{};
 			std::wstring wsLogString{};
@@ -301,7 +298,7 @@ namespace Registry {
 		return std::nullopt;
 	}
 
-	bool RegistryKey::SetRawValue(std::wstring name, AllocationWrapper bytes, DWORD dwType) const {
+	bool RegistryKey::SetRawValue(const std::wstring& name, AllocationWrapper bytes, DWORD dwType) const {
 		if(!Exists()){
 			return false;
 		}
@@ -323,42 +320,42 @@ namespace Registry {
 	}
 
 	template<class T>
-	bool RegistryKey::SetValue(std::wstring name, T value, DWORD size, DWORD type) const {
+	bool RegistryKey::SetValue(const std::wstring& name, T value, DWORD size, DWORD type) const {
 		return SetRawValue(name, { reinterpret_cast<BYTE*>(value), size, AllocationWrapper::STACK_ALLOC }, type);
 	}
 
 	template<>
-	bool RegistryKey::SetValue(std::wstring name, LPCWSTR value, DWORD size, DWORD type) const {
+	bool RegistryKey::SetValue(const std::wstring& name, LPCWSTR value, DWORD size, DWORD type) const {
 		return RegistryKey::SetRawValue(name, { PBYTE(value), wcslen(value), AllocationWrapper::STACK_ALLOC }, type);
 	}
-	template bool RegistryKey::SetValue<LPCWSTR>(std::wstring name, LPCWSTR value, DWORD size, DWORD type) const;
+	template bool RegistryKey::SetValue<LPCWSTR>(const std::wstring& name, LPCWSTR value, DWORD size, DWORD type) const;
 
 	template<>
-	bool RegistryKey::SetValue(std::wstring name, LPCSTR value, DWORD size, DWORD type) const {
+	bool RegistryKey::SetValue(const std::wstring& name, LPCSTR value, DWORD size, DWORD type) const {
 		return RegistryKey::SetRawValue(name, { PBYTE(value), strlen(value), AllocationWrapper::STACK_ALLOC }, type);
 	}
-	template bool RegistryKey::SetValue<LPCSTR>(std::wstring name, LPCSTR value, DWORD size, DWORD type) const;
+	template bool RegistryKey::SetValue<LPCSTR>(const std::wstring& name, LPCSTR value, DWORD size, DWORD type) const;
 
 	template<>
-	bool RegistryKey::SetValue(std::wstring name, DWORD value, DWORD size, DWORD type) const {
+	bool RegistryKey::SetValue(const std::wstring& name, DWORD value, DWORD size, DWORD type) const {
 		return SetRawValue(name, { reinterpret_cast<BYTE*>(&value), 4, AllocationWrapper::STACK_ALLOC }, REG_DWORD);
 	}
-	template bool RegistryKey::SetValue<DWORD>(std::wstring name, DWORD value, DWORD size, DWORD type) const;
+	template bool RegistryKey::SetValue<DWORD>(const std::wstring& name, DWORD value, DWORD size, DWORD type) const;
 
 	template<> 
-	bool RegistryKey::SetValue(std::wstring name, std::wstring value, DWORD size, DWORD type) const {
+	bool RegistryKey::SetValue(const std::wstring& name, std::wstring value, DWORD size, DWORD type) const {
 		return SetValue<LPCWSTR>(name, value.c_str(), static_cast<DWORD>((value.size() + 1) * 2), REG_SZ);
 	}
-	template bool RegistryKey::SetValue<std::wstring>(std::wstring name, std::wstring value, DWORD size, DWORD type) const;
+	template bool RegistryKey::SetValue<std::wstring>(const std::wstring& name, std::wstring value, DWORD size, DWORD type) const;
 
 	template<>
-	bool RegistryKey::SetValue(std::wstring name, std::string value, DWORD size, DWORD type) const {
+	bool RegistryKey::SetValue(const std::wstring& name, std::string value, DWORD size, DWORD type) const {
 		return SetValue<std::wstring>(name, StringToWidestring(value));
 	}
-	template bool RegistryKey::SetValue<std::string>(std::wstring name, std::string value, DWORD size, DWORD type) const;
+	template bool RegistryKey::SetValue<std::string>(const std::wstring& name, std::string value, DWORD size, DWORD type) const;
 
 	template<>
-	bool RegistryKey::SetValue(std::wstring name, std::vector<std::wstring> value, DWORD _size, DWORD type) const {
+	bool RegistryKey::SetValue(const std::wstring& name, std::vector<std::wstring> value, DWORD _size, DWORD type) const {
 		SIZE_T size = 1;
 		for(auto string : value){
 			size += (string.length() + 1);
@@ -389,7 +386,7 @@ namespace Registry {
 		return succeeded;
 	}
 
-	template bool RegistryKey::SetValue<std::vector<std::wstring>>(std::wstring name, std::vector<std::wstring> value, 
+	template bool RegistryKey::SetValue<std::vector<std::wstring>>(const std::wstring& name, std::vector<std::wstring> value,
 		DWORD _size, DWORD type) const;
 
 	std::vector<RegistryKey> RegistryKey::EnumerateSubkeys() const {
@@ -467,6 +464,14 @@ namespace Registry {
 						keyPath = std::wstring(buffer + 2);
 					}
 					delete[] buffer;
+					auto location = keyPath.find(L"\\REGISTRY\\MACHINE");
+					if(location != std::string::npos){
+						keyPath.replace(location, 17, L"HKEY_LOCAL_MACHINE");
+					}
+					location = keyPath.find(L"\\REGISTRY\\USER");
+					if(location != std::string::npos){
+						keyPath.replace(location, 14, L"HKEY_USERS");
+					}
 				}
 			}
 		}
@@ -478,7 +483,13 @@ namespace Registry {
 	}
 
 
-	bool RegistryKey::operator<(RegistryKey key) const {
+	bool RegistryKey::operator<(const RegistryKey& key) const {
 		return hkBackingKey < key.hkBackingKey;
+	}
+
+	bool RegistryKey::RemoveValue(const std::wstring& wsValueName) const {
+		auto status = RegDeleteValueW(hkBackingKey, wsValueName.c_str());
+		SetLastError(status);
+		return status == ERROR_SUCCESS;
 	}
 }

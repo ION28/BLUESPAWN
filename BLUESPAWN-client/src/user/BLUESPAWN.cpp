@@ -5,6 +5,8 @@
 #include "common/DynamicLinker.h"
 #include "common/StringUtils.h"
 #include "util/eventlogs/EventLogs.h"
+#include "hunt/reaction/SuspendProcess.h"
+#include "hunt/reaction/RemoveValue.h"
 
 #include <iostream>
 
@@ -128,24 +130,28 @@ void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase
 	}
 
 	HuntRegister record{io};
-	Hunts::HuntT1004 t1004(record);
-	Hunts::HuntT1037 t1037(record);
-	Hunts::HuntT1050 t1050(record);
-	Hunts::HuntT1055 t1055(record);
-	Hunts::HuntT1060 t1060(record);
-	Hunts::HuntT1100 t1100(record);
-	Hunts::HuntT1101 t1101(record);
-	Hunts::HuntT1103 t1103(record);
-	Hunts::HuntT1131 t1131(record);
-	Hunts::HuntT1138 t1138(record);
-	Hunts::HuntT1182 t1182(record);
-	Hunts::HuntT1183 t1183(record);
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1004>());
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1037>());
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1050>());
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1055>());
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1060>());
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1100>());
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1101>());
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1103>());
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1131>());
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1138>());
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1182>());
+	record.RegisterHunt(std::make_shared<Hunts::HuntT1183>());
 
 	DWORD tactics = UINT_MAX;
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
-	Reaction reaction = Reactions::LogReaction();
+	Reaction logreact = Reactions::LogReaction();
+	Reaction suspendreact = Reactions::SuspendProcessReaction(io);
+	Reaction logsuspend = logreact.Combine(suspendreact);
+	Reaction removereact = Reactions::RemoveValueReaction(io);
+	auto reaction = logsuspend.Combine(removereact);
 	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
 }
 
