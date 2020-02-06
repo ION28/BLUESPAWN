@@ -115,6 +115,8 @@ namespace FileSystem {
 		* @return 1 if trucation or extension was successful, 0 if unsuccessful
 		*/
 		short ChangeFileLength(IN const long length);
+
+		~File();
 	};
 
 	class Folder {
@@ -142,12 +144,6 @@ namespace FileSystem {
 		* @return 1 if successfully moved to next file 0 if no next file exists
 		*/
 		short moveToNextFile();
-		/**
-		* Function to move to the previous file
-		*
-		* @return 1 if successfully moved to next file 0 if no previous file exists
-		*/
-		short moveToPrevFile();
 		/**
 		* Function to move to the beginnning of the directory
 		* 
@@ -185,13 +181,14 @@ namespace FileSystem {
 		* @param fileName - the name of the file
 		* @param file - a pointer to store the created file
 		*
-		* @return 1 if the function is successful, 0 otherwise
+		* @return 1 if the function is successful or file already exists, 0 otherwise
 		*/
 		short AddFile(IN LPCWSTR fileName, OUT File*& file);
 		/**
 		* Function to remove current file and move to next handle
 		*
 		* @return 1 if the file was removed, 0 otherwise
+		* TODO: Add support for deleting folders
 		*/
 		short RemoveFile();
 		/**
@@ -204,5 +201,6 @@ namespace FileSystem {
 		* @return all files that match the given parameters
 		*/
 		std::vector<File*>* GetFiles(IN FileAttribs* attribs = NULL, IN int recurDepth = 0);
+		~Folder();
 	};
 }
