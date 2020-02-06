@@ -13,8 +13,6 @@
 #include <fileapi.h>
 #include <vector>
 #include <Shlwapi.h>
-#define LOG_VERBOSE(x, __VAR_ARGS)
-#define LOG_ERROR(__VAR_ARGS)
 #define BUFSIZE 1024
 #define MD5LEN  16
 
@@ -68,11 +66,18 @@ namespace FileSystem {
 		File(IN const LPCWSTR path);
 
 		/**
+		* Return the path to the file
+		*/
+		wstring GetFilePath(){
+			return wstring(FilePath);
+		}
+
+		/**
 		* Function to check if a file exists
 		*
 		* return true if file exists, false otherwise
 		*/
-		bool getFileExists() {
+		bool GetFileExists() {
 			return FileExists;
 		}
 
@@ -157,24 +162,25 @@ namespace FileSystem {
 		*
 		* @return 1 if successfully moved to next file 0 if no next file exists
 		*/
-		short moveToNextFile();
+		short MoveToNextFile();
 		/**
 		* Function to move to the beginnning of the directory
 		* 
 		* @return 1 if successful, 0 otherwise
 		*/
-		short moveToBeginning();
+		short MoveToBeginning();
 		/**
 		* Function to check if the folder exists
 		* 
 		* @return whether or not the folder exists.
 		*/
-		bool getFolderExists();
+		bool GetFolderExists();
 		/**
 		* Function to check if current handle is directory or file
 		*
 		* @return true if current is a file, false otherwise. 
-		*/bool getCurIsFile();
+		*/
+		bool GetCurIsFile();
 		/**
 		* Function to enter the current directory
 		*
