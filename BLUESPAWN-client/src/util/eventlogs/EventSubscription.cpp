@@ -16,12 +16,12 @@ DWORD WINAPI EventSubscription::SubscriptionCallback(EVT_SUBSCRIBE_NOTIFY_ACTION
 	case EvtSubscribeActionError:
 		if (ERROR_EVT_QUERY_RESULT_STALE == (DWORD)hEvent)
 		{
-			wprintf(L"The subscription callback was notified that event records are missing.\n");
+			LOG_ERROR("EventSubscription::SubscriptionCallback: The subscription callback was notified that event records are missing");
 			// Handle if this is an issue for your application.
 		}
 		else
 		{
-			wprintf(L"The subscription callback received the following Win32 error: %lu\n", (DWORD)hEvent);
+			LOG_ERROR("EventSubscription::SubscriptionCallback: The subscription callback received the following Win32 error: " + std::to_string((int)hEvent));
 		}
 		break;
 
@@ -33,7 +33,7 @@ DWORD WINAPI EventSubscription::SubscriptionCallback(EVT_SUBSCRIBE_NOTIFY_ACTION
 		break;
 
 	default:
-		wprintf(L"SubscriptionCallback: Unknown action.\n");
+		LOG_ERROR(L"EventSubscription::SubscriptionCallback: Unknown action.");
 	}
 
 cleanup:
@@ -47,4 +47,15 @@ cleanup:
 	return status; // The service ignores the returned status.
 }
 
-EventSubscription::EventSubscription(std::shared_ptr<Reactions::HuntTriggerReaction> reaction) : reaction(reaction) {}
+EventSubscription::EventSubscription(Reactions::HuntTriggerReaction& reaction) {
+	this->reaction = std::make_unique<Reactions::HuntTriggerReaction>(reaction);
+}
+
+EventSubscription::~EventSubscription() {
+	if (hSubscription)
+		EvtClose(hSubscription);
+}
+
+void EventSubscription::setSubHandle(EVT_HANDLE hSubscription) {
+	this->hSubscription = hSubscription;
+}

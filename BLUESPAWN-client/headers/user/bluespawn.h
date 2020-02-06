@@ -24,30 +24,10 @@
 #include "util/log/CLISink.h"
 #include "util/configurations/Registry.h"
 
-#include "monitor/ETW_Wrapper.h"
-
 #include "hunt/Hunt.h"
 #include "hunt/HuntRegister.h"
-#include "hunt/hunts/HuntT1004.h"
-#include "hunt/hunts/HuntT1037.h"
-#include "hunt/hunts/HuntT1050.h"
-#include "hunt/hunts/HuntT1060.h"
-#include "hunt/hunts/HuntT1100.h"
-#include "hunt/hunts/HuntT1101.h"
-#include "hunt/hunts/HuntT1103.h"
-#include "hunt/hunts/HuntT1131.h"
-#include "hunt/hunts/HuntT1138.h"
-#include "hunt/hunts/HuntT1182.h"
-#include "hunt/hunts/HuntT1183.h"
-
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
-#include "mitigation/mitigations/MitigateV1093.h"
-#include "mitigation/mitigations/MitigateV1153.h"
-#include "mitigation/mitigations/MitigateV3338.h"
-#include "mitigation/mitigations/MitigateV63597.h"
-#include "mitigation/mitigations/MitigateV72753.h"
-#include "mitigation/mitigations/MitigateV73519.h"
 
 class Bluespawn {
 	public:

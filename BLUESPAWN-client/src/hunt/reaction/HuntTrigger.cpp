@@ -1,5 +1,5 @@
 #include "hunt/reaction/HuntTrigger.h"
-#include <iostream>
+#include "util/log/huntlogmessage.h"
 
 namespace Reactions {
 	HuntTriggerReaction::HuntTriggerReaction(HuntRegister& record, Hunt* hunt, const Scope& scope, Aggressiveness level, Reaction& reaction) :

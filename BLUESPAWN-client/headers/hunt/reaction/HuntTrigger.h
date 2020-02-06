@@ -1,11 +1,7 @@
 #pragma once
 #include "Reaction.h"
 
-#include "hunt/HuntInfo.h"
-#include "util/log/huntlogmessage.h"
 #include "hunt/Hunt.h"
-#include <optional>
-
 #include "hunt/HuntRegister.h"
 
 namespace Reactions {

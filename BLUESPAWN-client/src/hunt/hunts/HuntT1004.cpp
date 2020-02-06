@@ -63,12 +63,4 @@ namespace Hunts {
 		reaction.EndHunt();
 		return detections;
 	}
-
-	void HuntT1004::SetupMonitoring(HuntRegister& record, const Scope& scope, Aggressiveness level, Reaction reaction) {
-		Hunt* myHunt = dynamic_cast<Hunt*>(this);
-		triggerReaction = std::make_shared<Reactions::HuntTriggerReaction>(record, myHunt, scope, level, reaction);
-		//triggerReaction->EventIdentified(NULL);
-		EventLogs::getLogs()->subscribe(L"Security", 4720, triggerReaction);
-		std::wcout << "monitoring 1004" << std::endl;
-	}
 }
