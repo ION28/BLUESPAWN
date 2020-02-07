@@ -81,12 +81,10 @@ namespace Hunts {
 		}
 		reaction.EndHunt();
 		return identified;
-		return 0;
 	}
 
 	int HuntT1100::ScanNormal(const Scope& scope, Reaction reaction){
-		return 0;
-		LOG_INFO("Hunting for T1100 - Web Shells at level Moderate");
+		LOG_INFO("Hunting for T1100 - Web Shells at level Normal");
 		reaction.BeginHunt(GET_INFO());
 		SetRegexAggressivenessLevel(Aggressiveness::Normal);
 
