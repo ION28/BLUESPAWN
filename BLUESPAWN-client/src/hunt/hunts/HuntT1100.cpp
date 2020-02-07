@@ -6,7 +6,7 @@
 
 namespace Hunts {
 	HuntT1100::HuntT1100() : Hunt(L"T1100 - Web Shells") {
-		smatch match_index;
+		std::smatch match_index;
 
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory | (DWORD) Aggressiveness::Normal;
 		dwCategoriesAffected = (DWORD) Category::Files;
@@ -43,25 +43,24 @@ namespace Hunts {
 
 		int identified = 0;
 
-		for (wstring path : web_directories) {
-			FileSystem::Folder  f = FileSystem::Folder((LPCWSTR)path.c_str());
+		for (std::wstring path : web_directories) {
+			auto f = FileSystem::Folder(path);
 			FileSystem::FileSearchAttribs attribs;
 			attribs.extensions = web_exts;
-			std::vector<FileSystem::File> files = f.GetFiles(&attribs, -1);
-			for (auto& entry : files) {
+			std::vector<FileSystem::File> files = f.GetFiles(attribs, -1);
+			for (const auto& entry : files) {
 				long offset = 0;
-				long targetAmount = 1000000;
+				unsigned long targetAmount = 1000000;
 				CHAR* read = (CHAR *)calloc(targetAmount + 1L, 1);
 				DWORD amountRead = 0;
-				wstring file_ext = entry.GetFileAttribs().extension;
+				std::wstring file_ext = entry.GetFileAttribs().extension;
 				do {
-					entry.Read(read, offset, targetAmount, amountRead);
-					read[amountRead] = '\0';
-					string sus_file(read);
-					transform(sus_file.begin(), sus_file.end(), sus_file.begin(), ::tolower);
+					auto read = entry.Read(targetAmount, offset, &amountRead);
+					read.SetByte(amountRead, '\0');
+					std::string sus_file = ToLowerCaseA(*read.ReadString());
 					if (file_ext.compare(L".php") == 0) {
 						if (regex_search(sus_file, match_index, php_vuln_functions)) {
-							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath())<< " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					else if (file_ext.substr(0, 4).compare(L".jsp") == 0) {
@@ -90,23 +89,20 @@ namespace Hunts {
 
 		int identified = 0;
 
-		for (wstring path : web_directories) {
-			FileSystem::Folder f = FileSystem::Folder((LPCWSTR)path.c_str());
+		for (std::wstring path : web_directories) {
+			FileSystem::Folder f = FileSystem::Folder(path);
 			FileSystem::FileSearchAttribs attribs;
 			attribs.extensions = web_exts;
-			std::vector<FileSystem::File> files = f.GetFiles(&attribs, -1);
-			for (auto& entry : files) {
+			std::vector<FileSystem::File> files = f.GetFiles(attribs, -1);
+			for (const auto& entry : files) {
 				long offset = 0;
 				long targetAmount = 1000000;
-				CHAR* read = (CHAR*)calloc(targetAmount + 1, 1);
 				DWORD amountRead = 0;
-				wstring file_ext = entry.GetFileAttribs().extension;
+				auto file_ext = entry.GetFileAttribs().extension;
 				do {
-					entry.Read(read, offset, targetAmount, amountRead);
-					read[amountRead] = '\0';
-					string sus_file(read);
-					transform(sus_file.begin(), sus_file.end(), sus_file.begin(), ::tolower);
-
+					auto read = entry.Read(targetAmount, offset, &amountRead);
+					read.SetByte(amountRead, '\0');
+					std::string sus_file = ToLowerCaseA(*read.ReadString());
 					if (file_ext.compare(L".php") == 0) {
 						if (regex_search(sus_file, match_index, php_vuln_functions)) {
 							identified++;
