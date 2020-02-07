@@ -12,10 +12,8 @@ HuntInfo::HuntInfo(const std::wstring& HuntName, Aggressiveness HuntAggressivene
 	HuntDatasources{ HuntDatasources },
 	HuntStartTime{ HuntStartTime }{}
 
-Hunt::Hunt(HuntRegister& record, const std::wstring& name) : 
+Hunt::Hunt(const std::wstring& name) : 
 	name{ name }{
-	record.RegisterHunt(this);
-
 	dwTacticsUsed = 0;
 	dwSourcesInvolved = 0;
 	dwCategoriesAffected = 0;

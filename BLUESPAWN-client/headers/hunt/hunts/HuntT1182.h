@@ -16,7 +16,7 @@ namespace Hunts {
 	 */
 	class HuntT1182 : public Hunt {
 	public:
-		HuntT1182(HuntRegister& record);
+		HuntT1182();
 
 		virtual int ScanCursory(const Scope& scope, Reaction reaction);
 	};

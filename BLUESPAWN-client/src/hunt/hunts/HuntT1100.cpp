@@ -31,11 +31,11 @@ namespace Hunts {
 	void HuntT1100::AddDirectoryToSearch(const std::wstring& sFileName){
 		web_directories.emplace_back(sFileName);
 	}
-//
+
 	void HuntT1100::AddFileExtensionToSearch(const std::wstring& sFileExtension) {
 		web_exts.emplace_back(sFileExtension);
 	}
-//
+
 	int HuntT1100::ScanCursory(const Scope& scope, Reaction reaction){
 		LOG_INFO("Hunting for T1100 - Web Shells at level Cursory");
 		reaction.BeginHunt(GET_INFO());

@@ -26,10 +26,12 @@ struct DETECTION {
 /// Note that the hash will have to be manually set.
 struct FILE_DETECTION : public DETECTION {
 	std::wstring wsFileName;
+	std::wstring wsFilePath;
 	BYTE hash[256];
-	FILE_DETECTION(const std::wstring& wsFileName) : 
+	FILE_DETECTION(const std::wstring& wsFileName, const std::wstring& wsFilePath) : 
 		DETECTION{ DetectionType::File },
 		wsFileName{ wsFileName },
+		wsFilePath{ wsFilePath },
 		hash{}{}
 };
 typedef std::function<void(std::shared_ptr<FILE_DETECTION>)> DetectFile;

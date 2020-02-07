@@ -19,7 +19,7 @@ namespace Hunts {
 	class HuntT1055 : public Hunt {
 
 	public:
-		HuntT1055(HuntRegister& record);
+		HuntT1055();
 
 		virtual int ScanNormal(const Scope& scope, Reaction reaction) override;
 	};

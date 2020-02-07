@@ -21,7 +21,7 @@ namespace Hunts {
 		std::vector<std::wstring> okSecPackages = { L"\"\"", L"wsauth", L"kerberos", L"msv1_0", L"schannel", L"wdigest", L"tspkg", L"pku2u" };
 
 	public:
-		HuntT1101(HuntRegister& record);
+		HuntT1101();
 
 		virtual int ScanCursory(const Scope& scope, Reaction reaction);
 	};

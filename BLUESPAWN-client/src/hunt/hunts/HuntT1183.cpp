@@ -7,7 +7,7 @@
 using namespace Registry;
 
 namespace Hunts{
-	HuntT1183::HuntT1183(HuntRegister& record) : Hunt(record, L"T1183 - Image File Execution Options") {
+	HuntT1183::HuntT1183() : Hunt(L"T1183 - Image File Execution Options") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;

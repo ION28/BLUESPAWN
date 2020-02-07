@@ -7,7 +7,7 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1060::HuntT1060(HuntRegister& record) : Hunt(record, L"T1060 - Registry Run Keys / Startup Folder") {
+	HuntT1060::HuntT1060() : Hunt(L"T1060 - Registry Run Keys / Startup Folder") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
