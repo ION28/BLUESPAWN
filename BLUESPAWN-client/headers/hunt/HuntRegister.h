@@ -14,7 +14,7 @@ using namespace std;
 
 class HuntRegister {
 private:
-	vector<Hunt*> vRegisteredHunts{};
+	vector<std::shared_ptr<Hunt>> vRegisteredHunts{};
 	IOBase& io;
 
 	map<Tactic, vector<reference_wrapper<Hunt>>> mTactics{};
@@ -24,11 +24,9 @@ private:
 public:
 	HuntRegister(IOBase& oIo);
 
-	void RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
+	void RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
 	void RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
 
-	void RegisterHunt(Hunt* hunt);
-
 	void SetupMonitoring(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
-
+	void RegisterHunt(std::shared_ptr<Hunt> hunt);
 };

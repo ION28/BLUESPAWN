@@ -27,7 +27,7 @@ protected:
 	std::wstring name;
 
 public:
-	Hunt(HuntRegister& hr, const std::wstring& name);
+	Hunt(const std::wstring& name);
 
 	std::wstring GetName();
 

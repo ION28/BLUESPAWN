@@ -4,7 +4,7 @@
 #include "util/log/Log.h"
 
 namespace Hunts {
-	HuntT1100::HuntT1100(HuntRegister& record) : Hunt(record, L"T1100 - Web Shells") {
+	HuntT1100::HuntT1100() : Hunt(L"T1100 - Web Shells") {
 		smatch match_index;
 
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory | (DWORD) Aggressiveness::Normal;

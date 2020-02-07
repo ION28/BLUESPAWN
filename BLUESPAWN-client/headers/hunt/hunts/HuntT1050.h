@@ -16,7 +16,7 @@ namespace Hunts {
 	 */
 	class HuntT1050 : public Hunt {
 	public:
-		HuntT1050(HuntRegister& record);
+		HuntT1050();
 
 		virtual int ScanIntensive(const Scope& scope, Reaction reaction) override;
 		virtual void SetupMonitoring(HuntRegister& record, const Scope& scope, Aggressiveness level, Reaction reaction) override;

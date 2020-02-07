@@ -36,10 +36,13 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h" />
     <ClInclude Include="headers\hunt\reaction\HuntTrigger.h" />
+    <ClInclude Include="headers\hunt\reaction\RemoveValue.h" />
+    <ClInclude Include="headers\hunt\reaction\SuspendProcess.h" />
     <ClInclude Include="headers\hunt\RegistryHunt.h" />
     <ClInclude Include="headers\hunt\Scope.h" />
     <ClInclude Include="headers\mitigation\Mitigation.h" />
     <ClInclude Include="headers\mitigation\MitigationRegister.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1025.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-LLMNR.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-WSH.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h" />
@@ -434,10 +437,13 @@
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
     <ClCompile Include="src\hunt\reaction\HuntTrigger.cpp" />
+    <ClCompile Include="src\hunt\reaction\RemoveValue.cpp" />
+    <ClCompile Include="src\hunt\reaction\SuspendProcess.cpp" />
     <ClCompile Include="src\hunt\RegistryHunt.cpp" />
     <ClCompile Include="src\hunt\Scope.cpp" />
     <ClCompile Include="src\mitigation\Mitigation.cpp" />
     <ClCompile Include="src\mitigation\MitigationRegister.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1025.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-LLMNR.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-WSH.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp" />

@@ -5,6 +5,8 @@
 #include "common/DynamicLinker.h"
 #include "common/StringUtils.h"
 #include "util/eventlogs/EventLogs.h"
+#include "hunt/reaction/SuspendProcess.h"
+#include "hunt/reaction/RemoveValue.h"
 
 #include "hunt/hunts/HuntT1004.h"
 #include "hunt/hunts/HuntT1037.h"
@@ -40,20 +42,19 @@ HuntRegister Bluespawn::huntRecord{ io };
 MitigationRegister Bluespawn::mitigationRecord{ io };
 
 Bluespawn::Bluespawn() {
-	using namespace Hunts;
 
-	HuntT1004* t1004 = new HuntT1004(huntRecord);
-	HuntT1037* t1037 = new HuntT1037(huntRecord);
-	HuntT1050* t1050 = new HuntT1050(huntRecord);
-	HuntT1055* t1055 = new HuntT1055(huntRecord);
-	HuntT1060* t1060 = new HuntT1060(huntRecord);
-	HuntT1100* t1100 = new HuntT1100(huntRecord);
-	HuntT1101* t1101 = new HuntT1101(huntRecord);
-	HuntT1103* t1103 = new HuntT1103(huntRecord);
-	HuntT1131* t1131 = new HuntT1131(huntRecord);
-	HuntT1138* t1138 = new HuntT1138(huntRecord);
-	HuntT1182* t1182 = new HuntT1182(huntRecord);
-	HuntT1183* t1183 = new HuntT1183(huntRecord);
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1004>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1037>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1050>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1055>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1060>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1100>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1101>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1103>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1131>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1138>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1182>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1183>());
 
 	using namespace Mitigations;
    
@@ -71,14 +72,17 @@ Bluespawn::Bluespawn() {
 }
 
 void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
-	DWORD tactics = UINT_MAX;
+	Bluespawn::io.InformUser(L"Starting a Hunt");
+  DWORD tactics = UINT_MAX;
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
-	Reaction reaction = Reactions::LogReaction();
-
-	Bluespawn::io.InformUser(L"Starting a Hunt");
-	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+	Reaction logreact = Reactions::LogReaction();
+	Reaction suspendreact = Reactions::SuspendProcessReaction(io);
+	Reaction logsuspend = logreact.Combine(suspendreact);
+	Reaction removereact = Reactions::RemoveValueReaction(io);
+	auto reaction = logsuspend.Combine(removereact);
+	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
 }
 
 void Bluespawn::dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce) {

@@ -3,7 +3,7 @@
 
 HuntRegister::HuntRegister(IOBase& io) : io(io) {}
 
-void HuntRegister::RegisterHunt(Hunt* hunt) {
+void HuntRegister::RegisterHunt(std::shared_ptr<Hunt> hunt) {
 	// The actual hunt itself is stored in the vector here!
 	// Make sure that all internal references to it are referencing
 	// the copy in vRegisteredHunts and not the argument to this function.
@@ -24,7 +24,7 @@ void HuntRegister::RegisterHunt(Hunt* hunt) {
 	}*/
 }
 
-void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction){
+void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction){
 	io.InformUser(L"Starting a hunt for " + std::to_wstring(vRegisteredHunts.size()) + L" techniques.");
 	int huntsRan = 0;
 

@@ -5,7 +5,7 @@
 
 namespace Hunts {
 
-	HuntT1050::HuntT1050(HuntRegister& record) : Hunt(record, L"T1050 - New Service") {
+	HuntT1050::HuntT1050() : Hunt(L"T1050 - New Service") {
 		// TODO: update these categories
 		dwSupportedScans = (DWORD) Aggressiveness::Intensive;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
