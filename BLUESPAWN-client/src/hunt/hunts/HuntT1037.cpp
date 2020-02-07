@@ -6,7 +6,7 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1037::HuntT1037(HuntRegister& record) : Hunt(record, L"T1037 - Logon Scripts") {
+	HuntT1037::HuntT1037() : Hunt(L"T1037 - Logon Scripts") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
