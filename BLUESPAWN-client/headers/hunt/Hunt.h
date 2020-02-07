@@ -39,4 +39,6 @@ public:
 	virtual int ScanCursory(const Scope& scope, Reaction reaction);
 	virtual int ScanNormal(const Scope& scope, Reaction reaction);
 	virtual int ScanIntensive(const Scope& scope, Reaction reaction);
+
+	virtual void SetupMonitoring(HuntRegister& record, const Scope& scope, Aggressiveness level, Reaction reaction);
 };

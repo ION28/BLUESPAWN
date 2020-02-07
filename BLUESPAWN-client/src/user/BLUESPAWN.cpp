@@ -8,7 +8,106 @@
 #include "hunt/reaction/SuspendProcess.h"
 #include "hunt/reaction/RemoveValue.h"
 
+#include "hunt/hunts/HuntT1004.h"
+#include "hunt/hunts/HuntT1037.h"
+#include "hunt/hunts/HuntT1050.h"
+#include "hunt/hunts/HuntT1055.h"
+#include "hunt/hunts/HuntT1060.h"
+#include "hunt/hunts/HuntT1100.h"
+#include "hunt/hunts/HuntT1101.h"
+#include "hunt/hunts/HuntT1103.h"
+#include "hunt/hunts/HuntT1131.h"
+#include "hunt/hunts/HuntT1138.h"
+#include "hunt/hunts/HuntT1182.h"
+#include "hunt/hunts/HuntT1183.h"
+
+#include "monitor/ETW_Wrapper.h"
+
+#include "mitigation/mitigations/MitigateM1042-LLMNR.h"
+#include "mitigation/mitigations/MitigateM1042-WSH.h"
+#include "mitigation/mitigations/MitigateV1093.h"
+#include "mitigation/mitigations/MitigateV1153.h"
+#include "mitigation/mitigations/MitigateV3338.h"
+#include "mitigation/mitigations/MitigateV63597.h"
+#include "mitigation/mitigations/MitigateV63817.h"
+#include "mitigation/mitigations/MitigateV63825.h"
+#include "mitigation/mitigations/MitigateV63829.h"
+#include "mitigation/mitigations/MitigateV72753.h"
+#include "mitigation/mitigations/MitigateV73519.h"
+
 #include <iostream>
+
+IOBase& Bluespawn::io = CLI();
+HuntRegister Bluespawn::huntRecord{ io };
+MitigationRegister Bluespawn::mitigationRecord{ io };
+
+Bluespawn::Bluespawn() {
+
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1004>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1037>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1050>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1055>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1060>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1100>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1101>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1103>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1131>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1138>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1182>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1183>());
+
+	using namespace Mitigations;
+   
+	MitigateM1042LLMNR* m1042llmnr = new MitigateM1042LLMNR(mitigationRecord);
+	MitigateM1042WSH* m1042wsh = new MitigateM1042WSH(mitigationRecord);
+	MitigateV1093* v1093 = new MitigateV1093(mitigationRecord);
+	MitigateV1153* v1153 = new MitigateV1153(mitigationRecord);
+	MitigateV3338* v3338 = new MitigateV3338(mitigationRecord);
+	MitigateV63597* v63597 = new MitigateV63597(mitigationRecord);
+	MitigateV63817* v63817 = new MitigateV63817(mitigationRecord);
+	MitigateV63825* v63825 = new MitigateV63825(mitigationRecord);
+	MitigateV63829* v63829 = new MitigateV63829(mitigationRecord);
+	MitigateV72753* v72753 = new MitigateV72753(mitigationRecord);
+	MitigateV73519* v73519 = new MitigateV73519(mitigationRecord);
+}
+
+void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
+	Bluespawn::io.InformUser(L"Starting a Hunt");
+	DWORD tactics = UINT_MAX;
+	DWORD dataSources = UINT_MAX;
+	DWORD affectedThings = UINT_MAX;
+	Scope scope{};
+	Reaction logreact = Reactions::LogReaction();
+	Reaction suspendreact = Reactions::SuspendProcessReaction(io);
+	Reaction logsuspend = logreact.Combine(suspendreact);
+	Reaction removereact = Reactions::RemoveValueReaction(io);
+	auto reaction = logsuspend.Combine(removereact);
+	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+}
+
+void Bluespawn::dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce) {
+	if (mode == MitigationMode::Enforce) {
+		Bluespawn::io.InformUser(L"Enforcing Mitigations");
+		mitigationRecord.EnforceMitigations(SecurityLevel::High, bForceEnforce);
+	}
+	else {
+		Bluespawn::io.InformUser(L"Auditing Mitigations");
+		mitigationRecord.AuditMitigations(SecurityLevel::High);
+	}
+}
+
+void Bluespawn::monitor_system(Aggressiveness aHuntLevel) {
+	DWORD tactics = UINT_MAX;
+	DWORD dataSources = UINT_MAX;
+	DWORD affectedThings = UINT_MAX;
+	Scope scope{};
+	Reaction reaction = Reactions::LogReaction();
+
+	Bluespawn::io.InformUser(L"Monitoring the system");
+	huntRecord.SetupMonitoring(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+
+	while (true) {}
+}
 
 int main(int argc, char* argv[]){
 	Linker::LinkFunctions();
@@ -18,20 +117,15 @@ int main(int argc, char* argv[]){
 	Log::AddSink(DebugOutput);
 	Log::AddHuntSink(ConsoleOutput);
 
-	IOBase& io = CLI();
+	Bluespawn bluespawn;
 
 	print_banner();
-
-	/*
-	// Create and initialize the ETW wrapper
-	ETW_Wrapper wrapper;
-	wrapper.init();
-	*/
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
 	options.add_options()
 		("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
+		("n,monitor", "Monitor the System for Malicious Activity. Available options are Cursory, Normal, or Intensive.", cxxopts::value<std::string>()->implicit_value("Normal"))
 		("m,mitigate", "Mitigates vulnerabilities by applying security settings. Available options are audit and enforce.", cxxopts::value<std::string>()->implicit_value("audit"))
 		("help", "Help Information. You can also specify a category for help on a specific module such as hunt"
 			, cxxopts::value<std::string>()->implicit_value("general"))
@@ -72,11 +166,52 @@ int main(int argc, char* argv[]){
 		if (result.count("help")) {
 			print_help(result, options);
 		}
-		else if (result.count("hunt")) {
-			dispatch_hunt(result, options, io);
+		else if (result.count("hunt") || result.count("monitor")) {
+			std::string flag("level");
+			if (result.count("monitor"))
+				flag = "monitor";
+
+			// Parse the hunt level
+			std::string sHuntLevelFlag = "Normal";
+			Aggressiveness aHuntLevel;
+			try {
+				sHuntLevelFlag = result[flag].as < std::string >();
+			}
+			catch (int e) {}
+
+			if (sHuntLevelFlag == "Cursory") {
+				aHuntLevel = Aggressiveness::Cursory;
+			}
+			else if (sHuntLevelFlag == "Normal") {
+				aHuntLevel = Aggressiveness::Normal;
+			}
+			else if (sHuntLevelFlag == "Intensive") {
+				aHuntLevel = Aggressiveness::Intensive;
+			}
+			else {
+				LOG_ERROR("Error " << sHuntLevelFlag << " - Unknown level. Please specify either Cursory, Normal, or Intensive");
+				LOG_ERROR("Will default to Cursory for this run.");
+				Bluespawn::io.InformUser(L"Error " + StringToWidestring(sHuntLevelFlag) + L" - Unknown level. Please specify either Cursory, Normal, or Intensive");
+				Bluespawn::io.InformUser(L"Will default to Cursory.");
+				aHuntLevel = Aggressiveness::Cursory;
+			}
+			
+			if (result.count("hunt"))
+				bluespawn.dispatch_hunt(aHuntLevel);
+			else if (result.count("monitor"))
+				bluespawn.monitor_system(aHuntLevel);
+
 		}
 		else if (result.count("mitigate")) {
-			dispatch_mitigations_analysis(result, options, io);
+			bool bForceEnforce = false;
+			if (result.count("force"))
+				bForceEnforce = true;
+
+			MitigationMode mode = MitigationMode::Audit;
+			if (result["mitigate"].as<std::string>() == "e" || result["mitigate"].as<std::string>() == "enforce")
+				mode = MitigationMode::Enforce;
+
+			bluespawn.dispatch_mitigations_analysis(mode, bForceEnforce);
 		}
 		else {
 			LOG_ERROR("Nothing to do. Use the -h or --hunt flags to launch a hunt");
@@ -101,88 +236,5 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 	}
 	else {
 		std::cerr << ("Unknown help category") << std::endl;
-	}
-}
-
-void dispatch_hunt(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io) {
-	std::string sHuntLevelFlag = "Cursory";
-	Aggressiveness aHuntLevel;
-	if(result.count("level")) {
-		try {
-			sHuntLevelFlag = result["level"].as < std::string >();
-		} catch(int e) {
-			LOG_ERROR("Error " << e << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
-			io.InformUser(L"Error " + std::to_wstring(e) + L" - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
-		}
-	}
-	if(sHuntLevelFlag == "Cursory") {
-		aHuntLevel = Aggressiveness::Cursory;
-	} else if(sHuntLevelFlag == "Normal") {
-		aHuntLevel = Aggressiveness::Normal;
-	} else if (sHuntLevelFlag == "Intensive") {
-		aHuntLevel = Aggressiveness::Intensive;
-	} else {
-		LOG_ERROR("Error " << sHuntLevelFlag << " - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
-		LOG_ERROR("Will default to Cursory for this run.");
-		io.InformUser(L"Error " + StringToWidestring(sHuntLevelFlag) + L" - Unknown hunt level. Please specify either Cursory, Normal, or Intensive");
-		io.InformUser(L"Will default to Cursory for this run.");
-		aHuntLevel = Aggressiveness::Cursory;
-	}
-
-	HuntRegister record{io};
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1004>());
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1037>());
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1050>());
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1055>());
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1060>());
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1100>());
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1101>());
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1103>());
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1131>());
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1138>());
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1182>());
-	record.RegisterHunt(std::make_shared<Hunts::HuntT1183>());
-
-	DWORD tactics = UINT_MAX;
-	DWORD dataSources = UINT_MAX;
-	DWORD affectedThings = UINT_MAX;
-	Scope scope{};
-	Reaction logreact = Reactions::LogReaction();
-	Reaction suspendreact = Reactions::SuspendProcessReaction(io);
-	Reaction logsuspend = logreact.Combine(suspendreact);
-	Reaction removereact = Reactions::RemoveValueReaction(io);
-	auto reaction = logsuspend.Combine(removereact);
-	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
-}
-
-
-void dispatch_mitigations_analysis(cxxopts::ParseResult result, cxxopts::Options options, IOBase& io) {
-	bool bForceEnforce = false;
-	if (result.count("force")) {
-		bForceEnforce = true;
-	}
-
-	MitigationRegister record{io};
-
-	Mitigations::MitigateM1025 m1025(record);
-	Mitigations::MitigateM1042LLMNR m1042llmnr(record);
-	Mitigations::MitigateM1042WSH m1042wsh(record);
-	Mitigations::MitigateV1093 v1093(record);
-	Mitigations::MitigateV1153 v1153(record);
-	Mitigations::MitigateV3338 v3338(record);
-	Mitigations::MitigateV63597 v63597(record);
-	Mitigations::MitigateV63817 v63817(record);
-	Mitigations::MitigateV63825 v63825(record);
-	Mitigations::MitigateV63829 v63829(record);
-	Mitigations::MitigateV72753 v72753(record);
-	Mitigations::MitigateV73519 v73519(record);
-
-	if (result["mitigate"].as<std::string>() == "e" || result["mitigate"].as<std::string>() == "enforce") {
-		io.InformUser(L"Enforcing Mitigations");
-		record.EnforceMitigations(SecurityLevel::High, bForceEnforce);
-	}
-	else {
-		io.InformUser(L"Auditing Mitigations");
-		record.AuditMitigations(SecurityLevel::High);
 	}
 }

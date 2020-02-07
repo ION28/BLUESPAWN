@@ -17,8 +17,9 @@ namespace Hunts {
 		LOG_INFO("Hunting for T1050 - New Service at level Intensive");
 		reaction.BeginHunt(GET_INFO());
 
+
 		int identified = 0;
-		identified += QueryEvents(L"System", 7045, std::set<std::wstring>({L"Event/EventData/Data[@Name='ServiceName']", 
+		identified += EventLogs::getLogs()->QueryEvents(L"System", 7045, std::set<std::wstring>({L"Event/EventData/Data[@Name='ServiceName']",
 			L"Event/EventData/Data[@Name='ImagePath']", L"Event/EventData/Data[@Name='ServiceType']", L"Event/EventData/Data[@Name='StartType']" }), reaction);
 
 		if (identified == -1) {
@@ -30,4 +31,14 @@ namespace Hunts {
 		return identified;
 	}
 
+	void HuntT1050::SetupMonitoring(HuntRegister& record, const Scope& scope, Aggressiveness level, Reaction reaction) {
+		Reactions::HuntTriggerReaction triggerReaction(record, dynamic_cast<Hunt*>(this), scope, level, reaction);
+		DWORD status;
+		eventSubscriptions.push_back(EventLogs::getLogs()->subscribe(L"System", 7045, triggerReaction, &status));
+
+		if (status == ERROR_SUCCESS)
+			LOG_INFO("Monitoring for T1050 - New Service at level Cursory");
+		else
+			LOG_WARNING("Monitoring for T1050 failed with error code " + std::to_string(status));
+	}
 }
