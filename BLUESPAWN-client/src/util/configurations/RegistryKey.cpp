@@ -279,8 +279,7 @@ namespace Registry {
 			std::vector<std::wstring> strings{};
 			std::wstring wsLogString{};
 
-			LPCWSTR data = reinterpret_cast<LPCWSTR>(GetRawValue(wsValueName).Copy());
-			auto tmp = data;
+			LPCWSTR data = reinterpret_cast<LPCWSTR>((LPVOID) GetRawValue(wsValueName));
 
 			while(*data){
 				std::wstring str = data;
@@ -289,8 +288,6 @@ namespace Registry {
 
 				data += str.length() + 1;
 			}
-
-			delete tmp;
 
 			return strings;
 		}
@@ -303,14 +300,7 @@ namespace Registry {
 			return false;
 		}
 
-		auto copy = bytes.Copy();
-		if(!copy){
-			SetLastError(ERROR_INVALID_PARAMETER);
-			return false;
-		}
-
-		LSTATUS status = RegSetValueEx(hkBackingKey, name.c_str(), 0, dwType, reinterpret_cast<BYTE*>(copy), bytes.GetSize());
-		delete[] copy;
+		LSTATUS status = RegSetValueEx(hkBackingKey, name.c_str(), 0, dwType, reinterpret_cast<BYTE*>((LPVOID) bytes), bytes.GetSize());
 		if(status != ERROR_SUCCESS){
 			SetLastError(status);
 			return false;
