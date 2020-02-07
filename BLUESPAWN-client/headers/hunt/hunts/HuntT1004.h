@@ -15,7 +15,7 @@ namespace Hunts {
 	 */
 	class HuntT1004 : public Hunt {
 	public:
-		HuntT1004(HuntRegister& record);
+		HuntT1004();
 
 		virtual int ScanCursory(const Scope& scope, Reaction reaction) override;
 	};

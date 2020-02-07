@@ -6,7 +6,7 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1103::HuntT1103(HuntRegister& record) : Hunt(record, L"T1103 - AppInit DLLs") {
+	HuntT1103::HuntT1103() : Hunt(L"T1103 - AppInit DLLs") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Processes;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;

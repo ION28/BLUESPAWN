@@ -7,7 +7,7 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1138::HuntT1138(HuntRegister& record) : Hunt(record, L"T1138 - Application Shimming") {
+	HuntT1138::HuntT1138() : Hunt(L"T1138 - Application Shimming") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;

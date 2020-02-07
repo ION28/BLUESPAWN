@@ -7,7 +7,7 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1131::HuntT1131(HuntRegister& record) : Hunt(record, L"T1131 - Authentication Package") {
+	HuntT1131::HuntT1131() : Hunt(L"T1131 - Authentication Package") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
