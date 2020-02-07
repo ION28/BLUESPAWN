@@ -4,9 +4,19 @@
 #include "util/log/Log.h"
 
 const int SIZE_DATA = 4096;
+const int ARRAY_SIZE = 10;
 
-DWORD GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param)
-{
+EventLogs* EventLogs::logs = NULL;
+
+/**
+The callback function directly called by event subscriptions.
+In turn it calls the EventSubscription::SubscriptionCallback of a specific class instance.
+*/
+DWORD WINAPI CallbackWrapper(EVT_SUBSCRIBE_NOTIFY_ACTION Action, PVOID UserContext, EVT_HANDLE Event) {
+	return reinterpret_cast<EventSubscription*>(UserContext)->SubscriptionCallback(Action, Event);
+}
+
+DWORD EventLogs::GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param) {
 	DWORD status = ERROR_SUCCESS;
 	EVT_HANDLE hContext = NULL;
 	DWORD dwBufferSize = 0;
@@ -25,7 +35,7 @@ DWORD GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param)
 	if (NULL == hContext)
 	{
 		status = GetLastError();
-		LOG_ERROR("EvtCreateRenderContext failed with " + std::to_string(status));
+		LOG_ERROR("EventLogs::GetEventParam: EvtCreateRenderContext failed with " + std::to_string(status));
 		goto cleanup;
 	}
 
@@ -44,7 +54,7 @@ DWORD GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param)
 			}
 			else
 			{
-				LOG_ERROR("GetEventParam malloc failed");
+				LOG_ERROR("EventLogs::GetEventParam: GetEventParam malloc failed");
 				status = ERROR_OUTOFMEMORY;
 				goto cleanup;
 			}
@@ -52,7 +62,7 @@ DWORD GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param)
 
 		if (ERROR_SUCCESS != (status = GetLastError()))
 		{
-			LOG_ERROR("EvtRender in GetEventParam failed with " + std::to_string(status));
+			LOG_ERROR("EventLogs::GetEventParam: EvtRender in GetEventParam failed with " + std::to_string(status));
 			goto cleanup;
 		}
 	}
@@ -92,7 +102,7 @@ cleanup:
 	return status;
 }
 
-DWORD GetEventXML(EVT_HANDLE hEvent, std::wstring * data)
+DWORD EventLogs::GetEventXML(EVT_HANDLE hEvent, std::wstring * data)
 {
 	DWORD status = ERROR_SUCCESS;
 	DWORD dwBufferSize = 0;
@@ -115,7 +125,7 @@ DWORD GetEventXML(EVT_HANDLE hEvent, std::wstring * data)
 			}
 			else
 			{
-				LOG_ERROR("GetEventXML malloc failed");
+				LOG_ERROR("EventLogs::GetEventXML: GetEventXML malloc failed");
 				status = ERROR_OUTOFMEMORY;
 				goto cleanup;
 			}
@@ -123,7 +133,7 @@ DWORD GetEventXML(EVT_HANDLE hEvent, std::wstring * data)
 
 		if (ERROR_SUCCESS != (status = GetLastError()))
 		{
-			LOG_ERROR("EvtRender in GetEventXML failed with " + std::to_string(GetLastError()));
+			LOG_ERROR("EventLogs::GetEventXML: EvtRender in GetEventXML failed with " + std::to_string(GetLastError()));
 			goto cleanup;
 		}
 	}
@@ -136,7 +146,7 @@ cleanup:
 }
 
 // Enumerate all the events in the result set. 
-DWORD ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std::set<std::wstring> &params)
+DWORD EventLogs::ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std::set<std::wstring> &params)
 {
 	DWORD status = ERROR_SUCCESS;
 	EVT_HANDLE hEvents[ARRAY_SIZE];
@@ -145,50 +155,17 @@ DWORD ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std
 	while (true)
 	{
 		// Get a block of events from the result set.
-		if (!EvtNext(hResults, ARRAY_SIZE, hEvents, INFINITE, 0, &dwReturned))
-		{
+		if (!EvtNext(hResults, ARRAY_SIZE, hEvents, INFINITE, 0, &dwReturned)) {
 			if (ERROR_NO_MORE_ITEMS != (status = GetLastError()))
-			{
-				LOG_ERROR("EvtNext failed with " + std::to_string(status));
-			}
+				LOG_ERROR("EventLogs::ProcessResults: EvtNext failed with " + std::to_string(status));
 
 			goto cleanup;
 		}
-
-		// For each event, call the PrintEvent function which renders the
-		// event for display. PrintEvent is shown in RenderingEvents.
-		std::wstring eventIDStr;
-		std::wstring eventRecordIDStr;
-		std::wstring timeCreated;
-		std::wstring channel;
-		std::wstring rawXML;
-		for (DWORD i = 0; i < dwReturned; i++)
-		{
-			if (ERROR_SUCCESS != (status = GetEventParam(hEvents[i], &eventIDStr, L"Event/System/EventID")))
+		
+		for (DWORD i = 0; i < dwReturned; i++) {
+			EVENT_DETECTION detect(0, 0, L"", L"", L"");
+			if(ERROR_SUCCESS != (status = EventToDetection(hEvents[i], &detect, params)))
 				goto cleanup;
-			if (ERROR_SUCCESS != (status = GetEventParam(hEvents[i], &eventRecordIDStr, L"Event/System/EventRecordID")))
-				goto cleanup;
-			if (ERROR_SUCCESS != (status = GetEventParam(hEvents[i], &timeCreated, L"Event/System/TimeCreated/@SystemTime")))
-				goto cleanup;
-			if (ERROR_SUCCESS != (status = GetEventParam(hEvents[i], &channel, L"Event/System/Channel")))
-				goto cleanup;
-			if (ERROR_SUCCESS != (status = GetEventXML(hEvents[i], &rawXML)))
-				goto cleanup;
-
-			// Specify extra parameters
-			std::unordered_map<std::wstring, std::wstring> extraParams;
-			for (std::wstring key : params) {
-				std::wstring val;
-				if (ERROR_SUCCESS != (status = GetEventParam(hEvents[i], &val, key))) {
-					LOG_ERROR(L"Failed query parameter " + key + L" with code " + std::to_wstring(status));
-					goto cleanup;
-				}
-
-				extraParams.insert({ key, val });
-			}
-
-			EVENT_DETECTION detect(std::stoul(eventIDStr), std::stoul(eventRecordIDStr), timeCreated, channel, rawXML);
-			detect.params = extraParams;
 			reaction.EventIdentified(std::make_shared<EVENT_DETECTION>(detect));
 
 			(*numFound) += 1;
@@ -211,12 +188,54 @@ cleanup:
 	return status;
 }
 
-int QueryEvents(const wchar_t* channel, unsigned int id, Reaction& reaction)
+DWORD EventLogs::EventToDetection(EVT_HANDLE hEvent, EVENT_DETECTION* pDetection, std::set<std::wstring>& params) {
+	DWORD status = ERROR_SUCCESS;
+
+	std::wstring eventIDStr;
+	std::wstring eventRecordIDStr;
+	std::wstring timeCreated;
+	std::wstring channel;
+	std::wstring rawXML;
+
+	if (ERROR_SUCCESS != (status = GetEventParam(hEvent, &eventIDStr, L"Event/System/EventID")))
+		return status;
+	if (ERROR_SUCCESS != (status = GetEventParam(hEvent, &eventRecordIDStr, L"Event/System/EventRecordID")))
+		return status;
+	if (ERROR_SUCCESS != (status = GetEventParam(hEvent, &timeCreated, L"Event/System/TimeCreated/@SystemTime")))
+		return status;
+	if (ERROR_SUCCESS != (status = GetEventParam(hEvent, &channel, L"Event/System/Channel")))
+		return status;
+	if (ERROR_SUCCESS != (status = GetEventXML(hEvent, &rawXML)))
+		return status;
+
+	// Specify extra parameters
+	std::unordered_map<std::wstring, std::wstring> extraParams;
+	for (std::wstring key : params) {
+		std::wstring val;
+		if (ERROR_SUCCESS != (status = GetEventParam(hEvent, &val, key))) {
+			LOG_ERROR(L"EventLogs::EventToDetection: Failed query parameter " + key + L" with code " + std::to_wstring(status));
+			return status;
+		}
+
+		extraParams.insert({ key, val });
+	}
+
+	pDetection->eventID = std::stoul(eventIDStr);
+	pDetection->eventRecordID = std::stoul(eventRecordIDStr);
+	pDetection->timeCreated = timeCreated;
+	pDetection->channel = channel;
+	pDetection->rawXML = rawXML;
+	pDetection->params = extraParams;
+
+	return status;
+}
+
+int EventLogs::QueryEvents(const wchar_t* channel, unsigned int id, Reaction& reaction)
 {
 	return QueryEvents(channel, id, std::set<std::wstring>(), reaction);
 }
 
-int QueryEvents(const wchar_t* channel, unsigned int id, std::set<std::wstring>& params, Reaction& reaction)
+int EventLogs::QueryEvents(const wchar_t* channel, unsigned int id, std::set<std::wstring>& params, Reaction& reaction)
 {
 	DWORD status = ERROR_SUCCESS;
 	EVT_HANDLE hResults = NULL;
@@ -230,13 +249,13 @@ int QueryEvents(const wchar_t* channel, unsigned int id, std::set<std::wstring>&
 		status = GetLastError();
 
 		if (ERROR_EVT_CHANNEL_NOT_FOUND == status)
-			LOG_ERROR("The channel was not found.");
+			LOG_ERROR("EventLogs::QueryEvents: The channel was not found.");
 		else if (ERROR_EVT_INVALID_QUERY == status)
 			// You can call the EvtGetExtendedStatus function to try to get 
 			// additional information as to what is wrong with the query.
-			LOG_ERROR(L"The query " + query + L" is not valid.");
+			LOG_ERROR(L"EventLogs::QueryEvents: The query " + query + L" is not valid.");
 		else
-			LOG_ERROR("EvtQuery failed with " + std::to_string(status));
+			LOG_ERROR("EventLogs::QueryEvents: EvtQuery failed with " + std::to_string(status));
 
 		goto cleanup;
 	}
@@ -252,4 +271,31 @@ cleanup:
 	if (status == ERROR_SUCCESS)
 		return numFound;
 	return -1;
+}
+
+std::unique_ptr<EventSubscription> EventLogs::subscribe(LPWSTR pwsPath, unsigned int id, Reactions::HuntTriggerReaction& reaction, DWORD * pStatus) {
+	*pStatus = ERROR_SUCCESS;
+	EVT_HANDLE hSubscription = NULL;
+
+	auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
+	auto wquery = query.c_str();
+
+	auto eventSub = std::make_unique<EventSubscription>(reaction);
+
+	hSubscription = EvtSubscribe(NULL, NULL, pwsPath, wquery, NULL, reinterpret_cast<void*>(eventSub.get()),
+		CallbackWrapper, EvtSubscribeToFutureEvents);
+
+	if (hSubscription == NULL) {
+		// Cleanup a failed subscription
+		*pStatus = GetLastError();
+
+		if (ERROR_EVT_CHANNEL_NOT_FOUND == *pStatus)
+			LOG_ERROR("EventLogs::subscribe: Channel was not found.");
+		else if (ERROR_EVT_INVALID_QUERY == *pStatus)
+			LOG_ERROR(L"EventLogs::subscribe: query " + query + L" is not valid.");
+		else
+			LOG_ERROR("EventLogs::subscribe: EvtSubscribe failed with " + std::to_string(*pStatus));
+	}
+
+	return eventSub;
 }
