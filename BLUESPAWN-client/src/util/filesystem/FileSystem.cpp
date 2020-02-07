@@ -442,7 +442,7 @@ bool FileSystem::Folder::RemoveFile() {
 	if (GetCurIsFile()) {
 		std::optional<File> f = Open();
 		if (f) {
-			File file = f.value;
+			File file = *f;
 			if (file.GetFileExists()) {
 				if (file.Delete()){
 					return true;
@@ -463,7 +463,7 @@ std::vector<File> FileSystem::Folder::GetFiles(IN FileSearchAttribs* attribs, IN
 		if (GetCurIsFile()) {
 			std::optional<File> f = Open();
 			if (f) {
-				File file = f.value;
+				File file = *f;
 				if (!attribs) {
 					toRet.emplace_back(file);
 				}
@@ -478,7 +478,7 @@ std::vector<File> FileSystem::Folder::GetFiles(IN FileSearchAttribs* attribs, IN
 			std::vector<File> temp;
 			std::optional<Folder> f = EnterDir();
 			if (f) {
-				Folder folder = f.value;
+				Folder folder = *f;
 				if (recurDepth == -1) {
 					temp = folder.GetFiles(attribs, recurDepth);
 				}
