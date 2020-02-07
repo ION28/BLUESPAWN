@@ -59,17 +59,22 @@ namespace Hunts {
 					std::string sus_file = ToLowerCaseA(*read.ReadString());
 					if (file_ext.compare(L".php") == 0) {
 						if (regex_search(sus_file, match_index, php_vuln_functions)) {
+							identified++;
+							reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath().substr(entry.GetFilePath().find_last_of(L"\\/")), entry.GetFilePath()));
 							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath())<< " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					else if (file_ext.substr(0, 4).compare(L".jsp") == 0) {
 						if (regex_search(sus_file, match_index, jsp_indicators)) {
+							identified++;
+							reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath().substr(entry.GetFilePath().find_last_of(L"\\/")), entry.GetFilePath()));
 							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					else if (file_ext.substr(0, 3).compare(L".as") == 0) {
 						if (regex_search(sus_file, match_index, asp_indicators)) {
 							identified++;
+							reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath().substr(entry.GetFilePath().find_last_of(L"\\/")), entry.GetFilePath()));
 							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
@@ -105,12 +110,14 @@ namespace Hunts {
 					if (file_ext.compare(L".php") == 0) {
 						if (regex_search(sus_file, match_index, php_vuln_functions)) {
 							identified++;
+							reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath().substr(entry.GetFilePath().find_last_of(L"\\/")), entry.GetFilePath()));
 							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					else if (file_ext.substr(0, 4).compare(L".jsp") == 0) {
 						if (regex_search(sus_file, match_index, jsp_indicators)) {
 							identified++;
+							reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath().substr(entry.GetFilePath().find_last_of(L"\\/")), entry.GetFilePath()));
 							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
@@ -118,6 +125,7 @@ namespace Hunts {
 					else if (file_ext.substr(0, 3).compare(L".as") == 0) {
 						if (regex_search(sus_file, match_index, asp_indicators)) {
 							identified++;
+							reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath().substr(entry.GetFilePath().find_last_of(L"\\/")), entry.GetFilePath()));
 							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
