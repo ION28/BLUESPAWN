@@ -2,6 +2,7 @@
 
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
+#include "common/StringUtils.h"
 
 namespace Hunts {
 	HuntT1100::HuntT1100() : Hunt(L"T1100 - Web Shells") {
@@ -43,74 +44,67 @@ namespace Hunts {
 		int identified = 0;
 
 		for (wstring path : web_directories) {
-			FileSystem::Folder* f = new FileSystem::Folder((LPCWSTR)path.c_str());
+			FileSystem::Folder  f = FileSystem::Folder((LPCWSTR)path.c_str());
 			FileSystem::FileSearchAttribs attribs;
 			attribs.extensions = web_exts;
-			std::vector<FileSystem::File*>* files = f->GetFiles(&attribs, -1);
-			for (const auto& entry : *files) {
+			std::vector<FileSystem::File> files = f.GetFiles(&attribs, -1);
+			for (auto& entry : files) {
 				long offset = 0;
 				long targetAmount = 1000000;
-				CHAR* read = (CHAR *)calloc(targetAmount + 1, 1);
+				CHAR* read = (CHAR *)calloc(targetAmount + 1L, 1);
 				DWORD amountRead = 0;
-				wstring file_ext = entry->GetFileAttribs().extension;
+				wstring file_ext = entry.GetFileAttribs().extension;
 				do {
-					entry->Read(read, offset, targetAmount, amountRead);
+					entry.Read(read, offset, targetAmount, amountRead);
 					read[amountRead] = '\0';
 					string sus_file(read);
 					transform(sus_file.begin(), sus_file.end(), sus_file.begin(), ::tolower);
 					if (file_ext.compare(L".php") == 0) {
 						if (regex_search(sus_file, match_index, php_vuln_functions)) {
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					else if (file_ext.substr(0, 4).compare(L".jsp") == 0) {
 						if (regex_search(sus_file, match_index, jsp_indicators)) {
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					else if (file_ext.substr(0, 3).compare(L".as") == 0) {
 						if (regex_search(sus_file, match_index, asp_indicators)) {
 							identified++;
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					offset += amountRead - 1000;
 				} while (targetAmount <= amountRead);
 			}
-			//Cleanup
-			while (!files->empty()) {
-				delete files->at(files->size() - 1);
-				files->pop_back();
-			}
-			delete files;
-			delete f;
 		}
 		reaction.EndHunt();
 		return identified;
 		return 0;
 	}
 
-	int HuntT1100::ScanModerate(const Scope& scope, Reaction reaction){
+	int HuntT1100::ScanNormal(const Scope& scope, Reaction reaction){
 		return 0;
 		LOG_INFO("Hunting for T1100 - Web Shells at level Moderate");
 		reaction.BeginHunt(GET_INFO());
-		SetRegexAggressivenessLevel(Aggressiveness::Moderate);
+		SetRegexAggressivenessLevel(Aggressiveness::Normal);
 
 		int identified = 0;
 
 		for (wstring path : web_directories) {
-			FileSystem::Folder* f = new FileSystem::Folder((LPCWSTR)path.c_str());
+			FileSystem::Folder f = FileSystem::Folder((LPCWSTR)path.c_str());
 			FileSystem::FileSearchAttribs attribs;
 			attribs.extensions = web_exts;
-			std::vector<FileSystem::File*>* files = f->GetFiles(&attribs, -1);
-			for (const auto& entry : *files) {
+			std::vector<FileSystem::File> files = f.GetFiles(&attribs, -1);
+			for (auto& entry : files) {
 				long offset = 0;
 				long targetAmount = 1000000;
 				CHAR* read = (CHAR*)calloc(targetAmount + 1, 1);
 				DWORD amountRead = 0;
-				wstring file_ext = entry->GetFileAttribs().extension;
+				wstring file_ext = entry.GetFileAttribs().extension;
 				do {
-					entry->Read(read, offset, targetAmount, amountRead);
+					entry.Read(read, offset, targetAmount, amountRead);
 					read[amountRead] = '\0';
 					string sus_file(read);
 					transform(sus_file.begin(), sus_file.end(), sus_file.begin(), ::tolower);
@@ -118,33 +112,26 @@ namespace Hunts {
 					if (file_ext.compare(L".php") == 0) {
 						if (regex_search(sus_file, match_index, php_vuln_functions)) {
 							identified++;
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 					else if (file_ext.substr(0, 4).compare(L".jsp") == 0) {
 						if (regex_search(sus_file, match_index, jsp_indicators)) {
 							identified++;
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
 					}
 
 					else if (file_ext.substr(0, 3).compare(L".as") == 0) {
 						if (regex_search(sus_file, match_index, asp_indicators)) {
 							identified++;
-							LOG_ERROR("Located likely web shell in file " << entry.path().string() << " in text " << sus_file.substr(match_index.position(), match_index.length()));
+							LOG_ERROR("Located likely web shell in file " << WidestringToString(entry.GetFilePath()) << " in text " << sus_file.substr(match_index.position(), match_index.length()));
 						}
-					}					offset += amountRead - 1000;
+					}
+					offset += amountRead - 1000;
 				} while (targetAmount <= amountRead);
 			}
-			//Cleanup
-			while (!files->empty()) {
-				delete files->at(files->size() - 1);
-				files->pop_back();
-			}
-			delete files;
-			delete f;
 		}		
-
 		reaction.EndHunt();
 		return identified;
 	}
