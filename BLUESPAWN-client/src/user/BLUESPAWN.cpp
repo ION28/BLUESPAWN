@@ -73,7 +73,7 @@ Bluespawn::Bluespawn() {
 
 void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
 	Bluespawn::io.InformUser(L"Starting a Hunt");
-  DWORD tactics = UINT_MAX;
+	DWORD tactics = UINT_MAX;
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
@@ -82,7 +82,7 @@ void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
 	Reaction logsuspend = logreact.Combine(suspendreact);
 	Reaction removereact = Reactions::RemoveValueReaction(io);
 	auto reaction = logsuspend.Combine(removereact);
-	record.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
 }
 
 void Bluespawn::dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce) {
