@@ -23,8 +23,8 @@
             "techniqueID": "T1103"
         },
         {
-            "color": "#FF9E3C",
-	    "comment": "(In Progress) Currently checks most Run* keys, needs to check actual files in Startup folders",
+            "color": "#5AADFF",
+	    "comment": "Coverd by checking most Run* keys. Future coverage will be obtained through checking files in Startup folders",
             "techniqueID": "T1060"
         },
         {
@@ -58,58 +58,35 @@
             "techniqueID": "T1100"
         },
         {
-            "color": "#fcf26b",
-	    "comment": "Planned coverage",
-            "techniqueID": "T1035"
-        },
-        {
-            "color": "#fcf26b",
-	    "comment": "Planned coverage",
-            "techniqueID": "T1031"
-        },
-        {
-            "color": "#fcf26b",
-	    "comment": "Planned coverage",
+            "color": "#5AADFF",
+	    "comment": "Covered by notifying a user when event logs are created for new service creation.",
             "techniqueID": "T1050"
         },
-        {
-            "color": "#fcf26b",
-	    "comment": "Planned coverage",
-            "techniqueID": "T1084"
-        },
-        {
-            "color": "#fcf26b",
-	    "comment": "Planned coverage",
-            "techniqueID": "T1015"
-        },
-        {
-            "color": "#fcf26b",
-	    "comment": "Planned coverage",
-            "techniqueID": "T1128"
-        },
-        {
-            "color": "#fcf26b",
-	    "comment": "Planned coverage",
-            "techniqueID": "T1077"
-        },
-        {
-            "color": "#fcf26b",
-	    "comment": "Planned coverage",
-            "techniqueID": "T1053"
-        }
+	{
+	    "color": "#5AADFF",
+	    "comment": "Covered by scanning all running processes for indicators of process injection.",
+	    "techniqueID": "T1055"
+	},
+	{
+	    "color": "#5AADFF",
+	    "comment": "Covered by scanning all running processes for indicators of process injection.",
+	    "techniqueID": "T1093"
+	},
+	{
+	    "color": "#5AADFF",
+	    "comment": "Covered by scanning all running processes for indicators of process injection.",
+	    "techniqueID": "T1086"
+	},
+	{
+	    "color": "#5AADFF",
+	    "comment": "Covered by checking Registry keys for Image File Execution Options.",
+	    "techniqueID": "T1183"
+	}
     ],
     "legendItems": [
         {
             "label": "BLUESPAWN Coverage",
             "color": "#5AADFF"
-        },
-		{
-            "label": "(In Progress) BLUESPAWN Coverage",
-            "color": "#FF9E3C"
-        },
-		{
-            "label": "Planned BLUESPAWN Coverage",
-            "color": "#fcf26b"
         }
     ]
 }
