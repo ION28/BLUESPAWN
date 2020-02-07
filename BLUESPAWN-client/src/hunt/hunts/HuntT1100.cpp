@@ -51,7 +51,6 @@ namespace Hunts {
 			for (const auto& entry : files) {
 				long offset = 0;
 				unsigned long targetAmount = 1000000;
-				CHAR* read = (CHAR *)calloc(targetAmount + 1L, 1);
 				DWORD amountRead = 0;
 				std::wstring file_ext = entry.GetFileAttribs().extension;
 				do {
