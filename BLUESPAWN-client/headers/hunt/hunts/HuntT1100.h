@@ -29,7 +29,7 @@ namespace Hunts {
 		void SetRegexAggressivenessLevel(Aggressiveness aLevel);
 
 	public:
-		HuntT1100(HuntRegister& record);
+		HuntT1100();
 
 		void AddDirectoryToSearch(const std::string& sFileName);
 		void AddFileExtensionToSearch(const std::string& sFileExtension);

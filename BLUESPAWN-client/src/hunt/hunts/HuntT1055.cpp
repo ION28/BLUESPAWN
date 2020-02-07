@@ -17,7 +17,7 @@ extern "C" {
 
 namespace Hunts{
 
-	HuntT1055::HuntT1055(HuntRegister& record) : Hunt(record, L"T1055 - Process Injection") {
+	HuntT1055::HuntT1055() : Hunt(L"T1055 - Process Injection") {
 		// TODO: update these categories
 		dwSupportedScans = (DWORD) Aggressiveness::Normal;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
@@ -89,7 +89,7 @@ namespace Hunts{
 
 		int identified = 0;
 
-		DWORD processes[4096];
+		DWORD processes[1024];
 		DWORD ProcessCount = 0;
 		ZeroMemory(processes, sizeof(processes));
 		auto success = EnumProcesses(processes, sizeof(processes), &ProcessCount);
