@@ -69,6 +69,16 @@
 	},
 	{
 	    "color": "#5AADFF",
+	    "comment": "Covered by scanning all running processes for indicators of process injection.",
+	    "techniqueID": "T1093"
+	},
+	{
+	    "color": "#5AADFF",
+	    "comment": "Covered by scanning all running processes for indicators of process injection.",
+	    "techniqueID": "T1086"
+	},
+	{
+	    "color": "#5AADFF",
 	    "comment": "Covered by checking Registry keys for Image File Execution Options.",
 	    "techniqueID": "T1183"
 	}
