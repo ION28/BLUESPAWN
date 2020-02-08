@@ -170,7 +170,7 @@ public:
 		} else return std::nullopt;
 	}
 
-	bool CompareMemory(const AllocationWrapper& wrapper){
+	bool CompareMemory(const AllocationWrapper& wrapper) const {
 		if(!wrapper && !Memory.has_value()){
 			return true;
 		} else if(!wrapper || !Memory.has_value()){
