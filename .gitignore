@@ -2,3 +2,6 @@
 build/
 artifacts/
 BLUESPAWN-client/external/
+*.user
+*.filters
+*.cache

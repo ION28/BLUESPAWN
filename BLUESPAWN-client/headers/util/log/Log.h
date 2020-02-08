@@ -136,7 +136,7 @@ namespace Log {
 		 * This is meant to serve as a handler for components implementing the Loggable
 		 * interface.
 		 */
-		LogMessage& InnerLog(Loggable& loggable, std::true_type){
+		LogMessage& InnerLog(const Loggable& loggable, std::true_type){
 			return operator<<(loggable.ToString());
 		}
 

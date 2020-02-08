@@ -11,13 +11,12 @@ namespace Hunts {
 	 * 
 	 * @scans Cursory checks the values of the associated Application Shimming registry
 	 * keys that can be abused.
-	 * @scans Moderate Scan not supported.
-	 * @scans Careful Scan not supported.
-	 * @scans Aggressive Scan not supported.
+	 * @scans Normal Scan not supported.
+	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1138 : public Hunt {
 	public:
-		HuntT1138(HuntRegister& record);
+		HuntT1138();
 
 		virtual int ScanCursory(const Scope& scope, Reaction reaction);
 	};

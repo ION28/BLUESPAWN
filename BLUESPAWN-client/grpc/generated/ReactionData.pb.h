@@ -197,15 +197,14 @@ inline bool Category_Parse(
 }
 enum Aggressiveness {
   Cursory = 0,
-  Moderate = 1,
-  Careful = 2,
-  Aggressive = 3,
+  Normal = 1,
+  Intensive = 2,
   Aggressiveness_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   Aggressiveness_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool Aggressiveness_IsValid(int value);
 const Aggressiveness Aggressiveness_MIN = Cursory;
-const Aggressiveness Aggressiveness_MAX = Aggressive;
+const Aggressiveness Aggressiveness_MAX = Intensive;
 const int Aggressiveness_ARRAYSIZE = Aggressiveness_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Aggressiveness_descriptor();

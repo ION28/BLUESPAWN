@@ -1,12 +1,12 @@
 #include "hunt/hunts/HuntT1037.h"
-#include "hunt/RegistryHunt.hpp"
+#include "hunt/RegistryHunt.h"
 
 #include "util/log/Log.h"
 
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1037::HuntT1037(HuntRegister& record) : Hunt(record, L"T1037 - Logon Scripts") {
+	HuntT1037::HuntT1037() : Hunt(L"T1037 - Logon Scripts") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
@@ -17,12 +17,22 @@ namespace Hunts {
 		LOG_INFO("Hunting for T1037 - Logon Scripts at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
-		int identified = 0;
+		std::map<RegistryKey, std::vector<RegistryValue>> keys;
 
-		identified += CheckKey({ HKEY_CURRENT_USER, L"Environment", L"UserInitMprLogonScript" }, L"", reaction);
+		auto HKCUEnvironment = RegistryKey{ HKEY_CURRENT_USER, L"Environment", };
+		keys.emplace(HKCUEnvironment, CheckValues(HKCUEnvironment, {
+			{ L"UserInitMprLogonScript", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty } 
+		}));
+
+		int detections = 0;
+		for(const auto& key : keys){
+			for(const auto& value : key.second){
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
+				detections++;
+			}
+		}
 
 		reaction.EndHunt();
-		return identified;
+		return detections;
 	}
-
 }

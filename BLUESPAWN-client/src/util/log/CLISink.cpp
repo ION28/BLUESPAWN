@@ -16,9 +16,8 @@ namespace Log {
 			SetConsoleColor(CLISink::PrependColors[static_cast<WORD>(level.severity)]);
 
 			if(level.severity == Severity::LogHunt){
-				std::wstring aggressiveness = info->HuntAggressiveness == Aggressiveness::Aggressive ? L"Aggressive" :
-					info->HuntAggressiveness == Aggressiveness::Careful ? L"Careful" :
-					info->HuntAggressiveness == Aggressiveness::Moderate ? L"Moderate" : L"Cursory";
+				std::wstring aggressiveness = info->HuntAggressiveness == Aggressiveness::Intensive ? L"Intensive" :
+					info->HuntAggressiveness == Aggressiveness::Normal ? L"Normal" : L"Cursory";
 				std::wcout << L"[" << info->HuntName << L": " << aggressiveness << L"] ";
 				SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
 				std::wcout << L" - " << detections.size() << " detection" << (detections.size() == 1 ? L"" : L"s") << L"!" << std::endl;
@@ -34,9 +33,9 @@ namespace Log {
 						std::wcout << L"\tPotentially malicious service detected - " << lpServiceDetection->wsServiceName << L" (PID is " << lpServiceDetection->ServicePID << L")" << std::endl;
 					} else if(detection->Type == DetectionType::Registry){
 						auto lpRegistryDetection = std::static_pointer_cast<REGISTRY_DETECTION>(detection);
-						std::wcout << L"\tPotentially malicious registry key detected - " << lpRegistryDetection->wsRegistryKeyPath << (lpRegistryDetection->wsRegistryKeyValue.length() ? L": " : L"") << lpRegistryDetection->wsRegistryKeyValue << std::endl;
-					}
-					else if (detection->Type == DetectionType::Event) {
+						std::wcout << L"\tPotentially malicious registry key detected - " << lpRegistryDetection->wsRegistryKeyPath << L": " << lpRegistryDetection->contents.wValueName
+							<< L" with data " << lpRegistryDetection->contents.ToString() << std::endl;
+					} else if (detection->Type == DetectionType::Event) {
 						auto lpEvtDet = std::static_pointer_cast<EVENT_DETECTION>(detection);
 						std::wcout << L"\tPotentially malicious event detected:" << std::endl;
 						std::wcout << "\t\tChannel: " << lpEvtDet->channel << std::endl;
@@ -47,8 +46,7 @@ namespace Log {
 							std::wcout << "\t\t" << iter->first << ": " << iter->second << std::endl;
 						}
 
-					}
-					else {
+					} else {
 						std::wcout << L"\tUnknown detection type!" << std::endl;
 					}
 				}

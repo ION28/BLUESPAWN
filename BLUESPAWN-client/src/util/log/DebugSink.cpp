@@ -9,9 +9,8 @@ namespace Log {
 		const std::vector<std::shared_ptr<DETECTION>>& detections){
 		if(level.Enabled()){
 			if(level.severity == Severity::LogHunt){
-				std::wstring aggressiveness = info->HuntAggressiveness == Aggressiveness::Aggressive ? L"Aggressive" :
-					info->HuntAggressiveness == Aggressiveness::Careful ? L"Careful" :
-					info->HuntAggressiveness == Aggressiveness::Moderate ? L"Moderate" : L"Cursory";
+				std::wstring aggressiveness = info->HuntAggressiveness == Aggressiveness::Intensive ? L"Intensive" :
+					info->HuntAggressiveness == Aggressiveness::Normal ? L"Normal" : L"Cursory";
 				std::wstring sLogHeader = L"[" + info->HuntName + L": " + aggressiveness + L"] - ";
 				OutputDebugStringW((sLogHeader + std::to_wstring(detections.size()) + L" detection" + (detections.size() == 1 ? L"!" : L"s!")).c_str());
 				for(auto detection : detections){
@@ -26,7 +25,8 @@ namespace Log {
 						OutputDebugStringW((sLogHeader + L"\tPotentially malicious service detected - " + lpServiceDetection->wsServiceName + L" (PID is " + std::to_wstring(lpServiceDetection->ServicePID) + L")").c_str());
 					} else if(detection->Type == DetectionType::Registry){
 						auto lpRegistryDetection = std::static_pointer_cast<REGISTRY_DETECTION>(detection);
-						OutputDebugStringW((sLogHeader + L"\tPotentially malicious registry key detected - " + lpRegistryDetection->wsRegistryKeyPath + (lpRegistryDetection->wsRegistryKeyValue.length() ? L": " : L"") + lpRegistryDetection->wsRegistryKeyValue).c_str());
+						OutputDebugStringW((sLogHeader + L"\tPotentially malicious registry key detected - " + lpRegistryDetection->wsRegistryKeyPath + L": " + lpRegistryDetection->contents.wValueName + L" with value " + 
+							lpRegistryDetection->contents.ToString()).c_str());
 					} else {
 						OutputDebugStringW((sLogHeader + L"\tUnknown detection type!").c_str());
 					}

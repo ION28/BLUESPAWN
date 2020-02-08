@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -58,9 +58,6 @@
     <Filter Include="Source Files\monitor">
       <UniqueIdentifier>{6f3b3ba6-87f7-461f-a9ca-95e5d976dc3a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\user">
-      <UniqueIdentifier>{bb865992-8401-4892-837f-29746f11a9f7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\util">
       <UniqueIdentifier>{d7e04114-31a5-49e8-ae0e-7f41d50aff4a}</UniqueIdentifier>
     </Filter>
@@ -97,11 +94,8 @@
     <Filter Include="Header Files\mitigation\mitigations">
       <UniqueIdentifier>{9387c772-fdc7-45c9-a31f-d13558ffe430}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\util\eventlogs">
-      <UniqueIdentifier>{23120957-b2c7-4957-9951-0eabd2e5edf2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\util\eventlogs">
-      <UniqueIdentifier>{7e223556-6f7d-4752-ae74-120962505e82}</UniqueIdentifier>
+    <Filter Include="Source Files\monitor\user">
+      <UniqueIdentifier>{bb865992-8401-4892-837f-29746f11a9f7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1059,20 +1053,80 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateV72753.h">
       <Filter>Header Files\mitigation\mitigations</Filter>
     </ClInclude>
-    <ClInclude Include="headers\util\eventlogs\EventLogs.h">
-      <Filter>Header Files\util\eventlogs</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h">
-      <Filter>Header Files\mitigation\mitigations</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\user\iobase.h">
-      <Filter>Header Files\user</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\user\CLI.h">
-      <Filter>Header Files\user</Filter>
+    <ClInclude Include="external\pe-sieve\include\pe_sieve_types.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\hunt\hunts\HuntT1050.h">
-      <Filter>Header Files\hunt\hunts</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1055.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\hunts\HuntT1183.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\reaction\HuntTrigger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\reaction\RemoveValue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\reaction\SuspendProcess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\hunt\RegistryHunt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1025.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-LLMNR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-WSH.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV1153.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV63597.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV63817.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV63825.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV63829.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV73519.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\user\CLI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\user\iobase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\configurations\RegistryValue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\eventlogs\EventLogs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\eventlogs\EventSubscription.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\processes\ProcessChecker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\util\processes\ProcessUtils.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1119,10 +1173,10 @@
       <Filter>Source Files\mitigation</Filter>
     </ClCompile>
     <ClCompile Include="src\user\banners.cpp">
-      <Filter>Source Files\user</Filter>
+      <Filter>Source Files\monitor\user</Filter>
     </ClCompile>
     <ClCompile Include="src\user\BLUESPAWN.cpp">
-      <Filter>Source Files\user</Filter>
+      <Filter>Source Files\monitor\user</Filter>
     </ClCompile>
     <ClCompile Include="src\util\configurations\CollectInfo.cpp">
       <Filter>Source Files\util\configurations</Filter>
@@ -1202,17 +1256,74 @@
     <ClCompile Include="src\mitigation\mitigations\MitigateV72753.cpp">
       <Filter>Source Files\mitigation\mitigations</Filter>
     </ClCompile>
-    <ClCompile Include="src\util\eventlogs\EventLogs.cpp">
-      <Filter>Source Files\util\eventlogs</Filter>
+    <ClCompile Include="src\hunt\hunts\HuntT1050.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1055.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\hunts\HuntT1183.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\reaction\HuntTrigger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\reaction\RemoveValue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\reaction\SuspendProcess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hunt\RegistryHunt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1025.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1042-LLMNR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1042-WSH.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp">
-      <Filter>Source Files\mitigation\mitigations</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV1153.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV63597.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV63817.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV63825.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV63829.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mitigation\mitigations\MitigateV73519.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\user\CLI.cpp">
-      <Filter>Source Files\user</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\hunt\hunts\HuntT1050.cpp">
-      <Filter>Source Files\hunt\hunt</Filter>
+    <ClCompile Include="src\util\eventlogs\EventLogs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\configurations\RegistryKey.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\configurations\RegistryValue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\eventlogs\EventSubscription.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\processes\ProcessUtils.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

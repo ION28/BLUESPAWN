@@ -1,6 +1,6 @@
 #pragma once
-#include "../Mitigation.h"
-#include <mitigation\MitigationRegister.h>
+#include "mitigation/Mitigation.h"
+#include "mitigation/MitigationRegister.h"
 #include "hunt/reaction/Reaction.h"
 #include "hunt/reaction/Log.h"
 

@@ -3,6 +3,9 @@
 
 #include <map>
 #include <string>
+#include <memory>
+#include <optional>
+#include <functional>
 
 template<class T>
 class GenericWrapper {
@@ -13,7 +16,7 @@ protected:
 	T BadValue;
 	bool bFreeOnDestruction = true;
 
-	void (*freeResource)(T);
+	std::function<void(T)> freeResource;
 
 	void DestroyReference(){
 		mReferenceCounts[WrappedObject]--;
@@ -23,9 +26,11 @@ protected:
 				freeResource(WrappedObject);
 			}
 		}
+		WrappedObject = BadValue;
 	}
 
 	void SetReference(T object){
+		WrappedObject = object;
 		if(mReferenceCounts.find(object) == mReferenceCounts.end()){
 			mReferenceCounts.emplace(object, 1);
 		} else {
@@ -35,7 +40,7 @@ protected:
 
 public:
 
-	GenericWrapper(T object, void(*freeFunction)(T) = [](T object){ delete object; }, T BadValue = nullptr)
+	GenericWrapper(T object, std::function<void(T)> freeFunction = [](T object){ delete object; }, T BadValue = nullptr)
 		: WrappedObject{ object }, freeResource{ freeFunction }, BadValue{ BadValue } { SetReference(object); }
 
 	GenericWrapper(const GenericWrapper& copy)
@@ -46,7 +51,7 @@ public:
 
 	GenericWrapper& operator=(const GenericWrapper& copy){ 
 		freeResource = copy.freeResource; 
-		DestroyReference(); 
+		DestroyReference();
 		SetReference(copy.WrappedObject); 
 		return *this;
 	}
@@ -69,8 +74,124 @@ public:
 
 class HandleWrapper : public GenericWrapper<HANDLE> {
 public:
-	HandleWrapper(HANDLE handle) : 
-		GenericWrapper(handle, (void(*)(HANDLE)) CloseHandle, INVALID_HANDLE_VALUE){};
+	HandleWrapper(HANDLE handle) :
+		GenericWrapper(handle, std::function<void(HANDLE)>(CloseHandle), INVALID_HANDLE_VALUE){};
+};
+
+class AllocationWrapper {
+	std::optional<std::shared_ptr<char[]>> Memory;
+	PCHAR pointer;
+	SIZE_T AllocationSize;
+
+public:
+	enum AllocationFunction {
+		VIRTUAL_ALLOC, HEAP_ALLOC, MALLOC, CPP_ALLOC, CPP_ARRAY_ALLOC, STACK_ALLOC
+	};
+
+	AllocationWrapper(LPVOID memory, SIZE_T size, AllocationFunction AllocationType = STACK_ALLOC) :
+		pointer{ reinterpret_cast<PCHAR>(memory) },
+		Memory{ 
+			size && memory ? std::optional<std::shared_ptr<char[]>>{{
+				reinterpret_cast<PCHAR>(memory), [AllocationType](char* value){
+					if(AllocationType == CPP_ALLOC)
+						delete value;
+					else if(AllocationType == CPP_ARRAY_ALLOC)
+						delete[] value; 
+					else if(AllocationType == MALLOC)
+						free(value);
+					else if(AllocationType == HEAP_ALLOC)
+						HeapFree(GetProcessHeap(), 0, value);
+					else if(AllocationType == VIRTUAL_ALLOC)
+						VirtualFree(value, 0, MEM_RELEASE);
+				}
+			}} : std::nullopt
+	    },
+		AllocationSize{ size }{}
+
+	CHAR operator[](int i) const {
+		return Memory && i < AllocationSize ? pointer[i] : 0;
+	}
+
+	operator bool() const {
+		return Memory.has_value();
+	}
+
+	operator LPVOID() const {
+		return pointer;
+	}
+
+	DWORD GetSize() const {
+		return Memory.has_value() ? AllocationSize : 0;
+	}
+
+	template<class T>
+	std::optional<T> operator*() const {
+		return Dereference();
+	}
+
+	template<class T>
+	std::optional<T> Dereference() const {
+		if(AllocationSize < sizeof(T) || !Memory.has_value()){
+			return std::nullopt;
+		} else {
+			return *reinterpret_cast<T*>(pointer);
+		}
+	}
+
+	std::optional<std::wstring> ReadWString() const {
+		if(Memory.has_value()){
+			SIZE_T size = 0;
+			while(size * 2 + 1 < AllocationSize && (pointer[size * 2] || pointer[size * 2 + 1]))
+				size++;
+			char* buffer = new char[size * 2 + 2];
+			for(int i = 0; i < size * 2; i++){
+				buffer[i] = pointer[i];
+			}
+			buffer[size * 2] = buffer[size * 2 + 1] = 0;
+			auto str = std::wstring{ reinterpret_cast<wchar_t*>(buffer) };
+			delete[] buffer;
+			return str;
+		} else return std::nullopt;
+	}
+
+	std::optional<std::string> ReadString() const {
+		if(Memory.has_value()){
+			SIZE_T size = 0;
+			while(size < AllocationSize && pointer[size])
+				size++;
+			char* buffer = new char[size + 1];
+			for(SIZE_T i = 0; i < size; i++){
+				buffer[i] = pointer[i];
+			}
+			buffer[size] = 0;
+			auto str = std::string{ buffer };
+			delete[] buffer;
+			return str;
+		} else return std::nullopt;
+	}
+
+	bool CompareMemory(const AllocationWrapper& wrapper) const {
+		if(!wrapper && !Memory.has_value()){
+			return true;
+		} else if(!wrapper || !Memory.has_value()){
+			return false;
+		} else if(wrapper.AllocationSize == AllocationSize){
+			for(int i = 0; i < AllocationSize; i++)
+				if(pointer[i] != wrapper[i])
+					return false;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	bool SetByte(SIZE_T offset, char value){
+		if(offset < AllocationSize){
+			pointer[offset] = value;
+			return true;
+		}
+		return false;
+	}
 };
 
 template<class T = CHAR>
@@ -82,7 +203,7 @@ public:
 	HandleWrapper process;
 	SIZE_T MemorySize;
 
-	MemoryWrapper(LPVOID lpMemoryBase, SIZE_T size = sizeof(T), HANDLE process = GetCurrentProcess()) 
+	MemoryWrapper(LPVOID lpMemoryBase, SIZE_T size = sizeof(T), HANDLE process = GetCurrentProcess())
 		: address{ reinterpret_cast<T*>(lpMemoryBase) }, process{ process }, MemorySize{ size } {}
 
 	T Dereference() const {
@@ -129,23 +250,6 @@ public:
 			return { reinterpret_cast<T*>(PCHAR(address) + offset), MemorySize - offset, process };
 		}
 	}
-	
-	bool Write(const T* lpToWrite, SIZE_T nWriteSize = sizeof(T), SIZE_T offset = 0) const {
-		if(offset != 0){
-			return GetOffset(offset).Write(lpToWrite, nWriteSize);
-		}
-
-		if(nWriteSize > MemorySize){
-			return false;
-		} else {
-			if(!process){
-				CopyMemory(address, lpToWrite, nWriteSize);
-				return true;
-			} else {
-				return WriteProcessMemory(process, address, lpToWrite, nWriteSize, nullptr);
-			}
-		}
-	}
 
 	bool CompareMemory(MemoryWrapper<T> memory) const {
 		auto data1 = Dereference();
@@ -169,16 +273,16 @@ public:
 		} else {
 			int idx = 0;
 			int maxIdx = 10;
-			char* memory = new char[maxIdx];
+			char* memory = new char[maxIdx * 2];
 			bool valid = false;
-			while(!valid && !ReadProcessMemory(process, address, memory, maxIdx *= 2, nullptr)){
-				delete[] memory;
-				memory = new char[maxIdx];
+			while(!valid && !ReadProcessMemory(process, address, memory, maxIdx = min(maxIdx * 2, MemorySize), nullptr)){
 				for(; idx < maxIdx; idx++){
 					if(memory[idx] == 0){
 						valid = true;
 						break;
 					}
+					delete[] memory;
+					memory = new char[maxIdx * 2];
 				}
 			}
 			if(valid){
@@ -195,15 +299,17 @@ public:
 		} else {
 			int idx = 0;
 			int maxIdx = 10;
-			wchar_t* memory = new wchar_t[maxIdx];
+			wchar_t* memory = new wchar_t[maxIdx * 2];
 			bool valid = false;
-			while(!valid && !ReadProcessMemory(process, address, memory, (maxIdx *= 2) * sizeof(wchar_t), nullptr)){
+			while(!valid && !ReadProcessMemory(process, address, memory, (maxIdx = min(maxIdx * 2, MemorySize / sizeof(WCHAR))) * sizeof(WCHAR), nullptr)){
 				for(; idx < maxIdx; idx++){
 					if(memory[idx] == 0){
 						valid = true;
 						break;
 					}
 				}
+				delete[] memory;
+				memory = new wchar_t[maxIdx * 2];
 			}
 			if(valid){
 				return std::wstring{ memory };
@@ -217,22 +323,8 @@ public:
 	bool operator !() const { return !address; }
 };
 
-template<class T>
-class MemoryAllocationWrapper : 
-	public GenericWrapper<T*>, 
-	public MemoryWrapper<T> {
-public:
-	MemoryAllocationWrapper(T* lpAddress, SIZE_T nSize = sizeof(T)) :
-		GenericWrapper<T*>(reinterpret_cast<T*>(lpAddress), [](T* memory){
-			VirtualFree(memory, 0, MEM_RELEASE);
-		}, nullptr),
-		MemoryWrapper<T>(reinterpret_cast<T*>(lpAddress), nSize, GetCurrentProcess()) {};
-
-	using MemoryWrapper<T>::operator*;
-	using MemoryWrapper<T>::operator&;
-	using MemoryWrapper<T>::operator!;
-	using MemoryWrapper<T>::operator bool;
-};
-
 #define WRAP(type, name, value, function) \
-    GenericWrapper<type> name = {value, [](type data){ function; }}
+    GenericWrapper<type> name = {value, [&](type data){ function; }}
+
+#define SCOPE_LOCK(function, name) \
+    GenericWrapper<DWORD> __##name = { 1, [&](DWORD data){ function; }, 0 }

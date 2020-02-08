@@ -1,5 +1,5 @@
 #include "hunt/hunts/HuntT1182.h"
-#include "hunt/RegistryHunt.hpp"
+#include "hunt/RegistryHunt.h"
 
 #include "util/log/Log.h"
 #include "util/configurations/Registry.h"
@@ -7,7 +7,7 @@
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1182::HuntT1182(HuntRegister& record) : Hunt(record, L"T1182 - AppCert DLLs") {
+	HuntT1182::HuntT1182() : Hunt(L"T1182 - AppCert DLLs") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
@@ -18,12 +18,24 @@ namespace Hunts {
 		LOG_INFO("Hunting for T1182 - AppCert DLLs at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
-		int identified = 0;
+		std::map<RegistryKey, std::vector<RegistryValue>> keys;
 
-		identified += CheckForSubkeys(RegistryKey(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls"), reaction);
-		
+		auto SessMan = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager" };
+
+		keys.emplace(SessMan, CheckValues(SessMan, {
+			{ L"AppCertDLLs", RegistryType::REG_MULTI_SZ_T, std::vector<std::wstring>{}, false, CheckMultiSzEmpty },
+		}));
+
+		int detections = 0;
+		for(const auto& key : keys){
+			for(const auto& value : key.second){
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
+				detections++;
+			}
+		}
+
 		reaction.EndHunt();
-		return identified;
+		return detections;
 	}
 
 }

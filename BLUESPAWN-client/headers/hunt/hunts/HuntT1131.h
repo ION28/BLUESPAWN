@@ -12,16 +12,15 @@ namespace Hunts {
 	 * 
 	 * @scans Cursory checks the values of the associated Authentication packages 
 	 * keys that can be abused.
-	 * @scans Moderate Scan not supported.
-	 * @scans Careful Scan not supported.
-	 * @scans Aggressive Scan not supported.
+	 * @scans Normal Scan not supported.
+	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1131 : public Hunt {
 	private:
 		std::vector<std::wstring> okAuthPackages = { L"msv1_0", L"SshdPinAuthLsa" };
 		std::vector<std::wstring> okNotifPackages = { L"scecli" };
 	public:
-		HuntT1131(HuntRegister& record);
+		HuntT1131();
 
 		virtual int ScanCursory(const Scope& scope, Reaction reaction);
 	};

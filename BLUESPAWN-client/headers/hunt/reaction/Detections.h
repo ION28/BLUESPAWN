@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "hunt/HuntInfo.h"
+#include "util/configurations/RegistryValue.h"
 
 enum class DetectionType {
 	File,
@@ -25,10 +26,12 @@ struct DETECTION {
 /// Note that the hash will have to be manually set.
 struct FILE_DETECTION : public DETECTION {
 	std::wstring wsFileName;
+	std::wstring wsFilePath;
 	BYTE hash[256];
-	FILE_DETECTION(const std::wstring& wsFileName) : 
+	FILE_DETECTION(const std::wstring& wsFileName, const std::wstring& wsFilePath) : 
 		DETECTION{ DetectionType::File },
 		wsFileName{ wsFileName },
+		wsFilePath{ wsFilePath },
 		hash{}{}
 };
 typedef std::function<void(std::shared_ptr<FILE_DETECTION>)> DetectFile;
@@ -36,12 +39,10 @@ typedef std::function<void(std::shared_ptr<FILE_DETECTION>)> DetectFile;
 /// A struct containing information about a registry key value identified in a hunt
 struct REGISTRY_DETECTION : public DETECTION {
 	std::wstring wsRegistryKeyPath;
-	std::wstring wsRegistryKeyValue;
-	BYTE* contents;
-	REGISTRY_DETECTION(const std::wstring& wsRegistryKeyPath, const std::wstring& wsRegistryKeyValue, BYTE* contents) :
+	Registry::RegistryValue contents;
+	REGISTRY_DETECTION(const std::wstring& wsRegistryKeyPath, const Registry::RegistryValue& contents) :
 		DETECTION{ DetectionType::Registry },
 		wsRegistryKeyPath{ wsRegistryKeyPath },
-		wsRegistryKeyValue{ wsRegistryKeyValue },
 		contents{ contents }{}
 };
 typedef std::function<void(std::shared_ptr<REGISTRY_DETECTION>)> DetectRegistry;
@@ -63,11 +64,12 @@ struct SERVICE_DETECTION : public DETECTION {
 typedef std::function<void(std::shared_ptr<SERVICE_DETECTION>)> DetectService;
 
 enum class ProcessDetectionMethod {
-	NotImageBacked,
-	BackingImageMismatch,
-	NotInLoader,
-	NotSigned,
-	Other
+	Replaced       = 1,
+	HeaderModified = 2,
+	Detached       = 4,
+	Hooked         = 8,
+	Implanted      = 16,
+	Other          = 32
 };
 
 /// A struct containing information about a process identified in a hunt
@@ -78,10 +80,10 @@ struct PROCESS_DETECTION : public DETECTION {
 	std::wstring wsCmdline;
 	int PID;
 	int TID;
-	ProcessDetectionMethod method;
+	DWORD method;
 	BYTE AllocationStart[512];      // This member is intended to be used for signaturing purposes
 	PROCESS_DETECTION(const std::wstring& wsImageName, const std::wstring& wsImagePath, const std::wstring& wsCmdLine,
-		const int& PID, const int& TID, ProcessDetectionMethod method) :
+		const int& PID, const int& TID, DWORD method) :
 		DETECTION{ DetectionType::Process },
 		wsImageName{ wsImageName },
 		wsImagePath{ wsCmdLine },

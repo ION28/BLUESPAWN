@@ -1,199 +1,207 @@
 #pragma once
 
-#include <windows.h>
+#include <Windows.h>
 
 #include <string>
-#include <map>
 #include <vector>
-#include <set>
-#include <iostream>
+#include <map>
+#include <optional>
 
-#include "util/log/Log.h"
+#include "common/DynamicLinker.h"
+#include "common/wrappers.hpp"
+
+#include "util/log/Loggable.h"
+#include "util/configurations/RegistryValue.h"
+
+DEFINE_FUNCTION(DWORD, NtQueryKey, __stdcall, HANDLE KeyHandle, int KeyInformationClass, PVOID KeyInformation, ULONG Length, PULONG ResultLength);
 
 namespace Registry {
-	typedef std::wstring REG_SZ_T;
-	typedef std::vector<std::wstring> REG_MULTI_SZ_T;
-	typedef DWORD REG_DWORD_T;
-
 	extern std::map<std::wstring, HKEY> vHiveNames;
 	extern std::map<HKEY, std::wstring> vHives;
-	extern std::map<HKEY, DWORD> _globalOpenKeys;
 
-	class RegistryKey : public Loggable {
-		HKEY hive;
-		std::wstring path;
-		std::wstring name;
+	/**
+	 * This class is for interaction with the Windows Registry. A single instance of this
+	 * class represents a key in the registry, not to be confused with a value. Note that each
+	 * key will have multiple values in addition to some number of subkeys. Each value is associated
+	 * with data, which will generally be a REG_DWORD, REG_SZ, REG_EXPAND_SZ, REG_MULTI_SZ, or 
+	 * REG_BINARY. This class provides support for all of these. 
+	 */
+	class RegistryKey : 
+		public Loggable {
+	public:
+		/* Copy constructor for a RegistryKey */
+		RegistryKey(const RegistryKey& key) noexcept;
 
-		BYTE* lpbValue = nullptr;
-		DWORD dwDataSize{};
-		DWORD dwDataType{};
+		/* Move constructor for a RegistryKey */
+		RegistryKey(RegistryKey&& key) noexcept;
 
-		bool bKeyExists = false;
-		bool bValueExists = false;
+		/**
+		 * Creates a RegistryKey object from the backing associated HKEY.
+		 *
+		 * @param key The HKEY handle on the registry key to create an instance for.
+		 */
+		RegistryKey(HKEY key);
+
+		/**
+		 * Creates a RegistryKey object from a path relative to a given HKEY.
+		 * For example, the HKEY may reference the key at HKLM\SYSTEM and the path may be 
+		 * CurrentControlSet\Services. The resulting instance would reference the key stored at
+		 * HKLM\SYSTEM\CurrentControlSet\Services.
+		 *
+		 * @param base The base key.
+		 * @param path The path relative to the base key.
+		 */
+		RegistryKey(HKEY base, std::wstring path);
+
+		/**
+		 * Creates a RegistryKey object to reference a key at a given path.
+		 *
+		 * @param path The path of the registry key to reference.
+		 */
+		RegistryKey(std::wstring path);
+
+		/** Copy operator overload */
+		RegistryKey& operator=(const RegistryKey& key) noexcept;
+
+		/** Move operator overload */
+		RegistryKey& operator=(RegistryKey&& key) noexcept;
+
+	private:
+		static std::map<HKEY, int> _ReferenceCounts;
+
+		HKEY hkBackingKey;
+
+		bool bKeyExists;
+
+		HKEY hkHive{};
+		std::wstring path{};
 
 	public:
-		HKEY key = nullptr;
-
-		RegistryKey(HKEY hive, std::wstring path, std::wstring name = L"", bool Create = false);
-
-		RegistryKey(std::wstring path, std::wstring name = L"");
-
+		/** Destructor for a RegistryKey. Decrements a reference count, and if zero, closes the handle */
 		~RegistryKey();
 
-		bool KeyExists();
-		bool ValueExists();
+		/** 
+		 * Indicates whether this instance references a registry key that exists.
+		 *
+		 * @return true if the referenced key exists; false otherwise
+		 */
+		bool Exists() const;
 
-		std::wstring GetName();
+		/**
+		 * Indicates whether the referenced key contains a certain value.
+		 *
+		 * @param wsValueName The name of the value to check.
+		 *
+		 * @return true if the referenced key has the given value; false otherwise
+		 */
+		bool ValueExists(const std::wstring& wsValueName) const;
 
-		bool Set(LPVOID value, DWORD dwSize, DWORD dwType = REG_BINARY);
-		bool Create(LPVOID value, DWORD dwSize, DWORD dwType = REG_BINARY);
+		/**
+		 * If the registry key referenced by this instance doesn't exist, this will create it.
+		 * 
+		 * @return true if the registry key already existed or was created; false otherwise.
+		 */
+		bool Create();
 
+		/**
+		 * Reads the raw bytes present in a given value. 
+		 *
+		 * @return A AllocationWrapper object pointing to the bytes read if the value is present, or
+		 *	       an empty memory wrapper if the value is not present. The memory must be freed.
+		 */
+		AllocationWrapper GetRawValue(const std::wstring& wsValueName) const;
+
+		/**
+		 * Writes bytes to a given value under the key referenced by this object.
+		 *
+		 * @param name The name of the value to set
+		 * @param bytes The bytes to write to the value
+		 * @param type The datatype of the value
+		 *
+		 * @return True if the value was successfully set; false otherwise
+		 */
+		bool SetRawValue(const std::wstring& name, AllocationWrapper bytes, DWORD type = REG_BINARY) const;
+
+		/**
+		 * Reads data from the specified value and handles conversion to common types.
+		 * Supported types: std::wstring (REG_SZ and REG_EXPAND_SZ), std::vector<std::wstring>
+		 * (REG_MULTI_SZ), and DWORD (REG_DWORD). 
+		 * In other types, the data stored in the value will be converted to the template type.
+		 *
+		 * @param wsValueName The name of the value to read.
+		 *
+		 * @return An optional containing the object stored in the registry, or nullopt if an error
+		 *		   occured or the value does exist.
+		 */
 		template<class T>
-		inline bool Set(T value) {
-			LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << value);
+		std::optional<T> GetValue(const std::wstring& wsValueName) const;
 
-			Set(&value, sizeof(value));
-		}
+		/**
+		 * Returns the type of a value under the currently referenced registry key.
+		 * Currently, this only supports REG_SZ, REG_EXPAND_SZ, REG_DWORD, and REG_MULTI_SZ.
+		 *
+		 * @param wsValueName The name of the value to check
+		 *
+		 * @return An optional containing the registry type, or nullopt if the value does not exist or
+		 *		   an error ocurred.
+		 */
+		std::optional<RegistryType> GetValueType(const std::wstring& wsValueName) const;
 
-		template<>
-		inline bool Set<REG_DWORD_T>(REG_DWORD_T value) {
-			LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << value);
-
-			return Set(&value, sizeof(DWORD), REG_DWORD);
-		}
-
-		template<>
-		inline bool Set<REG_SZ_T>(REG_SZ_T value) {
-			LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << value);
-
-			return Set(const_cast<wchar_t*>(value.c_str()), sizeof(WCHAR) * static_cast<DWORD>(value.length() + 1), REG_SZ);
-		}
-
-		template<>
-		inline bool Set<REG_MULTI_SZ_T>(REG_MULTI_SZ_T value) {
-			SIZE_T size = 1;
-			for(auto string : value){
-				size += (string.length() + 1);
-			}
-
-			WCHAR* data = new WCHAR[size];
-			int ptr = 0;
-
-			std::wstring wsLogStatement{};
-			for(auto string : value){
-				wsLogStatement += string + L"; ";
-				LPCWSTR lpRawString = string.c_str();
-				for(int i = 0; i < string.length() + 1; i++){
-					if(ptr < size){
-						data[ptr++] = lpRawString[i];
-					}
-				}
-			}
-
-			if(ptr < size){
-				data[ptr] = { static_cast<WCHAR>(0) };
-			}
-
-			LOG_VERBOSE(1, "Setting registry key " << GetName() << " to " << wsLogStatement);
-
-			return Set(data, static_cast<DWORD>(size * sizeof(WCHAR)), REG_MULTI_SZ);
-		}
-
-		LPVOID GetRaw();
-
+		/**
+		 * Sets data for a specified value under the referenced key and handles conversions from
+		 * common types. For common types, the size and type do not need to be specified.
+		 * Supported types: std::wstring, std::string, LPCSTR, LPCWSTR, DWORD, and 
+		 * std::vector<std::wstring>.
+		 *
+		 * @param name The name of the value to set.
+		 * @param value The data to write to the value.
+		 * @param size The size of the data to write. This is ignored if the type is one of the
+		 *        supported types for this function.
+		 * @param type The registry datatype for the data to write. This is ignored if the type is
+		 *	      one of the supported types for this function.
+		 *
+		 * @return True if the value was successfully set; false otherwise.
+		 */
 		template<class T>
-		inline T Get(){ return reinterpret_cast<T>(GetRaw()); }
+		bool SetValue(const std::wstring&, T value, DWORD size = sizeof(T), DWORD type = REG_BINARY) const;
 
-		template<>
-		inline REG_DWORD_T Get<REG_DWORD_T>(){
-			DWORD value = *reinterpret_cast<DWORD*>(GetRaw());
-			LOG_VERBOSE(2, "Read value " << value << " from key " << GetName());
+		/**
+		 * Returns a list of values present under the currently referenced registry key.
+		 *
+		 * @return a list of values present under the currently referenced registry key.
+		 */
+		std::vector<std::wstring> EnumerateValues() const;
 
-			return value;
-		}
+		/**
+		 * Returns a list of subkeys under the currently referenced registry key.
+		 *
+		 * @return a list of subkeys under the currently referenced registry key.
+		 */
+		std::vector<RegistryKey> EnumerateSubkeys() const;
 
-		template<>
-		inline REG_SZ_T Get<REG_SZ_T>() {
-			if(ValueExists()){
-				LOG_VERBOSE(2, "Read value " << reinterpret_cast<LPCWSTR>(GetRaw()) << " from key " << GetName());
-				return reinterpret_cast<LPCWSTR>(GetRaw());
-			}
+		/**
+		 * Returns the full path of the referenced registry key.
+		 *
+		 * @return the full path of the referenced registry key.
+		 */
+		std::wstring GetName() const;
 
-			LOG_VERBOSE(1, "Tried to read key " << GetName() << ", but the value did not exist!");
-			return L"";
-		}
+		/**
+		 * Returns the full path of the referenced registry key.
+		 *
+		 * @return the full path of the referenced registry key.
+		 */
+		virtual std::wstring ToString() const;
 
-		template<>
-		inline REG_MULTI_SZ_T Get<REG_MULTI_SZ_T>(){
-			if(ValueExists()){
-				std::vector<std::wstring> strings{};
-				std::wstring wsLogString{};
+		/**
+		 * Override the < operator so registry keys can be used in sets, maps, and trees.
+		 *
+		 * @param key The key to compare
+		 *
+		 * @return true or false
+		 */
+		bool operator<(const RegistryKey& key) const;
 
-				LPCWSTR data = reinterpret_cast<LPCWSTR>(GetRaw());
-
-				LPCVOID base = data;
-
-				while(reinterpret_cast<ULONG_PTR>(data) - reinterpret_cast<ULONG_PTR>(base) < dwDataSize && *data){
-					std::wstring str = data;
-					strings.emplace_back(data);
-					wsLogString += str;
-
-					data += str.length() + 1;
-				}
-
-				LOG_VERBOSE(2, "Read value " << wsLogString << " from key " << GetName());
-
-				return strings;
-			}
-
-			LOG_VERBOSE(1, "Tried to read key " << GetName() << ", but the value did not exist!");
-			return {};
-		}
-
-		template<class T>
-		inline bool operator==(T value){
-			return Get<T>() == value;
-		}
-
-		template<>
-		inline bool operator==<LPCWSTR>(LPCWSTR wcsKnownGood){
-			return operator==<std::wstring>(std::wstring(wcsKnownGood));
-		}
-
-		template<>
-		inline bool operator==<REG_MULTI_SZ_T>(REG_MULTI_SZ_T vKnownGood){
-			auto data = Get<std::vector<std::wstring>>();
-
-			std::set<std::wstring> GoodContents{};
-			for(auto string : vKnownGood){
-				GoodContents.insert(string);
-			}
-
-			std::set<std::wstring> ActualContents{};
-			for(auto string : data){
-				ActualContents.insert(string);
-			}
-
-			for(auto string : GoodContents){
-				if(ActualContents.find(string) == ActualContents.end()){
-					return false;
-				}
-			}
-
-			for(auto string : ActualContents){
-				if(GoodContents.find(string) == GoodContents.end()){
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		std::vector<RegistryKey> KeyValues();
-		std::vector<RegistryKey> Subkeys();
-
-		std::wstring GetPath();
-
-		virtual std::wstring ToString();
+		bool RemoveValue(const std::wstring& wsValueName) const;
 	};
 }

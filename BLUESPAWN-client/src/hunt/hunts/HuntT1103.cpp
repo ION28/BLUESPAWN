@@ -1,12 +1,12 @@
 #include "hunt/hunts/HuntT1103.h"
-#include "hunt/RegistryHunt.hpp"
+#include "hunt/RegistryHunt.h"
 #include "util/log/Log.h"
 #include "util/configurations/Registry.h"
 
 using namespace Registry;
 
 namespace Hunts {
-	HuntT1103::HuntT1103(HuntRegister& record) : Hunt(record, L"T1103 - AppInit DLLs") {
+	HuntT1103::HuntT1103() : Hunt(L"T1103 - AppInit DLLs") {
 		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Processes;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
@@ -17,15 +17,30 @@ namespace Hunts {
 		LOG_INFO("Hunting for T1103 - AppInit DLLs at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
-		int identified = 0;
+		std::map<RegistryKey, std::vector<RegistryValue>> keys;
 
-		identified += CheckKey<REG_SZ_T>({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", L"AppInit_DLLs" }, L"", reaction);
-		identified += CheckKey<REG_SZ_T>({ HKEY_LOCAL_MACHINE,L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows", L"AppInit_DLLs" }, L"", reaction);
-		identified += CheckKey<REG_DWORD_T>({ HKEY_LOCAL_MACHINE,L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", L"LoadAppInit_DLLs" }, 0, reaction);
-		identified += CheckKey<REG_DWORD_T>({ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows", L"LoadAppInit_DLLs" }, 0, reaction);
+		auto WinKey = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows" };
+		keys.emplace(WinKey, CheckValues(WinKey, {
+			{ L"AppInit_Dlls", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
+			{ L"LoadAppInit_Dlls", RegistryType::REG_DWORD_T, 0, false, CheckDwordEqual },
+		}));
+
+		auto WinKeyWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows" };
+		keys.emplace(WinKeyWow64, CheckValues(WinKeyWow64, {
+			{ L"AppInit_Dlls", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
+			{ L"LoadAppInit_Dlls", RegistryType::REG_DWORD_T, 0, false, CheckDwordEqual },
+		}));
+
+		int detections = 0;
+		for(const auto& key : keys){
+			for(const auto& value : key.second){
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
+				detections++;
+			}
+		}
 
 		reaction.EndHunt();
-		return identified;
+		return detections;
 	}
 
 }

@@ -14,14 +14,13 @@ namespace Hunts {
 	 * webshells.
 	 * 
 	 * @scans Cursory Checks for obvious bad functions that indicate a webshell
-	 * @scans Moderate Adds more suspicious indicators in the regex to look for
-	 * @scans Careful Scan not supported.
-	 * @scans Aggressive Scan not supported.
+	 * @scans Normal Adds more suspicious indicators in the regex to look for
+	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1100 : public Hunt {
 	private:
-		std::vector<std::string> web_directories = { "C:\\inetpub\\wwwroot", "C:\\xampp\\htdocs" };
-		std::vector<std::string> web_exts = { ".php", ".jsp", ".jspx", ".asp", ".aspx", ".asmx", ".ashx", ".ascx" };
+		std::vector<std::wstring> web_directories = { L"C:\\inetpub\\wwwroot", L"C:\\xampp\\htdocs" };
+		std::vector<std::wstring> web_exts = { L".php", L".jsp", L".jspx", L".asp", L".aspx", L".asmx", L".ashx", L".ascx" };
 		std::regex php_vuln_functions{};
 		std::regex asp_indicators{};
 		std::regex jsp_indicators{};
@@ -30,12 +29,12 @@ namespace Hunts {
 		void SetRegexAggressivenessLevel(Aggressiveness aLevel);
 
 	public:
-		HuntT1100(HuntRegister& record);
+		HuntT1100();
 
-		void AddDirectoryToSearch(const std::string& sFileName);
-		void AddFileExtensionToSearch(const std::string& sFileExtension);
+		void AddDirectoryToSearch(const std::wstring& sFileName);
+		void AddFileExtensionToSearch(const std::wstring& sFileExtension);
 
 		virtual int ScanCursory(const Scope& scope, Reaction reaction = Reactions::LogReaction());
-		virtual int ScanModerate(const Scope& scope, Reaction reaction = Reactions::LogReaction());
+		virtual int ScanNormal(const Scope& scope, Reaction reaction = Reactions::LogReaction());
 	};
 }

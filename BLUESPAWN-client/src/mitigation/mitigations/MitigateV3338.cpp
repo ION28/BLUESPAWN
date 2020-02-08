@@ -22,30 +22,28 @@ namespace Mitigations {
 
 	bool MitigateV3338::MitigationIsEnforced(SecurityLevel level) {
 		LOG_INFO("Checking for presence of " << name);
-		
-		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Services\\LanManServer\\Parameters", L"NullSessionPipes" };
-		if(key.ValueExists()){
-			LOG_VERBOSE(2, L"Located value for " + key.GetName());
-			auto values = key.Get<REG_MULTI_SZ_T>();
+
+		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Services\\LanManServer\\Parameters" };
+		if(key.ValueExists(L"NullSessionPipes")){
+			auto values = *key.GetValue<std::vector<std::wstring>>(L"NullSessionPipes");
+			auto vGoodValues = std::vector<std::wstring>{};
 			for(auto value : values){
-				if(value.size() != 0){ // TODO: Add exceptions on domain controllers (netlogon, samr, lsarpc)
+				if(value.size() == 0){ // TODO: Add exceptions on domain controllers (netlogon, samr, lsarpc)
 					LOG_VERBOSE(1, "Found a non-zero number of named pipes accessible anonymously.");
 					return false;
 				}
 			}
-		} 
+		}
 		LOG_VERBOSE(1, "Found no named pipes accessible anonymously.");
-
 		return true;
 	}
 
 	bool MitigateV3338::EnforceMitigation(SecurityLevel level) {
 		LOG_INFO("Enforcing Mitigation for " << name);
-
-		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Services\\LanManServer\\Parameters", L"NullSessionPipes" };
-		if(key.ValueExists()){
-			LOG_VERBOSE(2, L"Located value for " + key.GetName());
-			auto values = key.Get<REG_MULTI_SZ_T>();
+		
+		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Services\\LanManServer\\Parameters" };
+		if(key.ValueExists(L"NullSessionPipes")){
+			auto values = *key.GetValue<std::vector<std::wstring>>(L"NullSessionPipes");
 			/* TODO: Add prompt to ask if this is a domain controller */
 			//auto vGoodValues = std::vector<std::wstring>{L"NETLOGON", L"SAMR", L"LSARPC"};
 			auto vGoodValues = std::vector<std::wstring>{};
@@ -55,9 +53,8 @@ namespace Mitigations {
 				}
 			}
 			LOG_VERBOSE(2, L"Setting accessible named pipes to specified good values.");
-			return key.Set<REG_MULTI_SZ_T>(vGoodValues);
+			return key.SetValue<std::vector<std::wstring>>(L"NullSessionPipes", vGoodValues);
 		}
-
 		return true;
 	}
 
