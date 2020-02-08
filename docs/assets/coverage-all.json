@@ -75,15 +75,15 @@
 		{
 			"color": "#5AADFF",
 			"comment": "Covered by scanning all running processes for indicators of process injection.",
-			"techniqueID": "T1086"
+			"techniqueID": "T1186"
 		},
 		{
 			"color": "#5AADFF",
 			"comment": "Covered by checking Registry keys for Image File Execution Options.",
 			"techniqueID": "T1183"
 		},
-		{
-            "color": "#5AADFF",
+        {
+            "color": "#FCF26B",
 			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
             "techniqueID": "T1003"
         },
@@ -98,17 +98,17 @@
             "techniqueID": "T1171"
         },
         {
-            "color": "#5AADFF",
+            "color": "#FCF26B",
 			"comment": "Disables Windows Script Hosts which prevents some scripts from executing (M1042-WSH)",
             "techniqueID": "T1064"
         },
         {
-            "color": "#5AADFF",
+            "color": "#FCF26B",
 			"comment": "Limits anonymous access to shares (V-1093)",
             "techniqueID": "T1135"
         },
         {
-            "color": "#5AADFF",
+            "color": "#FCF26B",
 			"comment": "Filters Admin tokens over the network (V-63597)",
             "techniqueID": "T1075"
         },
@@ -120,8 +120,12 @@
     ],
     "legendItems": [
         {
-            "label": "BLUESPAWN Coverage",
+            "label": "Strong BLUESPAWN Coverage",
             "color": "#5AADFF"
+        },
+        {
+            "label": "Partial BLUESPAWN Coverage",
+            "color": "#FCF26B"
         }
     ]
 }
