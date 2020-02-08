@@ -17,7 +17,7 @@ We've created and open-sourced this for a number of reasons which include the fo
   * **Demonstrate Features of Windows API**: We combed through a ton of Microsoft Documentation, StackOverflow Answers, and more to create this. Hopefully others may find some of the code useful.
 
 ## Coverage of MITRE ATT&CK
-Visit [this map](https://ion28.github.io/BLUESPAWN/#layerURL=https%3A%2F%2Fion28.github.io%2FBLUESPAWN%2Fassets%2Fcoverage.json) to see current coverage capabilities
+Visit [this map](https://ion28.github.io/BLUESPAWN/) to see current coverage capabilities
 
 ## Try out BLUESPAWN 
 
