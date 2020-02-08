@@ -19,7 +19,7 @@ namespace Registry {
 
 	typedef std::function<bool(const std::wstring&, const std::wstring&)> REG_SZ_CHECK;
 	typedef std::function<bool(DWORD, DWORD)> REG_DWORD_CHECK;
-	typedef std::function<bool(AllocationWrapper, AllocationWrapper)> REG_BINARY_CHECK;
+	typedef std::function<bool(const AllocationWrapper&, const AllocationWrapper&)> REG_BINARY_CHECK;
 	typedef std::function<bool(const std::vector<std::wstring>&, const std::vector<std::wstring>&)> REG_MULTI_SZ_CHECK;
 
 	extern REG_SZ_CHECK CheckSzEqual;
@@ -51,19 +51,19 @@ namespace Registry {
 		REG_BINARY_CHECK lpCheck;
 		REG_MULTI_SZ_CHECK vCheck;
 		
-		RegistryCheck(std::wstring wValueName, RegistryType type, std::wstring wData, bool MissingBad = false,
-			REG_SZ_CHECK check = CheckSzEqual);
-		RegistryCheck(std::wstring wValueName, RegistryType type, DWORD dwData, bool MissingBad = false,
-			REG_DWORD_CHECK check = CheckDwordEqual);
-		RegistryCheck(std::wstring wValueName, RegistryType type, AllocationWrapper lpData, bool MissingBad = false,
-			REG_BINARY_CHECK check = CheckBinaryEqual);
-		RegistryCheck(std::wstring wValueName, RegistryType type, std::vector<std::wstring> wData, bool MissingBad = false,
-			REG_MULTI_SZ_CHECK check = CheckMultiSzSubset);
+		RegistryCheck(const std::wstring& wValueName, RegistryType type, const std::wstring& wData, bool MissingBad = false,
+			const REG_SZ_CHECK& check = CheckSzEqual);
+		RegistryCheck(const std::wstring& wValueName, RegistryType type, const DWORD dwData, bool MissingBad = false,
+			const REG_DWORD_CHECK& check = CheckDwordEqual);
+		RegistryCheck(const std::wstring& wValueName, RegistryType type, const AllocationWrapper& lpData, bool MissingBad = false,
+			const REG_BINARY_CHECK& check = CheckBinaryEqual);
+		RegistryCheck(const std::wstring& wValueName, RegistryType type, const std::vector<std::wstring>& wData, bool MissingBad = false,
+			const REG_MULTI_SZ_CHECK& check = CheckMultiSzSubset);
 
 		RegistryType GetType() const;
 	};
 
-	std::vector<RegistryValue> CheckValues(const RegistryKey& key, const std::vector<RegistryCheck> values);
+	std::vector<RegistryValue> CheckValues(const RegistryKey& key, const std::vector<RegistryCheck>& values);
 
 	std::vector<RegistryValue> CheckKeyValues(const RegistryKey& key);
 
