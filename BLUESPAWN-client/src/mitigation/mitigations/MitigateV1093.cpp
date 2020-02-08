@@ -39,10 +39,8 @@ namespace Mitigations {
 
 	bool MitigateV1093::EnforceMitigation(SecurityLevel level) {
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Lsa" };
-		std::wstring value = L"restrictanonymous";
-		DWORD data = 1;
 
-		return key.SetValue<DWORD>(L"restrictanonymous", data);
+		return key.SetValue<DWORD>(L"restrictanonymous", 1);
 	}
 
 	bool MitigateV1093::MitigationApplies(){
