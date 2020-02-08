@@ -7,7 +7,7 @@
 namespace Mitigations{
 
 	/**
-	 * MitigateM1042-LLMNR looks for Netbios (NBT) to be disabled. This helps
+	 * MitigateM1042-NBT looks for Netbios (NBT) to be disabled. This helps
 	 * to prevent against T1171 and is M1042 (NBT).
 	 */
 	class MitigateM1042NBT : public Mitigation {
