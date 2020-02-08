@@ -27,6 +27,11 @@ namespace Reactions{
 	}
 
 	void SuspendProcessReaction::SuspendFileIdentified(std::shared_ptr<FILE_DETECTION> detection){
+		auto ext = detection->wsFileName.substr(detection->wsFileName.size() - 4);
+		if(ext != L".exe" && ext != L".dll"){
+			return;
+		}
+
 		if(io.GetUserConfirm(detection->wsFileName + L" appears to be a malicious file. Suspend related processes?") == 1){
 			DWORD processes[1024];
 			DWORD ProcessCount = 0;
