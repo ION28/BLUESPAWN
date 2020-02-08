@@ -24,6 +24,7 @@
 #include "monitor/ETW_Wrapper.h"
 
 #include "mitigation/mitigations/MitigateM1042-LLMNR.h"
+#include "mitigation/mitigations/MitigateM1042-NBT.h"
 #include "mitigation/mitigations/MitigateM1042-WSH.h"
 #include "mitigation/mitigations/MitigateV1093.h"
 #include "mitigation/mitigations/MitigateV1153.h"
@@ -59,6 +60,7 @@ Bluespawn::Bluespawn() {
 	using namespace Mitigations;
    
 	MitigateM1042LLMNR* m1042llmnr = new MitigateM1042LLMNR(mitigationRecord);
+	MitigateM1042NBT* m1042nbt = new MitigateM1042NBT(mitigationRecord);
 	MitigateM1042WSH* m1042wsh = new MitigateM1042WSH(mitigationRecord);
 	MitigateV1093* v1093 = new MitigateV1093(mitigationRecord);
 	MitigateV1153* v1153 = new MitigateV1153(mitigationRecord);
