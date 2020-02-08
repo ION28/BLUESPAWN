@@ -24,7 +24,7 @@
         },
         {
             "color": "#5AADFF",
-			"comment": "Disables LLMNR to prevent against LLMNR spoofing attacks (M1042-LLMNR)",
+			"comment": "Disables LLMNR and NBT-NS to prevent against LLMNR/NBT-NS spoofing attacks (M1042-LLMNR, M1042-NBT)",
             "techniqueID": "T1171"
         },
         {
