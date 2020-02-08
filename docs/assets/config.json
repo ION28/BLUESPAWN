@@ -20,7 +20,7 @@
 
     "default_layers": {
         "enabled": true,
-        "urls": ["assets/example.json"]
+        "urls": ["assets/coverage-all.json", "assets/coverage-hunts.json", "assets/coverage-mitigations.json"]
     },
 
     "comment_color": "yellow",

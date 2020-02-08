@@ -1,5 +1,5 @@
 {
-    "description": "Current Coverage of BLUESPAWN",
+    "description": "Current Coverage of Hunts in BLUESPAWN",
 	"filters": {
 		"stages": [
 			"act"
@@ -9,7 +9,7 @@
 		]
 	},
     "version": "2.1",
-    "name": "BLUESPAWN",
+    "name": "BLUESPAWN Hunts",
     "domain": "mitre-enterprise",
     "techniques": [
         {
