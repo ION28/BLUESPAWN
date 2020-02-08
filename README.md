@@ -56,12 +56,12 @@ BLUESPAWN consists of 3 major modes as listed below. Several of these modules ha
 * **User** (Contains program main, IOBase, and other similar functions)
 
 * **Util** (Contains a collection of modules that support core operations)
-  * Configurations
-  * Event Logs
-  * File System
-  * Log
-  * PEs
-  * Processes
+    * Configurations
+    * Event Logs
+    * File System
+    * Log
+    * PEs
+    * Processes
 
 ## Project Authors
 Made with :heart: by the UVA Cyber Defense Team Windows Group
