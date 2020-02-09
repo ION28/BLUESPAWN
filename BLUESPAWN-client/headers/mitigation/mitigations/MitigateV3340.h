@@ -7,7 +7,7 @@
 namespace Mitigations {
 
 	/**
-	 * MitigateV3338 looks for unauthorized shares that can be accessed anonymously
+	 * MitigateV3340 looks for unauthorized shares that can be accessed anonymously
 	 * (V-3340).
 	 */
 	class MitigateV3340 : public Mitigation {
