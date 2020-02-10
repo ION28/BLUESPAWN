@@ -4,8 +4,6 @@
 #include "util/configurations/Registry.h"
 #include "util/log/Log.h"
 
-#include <VersionHelpers.h>
-
 using namespace Registry;
 
 namespace Mitigations{
@@ -28,11 +26,11 @@ namespace Mitigations{
 				LOG_VERBOSE(1, "Setting LimitBlankPasswordUse to 1");
 				return lsa.SetValue<DWORD>(L"RunAsPPL", 1);
 			} else {
-				LOG_VERBOSE(1, "Detected LSA allowing blank passwords");
+				LOG_VERBOSE(1, "Detected LSA allowing non-console logons with blank passwords");
 				return false;
 			}
 		}
-		LOG_VERBOSE(1, "LSA is limiting blank passwords");
+		LOG_VERBOSE(1, "LSA is denying non-console logons with blank passwords");
 		return true;
 	}
 
@@ -49,10 +47,6 @@ namespace Mitigations{
 	}
 
 	bool MitigateV3344::MitigationApplies(){
-		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion" };
-		auto version = key.GetValue<std::wstring>(L"CurrentVersion");
-		DWORD dwMajorVersion = _wtoi(version->substr(0, version->find(L".", 0)).c_str());
-		DWORD dwMinorVersion = _wtoi(version->substr(version->find(L".", 0) + 1).c_str());
-		return dwMajorVersion > 6 || (dwMajorVersion == 6 && dwMinorVersion >= 3);
+		return true;
 	}
 }
