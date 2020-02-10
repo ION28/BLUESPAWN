@@ -7,7 +7,7 @@
 namespace Mitigations{
 
 	/**
-	 * MitigateV3338 looks for local accounts with blank passwords
+	 * MitigateV3344 prevents non-console logons from accounts with blank passwords.
 	 */
 	class MitigateV3344 : public Mitigation {
 	public:
