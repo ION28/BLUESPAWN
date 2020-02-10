@@ -8,9 +8,8 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateV1093::MitigateV1093(MitigationRegister& record) :
+	MitigateV1093::MitigateV1093() :
 		Mitigation(
-			record,
 			L"V-1093 - Anonymous enumeration of shares must be restricted",
 			L"This is a High finding because allowing anonymous logon users (null session connections) to list all"
 				"account names and enumerate all shared resources can provide a map of potential points to attack the system.",
@@ -39,10 +38,8 @@ namespace Mitigations {
 
 	bool MitigateV1093::EnforceMitigation(SecurityLevel level) {
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Lsa" };
-		std::wstring value = L"restrictanonymous";
-		DWORD data = 1;
 
-		return key.SetValue<DWORD>(L"restrictanonymous", data);
+		return key.SetValue<DWORD>(L"restrictanonymous", 1);
 	}
 
 	bool MitigateV1093::MitigationApplies(){

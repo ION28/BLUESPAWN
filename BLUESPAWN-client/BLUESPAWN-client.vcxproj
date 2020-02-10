@@ -35,18 +35,23 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1138.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h" />
+    <ClInclude Include="headers\hunt\reaction\HuntTrigger.h" />
     <ClInclude Include="headers\hunt\reaction\RemoveValue.h" />
     <ClInclude Include="headers\hunt\reaction\SuspendProcess.h" />
     <ClInclude Include="headers\hunt\RegistryHunt.h" />
     <ClInclude Include="headers\hunt\Scope.h" />
     <ClInclude Include="headers\mitigation\Mitigation.h" />
     <ClInclude Include="headers\mitigation\MitigationRegister.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1025.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-LLMNR.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-NBT.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-WSH.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV1153.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3379.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV3340.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV3344.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63597.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63817.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63825.h" />
@@ -68,6 +73,7 @@
     <ClInclude Include="headers\util\configurations\RegistryValue.h" />
     <ClInclude Include="headers\util\configurations\ScheduledTasks.h" />
     <ClInclude Include="headers\util\eventlogs\EventLogs.h" />
+    <ClInclude Include="headers\util\eventlogs\EventSubscription.h" />
     <ClInclude Include="headers\util\filesystem\FileSystem.h" />
     <ClInclude Include="headers\util\log\CLISink.h" />
     <ClInclude Include="headers\util\log\DebugSink.h" />
@@ -434,18 +440,23 @@
     <ClCompile Include="src\hunt\hunts\HuntT1138.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
+    <ClCompile Include="src\hunt\reaction\HuntTrigger.cpp" />
     <ClCompile Include="src\hunt\reaction\RemoveValue.cpp" />
     <ClCompile Include="src\hunt\reaction\SuspendProcess.cpp" />
     <ClCompile Include="src\hunt\RegistryHunt.cpp" />
     <ClCompile Include="src\hunt\Scope.cpp" />
     <ClCompile Include="src\mitigation\Mitigation.cpp" />
     <ClCompile Include="src\mitigation\MitigationRegister.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1025.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-LLMNR.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1042-NBT.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-WSH.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM3379.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV1153.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV3340.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV3344.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63597.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63817.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63825.cpp" />
@@ -465,6 +476,7 @@
     <ClCompile Include="src\util\eventlogs\EventLogs.cpp" />
     <ClCompile Include="src\util\configurations\RegistryKey.cpp" />
     <ClCompile Include="src\util\configurations\RegistryValue.cpp" />
+    <ClCompile Include="src\util\eventlogs\EventSubscription.cpp" />
     <ClCompile Include="src\util\filesystem\FileSystem.cpp" />
     <ClCompile Include="src\util\log\CLISink.cpp" />
     <ClCompile Include="src\util\log\DebugSink.cpp" />
@@ -530,7 +542,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-client\external\krabsetw\krabs;$(SolutionDir)BLUESPAWN-client\external\cxxopts\include;$(SolutionDir)BLUESPAWN-client\external\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">

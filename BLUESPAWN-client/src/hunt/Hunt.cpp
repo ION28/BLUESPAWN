@@ -2,8 +2,6 @@
 #include "hunt/HuntRegister.h"
 #include "hunt/reaction/Reaction.h"
 
-#include <iostream>
-
 HuntInfo::HuntInfo(const std::wstring& HuntName, Aggressiveness HuntAggressiveness, DWORD HuntTactics, DWORD HuntCategories, DWORD HuntDatasources, long HuntStartTime) :
 	HuntName{ HuntName },
 	HuntAggressiveness{ HuntAggressiveness },
@@ -44,6 +42,8 @@ int Hunt::ScanIntensive(const Scope& scope, Reaction reaction){
 	}
 	return 0;
 }
+
+void Hunt::SetupMonitoring(HuntRegister& record, const Scope& scope, Aggressiveness level, Reaction reaction) {}
 
 bool Hunt::AffectsCategory(DWORD dwStuff){
 	return (dwStuff && dwCategoriesAffected) == dwStuff;

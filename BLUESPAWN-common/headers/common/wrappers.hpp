@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <optional>
+#include <functional>
 
 template<class T>
 class GenericWrapper {
@@ -15,7 +16,7 @@ protected:
 	T BadValue;
 	bool bFreeOnDestruction = true;
 
-	void (*freeResource)(T);
+	std::function<void(T)> freeResource;
 
 	void DestroyReference(){
 		mReferenceCounts[WrappedObject]--;
@@ -25,9 +26,11 @@ protected:
 				freeResource(WrappedObject);
 			}
 		}
+		WrappedObject = BadValue;
 	}
 
 	void SetReference(T object){
+		WrappedObject = object;
 		if(mReferenceCounts.find(object) == mReferenceCounts.end()){
 			mReferenceCounts.emplace(object, 1);
 		} else {
@@ -37,7 +40,7 @@ protected:
 
 public:
 
-	GenericWrapper(T object, void(*freeFunction)(T) = [](T object){ delete object; }, T BadValue = nullptr)
+	GenericWrapper(T object, std::function<void(T)> freeFunction = [](T object){ delete object; }, T BadValue = nullptr)
 		: WrappedObject{ object }, freeResource{ freeFunction }, BadValue{ BadValue } { SetReference(object); }
 
 	GenericWrapper(const GenericWrapper& copy)
@@ -48,7 +51,7 @@ public:
 
 	GenericWrapper& operator=(const GenericWrapper& copy){ 
 		freeResource = copy.freeResource; 
-		DestroyReference(); 
+		DestroyReference();
 		SetReference(copy.WrappedObject); 
 		return *this;
 	}
@@ -72,11 +75,12 @@ public:
 class HandleWrapper : public GenericWrapper<HANDLE> {
 public:
 	HandleWrapper(HANDLE handle) :
-		GenericWrapper(handle, (void(*)(HANDLE)) CloseHandle, INVALID_HANDLE_VALUE){};
+		GenericWrapper(handle, std::function<void(HANDLE)>(CloseHandle), INVALID_HANDLE_VALUE){};
 };
 
 class AllocationWrapper {
 	std::optional<std::shared_ptr<char[]>> Memory;
+	PCHAR pointer;
 	SIZE_T AllocationSize;
 
 public:
@@ -85,13 +89,14 @@ public:
 	};
 
 	AllocationWrapper(LPVOID memory, SIZE_T size, AllocationFunction AllocationType = STACK_ALLOC) :
+		pointer{ reinterpret_cast<PCHAR>(memory) },
 		Memory{ 
 			size && memory ? std::optional<std::shared_ptr<char[]>>{{
 				reinterpret_cast<PCHAR>(memory), [AllocationType](char* value){
 					if(AllocationType == CPP_ALLOC)
 						delete value;
 					else if(AllocationType == CPP_ARRAY_ALLOC)
-						delete[] value;
+						delete[] value; 
 					else if(AllocationType == MALLOC)
 						free(value);
 					else if(AllocationType == HEAP_ALLOC)
@@ -104,11 +109,15 @@ public:
 		AllocationSize{ size }{}
 
 	CHAR operator[](int i) const {
-		return Memory ? (*Memory)[i] : 0;
+		return Memory && i < AllocationSize ? pointer[i] : 0;
 	}
 
 	operator bool() const {
 		return Memory.has_value();
+	}
+
+	operator LPVOID() const {
+		return pointer;
 	}
 
 	DWORD GetSize() const {
@@ -122,27 +131,21 @@ public:
 
 	template<class T>
 	std::optional<T> Dereference() const {
-		if(AllocationSize < sizeof(T)){
+		if(AllocationSize < sizeof(T) || !Memory.has_value()){
 			return std::nullopt;
 		} else {
-			char* buffer = new char[sizeof(T)];
-			for(int i = 0; i < sizeof(T); i++){
-				buffer[i] = (*Memory)[i];
-			}
-			T value = *reinterpret_cast<T*>(buffer);
-			delete[] buffer;
-			return value;
+			return *reinterpret_cast<T*>(pointer);
 		}
 	}
 
 	std::optional<std::wstring> ReadWString() const {
 		if(Memory.has_value()){
 			SIZE_T size = 0;
-			while(size * 2 + 1 < AllocationSize && ((*Memory)[size * 2] || (*Memory)[size * 2 + 1]))
+			while(size * 2 + 1 < AllocationSize && (pointer[size * 2] || pointer[size * 2 + 1]))
 				size++;
 			char* buffer = new char[size * 2 + 2];
 			for(int i = 0; i < size * 2; i++){
-				buffer[i] = (*Memory)[i];
+				buffer[i] = pointer[i];
 			}
 			buffer[size * 2] = buffer[size * 2 + 1] = 0;
 			auto str = std::wstring{ reinterpret_cast<wchar_t*>(buffer) };
@@ -154,11 +157,11 @@ public:
 	std::optional<std::string> ReadString() const {
 		if(Memory.has_value()){
 			SIZE_T size = 0;
-			while(size < AllocationSize && (*Memory)[size])
+			while(size < AllocationSize && pointer[size])
 				size++;
 			char* buffer = new char[size + 1];
 			for(SIZE_T i = 0; i < size; i++){
-				buffer[i] = (*Memory)[i];
+				buffer[i] = pointer[i];
 			}
 			buffer[size] = 0;
 			auto str = std::string{ buffer };
@@ -167,14 +170,14 @@ public:
 		} else return std::nullopt;
 	}
 
-	bool CompareMemory(const AllocationWrapper& wrapper){
+	bool CompareMemory(const AllocationWrapper& wrapper) const {
 		if(!wrapper && !Memory.has_value()){
 			return true;
 		} else if(!wrapper || !Memory.has_value()){
 			return false;
 		} else if(wrapper.AllocationSize == AllocationSize){
 			for(int i = 0; i < AllocationSize; i++)
-				if((*Memory)[i] != wrapper[i])
+				if(pointer[i] != wrapper[i])
 					return false;
 			return true;
 		} else {
@@ -182,13 +185,12 @@ public:
 		}
 	}
 
-	char* Copy(){
-		if(Memory.has_value()){
-			char* copy = new char[AllocationSize];
-			for(SIZE_T i = 0; i < AllocationSize; i++)
-				copy[i] = (*Memory)[i];
-			return copy;
-		} else return nullptr;
+	bool SetByte(SIZE_T offset, char value){
+		if(offset < AllocationSize){
+			pointer[offset] = value;
+			return true;
+		}
+		return false;
 	}
 };
 
@@ -322,4 +324,7 @@ public:
 };
 
 #define WRAP(type, name, value, function) \
-    GenericWrapper<type> name = {value, [](type data){ function; }}
+    GenericWrapper<type> name = {value, [&](type data){ function; }}
+
+#define SCOPE_LOCK(function, name) \
+    GenericWrapper<DWORD> __##name = { 1, [&](DWORD data){ function; }, 0 }

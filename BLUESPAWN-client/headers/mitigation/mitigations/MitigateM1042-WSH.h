@@ -14,7 +14,7 @@ namespace Mitigations{
 	 */
 	class MitigateM1042WSH : public Mitigation {
 	public:
-		MitigateM1042WSH(MitigationRegister& record);
+		MitigateM1042WSH();
 
 		virtual bool MitigationIsEnforced(SecurityLevel level) override;
 		virtual bool EnforceMitigation(SecurityLevel level) override;

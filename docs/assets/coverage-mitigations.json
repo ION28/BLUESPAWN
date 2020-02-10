@@ -1,0 +1,61 @@
+{
+    "description": "Current Coverage of Mitigations in BLUESPAWN",
+	"filters": {
+		"stages": [
+			"act"
+		],
+		"platforms": [
+			"windows"
+		]
+	},
+    "version": "2.1",
+    "name": "BLUESPAWN Mitigations",
+    "domain": "mitre-enterprise",
+    "techniques": [
+        {
+            "color": "#FCF26B",
+			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+            "techniqueID": "T1003"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025)",
+            "techniqueID": "T1177"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Disables LLMNR and NBT-NS to prevent against LLMNR/NBT-NS spoofing attacks (M1042-LLMNR, M1042-NBT)",
+            "techniqueID": "T1171"
+        },
+        {
+            "color": "#FCF26B",
+			"comment": "Disables Windows Script Hosts which prevents some scripts from executing (M1042-WSH)",
+            "techniqueID": "T1064"
+        },
+        {
+            "color": "#FCF26B",
+			"comment": "Limits anonymous access to shares (V-1093)",
+            "techniqueID": "T1135"
+        },
+        {
+            "color": "#FCF26B",
+			"comment": "Filters Admin tokens over the network (V-63597)",
+            "techniqueID": "T1075"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "A number of settings to strengthen UAC are applied (V-63817)",
+            "techniqueID": "T1088"
+        }
+    ],
+    "legendItems": [
+        {
+            "label": "Strong BLUESPAWN Coverage",
+            "color": "#5AADFF"
+        },
+        {
+            "label": "Partial BLUESPAWN Coverage",
+            "color": "#FCF26B"
+        }
+    ]
+}

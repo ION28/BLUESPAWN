@@ -8,24 +8,24 @@
 #include <unordered_set>
 
 namespace Registry {
-	REG_SZ_CHECK CheckSzEqual = [](std::wstring s1, std::wstring s2){ return s1 == s2; };
-	REG_SZ_CHECK CheckSzNotEqual = [](std::wstring s1, std::wstring s2){ return s1 != s2; };
-	REG_SZ_CHECK CheckSzEmpty = [](std::wstring s1, std::wstring s2){ return s1.length() == 0; };
-	REG_SZ_CHECK CheckSzRegexMatch = [](std::wstring s1, std::wstring s2){ return std::regex_match(s1, std::wregex(s2)); };
-	REG_SZ_CHECK CheckSzRegexNotMatch = [](std::wstring s1, std::wstring s2){ return !std::regex_match(s1, std::wregex(s2)); };
+	REG_SZ_CHECK CheckSzEqual = [](const std::wstring& s1, const std::wstring& s2){ return s1 == s2; };
+	REG_SZ_CHECK CheckSzNotEqual = [](const std::wstring& s1, const std::wstring& s2){ return s1 != s2; };
+	REG_SZ_CHECK CheckSzEmpty = [](const std::wstring& s1, const std::wstring& s2){ return s1.length() == 0; };
+	REG_SZ_CHECK CheckSzRegexMatch = [](const std::wstring& s1, const std::wstring& s2){ return std::regex_match(s1, std::wregex(s2)); };
+	REG_SZ_CHECK CheckSzRegexNotMatch = [](const std::wstring& s1, const std::wstring& s2){ return !std::regex_match(s1, std::wregex(s2)); };
 
 	REG_DWORD_CHECK CheckDwordEqual = [](DWORD d1, DWORD d2){ return d1 == d2; };
 	REG_DWORD_CHECK CheckDwordNotEqual = [](DWORD d1, DWORD d2){ return d1 != d2; };
 
-	REG_BINARY_CHECK CheckBinaryEqual = [](AllocationWrapper s1, AllocationWrapper s2){
+	REG_BINARY_CHECK CheckBinaryEqual = [](const AllocationWrapper& s1, const AllocationWrapper& s2){
 		return s1.CompareMemory(s2);
 	};
-	REG_BINARY_CHECK CheckBinaryNotEqual = [](AllocationWrapper s1, AllocationWrapper s2){
+	REG_BINARY_CHECK CheckBinaryNotEqual = [](const AllocationWrapper& s1, const AllocationWrapper& s2){
 		return !s1.CompareMemory(s2);
 	};
-	REG_BINARY_CHECK CheckBinaryNull = [](AllocationWrapper s1, AllocationWrapper s2){ return !s1; };
+	REG_BINARY_CHECK CheckBinaryNull = [](const AllocationWrapper& s1, const AllocationWrapper& s2){ return !s1; };
 
-	REG_MULTI_SZ_CHECK CheckMultiSzSubset = [](std::vector<std::wstring> s1, std::vector<std::wstring> s2){
+	REG_MULTI_SZ_CHECK CheckMultiSzSubset = [](const std::vector<std::wstring>& s1, const std::vector<std::wstring>& s2){
 		std::unordered_set<std::wstring> vals = { s2.begin(), s2.end() };
 		for(auto string : s1){
 			if(vals.find(string) == vals.end()){
@@ -34,7 +34,7 @@ namespace Registry {
 		}
 		return true;
 	};
-	REG_MULTI_SZ_CHECK CheckMultiSzExclusion = [](std::vector<std::wstring> s1, std::vector<std::wstring> s2){
+	REG_MULTI_SZ_CHECK CheckMultiSzExclusion = [](const std::vector<std::wstring>& s1, const std::vector<std::wstring>& s2){
 		std::unordered_set<std::wstring> vals = { s2.begin(), s2.end() };
 		for(auto string : s1){
 			if(vals.find(string) != vals.end()){
@@ -43,30 +43,30 @@ namespace Registry {
 		}
 		return true;
 	};
-	REG_MULTI_SZ_CHECK CheckMultiSzEmpty = [](std::vector<std::wstring> s1, std::vector<std::wstring> s2){
+	REG_MULTI_SZ_CHECK CheckMultiSzEmpty = [](const std::vector<std::wstring>& s1, const std::vector<std::wstring>& s2){
 		return s1.size() == 0;
 	};
 
-	RegistryCheck::RegistryCheck(std::wstring wValueName, RegistryType type, std::wstring wData,
-		bool MissingBad, REG_SZ_CHECK check) :
+	RegistryCheck::RegistryCheck(const std::wstring& wValueName, RegistryType type, const std::wstring& wData,
+		bool MissingBad, const REG_SZ_CHECK& check) :
 		value{ wValueName, type, wData },
 		MissingBad{ MissingBad },
 		wCheck{ check }{}
 
-	RegistryCheck::RegistryCheck(std::wstring wValueName, RegistryType type, DWORD dwData,
-		bool MissingBad, REG_DWORD_CHECK check) :
+	RegistryCheck::RegistryCheck(const std::wstring& wValueName, RegistryType type, DWORD dwData,
+		bool MissingBad, const REG_DWORD_CHECK& check) :
 		value{ wValueName, type, dwData },
 		MissingBad{ MissingBad },
 		dwCheck{ check }{}
 
-	RegistryCheck::RegistryCheck(std::wstring wValueName, RegistryType type, AllocationWrapper lpData,
-		bool MissingBad, REG_BINARY_CHECK check) :
+	RegistryCheck::RegistryCheck(const std::wstring& wValueName, RegistryType type, const AllocationWrapper& lpData,
+		bool MissingBad, const REG_BINARY_CHECK& check) :
 		value{ wValueName, type, lpData },
 		MissingBad{ MissingBad },
 		lpCheck{ check }{}
 
-	RegistryCheck::RegistryCheck(std::wstring wValueName, RegistryType type, std::vector<std::wstring> vData,
-		bool MissingBad, REG_MULTI_SZ_CHECK check) :
+	RegistryCheck::RegistryCheck(const std::wstring& wValueName, RegistryType type, const std::vector<std::wstring>& vData,
+		bool MissingBad, const REG_MULTI_SZ_CHECK& check) :
 		value{ wValueName, type, vData },
 		MissingBad{ MissingBad },
 		vCheck{ check }{}
@@ -75,7 +75,7 @@ namespace Registry {
 		return value.type;
 	}
 
-	std::vector<RegistryValue> CheckValues(const RegistryKey& key, const std::vector<RegistryCheck> checks){
+	std::vector<RegistryValue> CheckValues(const RegistryKey& key, const std::vector<RegistryCheck>& checks){
 		std::vector<RegistryValue> vIdentifiedValues = {};
 
 		LOG_VERBOSE(1, "Checking values under " << key.ToString());

@@ -4,14 +4,16 @@
 #include "hunt/reaction/Reaction.h"
 #include "hunt/reaction/Log.h"
 
-namespace Mitigations {
+namespace Mitigations{
 
 	/**
-	 * MitigateV72753 looks for Wdigest authentication to be disabled. (V-72753).
+	 * MitigateM1025 looks for LSA to be run as a protected process light,
+	 * which requires all loaded DLLs to be properly signed and prevents other processes
+	 * from interfering with LSA.
 	 */
-	class MitigateV72753 : public Mitigation {
+	class MitigateM1025 : public Mitigation {
 	public:
-		MitigateV72753();
+		MitigateM1025();
 
 		virtual bool MitigationIsEnforced(SecurityLevel level) override;
 		virtual bool EnforceMitigation(SecurityLevel level) override;
