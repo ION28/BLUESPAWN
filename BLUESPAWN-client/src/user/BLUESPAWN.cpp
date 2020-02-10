@@ -29,6 +29,7 @@
 #include "mitigation/mitigations/MitigateV1093.h"
 #include "mitigation/mitigations/MitigateV1153.h"
 #include "mitigation/mitigations/MitigateV3338.h"
+#include "mitigation/mitigations/MitigateV3340.h"
 #include "mitigation/mitigations/MitigateV63597.h"
 #include "mitigation/mitigations/MitigateV63817.h"
 #include "mitigation/mitigations/MitigateV63825.h"
@@ -65,6 +66,7 @@ Bluespawn::Bluespawn() {
 	MitigateV1093* v1093 = new MitigateV1093(mitigationRecord);
 	MitigateV1153* v1153 = new MitigateV1153(mitigationRecord);
 	MitigateV3338* v3338 = new MitigateV3338(mitigationRecord);
+	MitigateV3340* v3340 = new MitigateV3340(mitigationRecord);
 	MitigateV63597* v63597 = new MitigateV63597(mitigationRecord);
 	MitigateV63817* v63817 = new MitigateV63817(mitigationRecord);
 	MitigateV63825* v63825 = new MitigateV63825(mitigationRecord);
