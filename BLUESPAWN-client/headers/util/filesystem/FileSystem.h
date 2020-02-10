@@ -127,6 +127,13 @@ namespace FileSystem {
 		std::optional<std::string> GetMD5Hash() const;
 
 		/**
+		 * Returns whether or not the current file is signed.
+		 *
+		 * @return true if the file is properly signed; false if not signed or an error occured.
+		 */
+		bool GetFileSigned() const;
+
+		/**
 		* Function to create the file if it doesn't exist
 		* 
 		* @return true if creation was successful, false if unsuccessful
