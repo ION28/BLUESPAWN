@@ -8,9 +8,8 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateV3340::MitigateV3340(MitigationRegister& record) :
+	MitigateV3340::MitigateV3340() :
 		Mitigation(
-			record,
 			L"V-3340 - Unauthorized shares can be accessed anonymously",
 			L"This is a Category 1 finding because of the potential for gaining unauthorized "
 			"system access. Any shares listed can be accessed by any network user. This could "

@@ -10,9 +10,8 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateM1042NBT::MitigateM1042NBT(MitigationRegister& record) :
+	MitigateM1042NBT::MitigateM1042NBT() :
 		Mitigation(
-			record,
 			L"M1042-NBT - NetBIOS Name Service (NBT-NS) should be disabled",
 			L" NetBIOS Name Service (NBT-NS) serve as alternate methods for "
 			"host identification. Adversaries can spoof an authoritative source for name "

@@ -10,9 +10,8 @@ using namespace Registry;
 
 namespace Mitigations{
 
-	MitigateM1025::MitigateM1025(MitigationRegister& record) :
+	MitigateM1025::MitigateM1025() :
 		Mitigation(
-			record,
 			L"M1025 - Privileged Process Integrity",
 			L"Protect processes with high privileges that can be used to interact with critical "
 			"system components through use of protected process light, anti-process injection defenses, "

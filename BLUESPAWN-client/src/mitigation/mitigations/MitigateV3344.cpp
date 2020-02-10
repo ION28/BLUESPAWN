@@ -10,9 +10,8 @@ using namespace Registry;
 
 namespace Mitigations{
 
-	MitigateV3344::MitigateV3344(MitigationRegister& record) :
+	MitigateV3344::MitigateV3344() :
 		Mitigation(
-			record,
 			L"V3344 - Local accounts with blank passwords restricted to console logon only",
 			L"This is a Category 1 finding because no accounts with blank passwords should exist on a system. "
 			"The password policy should prevent this from occurring. However, if a local account with a blank "
