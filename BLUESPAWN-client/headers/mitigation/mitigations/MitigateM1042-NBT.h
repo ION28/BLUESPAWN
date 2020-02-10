@@ -12,7 +12,7 @@ namespace Mitigations{
 	 */
 	class MitigateM1042NBT : public Mitigation {
 	public:
-		MitigateM1042NBT(MitigationRegister& record);
+		MitigateM1042NBT();
 
 		virtual bool MitigationIsEnforced(SecurityLevel level) override;
 		virtual bool EnforceMitigation(SecurityLevel level) override;

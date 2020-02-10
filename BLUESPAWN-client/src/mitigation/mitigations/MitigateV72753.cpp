@@ -10,9 +10,8 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateV72753::MitigateV72753(MitigationRegister& record) : 
+	MitigateV72753::MitigateV72753() : 
 		Mitigation(
-			record,
 			L"V-72753 - WDigest Authentication must be disabled",
 			L"When the WDigest Authentication protocol is enabled, plain text passwords are stored in the Local Security Authority"
 			"Subsystem Service (LSASS) exposing them to theft. This setting will prevent WDigest from storing credentials in memory.",

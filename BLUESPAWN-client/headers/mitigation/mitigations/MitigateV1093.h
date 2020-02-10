@@ -10,7 +10,7 @@ namespace Mitigations {
 	 */
 	class MitigateV1093 : public Mitigation {
 	public:
-		MitigateV1093(MitigationRegister& record);
+		MitigateV1093();
 
 		virtual bool MitigationIsEnforced(SecurityLevel level) override;
 		virtual bool EnforceMitigation(SecurityLevel level) override;
