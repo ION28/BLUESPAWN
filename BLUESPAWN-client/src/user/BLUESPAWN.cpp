@@ -17,6 +17,7 @@
 #include "hunt/hunts/HuntT1101.h"
 #include "hunt/hunts/HuntT1103.h"
 #include "hunt/hunts/HuntT1131.h"
+#include "hunt/hunts/HuntT1136.h"
 #include "hunt/hunts/HuntT1138.h"
 #include "hunt/hunts/HuntT1182.h"
 #include "hunt/hunts/HuntT1183.h"
@@ -56,6 +57,7 @@ Bluespawn::Bluespawn() {
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1101>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1103>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1131>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1136>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1138>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1182>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1183>());
