@@ -12,6 +12,11 @@
     "name": "BLUESPAWN Overall",
     "domain": "mitre-enterprise",
     "techniques": [
+		{
+            "color": "#5AADFF",
+			"comment": "Covered by checking EventLogs for Security/4720 events and monitoring for these events",
+            "techniqueID": "T1136"
+        },
         {
             "color": "#5AADFF",
 			"comment": "Covered by registry checking HKCU\\Environment\\UserInitMprLogonScript",
