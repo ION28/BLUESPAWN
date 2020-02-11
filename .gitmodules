@@ -7,3 +7,6 @@
 [submodule "BLUESPAWN-client/external/pe-sieve"]
 	path = BLUESPAWN-client/external/pe-sieve
 	url = https://github.com/hasherezade/pe-sieve
+[submodule "BLUESPAWN-client/external/yara"]
+	path = BLUESPAWN-client/external/yara
+	url = https://github.com/VirusTotal/yara

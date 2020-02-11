@@ -78,6 +78,12 @@ public:
 		GenericWrapper(handle, std::function<void(HANDLE)>(CloseHandle), INVALID_HANDLE_VALUE){};
 };
 
+class FindWrapper : public GenericWrapper<HANDLE> {
+public:
+	FindWrapper(HANDLE handle) :
+		GenericWrapper(handle, std::function<void(HANDLE)>(FindClose), INVALID_HANDLE_VALUE){};
+};
+
 class AllocationWrapper {
 	std::optional<std::shared_ptr<char[]>> Memory;
 	PCHAR pointer;
@@ -140,15 +146,11 @@ public:
 
 	std::optional<std::wstring> ReadWString() const {
 		if(Memory.has_value()){
-			SIZE_T size = 0;
-			while(size * 2 + 1 < AllocationSize && (pointer[size * 2] || pointer[size * 2 + 1]))
-				size++;
-			char* buffer = new char[size * 2 + 2];
-			for(int i = 0; i < size * 2; i++){
-				buffer[i] = pointer[i];
-			}
-			buffer[size * 2] = buffer[size * 2 + 1] = 0;
-			auto str = std::wstring{ reinterpret_cast<wchar_t*>(buffer) };
+			SIZE_T size = wcsnlen(reinterpret_cast<PWCHAR>(pointer), AllocationSize / 2);
+			PWCHAR buffer = new WCHAR[size + 1];
+			CopyMemory(buffer, pointer, size * 2);
+			buffer[size] = 0;
+			auto str = std::wstring{ buffer };
 			delete[] buffer;
 			return str;
 		} else return std::nullopt;
@@ -156,13 +158,9 @@ public:
 
 	std::optional<std::string> ReadString() const {
 		if(Memory.has_value()){
-			SIZE_T size = 0;
-			while(size < AllocationSize && pointer[size])
-				size++;
-			char* buffer = new char[size + 1];
-			for(SIZE_T i = 0; i < size; i++){
-				buffer[i] = pointer[i];
-			}
+			SIZE_T size = strnlen(reinterpret_cast<PCHAR>(pointer), AllocationSize);
+			PCHAR buffer = new CHAR[size + 1];
+			CopyMemory(buffer, pointer, size);
 			buffer[size] = 0;
 			auto str = std::string{ buffer };
 			delete[] buffer;
