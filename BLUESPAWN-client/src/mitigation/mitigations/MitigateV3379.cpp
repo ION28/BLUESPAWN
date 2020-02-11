@@ -3,15 +3,13 @@
 #include "hunt/RegistryHunt.h"
 #include "util/configurations/Registry.h"
 #include "util/log/Log.h"
-#include <algorithm>
 
 using namespace Registry;
 
 namespace Mitigations{
 
-	MitigateV3379::MitigateV3379(MitigationRegister& record) :
+	MitigateV3379::MitigateV3379() :
 		Mitigation(
-			record,
 			L"V-3379 - The system is configured to store the LAN Manager hash of the password in the SAM",
 			L"This setting controls whether or not a LAN Manager hash of the password is stored in the SAM "
 			"the next time the password is changed. The LAN Manager hash uses a weak encryption algorithm and "

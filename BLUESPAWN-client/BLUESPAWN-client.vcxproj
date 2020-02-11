@@ -451,12 +451,12 @@
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-LLMNR.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-NBT.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-WSH.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateM3379.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV1153.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3340.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3344.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV3379.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63597.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63817.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63825.cpp" />
