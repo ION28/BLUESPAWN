@@ -33,7 +33,7 @@ namespace Hunts {
 
 	std::vector<std::shared_ptr<Event>> HuntT1050::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
-		events.push_back(std::make_shared<EventLogEvent>(L"Security", 4720));
+		events.push_back(std::make_shared<EventLogEvent>(L"System", 7045));
 		return events;
 	}
 }
