@@ -104,11 +104,13 @@ void HuntRegister::SetupMonitoring(Aggressiveness aggressiveness, const Reaction
 					break;
 			}
 
-			DWORD status = EventManager::subscribeToEvent(event, callback);
-			if(status == ERROR_SUCCESS)
-				io.InformUser(L"Monitoring for " + name->GetName());
-			else
-				io.AlertUser(L"Monitoring for " + name->GetName() + L" failed with error code " + std::to_wstring(status));
+			if (name->SupportsScan(level)) {
+				DWORD status = EventManager::subscribeToEvent(event, callback);
+				if (status == ERROR_SUCCESS)
+					io.InformUser(L"Monitoring for " + name->GetName());
+				else
+					io.AlertUser(L"Monitoring for " + name->GetName() + L" failed with error code " + std::to_wstring(status));
+			}
 		}
 	}
 }
