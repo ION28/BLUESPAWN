@@ -23,11 +23,15 @@
 
 #include "monitor/ETW_Wrapper.h"
 
+#include "mitigation/mitigations/MitigateM1025.h"
 #include "mitigation/mitigations/MitigateM1042-LLMNR.h"
+#include "mitigation/mitigations/MitigateM1042-NBT.h"
 #include "mitigation/mitigations/MitigateM1042-WSH.h"
 #include "mitigation/mitigations/MitigateV1093.h"
 #include "mitigation/mitigations/MitigateV1153.h"
 #include "mitigation/mitigations/MitigateV3338.h"
+#include "mitigation/mitigations/MitigateV3340.h"
+#include "mitigation/mitigations/MitigateV3344.h"
 #include "mitigation/mitigations/MitigateV63597.h"
 #include "mitigation/mitigations/MitigateV63817.h"
 #include "mitigation/mitigations/MitigateV63825.h"
@@ -57,18 +61,21 @@ Bluespawn::Bluespawn() {
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1183>());
 
 	using namespace Mitigations;
-   
-	MitigateM1042LLMNR* m1042llmnr = new MitigateM1042LLMNR(mitigationRecord);
-	MitigateM1042WSH* m1042wsh = new MitigateM1042WSH(mitigationRecord);
-	MitigateV1093* v1093 = new MitigateV1093(mitigationRecord);
-	MitigateV1153* v1153 = new MitigateV1153(mitigationRecord);
-	MitigateV3338* v3338 = new MitigateV3338(mitigationRecord);
-	MitigateV63597* v63597 = new MitigateV63597(mitigationRecord);
-	MitigateV63817* v63817 = new MitigateV63817(mitigationRecord);
-	MitigateV63825* v63825 = new MitigateV63825(mitigationRecord);
-	MitigateV63829* v63829 = new MitigateV63829(mitigationRecord);
-	MitigateV72753* v72753 = new MitigateV72753(mitigationRecord);
-	MitigateV73519* v73519 = new MitigateV73519(mitigationRecord);
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1025>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042LLMNR>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042NBT>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042WSH>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1093>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1153>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3338>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3340>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3344>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63597>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63817>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63825>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
 }
 
 void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {

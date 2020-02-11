@@ -9,9 +9,8 @@ using namespace Registry;
 
 namespace Mitigations{
 
-	MitigateV73519::MitigateV73519(MitigationRegister& record) :
+	MitigateV73519::MitigateV73519() :
 		Mitigation(
-			record,
 			L"V-73519 - The Server Message Block (SMB) v1 protocol must be disabled on the SMB server",
 			L"SMBv1 is a legacy protocol that uses the MD5 algorithm as part of SMB. MD5 is known to be vulnerable to a "
 			L"number of attacks such as collision and preimage attacks as well as not being FIPS compliant. Disabling SMBv1 "

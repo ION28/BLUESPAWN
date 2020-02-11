@@ -10,9 +10,8 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateV63829::MitigateV63829(MitigationRegister& record) :
+	MitigateV63829::MitigateV63829() :
 		Mitigation(
-			record,
 			L"V-63829 - User Account Control must run all administrators in Admin Approval Mode, enabling UAC",
 			L"User Account Control (UAC) is a security mechanism for limiting the elevation of privileges, "
 			"including administrative accounts, unless authorized. This setting enables UAC.",

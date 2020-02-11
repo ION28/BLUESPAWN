@@ -4,14 +4,15 @@
 #include "hunt/reaction/Reaction.h"
 #include "hunt/reaction/Log.h"
 
-namespace Mitigations {
+namespace Mitigations{
 
 	/**
-	 * MitigateV72753 looks for Wdigest authentication to be disabled. (V-72753).
+	 * MitigateM1042-NBT looks for Netbios (NBT) to be disabled. This helps
+	 * to prevent against T1171 and is M1042 (NBT).
 	 */
-	class MitigateV72753 : public Mitigation {
+	class MitigateM1042NBT : public Mitigation {
 	public:
-		MitigateV72753();
+		MitigateM1042NBT();
 
 		virtual bool MitigationIsEnforced(SecurityLevel level) override;
 		virtual bool EnforceMitigation(SecurityLevel level) override;

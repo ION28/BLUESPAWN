@@ -277,20 +277,15 @@ namespace Registry {
 	std::optional<std::vector<std::wstring>> RegistryKey::GetValue(const std::wstring& wsValueName) const {
 		if(ValueExists(wsValueName)){
 			std::vector<std::wstring> strings{};
-			std::wstring wsLogString{};
 
-			LPCWSTR data = reinterpret_cast<LPCWSTR>(GetRawValue(wsValueName).Copy());
-			auto tmp = data;
+			LPCWSTR data = reinterpret_cast<LPCWSTR>((LPVOID) GetRawValue(wsValueName));
 
 			while(*data){
 				std::wstring str = data;
 				strings.emplace_back(data);
-				wsLogString += str;
 
 				data += str.length() + 1;
 			}
-
-			delete tmp;
 
 			return strings;
 		}
@@ -303,14 +298,7 @@ namespace Registry {
 			return false;
 		}
 
-		auto copy = bytes.Copy();
-		if(!copy){
-			SetLastError(ERROR_INVALID_PARAMETER);
-			return false;
-		}
-
-		LSTATUS status = RegSetValueEx(hkBackingKey, name.c_str(), 0, dwType, reinterpret_cast<BYTE*>(copy), bytes.GetSize());
-		delete[] copy;
+		LSTATUS status = RegSetValueEx(hkBackingKey, name.c_str(), 0, dwType, reinterpret_cast<BYTE*>((LPVOID) bytes), bytes.GetSize());
 		if(status != ERROR_SUCCESS){
 			SetLastError(status);
 			return false;
@@ -361,12 +349,11 @@ namespace Registry {
 			size += (string.length() + 1);
 		}
 
-		WCHAR* data = new WCHAR[size];
+		auto data = new WCHAR[size];
+		auto allocation = AllocationWrapper{ data, static_cast<DWORD>(size * sizeof(WCHAR)), AllocationWrapper::CPP_ARRAY_ALLOC };
 		unsigned ptr = 0;
 
-		std::wstring wsLogStatement{};
 		for(auto string : value){
-			wsLogStatement += string + L"; ";
 			LPCWSTR lpRawString = string.c_str();
 			for(unsigned i = 0; i < string.length() + 1; i++){
 				if(ptr < size){
@@ -379,9 +366,7 @@ namespace Registry {
 			data[ptr] = { static_cast<WCHAR>(0) };
 		}
 
-		bool succeeded = SetRawValue(name, AllocationWrapper{ data, static_cast<DWORD>(size * sizeof(WCHAR)), AllocationWrapper::CPP_ARRAY_ALLOC }, REG_MULTI_SZ);
-
-		delete[] data;
+		bool succeeded = SetRawValue(name, allocation, REG_MULTI_SZ);
 
 		return succeeded;
 	}
@@ -414,7 +399,10 @@ namespace Registry {
 
 				delete[] lpwName;
 			}
+		} else {
+			SetLastError(status);
 		}
+
 		return vSubKeys;
 	}
 
@@ -443,11 +431,19 @@ namespace Registry {
 
 				delete[] lpwName;
 			}
+		} else {
+			SetLastError(status);
 		}
+
 		return vSubKeys;
 	}
 
 	std::wstring RegistryKey::GetName() const {
+		if(!Exists()){
+			SetLastError(ERROR_NOT_FOUND);
+			return {};
+		}
+
 		// Taken largely from https://stackoverflow.com/questions/937044/determine-path-to-registry-key-from-hkey-handle-in-c
 		std::wstring keyPath = {};
 		if(hkBackingKey && Linker::NtQueryKey){

@@ -4,15 +4,14 @@
 #include "hunt/reaction/Reaction.h"
 #include "hunt/reaction/Log.h"
 
-namespace Mitigations {
+namespace Mitigations{
 
 	/**
-	 * MitigateV3338 looks for unauthorized named pipes that are accessible with anonymous
-	 * credentials (V-3338, CCI-001090).
+	 * MitigateV3344 prevents non-console logons from accounts with blank passwords.
 	 */
-	class MitigateV3338 : public Mitigation {
+	class MitigateV3344 : public Mitigation {
 	public:
-		MitigateV3338();
+		MitigateV3344();
 
 		virtual bool MitigationIsEnforced(SecurityLevel level) override;
 		virtual bool EnforceMitigation(SecurityLevel level) override;

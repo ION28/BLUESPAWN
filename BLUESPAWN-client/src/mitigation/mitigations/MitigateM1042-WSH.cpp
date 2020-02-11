@@ -10,9 +10,8 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateM1042WSH::MitigateM1042WSH(MitigationRegister& record) :
+	MitigateM1042WSH::MitigateM1042WSH() :
 		Mitigation(
-			record,
 			L"M1042-WSH - Windows Script Host (WSH) should be disabled",
 			L"Windows Script Host enables the execution of wscript and cscript "
 			"which allow VB, JS, and other scripts to be run. This feature is not "
