@@ -21,12 +21,14 @@ private:
 	map<DataSource, vector<reference_wrapper<Hunt>>> mDataSources{};
 	map<Category, vector<reference_wrapper<Hunt>>> mAffectedThings{};
 
+	Aggressiveness getLevelForHunt(Hunt& hunt, Aggressiveness aggressiveness);
+
 public:
 	HuntRegister(IOBase& oIo);
 
 	void RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
 	void RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
 
-	void SetupMonitoring(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
+	void SetupMonitoring(Aggressiveness aggressiveness, const Reaction& reaction);
 	void RegisterHunt(std::shared_ptr<Hunt> hunt);
 };

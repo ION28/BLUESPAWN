@@ -28,7 +28,7 @@ DWORD WINAPI EventSubscription::SubscriptionCallback(EVT_SUBSCRIBE_NOTIFY_ACTION
 	case EvtSubscribeActionDeliver:
 		if (ERROR_SUCCESS != (status = EventLogs::getLogs()->EventToDetection(hEvent, &detect, std::set<std::wstring>())))
 			goto cleanup;
-		reaction->EventIdentified(std::make_shared< EVENT_DETECTION>(detect));
+		callback(detect);
 
 		break;
 
@@ -47,9 +47,7 @@ cleanup:
 	return status; // The service ignores the returned status.
 }
 
-EventSubscription::EventSubscription(Reactions::HuntTriggerReaction& reaction) {
-	this->reaction = std::make_unique<Reactions::HuntTriggerReaction>(reaction);
-}
+EventSubscription::EventSubscription(std::function<void(EVENT_DETECTION)> callback) : callback(callback) {}
 
 EventSubscription::~EventSubscription() {
 	if (hSubscription)

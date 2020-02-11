@@ -104,7 +104,7 @@ void Bluespawn::monitor_system(Aggressiveness aHuntLevel) {
 	Reaction reaction = Reactions::LogReaction();
 
 	Bluespawn::io.InformUser(L"Monitoring the system");
-	huntRecord.SetupMonitoring(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+	huntRecord.SetupMonitoring(aHuntLevel, reaction);
 
 	while (true) {}
 }
