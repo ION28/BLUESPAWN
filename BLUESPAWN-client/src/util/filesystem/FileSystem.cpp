@@ -133,6 +133,17 @@ namespace FileSystem{
 		return success ? memory : AllocationWrapper{ nullptr, 0 };
 	}
 
+	bool File::MatchesAttributes(IN const FileSearchAttribs& searchAttribs) const {
+		if (searchAttribs.extensions.size() > 0) {
+			std::wstring ext = ToLowerCaseW(GetFileAttribs().extension);
+			if (std::count(searchAttribs.extensions.begin(), searchAttribs.extensions.end(), ext) == 0) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	bool File::GetFileSigned() const {
 
 		WINTRUST_FILE_INFO FileData{};
@@ -333,7 +344,7 @@ namespace FileSystem{
 		return (static_cast<DWORD64>(high) << 32) + size;
 	}
 
-	std::wstring File::toString() const {
+	std::wstring File::ToString() const {
 		return FilePath;
 	}
 
@@ -445,6 +456,11 @@ namespace FileSystem{
 				if(f) {
 					if(!attribs) {
 						toRet.emplace_back(*f);
+					}
+					else {
+						if (f->MatchesAttributes(attribs.value())) {
+							toRet.emplace_back(*f);
+						}
 					}
 				}
 			} else if(recurDepth != 0 && ffd.cFileName != std::wstring{ L"." } && ffd.cFileName != std::wstring{ L".." }){
