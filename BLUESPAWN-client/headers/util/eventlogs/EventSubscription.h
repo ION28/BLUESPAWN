@@ -3,7 +3,8 @@
 #include "windows.h"
 #include <stdio.h>
 #include <winevt.h>
-#include "hunt/reaction/HuntTrigger.h"
+#include <functional>
+#include "hunt/reaction/Detections.h"
 
 #pragma comment(lib, "wevtapi.lib")
 
@@ -12,7 +13,7 @@
 */
 class EventSubscription {
 	public:
-		EventSubscription(Reactions::HuntTriggerReaction& reaction);
+		EventSubscription(std::function<void(EVENT_DETECTION)> callback);
 		// Have a destructor to ensure we can clean up when this object is deleted
 		~EventSubscription();
 
@@ -28,6 +29,6 @@ class EventSubscription {
 		void setSubHandle(EVT_HANDLE hSubscription);
 
 	private:
-		std::unique_ptr<Reactions::HuntTriggerReaction> reaction;
+		std::function<void(EVENT_DETECTION)> callback;
 		EVT_HANDLE hSubscription;
 };

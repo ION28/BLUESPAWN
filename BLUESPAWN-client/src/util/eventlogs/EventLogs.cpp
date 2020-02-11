@@ -273,17 +273,18 @@ cleanup:
 	return -1;
 }
 
-std::unique_ptr<EventSubscription> EventLogs::subscribe(LPWSTR pwsPath, unsigned int id, Reactions::HuntTriggerReaction& reaction, DWORD * pStatus) {
+std::unique_ptr<EventSubscription> EventLogs::subscribe(LPWSTR pwsPath, unsigned int id, std::function<void(EVENT_DETECTION)> callback, DWORD * pStatus) {
 	*pStatus = ERROR_SUCCESS;
 	EVT_HANDLE hSubscription = NULL;
 
 	auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
 	auto wquery = query.c_str();
 
-	auto eventSub = std::make_unique<EventSubscription>(reaction);
+	auto eventSub = std::make_unique<EventSubscription>(callback);
 
 	hSubscription = EvtSubscribe(NULL, NULL, pwsPath, wquery, NULL, reinterpret_cast<void*>(eventSub.get()),
 		CallbackWrapper, EvtSubscribeToFutureEvents);
+	eventSub->setSubHandle(hSubscription);
 
 	if (hSubscription == NULL) {
 		// Cleanup a failed subscription
