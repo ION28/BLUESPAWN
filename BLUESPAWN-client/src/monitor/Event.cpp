@@ -22,7 +22,7 @@ EventLogEvent::EventLogEvent(std::wstring channel, int eventID) : Event(EventTyp
 	eventLogTrigger = std::bind(&EventLogEvent::eventLogCallback, this, std::placeholders::_1);
 }
 
-void EventLogEvent::eventLogCallback(EVENT_DETECTION detection) {
+void EventLogEvent::eventLogCallback(EventLogs::EventLogItem item) {
 	for (auto callback : this->callbacks)
 		callback(Scope(), Reactions::LogReaction());
 }

@@ -16,7 +16,7 @@ namespace Log {
 				for(auto detection : detections){
 					if(detection->Type == DetectionType::File){
 						auto lpFileDetection = std::static_pointer_cast<FILE_DETECTION>(detection);
-						OutputDebugStringW((sLogHeader + L"\tPotentially malicious file detected - " + lpFileDetection->wsFileName).c_str());
+						OutputDebugStringW((sLogHeader + L"\tPotentially malicious file detected - " + lpFileDetection->wsFilePath).c_str());
 					} else if(detection->Type == DetectionType::Process){
 						auto lpProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);
 						OutputDebugStringW((sLogHeader + L"\tPotentially malicious process detected - " + lpProcessDetection->wsImageName + L" (PID is " + std::to_wstring(lpProcessDetection->PID) + L")").c_str());

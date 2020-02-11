@@ -12,6 +12,7 @@
 #include <fileapi.h>
 #include <vector>
 #include <Shlwapi.h>
+#include <SoftPub.h>
 #include "common/wrappers.hpp"
 
 namespace FileSystem{
@@ -130,6 +131,49 @@ namespace FileSystem{
 		AllocationWrapper memory = { HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, amount + 1), amount + 1, AllocationWrapper::HEAP_ALLOC };
 		bool success = Read(memory, amount, offset, amountRead);
 		return success ? memory : AllocationWrapper{ nullptr, 0 };
+	}
+
+	bool File::MatchesAttributes(IN const FileSearchAttribs& searchAttribs) const {
+		if (searchAttribs.extensions.size() > 0) {
+			std::wstring ext = ToLowerCaseW(GetFileAttribs().extension);
+			if (std::count(searchAttribs.extensions.begin(), searchAttribs.extensions.end(), ext) == 0) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool File::GetFileSigned() const {
+
+		WINTRUST_FILE_INFO FileData{};
+		FileData.cbStruct = sizeof(WINTRUST_FILE_INFO);
+		FileData.pcwszFilePath = FilePath.c_str();
+		FileData.hFile = hFile;
+		FileData.pgKnownSubject = NULL;
+
+		GUID verification = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+
+		WINTRUST_DATA WinTrustData{};
+
+		WinTrustData.cbStruct = sizeof(WinTrustData);
+		WinTrustData.pPolicyCallbackData = NULL;
+		WinTrustData.pSIPClientData = NULL;
+		WinTrustData.dwUIChoice = WTD_UI_NONE;
+		WinTrustData.fdwRevocationChecks = WTD_REVOKE_NONE;
+		WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
+		WinTrustData.dwStateAction = WTD_STATEACTION_VERIFY;
+		WinTrustData.hWVTStateData = NULL;
+		WinTrustData.pwszURLReference = NULL;
+		WinTrustData.dwUIContext = 0;
+		WinTrustData.pFile = &FileData;
+
+		LONG result = WinVerifyTrust((HWND) INVALID_HANDLE_VALUE, &verification, &WinTrustData);
+		if(result){
+			return false;
+		}
+
+		return true;
 	}
 
 	std::optional<std::string> File::GetMD5Hash() const {
@@ -285,6 +329,7 @@ namespace FileSystem{
 			LOG_ERROR("Couldn't change file pointer to " << length << " in file " << FilePath);
 			return false;
 		}
+
 		if(!SetEndOfFile(hFile)) {
 			LOG_ERROR("Couldn't change the length of file " << FilePath);
 			return false;
@@ -297,6 +342,10 @@ namespace FileSystem{
 		DWORD high = {};
 		auto size = ::GetFileSize(hFile, &high);
 		return (static_cast<DWORD64>(high) << 32) + size;
+	}
+
+	std::wstring File::ToString() const {
+		return FilePath;
 	}
 
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
@@ -407,6 +456,11 @@ namespace FileSystem{
 				if(f) {
 					if(!attribs) {
 						toRet.emplace_back(*f);
+					}
+					else {
+						if (f->MatchesAttributes(attribs.value())) {
+							toRet.emplace_back(*f);
+						}
 					}
 				}
 			} else if(recurDepth != 0 && ffd.cFileName != std::wstring{ L"." } && ffd.cFileName != std::wstring{ L".." }){
