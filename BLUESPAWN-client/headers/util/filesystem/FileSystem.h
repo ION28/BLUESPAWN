@@ -31,7 +31,7 @@ namespace FileSystem {
 		std::wstring FilePath;
 
 		//Handle for the file
-		HandleWrapper hFile;
+		FindWrapper hFile;
 
 		//Attributes of the file
 		FileAttribs Attribs;
@@ -162,6 +162,13 @@ namespace FileSystem {
 		 * @return The size of the referenced file
 		 */
 		DWORD64 GetFileSize() const;
+
+		/**
+		 * Gets the file path (and thus its name)
+		 *
+		 * @return The file path of the object
+		 */
+		std::wstring toString() const;
 	};
 
 	class Folder {
@@ -173,7 +180,7 @@ namespace FileSystem {
 		bool FolderExists;
 
 		//Handle to current file or directory
-		HandleWrapper hCurFile;
+		FindWrapper hCurFile;
 
 		//Is the current handle a file or directory
 		bool IsFile;

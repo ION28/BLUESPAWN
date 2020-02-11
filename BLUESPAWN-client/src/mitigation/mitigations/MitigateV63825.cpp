@@ -10,9 +10,8 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateV63825::MitigateV63825(MitigationRegister& record) :
+	MitigateV63825::MitigateV63825() :
 		Mitigation(
-			record,
 			L"V-63825 - User Account Control must be configured to detect application installations and prompt for elevation",
 			L"User Account Control (UAC) is a security mechanism for limiting the elevation of privileges, including "
 			"administrative accounts, unless authorized. This setting requires Windows to respond to application installation "

@@ -318,6 +318,7 @@ namespace FileSystem{
 			LOG_ERROR("Couldn't change file pointer to " << length << " in file " << FilePath);
 			return false;
 		}
+
 		if(!SetEndOfFile(hFile)) {
 			LOG_ERROR("Couldn't change the length of file " << FilePath);
 			return false;
@@ -332,12 +333,16 @@ namespace FileSystem{
 		return (static_cast<DWORD64>(high) << 32) + size;
 	}
 
+	std::wstring File::toString() const {
+		return FilePath;
+	}
+
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
 		FolderPath = path;
 		std::wstring searchName = FolderPath;
 		searchName += L"\\*";
 		FolderExists = true;
-		hCurFile = HandleWrapper(FindFirstFile(searchName.c_str(), &ffd));
+		hCurFile = FindFirstFileW(searchName.c_str(), &ffd);
 		if(hCurFile == INVALID_HANDLE_VALUE) {
 			LOG_ERROR("Couldn't open folder " << path);
 			FolderExists = false;
@@ -442,7 +447,7 @@ namespace FileSystem{
 						toRet.emplace_back(*f);
 					}
 				}
-			} else if(recurDepth != 0 && ffd.cFileName != L"." && ffd.cFileName != L".."){
+			} else if(recurDepth != 0 && ffd.cFileName != std::wstring{ L"." } && ffd.cFileName != std::wstring{ L".." }){
 				std::vector<File> temp;
 				std::optional<Folder> f = EnterDir();
 				if(f) {
@@ -469,7 +474,7 @@ namespace FileSystem{
 		}
 		std::vector<Folder> toRet = {};
 		do {
-			if(!GetCurIsFile() && recurDepth != 0 && ffd.cFileName != L"." && ffd.cFileName != L".."){
+			if(!GetCurIsFile() && recurDepth != 0 && ffd.cFileName != std::wstring{ L"." } && ffd.cFileName != std::wstring{ L".." }){
 				std::vector<Folder> temp;
 				std::optional<Folder> f = EnterDir();
 				if(f) {

@@ -10,9 +10,8 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateM1042LLMNR::MitigateM1042LLMNR(MitigationRegister& record) :
+	MitigateM1042LLMNR::MitigateM1042LLMNR() :
 		Mitigation(
-			record,
 			L"M1042-LLMNR - Link-Local Multicast Name Resolution (LLMNR) should be disabled",
 			L"Link-Local Multicast Name Resolution (LLMNR) serve as alternate methods for "
 			"host identification. Adversaries can spoof an authoritative source for name "
