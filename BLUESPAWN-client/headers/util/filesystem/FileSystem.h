@@ -166,7 +166,7 @@ namespace FileSystem {
 		bool FolderExists;
 
 		//Handle to current file or directory
-		HandleWrapper hCurFile;
+		FindWrapper hCurFile;
 
 		//Is the current handle a file or directory
 		bool IsFile;
