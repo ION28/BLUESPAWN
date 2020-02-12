@@ -8,6 +8,7 @@
 
 #include "hunt/HuntInfo.h"
 #include "util/configurations/RegistryValue.h"
+#include <common\StringUtils.h>
 
 enum class DetectionType {
 	File,
@@ -28,11 +29,12 @@ struct FILE_DETECTION : public DETECTION {
 	std::wstring wsFileName;
 	std::wstring wsFilePath;
 	BYTE hash[256];
-	FILE_DETECTION(const std::wstring& wsFileName, const std::wstring& wsFilePath) : 
+	FILE_DETECTION(const std::wstring& wsFilePath) : 
 		DETECTION{ DetectionType::File },
-		wsFileName{ wsFileName },
 		wsFilePath{ wsFilePath },
-		hash{}{}
+		hash{}{
+		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
+	}
 };
 typedef std::function<void(std::shared_ptr<FILE_DETECTION>)> DetectFile;
 
