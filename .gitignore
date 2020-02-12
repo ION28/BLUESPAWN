@@ -2,6 +2,8 @@
 build/
 artifacts/
 BLUESPAWN-client/external/
+BLUESPAWN-client/resources/severe
+BLUESPAWN-client/resources/indicators
 *.user
 *.filters
 *.cache

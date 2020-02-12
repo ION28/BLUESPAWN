@@ -226,6 +226,7 @@ int main(int argc, char* argv[]){
 	catch (cxxopts::OptionParseException e1) {
 		LOG_ERROR(StringToWidestring(e1.what()));
 	}
+	return 0;
 }
 
 void print_help(cxxopts::ParseResult result, cxxopts::Options options) {

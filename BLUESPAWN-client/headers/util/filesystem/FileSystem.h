@@ -115,7 +115,7 @@ namespace FileSystem {
 		*
 		* @return true if read successful, false if read unsuccessful
 		*/
-		AllocationWrapper Read(__in_opt unsigned long amount, __in_opt long offset = 0, __out_opt PDWORD amountRead = nullptr) const;
+		AllocationWrapper Read(__in_opt unsigned long amount = -1, __in_opt long offset = 0, __out_opt PDWORD amountRead = nullptr) const;
 
 		/**
 		* Function to compute the MD5 hash of the file
