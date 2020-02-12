@@ -10,7 +10,7 @@ namespace Mitigations{
 
 	MitigateV3344::MitigateV3344() :
 		Mitigation(
-			L"V3344 - Local accounts with blank passwords restricted to console logon only",
+			L"V-3344 - Local accounts with blank passwords restricted to console logon only",
 			L"This is a Category 1 finding because no accounts with blank passwords should exist on a system. "
 			"The password policy should prevent this from occurring. However, if a local account with a blank "
 			"password does exist, enabling this setting will limit the account to local console logon only.",
