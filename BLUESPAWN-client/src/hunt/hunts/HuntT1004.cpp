@@ -5,7 +5,6 @@
 #include "util/log/Log.h"
 #include "util/log/HuntLogMessage.h"
 #include "util/eventlogs/EventLogs.h"
-#include "hunt/reaction/HuntTrigger.h"
 
 using namespace Registry;
 

@@ -1,7 +1,6 @@
 #pragma once
 #include "../Hunt.h"
 #include "hunt/reaction/Reaction.h"
-#include "hunt/reaction/HuntTrigger.h"
 #include "hunt/reaction/Log.h"
 
 namespace Hunts {

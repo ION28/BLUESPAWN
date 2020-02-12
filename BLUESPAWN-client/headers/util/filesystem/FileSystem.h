@@ -6,6 +6,7 @@
 #include <vector>
 #include <optional>
 
+#include "util/log/Loggable.h"
 #include "common/wrappers.hpp"
 
 #define BUFSIZE 1024
@@ -22,7 +23,7 @@ namespace FileSystem {
 		std::vector<std::wstring> extensions;
 	};
 
-	class File {
+	class File : public Loggable {
 
 		//Whether or not this current file actually exists on the filesystem
 		bool FileExists; 
@@ -31,7 +32,7 @@ namespace FileSystem {
 		std::wstring FilePath;
 
 		//Handle for the file
-		HandleWrapper hFile;
+		FindWrapper hFile;
 
 		//Attributes of the file
 		FileAttribs Attribs;
@@ -127,6 +128,22 @@ namespace FileSystem {
 		std::optional<std::string> GetMD5Hash() const;
 
 		/**
+		* Function to see if a file matches a given set of search criteria
+		*
+		* @param searchAttribs - a FileSearchAttribs object
+		*
+		* @return a boolean indicating if the file matched the criteria
+		*/
+		bool MatchesAttributes(IN const FileSearchAttribs& searchAttribs) const;
+
+		/**
+		 * Returns whether or not the current file is signed.
+		 *
+		 * @return true if the file is properly signed; false if not signed or an error occured.
+		 */
+		bool GetFileSigned() const;
+
+		/**
 		* Function to create the file if it doesn't exist
 		* 
 		* @return true if creation was successful, false if unsuccessful
@@ -155,6 +172,13 @@ namespace FileSystem {
 		 * @return The size of the referenced file
 		 */
 		DWORD64 GetFileSize() const;
+
+		/**
+		 * Gets the file path (and thus its name)
+		 *
+		 * @return The file path of the object
+		 */
+		virtual std::wstring ToString() const;
 	};
 
 	class Folder {
@@ -166,7 +190,7 @@ namespace FileSystem {
 		bool FolderExists;
 
 		//Handle to current file or directory
-		HandleWrapper hCurFile;
+		FindWrapper hCurFile;
 
 		//Is the current handle a file or directory
 		bool IsFile;

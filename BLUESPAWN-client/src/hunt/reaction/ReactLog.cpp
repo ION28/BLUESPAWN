@@ -19,7 +19,7 @@ namespace Reactions {
 		if(HuntBegun){
 			_HuntLogMessage->AddDetection(std::static_pointer_cast<DETECTION>(detection));
 		} else {
-			LOG_ERROR("Potentially malicious file " << detection->wsFileName << " detected outside of a hunt!");
+			LOG_ERROR("Potentially malicious file " << detection->wsFilePath << " detected outside of a hunt!");
 		}
 	}
 	void LogReaction::LogRegistryKeyIdentified(std::shared_ptr<REGISTRY_DETECTION> detection){

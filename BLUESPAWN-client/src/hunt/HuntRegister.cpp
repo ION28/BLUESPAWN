@@ -1,5 +1,7 @@
 #include "hunt/HuntRegister.h"
 #include <iostream>
+#include <functional>
+#include "monitor/EventManager.h"
 
 HuntRegister::HuntRegister(IOBase& io) : io(io) {}
 
@@ -30,28 +32,19 @@ void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffecte
 
   for (auto name : vRegisteredHunts) {
 		int huntRunStatus = 0;
-		if (aggressiveness == Aggressiveness::Intensive) {
-			if (name->SupportsScan(Aggressiveness::Intensive)) {
+		auto level = getLevelForHunt(*name, aggressiveness);
+		switch (level) {
+			case Aggressiveness::Intensive:
 				huntRunStatus = name->ScanIntensive(scope, reaction);
-			}
-			else if (name->SupportsScan(Aggressiveness::Normal)) {
+				break;
+			case Aggressiveness::Normal:
 				huntRunStatus = name->ScanNormal(scope, reaction);
-			}
-			else {
+				break;
+			case Aggressiveness::Cursory:
 				huntRunStatus = name->ScanCursory(scope, reaction);
-			}
+				break;
 		}
-		else if (aggressiveness == Aggressiveness::Normal) {
-			if (name->SupportsScan(Aggressiveness::Normal)) {
-				huntRunStatus = name->ScanNormal(scope, reaction);
-			}
-			else {
-				huntRunStatus = name->ScanCursory(scope, reaction);
-			}
-		}
-		else {
-			huntRunStatus = name->ScanCursory(scope, reaction);
-		}
+		
 		if (huntRunStatus != -1) {
 			++huntsRan;
 		}
@@ -68,28 +61,19 @@ void HuntRegister::RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggres
 	io.InformUser(L"Starting scan for " + hunt.GetName());
 	int huntRunStatus = 0;
 
-  if (aggressiveness == Aggressiveness::Intensive) {
-		if (hunt.SupportsScan(Aggressiveness::Intensive)) {
+	auto level = getLevelForHunt(hunt, aggressiveness);
+	switch (level) {
+		case Aggressiveness::Intensive:
 			huntRunStatus = hunt.ScanIntensive(scope, reaction);
-		}
-		else if (hunt.SupportsScan(Aggressiveness::Normal)) {
+			break;
+		case Aggressiveness::Normal:
 			huntRunStatus = hunt.ScanNormal(scope, reaction);
-		}
-		else {
+			break;
+		case Aggressiveness::Cursory:
 			huntRunStatus = hunt.ScanCursory(scope, reaction);
-		}
+			break;
 	}
-	else if (aggressiveness == Aggressiveness::Normal) {
-		if (hunt.SupportsScan(Aggressiveness::Normal)) {
-			huntRunStatus = hunt.ScanNormal(scope, reaction);
-		}
-		else {
-			huntRunStatus = hunt.ScanCursory(scope, reaction);
-		}
-	}
-	else {
-		huntRunStatus = hunt.ScanCursory(scope, reaction);
-	}
+
 	if (huntRunStatus == -1) {
 		io.InformUser(L"No scans for this level available for " + hunt.GetName());
 	}
@@ -98,8 +82,47 @@ void HuntRegister::RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggres
 	}
 }
 
-void HuntRegister::SetupMonitoring(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction) {
+void HuntRegister::SetupMonitoring(Aggressiveness aggressiveness, const Reaction& reaction) {
+	using namespace std::placeholders;
+
 	for (auto name : vRegisteredHunts) {
-		name->SetupMonitoring(*this, scope, aggressiveness, reaction);
+		auto level = getLevelForHunt(*name, aggressiveness);
+		for (auto event : name->GetMonitoringEvents()) {
+
+			std::function<void(const Scope & scope, Reaction reaction)> callback;
+			event->setReaction(reaction);
+
+			switch (level) {
+				case Aggressiveness::Intensive:
+					callback = std::bind(&Hunt::ScanIntensive, name.get(), _1, _2);
+					break;
+				case Aggressiveness::Normal:
+					callback = std::bind(&Hunt::ScanNormal, name.get(), _1, _2);
+					break;
+				case Aggressiveness::Cursory:
+					callback = std::bind(&Hunt::ScanCursory, name.get(), _1, _2);
+					break;
+			}
+
+			DWORD status = EventManager::subscribeToEvent(event, callback);
+			if(status == ERROR_SUCCESS)
+				io.InformUser(L"Monitoring for " + name->GetName());
+			else
+				io.AlertUser(L"Monitoring for " + name->GetName() + L" failed with error code " + std::to_wstring(status));
+		}
 	}
+}
+
+Aggressiveness HuntRegister::getLevelForHunt(Hunt& hunt, Aggressiveness aggressiveness) {
+	if (aggressiveness == Aggressiveness::Intensive) {
+		if (hunt.SupportsScan(Aggressiveness::Intensive)) 
+			return Aggressiveness::Intensive;
+		else if (hunt.SupportsScan(Aggressiveness::Normal)) 
+			return Aggressiveness::Normal;
+	}
+	else if (aggressiveness == Aggressiveness::Normal) 
+		if (hunt.SupportsScan(Aggressiveness::Normal)) 
+			return Aggressiveness::Normal;
+
+	return Aggressiveness::Cursory;
 }

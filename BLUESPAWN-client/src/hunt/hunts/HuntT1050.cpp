@@ -31,14 +31,9 @@ namespace Hunts {
 		return identified;
 	}
 
-	void HuntT1050::SetupMonitoring(HuntRegister& record, const Scope& scope, Aggressiveness level, Reaction reaction) {
-		Reactions::HuntTriggerReaction triggerReaction(record, dynamic_cast<Hunt*>(this), scope, level, reaction);
-		DWORD status;
-		eventSubscriptions.push_back(EventLogs::getLogs()->subscribe(L"System", 7045, triggerReaction, &status));
-
-		if (status == ERROR_SUCCESS)
-			LOG_INFO("Monitoring for T1050 - New Service at level Cursory");
-		else
-			LOG_WARNING("Monitoring for T1050 failed with error code " + std::to_string(status));
+	std::vector<std::shared_ptr<Event>> HuntT1050::GetMonitoringEvents() {
+		std::vector<std::shared_ptr<Event>> events;
+		events.push_back(std::make_shared<EventLogEvent>(L"System", 7045));
+		return events;
 	}
 }

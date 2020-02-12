@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <winevt.h>
 #include "hunt/reaction/Reaction.h"
-#include "hunt/reaction/HuntTrigger.h"
 #include <set>
 #include "util/eventlogs/EventSubscription.h"
 
@@ -74,7 +73,7 @@ class EventLogs {
 		* @param status the status of the operation
 		* @returns a shared pointer to the datasturctures storing the event subscription information
 		*/
-		std::unique_ptr<EventSubscription> subscribe(LPWSTR pwsPath, unsigned int id, Reactions::HuntTriggerReaction& reaction, DWORD* status);
+		std::unique_ptr<EventSubscription> subscribe(LPWSTR pwsPath, unsigned int id, std::function<void(EVENT_DETECTION)> callback, DWORD* status);
 
 	private:
 		DWORD ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std::set<std::wstring>& params);

@@ -64,7 +64,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="headers\user\banners.h" />
+	<ClInclude Include="headers\monitor\Event.h" />
+    <ClInclude Include="headers\monitor\EventManager.h" />
+	<ClInclude Include="headers\user\banners.h" />
     <ClInclude Include="headers\user\bluespawn.h" />
     <ClInclude Include="headers\user\CLI.h" />
     <ClInclude Include="headers\user\iobase.h" />
@@ -469,7 +471,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\user\banners.cpp" />
+	<ClCompile Include="src\monitor\Event.cpp" />
+    <ClCompile Include="src\monitor\EventManager.cpp" />
+	<ClCompile Include="src\user\banners.cpp" />
     <ClCompile Include="src\user\BLUESPAWN.cpp" />
     <ClCompile Include="src\user\CLI.cpp" />
     <ClCompile Include="src\util\configurations\CollectInfo.cpp" />
