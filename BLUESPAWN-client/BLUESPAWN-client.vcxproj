@@ -35,7 +35,6 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1138.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h" />
-    <ClInclude Include="headers\hunt\reaction\HuntTrigger.h" />
     <ClInclude Include="headers\hunt\reaction\RemoveValue.h" />
     <ClInclude Include="headers\hunt\reaction\SuspendProcess.h" />
     <ClInclude Include="headers\hunt\RegistryHunt.h" />
@@ -440,7 +439,6 @@
     <ClCompile Include="src\hunt\hunts\HuntT1138.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
-    <ClCompile Include="src\hunt\reaction\HuntTrigger.cpp" />
     <ClCompile Include="src\hunt\reaction\RemoveValue.cpp" />
     <ClCompile Include="src\hunt\reaction\SuspendProcess.cpp" />
     <ClCompile Include="src\hunt\RegistryHunt.cpp" />
