@@ -1,4 +1,0 @@
-google/protobuf/io/gzip_stream.lo: google/protobuf/io/gzip_stream.cc \
- /usr/include/stdc-predef.h
-
-/usr/include/stdc-predef.h:

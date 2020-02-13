@@ -6,10 +6,18 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommonLib", "BLUESPAWN-common\CommonLib.vcxproj", "{25AE1D80-3E17-4E1D-BFB4-8AFB375EBAF1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BLUESPAWN-client", "BLUESPAWN-client\BLUESPAWN-client.vcxproj", "{159B2E72-9553-4E17-9BEC-CB92FCA8D0B0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7C72350B-AA5B-41AD-8957-CE3924A7F11B} = {7C72350B-AA5B-41AD-8957-CE3924A7F11B}
+		{E236CE39-D8F3-4DB6-985C-F2794FF17746} = {E236CE39-D8F3-4DB6-985C-F2794FF17746}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pe-sieve", "BLUESPAWN-client\pe-sieve.vcxproj", "{BEC01F8E-5892-3F6F-A741-5BBD1D0F4EF9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpeconv", "BLUESPAWN-client\libpeconv.vcxproj", "{C9D09618-1DE6-3323-AED8-9B885AC8D9F3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libyara", "BLUESPAWN-client\libyara.vcxproj", "{E236CE39-D8F3-4DB6-985C-F2794FF17746}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yarac", "BLUESPAWN-client\yarac.vcxproj", "{7C72350B-AA5B-41AD-8957-CE3924A7F11B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +59,22 @@ Global
 		{C9D09618-1DE6-3323-AED8-9B885AC8D9F3}.Release|x64.Build.0 = Release|x64
 		{C9D09618-1DE6-3323-AED8-9B885AC8D9F3}.Release|x86.ActiveCfg = Release|Win32
 		{C9D09618-1DE6-3323-AED8-9B885AC8D9F3}.Release|x86.Build.0 = Release|Win32
+		{E236CE39-D8F3-4DB6-985C-F2794FF17746}.Debug|x64.ActiveCfg = Debug|x64
+		{E236CE39-D8F3-4DB6-985C-F2794FF17746}.Debug|x64.Build.0 = Debug|x64
+		{E236CE39-D8F3-4DB6-985C-F2794FF17746}.Debug|x86.ActiveCfg = Debug|Win32
+		{E236CE39-D8F3-4DB6-985C-F2794FF17746}.Debug|x86.Build.0 = Debug|Win32
+		{E236CE39-D8F3-4DB6-985C-F2794FF17746}.Release|x64.ActiveCfg = Release|x64
+		{E236CE39-D8F3-4DB6-985C-F2794FF17746}.Release|x64.Build.0 = Release|x64
+		{E236CE39-D8F3-4DB6-985C-F2794FF17746}.Release|x86.ActiveCfg = Release|Win32
+		{E236CE39-D8F3-4DB6-985C-F2794FF17746}.Release|x86.Build.0 = Release|Win32
+		{7C72350B-AA5B-41AD-8957-CE3924A7F11B}.Debug|x64.ActiveCfg = Debug|x64
+		{7C72350B-AA5B-41AD-8957-CE3924A7F11B}.Debug|x64.Build.0 = Debug|x64
+		{7C72350B-AA5B-41AD-8957-CE3924A7F11B}.Debug|x86.ActiveCfg = Debug|Win32
+		{7C72350B-AA5B-41AD-8957-CE3924A7F11B}.Debug|x86.Build.0 = Debug|Win32
+		{7C72350B-AA5B-41AD-8957-CE3924A7F11B}.Release|x64.ActiveCfg = Release|x64
+		{7C72350B-AA5B-41AD-8957-CE3924A7F11B}.Release|x64.Build.0 = Release|x64
+		{7C72350B-AA5B-41AD-8957-CE3924A7F11B}.Release|x86.ActiveCfg = Release|Win32
+		{7C72350B-AA5B-41AD-8957-CE3924A7F11B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

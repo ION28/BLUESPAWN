@@ -444,7 +444,7 @@ namespace FileSystem{
 		return false;
 	}
 
-	std::vector<File> Folder::GetFiles(IN std::optional<FileSearchAttribs> attribs, IN int recurDepth) {
+	std::vector<File> Folder::GetFiles(__in_opt std::optional<FileSearchAttribs> attribs, __in_opt int recurDepth) {
 		if(MoveToBeginning() == 0) {
 			LOG_ERROR("Couldn't get to beginning of folder " << FolderPath);
 			return std::vector<File>();
