@@ -5,6 +5,7 @@
 #include <winevt.h>
 #include <functional>
 #include "hunt/reaction/Detections.h"
+#include "util/eventlogs/EventLogItem.h"
 
 #pragma comment(lib, "wevtapi.lib")
 
@@ -13,7 +14,7 @@
 */
 class EventSubscription {
 	public:
-		EventSubscription(std::function<void(EVENT_DETECTION)> callback);
+		EventSubscription(std::function<void(EventLogs::EventLogItem)> callback);
 		// Have a destructor to ensure we can clean up when this object is deleted
 		~EventSubscription();
 
@@ -29,6 +30,6 @@ class EventSubscription {
 		void setSubHandle(EVT_HANDLE hSubscription);
 
 	private:
-		std::function<void(EVENT_DETECTION)> callback;
+		std::function<void(EventLogs::EventLogItem)> callback;
 		EVT_HANDLE hSubscription;
 };

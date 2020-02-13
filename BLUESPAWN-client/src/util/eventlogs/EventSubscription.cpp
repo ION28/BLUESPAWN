@@ -7,7 +7,7 @@
 DWORD WINAPI EventSubscription::SubscriptionCallback(EVT_SUBSCRIBE_NOTIFY_ACTION action, EVT_HANDLE hEvent) {
 	DWORD status = ERROR_SUCCESS;
 
-	EVENT_DETECTION detect(0, 0, L"", L"", L"");
+	EventLogs::EventLogItem item;
 
 	switch (action)
 	{
@@ -26,9 +26,9 @@ DWORD WINAPI EventSubscription::SubscriptionCallback(EVT_SUBSCRIBE_NOTIFY_ACTION
 		break;
 
 	case EvtSubscribeActionDeliver:
-		if (ERROR_SUCCESS != (status = EventLogs::getLogs()->EventToDetection(hEvent, &detect, std::set<std::wstring>())))
+		if (ERROR_SUCCESS != (status = EventLogs::EventToEventLogItem(hEvent, &item, std::vector<std::wstring>())))
 			goto cleanup;
-		callback(detect);
+		callback(item);
 
 		break;
 
@@ -47,7 +47,7 @@ cleanup:
 	return status; // The service ignores the returned status.
 }
 
-EventSubscription::EventSubscription(std::function<void(EVENT_DETECTION)> callback) : callback(callback) {}
+EventSubscription::EventSubscription(std::function<void(EventLogs::EventLogItem)> callback) : callback(callback) {}
 
 EventSubscription::~EventSubscription() {
 	if (hSubscription)

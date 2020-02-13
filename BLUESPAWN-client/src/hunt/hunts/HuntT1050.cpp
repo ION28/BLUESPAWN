@@ -17,18 +17,15 @@ namespace Hunts {
 		LOG_INFO("Hunting for T1050 - New Service at level Intensive");
 		reaction.BeginHunt(GET_INFO());
 
-
-		int identified = 0;
-		identified += EventLogs::getLogs()->QueryEvents(L"System", 7045, std::set<std::wstring>({L"Event/EventData/Data[@Name='ServiceName']",
-			L"Event/EventData/Data[@Name='ImagePath']", L"Event/EventData/Data[@Name='ServiceType']", L"Event/EventData/Data[@Name='StartType']" }), reaction);
-
-		if (identified == -1) {
-			LOG_ERROR("Hunting for T1050 - Event Query for 7045 failed.");
-			identified = 0;
-		}
+		// std::vector<std::wstring>({L"Event/EventData/Data[@Name='ServiceName']",
+		//L"Event/EventData/Data[@Name='ImagePath']", L"Event/EventData/Data[@Name='ServiceType']", L"Event/EventData/Data[@Name='StartType']"
+		//})
+		auto results = EventLogs::QueryEvents(L"System", 7045);
+		for (auto result : results)
+			reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
 
 		reaction.EndHunt();
-		return identified;
+		return results.size();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1050::GetMonitoringEvents() {

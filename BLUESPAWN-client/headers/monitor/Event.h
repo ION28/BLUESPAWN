@@ -32,7 +32,7 @@ class EventLogEvent : public Event {
 	public:
 		EventLogEvent(std::wstring channel, int eventID);
 
-		std::function<void(EVENT_DETECTION)> eventLogTrigger;
+		std::function<void(EventLogs::EventLogItem)> eventLogTrigger;
 
 		void setEventSub(std::unique_ptr< EventSubscription> sub);
 
@@ -40,7 +40,7 @@ class EventLogEvent : public Event {
 		int getEventID();
 
 	private:
-		void eventLogCallback(EVENT_DETECTION detection);
+		void eventLogCallback(EventLogs::EventLogItem item);
 		std::unique_ptr< EventSubscription> eventSub;
 		std::wstring channel;
 		int eventID;

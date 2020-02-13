@@ -16,18 +16,14 @@ namespace Hunts {
 		LOG_INFO("Hunting for T1136 - Account Created");
 		reaction.BeginHunt(GET_INFO());
 
-
-		int identified = 0;
-		identified += EventLogs::getLogs()->QueryEvents(L"Security", 4720, std::set<std::wstring>({ L"Event/EventData/Data[@Name='TargetUserName']",
-			L"Event/EventData/Data[@Name='SubjectUserName']" }), reaction);
-
-		if (identified == -1) {
-			LOG_ERROR("Hunting for T1136 - Event Query for 4720 failed.");
-			identified = 0;
-		}
+		//std::set<std::wstring>({ L"Event/EventData/Data[@Name='TargetUserName']",
+			//L"Event/EventData/Data[@Name='SubjectUserName']" })
+		auto results = EventLogs::QueryEvents(L"Security", 4720);
+		for (auto result : results)
+			reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
 
 		reaction.EndHunt();
-		return identified;
+		return results.size();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1136::GetMonitoringEvents() {
