@@ -9,3 +9,4 @@ BLUESPAWN-client/resources/indicators
 *.filters
 *.cache
 *.bak
+*.lib
