@@ -16,7 +16,6 @@ namespace Hunts {
 		LOG_INFO("Hunting for T1136 - Account Created");
 		reaction.BeginHunt(GET_INFO());
 
-
 		//std::set<std::wstring>({ L"Event/EventData/Data[@Name='TargetUserName']",
 			//L"Event/EventData/Data[@Name='SubjectUserName']" })
 		auto results = EventLogs::QueryEvents(L"Security", 4720);
