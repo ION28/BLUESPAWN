@@ -9,6 +9,7 @@
 #include "hunt/reaction/RemoveValue.h"
 
 #include "hunt/hunts/HuntT1004.h"
+#include "hunt/hunts/HuntT1015.h"
 #include "hunt/hunts/HuntT1037.h"
 #include "hunt/hunts/HuntT1050.h"
 #include "hunt/hunts/HuntT1055.h"
@@ -50,6 +51,7 @@ MitigationRegister Bluespawn::mitigationRecord{ io };
 Bluespawn::Bluespawn() {
 
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1004>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1015>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1037>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1050>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1055>());
