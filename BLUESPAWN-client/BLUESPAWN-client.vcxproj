@@ -128,6 +128,10 @@
     <ClInclude Include="headers\hunt\reaction\Detections.h" />
     <ClInclude Include="headers\hunt\reaction\Log.h" />
     <ClInclude Include="headers\hunt\reaction\Reaction.h" />
+    <ClInclude Include="headers\util\processes\ProcessChecker.h" />
+    <ClInclude Include="headers\util\processes\ProcessUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="src\hunt\Hunt.cpp" />
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1004.cpp" />
