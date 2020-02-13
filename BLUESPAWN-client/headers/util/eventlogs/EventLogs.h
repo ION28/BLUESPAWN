@@ -19,8 +19,7 @@ namespace EventLogs {
 	/**
 	* @param channel the channel to look for the event log (exe, 'Microsoft-Windows-Sysmon/Operational')
 	* @param id the event ID to filter for
-	* @param reaction the reaction to use when an event is detected
-	* @param params extra parameters to print in the output
+	* @param params pair mappings of xpaths to values to filter the event log results by
 	* @return the number of events detected, or -1 if something went wrong.
 	*/
 	std::vector<EventLogItem> QueryEvents(const wchar_t* channel, unsigned int id, ParamList& params = ParamList());
@@ -60,12 +59,15 @@ namespace EventLogs {
 	*
 	* @param pwsPath the event channel to subscribe to
 	* @param id the id of the event to subscribe to
-	* @param reaction the reaction to call when an event is generated
+	* @param callback the function to call when event subscriptions are returned
 	* @param status the status of the operation
 	* @returns a shared pointer to the datasturctures storing the event subscription information
 	*/
 	std::unique_ptr<EventSubscription> subscribe(LPWSTR pwsPath, unsigned int id, std::function<void(EventLogItem)> callback, DWORD* status);
 
+	/**
+	* A utility function called by QueryEvents
+	*/
 	std::vector<EventLogItem> ProcessResults(EVT_HANDLE hResults, ParamList& params);
 
 
