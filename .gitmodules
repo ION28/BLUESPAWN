@@ -12,4 +12,4 @@
 	url = https://github.com/VirusTotal/yara
 [submodule "BLUESPAWN-client/external/yara-rules"]
 	path = BLUESPAWN-client/external/yara-rules
-	url = https://github.com/Yara-Rules/rules
+	url = https://github.com/Yara-Rules/rules.git
