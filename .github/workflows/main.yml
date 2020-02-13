@@ -22,8 +22,14 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - name: Setup NuGet.exe
+      uses: warrenbuckley/Setup-Nuget@v1
+
     - name: Update submodules
       run: git submodule update --init --recursive --remote
+
+    - name: Download NuGet packages
+      run: nuget restore BLUESPAWN.sln
 
     - name: Build BLUESPAWN-client
       run: |

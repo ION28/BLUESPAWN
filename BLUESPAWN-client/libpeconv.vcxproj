@@ -33,6 +33,22 @@
     <Link>
       <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
