@@ -83,29 +83,27 @@ void HuntRegister::RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggres
 }
 
 void HuntRegister::SetupMonitoring(Aggressiveness aggressiveness, const Reaction& reaction) {
-	using namespace std::placeholders;
-
+	auto& EvtManager = EventManager::GetInstance();
 	for (auto name : vRegisteredHunts) {
 		auto level = getLevelForHunt(*name, aggressiveness);
 		for (auto event : name->GetMonitoringEvents()) {
 
-			std::function<void(const Scope & scope, Reaction reaction)> callback;
-			event->setReaction(reaction);
+			std::function<void()> callback;
 
 			switch (level) {
 				case Aggressiveness::Intensive:
-					callback = std::bind(&Hunt::ScanIntensive, name.get(), _1, _2);
+					callback = std::bind(&Hunt::ScanIntensive, name.get(), Scope{}, reaction);
 					break;
 				case Aggressiveness::Normal:
-					callback = std::bind(&Hunt::ScanNormal, name.get(), _1, _2);
+					callback = std::bind(&Hunt::ScanNormal, name.get(), Scope{}, reaction);
 					break;
 				case Aggressiveness::Cursory:
-					callback = std::bind(&Hunt::ScanCursory, name.get(), _1, _2);
+					callback = std::bind(&Hunt::ScanCursory, name.get(), Scope{}, reaction);
 					break;
 			}
 
 			if (name->SupportsScan(level)) {
-				DWORD status = EventManager::subscribeToEvent(event, callback);
+				DWORD status = EvtManager.SubscribeToEvent(event, callback);
 				if (status == ERROR_SUCCESS)
 					io.InformUser(L"Monitoring for " + name->GetName());
 				else

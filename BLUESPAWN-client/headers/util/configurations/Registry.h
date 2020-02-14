@@ -202,6 +202,15 @@ namespace Registry {
 		 */
 		bool operator<(const RegistryKey& key) const;
 
+		/**
+		 * Removes a value from the referenced registry key.
+		 *
+		 * @param wsValueName The name of the value to be removed
+		 *
+		 * @return a boolean indicating whether the value was successfully removed
+		 */
 		bool RemoveValue(const std::wstring& wsValueName) const;
+
+		operator HKEY() const;
 	};
 }

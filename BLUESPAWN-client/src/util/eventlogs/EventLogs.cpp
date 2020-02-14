@@ -261,7 +261,7 @@ namespace EventLogs {
 		return items;
 	}
 
-	std::unique_ptr<EventSubscription> EventLogs::subscribe(LPWSTR pwsPath, unsigned int id, std::function<void(EventLogItem)> callback, DWORD* pStatus) {
+	std::unique_ptr<EventSubscription> EventLogs::SubscribeToEvent(LPWSTR pwsPath, unsigned int id, std::function<void(EventLogItem)> callback, DWORD* pStatus) {
 		*pStatus = ERROR_SUCCESS;
 		EVT_HANDLE hSubscription = NULL;
 
@@ -279,11 +279,11 @@ namespace EventLogs {
 			*pStatus = GetLastError();
 
 			if (ERROR_EVT_CHANNEL_NOT_FOUND == *pStatus)
-				LOG_ERROR("EventLogs::subscribe: Channel was not found.");
+				LOG_ERROR("EventLogs::SubscribeToEvent: Channel was not found.");
 			else if (ERROR_EVT_INVALID_QUERY == *pStatus)
-				LOG_ERROR(L"EventLogs::subscribe: query " + query + L" is not valid.");
+				LOG_ERROR(L"EventLogs::SubscribeToEvent: query " + query + L" is not valid.");
 			else
-				LOG_ERROR("EventLogs::subscribe: EvtSubscribe failed with " + std::to_string(*pStatus));
+				LOG_ERROR("EventLogs::SubscribeToEvent: EvtSubscribe failed with " + std::to_string(*pStatus));
 		}
 
 		return eventSub;

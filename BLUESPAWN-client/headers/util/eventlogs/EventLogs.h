@@ -64,7 +64,7 @@ namespace EventLogs {
 	* @param status the status of the operation
 	* @returns a shared pointer to the datasturctures storing the event subscription information
 	*/
-	std::unique_ptr<EventSubscription> subscribe(LPWSTR pwsPath, unsigned int id, std::function<void(EventLogItem)> callback, DWORD* status);
+	std::unique_ptr<EventSubscription> SubscribeToEvent(LPWSTR pwsPath, unsigned int id, std::function<void(EventLogItem)> callback, DWORD* status);
 
 	std::vector<EventLogItem> ProcessResults(EVT_HANDLE hResults, ParamList& params);
 
