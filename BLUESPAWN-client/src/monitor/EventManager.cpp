@@ -26,7 +26,7 @@ DWORD EventManager::setupEventLogEvent(std::shared_ptr<Event> e) {
 	auto logEvent = std::static_pointer_cast<EventLogEvent>(e);
 
 	DWORD status;
-	auto subscription = EventLogs::subscribe((LPWSTR)logEvent->getChannel().c_str(), logEvent->getEventID(), logEvent->eventLogTrigger, &status);
+	auto subscription = EventLogs::subscribe((LPWSTR)logEvent->getChannel().c_str(), logEvent->getEventID(), logEvent->eventLogTrigger, &status, logEvent->getQueries());
 	logEvent->setEventSub(move(subscription));
 
 	return status;
