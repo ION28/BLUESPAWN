@@ -18,7 +18,8 @@ void Event::addCallback(std::function<void(const Scope & scope, Reaction reactio
 /************************
 ***   EventLogEvent   ***
 *************************/
-EventLogEvent::EventLogEvent(std::wstring channel, int eventID) : Event(EventType::EventLog) , channel(channel), eventID(eventID) {
+EventLogEvent::EventLogEvent(std::wstring channel, int eventID, std::vector<EventLogs::XpathQuery> queries) :
+	Event(EventType::EventLog) , channel(channel), eventID(eventID), queries(queries) {
 	eventLogTrigger = std::bind(&EventLogEvent::eventLogCallback, this, std::placeholders::_1);
 }
 
@@ -36,4 +37,8 @@ std::wstring EventLogEvent::getChannel() {
 }
 int EventLogEvent::getEventID() {
 	return eventID;
+}
+
+std::vector<EventLogs::XpathQuery> EventLogEvent::getQueries() {
+	return this->queries;
 }

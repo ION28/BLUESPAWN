@@ -9,6 +9,7 @@
 #include <vector>
 #include "util/eventlogs/EventSubscription.h"
 #include "util/eventlogs/EventLogItem.h"
+#include "XpathQuery.h"
 
 #pragma comment(lib, "wevtapi.lib")
 
@@ -22,7 +23,7 @@ namespace EventLogs {
 	* @param params pair mappings of xpaths to values to filter the event log results by
 	* @return the number of events detected, or -1 if something went wrong.
 	*/
-	std::vector<EventLogItem> QueryEvents(const wchar_t* channel, unsigned int id, ParamList& params = ParamList());
+	std::vector<EventLogItem> QueryEvents(const wchar_t* channel, unsigned int id, std::vector<XpathQuery>& filters = std::vector<XpathQuery>());
 
 	/**
 	* Get the string value of a parameter in an event
@@ -63,12 +64,11 @@ namespace EventLogs {
 	* @param status the status of the operation
 	* @returns a shared pointer to the datasturctures storing the event subscription information
 	*/
-	std::unique_ptr<EventSubscription> subscribe(LPWSTR pwsPath, unsigned int id, std::function<void(EventLogItem)> callback, DWORD* status);
+	std::unique_ptr<EventSubscription> subscribe(LPWSTR pwsPath, unsigned int id, std::function<void(EventLogItem)> callback, DWORD* status, std::vector<XpathQuery>& filters = std::vector<XpathQuery>());
 
 	/**
 	* A utility function called by QueryEvents
 	*/
-	std::vector<EventLogItem> ProcessResults(EVT_HANDLE hResults, ParamList& params);
-
+	std::vector<EventLogItem> ProcessResults(EVT_HANDLE hResults, std::vector<XpathQuery>& filters);
 
 }
