@@ -121,6 +121,11 @@
             "color": "#5AADFF",
 			"comment": "A number of settings to strengthen UAC are applied (V-63817)",
             "techniqueID": "T1088"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by registry checking looking for Debuggers and YARA scanning Accessibility Files",
+            "techniqueID": "T1015"
         }
     ],
     "legendItems": [
