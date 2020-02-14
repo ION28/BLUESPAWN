@@ -17,7 +17,7 @@ void Event::RunCallbacks() const {
 /************************
 ***   EventLogEvent   ***
 *************************/
-EventLogEvent::EventLogEvent(const std::wstring& channel, int eventID) : 
+EventLogEvent::EventLogEvent(const std::wstring& channel, int eventID, const std::vector<EventLogs::XpathQuery>& queries) :
 	Event(EventType::EventLog), 
     channel(channel), 
 	eventID(eventID), 
@@ -25,7 +25,7 @@ EventLogEvent::EventLogEvent(const std::wstring& channel, int eventID) :
 
 bool EventLogEvent::Subscribe(){
 	DWORD status{};
-	auto subscription = EventLogs::SubscribeToEvent(const_cast<LPWSTR>(GetChannel().c_str()), GetEventID(), eventLogTrigger, &status);
+	auto subscription = EventLogs::SubscribeToEvent(const_cast<LPWSTR>(GetChannel().c_str()), GetEventID(), eventLogTrigger, &status, queries);
 	if(subscription){
 		eventSub = *subscription;
 	}
@@ -38,6 +38,10 @@ std::wstring EventLogEvent::GetChannel() const {
 
 int EventLogEvent::GetEventID() const {
 	return eventID;
+}
+
+std::vector<EventLogs::XpathQuery> EventLogEvent::GetQueries() const {
+	return this->queries;
 }
 
 bool EventLogEvent::operator==(const Event& e) const {
@@ -131,6 +135,11 @@ void RegistryEvent::RegistryEventThreadFunction(RegistryEventThreadArgs* argumen
 	}
 }
 
+HandleWrapper RegistryEvent::hMutex = CreateMutexW(nullptr, false, nullptr);
+HandleWrapper RegistryEvent::hSubscribed = CreateEventW(nullptr, false, false, nullptr);
+std::optional<HandleWrapper> RegistryEvent::hListener = std::nullopt;
+std::optional<RegistryEvent> RegistryEvent::subscribe = std::nullopt;
+
 RegistryEvent::RegistryEvent(const Registry::RegistryKey& key, bool WatchSubkeys) :
 	Event(EventType::Registry),
 	key{ key },
@@ -145,7 +154,7 @@ bool RegistryEvent::Subscribe(){
 			RegistryEvent::subscribe = *this;
 			if(RegistryEvent::hListener){
 				SetEvent(*RegistryEvent::hListener);
-				WaitForSingleObject(RegistryEvent::hEvent, INFINITE);
+				WaitForSingleObject(RegistryEvent::hSubscribed, INFINITE);
 			} else {
 				DispatchRegistryThread();
 			}

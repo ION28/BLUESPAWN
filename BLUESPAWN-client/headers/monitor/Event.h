@@ -8,6 +8,7 @@
 #include "util/eventlogs/EventSubscription.h"
 #include "util/configurations/Registry.h"
 #include "util/configurations/RegistryValue.h"
+#include "util/eventlogs/XpathQuery.h"
 
 enum class EventType {
 	EventLog,
@@ -37,12 +38,13 @@ protected:
 
 class EventLogEvent : public Event {
 public:
-	EventLogEvent(const std::wstring& channel, int eventID);
+	EventLogEvent(const std::wstring & channel, int eventID, const std::vector<EventLogs::XpathQuery>& queries = {});
 
 	std::function<void(EventLogs::EventLogItem)> eventLogTrigger;
 
 	std::wstring GetChannel() const;
 	int GetEventID() const;
+	std::vector<EventLogs::XpathQuery> GetQueries() const;
 
 	virtual bool Subscribe();
 
@@ -52,6 +54,7 @@ private:
 	std::optional<EventSubscription> eventSub;
 	std::wstring channel;
 	int eventID;
+	std::vector<EventLogs::XpathQuery> queries;
 };
 
 struct RegistryEventThreadArgs;

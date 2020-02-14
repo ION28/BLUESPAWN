@@ -146,15 +146,12 @@ namespace EventLogs {
 	}
 
 	// Enumerate all the events in the result set. 
-	std::vector<EventLogItem> EventLogs::ProcessResults(EVT_HANDLE hResults, ParamList& params) {
+	std::vector<EventLogItem> EventLogs::ProcessResults(EVT_HANDLE hResults, std::vector<XpathQuery>& filters) {
 		DWORD status = ERROR_SUCCESS;
 		EVT_HANDLE hEvents[ARRAY_SIZE];
 		DWORD dwReturned = 0;
 
 		std::vector<EventLogItem> results;
-		std::vector<std::wstring> keyList;
-		for (auto element : params)
-			keyList.push_back(element.first);
 
 		while (true)
 		{
@@ -168,7 +165,13 @@ namespace EventLogs {
 
 			for (DWORD i = 0; i < dwReturned; i++) {
 				EventLogItem detect;
-				if (ERROR_SUCCESS != (status = EventToEventLogItem(hEvents[i], &detect, keyList)))
+
+				// Generate a list of all filters that searched by existance and not value
+				std::vector<std::wstring > params;
+				for (auto query : filters)
+					if (!query.SearchesByValue())
+						params.push_back(query.ToString());
+				if (ERROR_SUCCESS != (status = EventToEventLogItem(hEvents[i], &detect, params)))
 					goto cleanup;
 
 				results.push_back(detect);
@@ -184,7 +187,7 @@ namespace EventLogs {
 		for (DWORD i = 0; i < dwReturned; i++)
 			if (NULL != hEvents[i])
 				EvtClose(hEvents[i]);
-		
+
 		return results;
 	}
 
@@ -208,8 +211,7 @@ namespace EventLogs {
 		if (ERROR_SUCCESS != (status = GetEventXML(hEvent, &rawXML)))
 			return status;
 
-		// Specify extra parameters
-		std::unordered_map<std::wstring, std::wstring> extraParams;
+		// Provide values for filtered parameters
 		for (std::wstring key : params) {
 			std::wstring val;
 			if (ERROR_SUCCESS != (status = GetEventParam(hEvent, &val, key))) {
@@ -217,7 +219,7 @@ namespace EventLogs {
 				return status;
 			}
 
-			pItem->SetProperty( key, val );
+			pItem->SetProperty(key, val);
 		}
 
 		pItem->SetEventID(std::stoul(eventIDStr));
@@ -229,13 +231,15 @@ namespace EventLogs {
 		return status;
 	}
 
-	std::vector<EventLogItem>  EventLogs::QueryEvents(const wchar_t* channel, unsigned int id, ParamList& params) {
+	std::vector<EventLogItem>  EventLogs::QueryEvents(const wchar_t* channel, unsigned int id, std::vector<XpathQuery>& filters) {
 		DWORD status = ERROR_SUCCESS;
 		EVT_HANDLE hResults = NULL;
 
 		std::vector<EventLogItem> items;
 
 		auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
+		for (auto param : filters)
+			query += L" and " + param.ToString();
 		auto wquery = query.c_str();
 
 		hResults = EvtQuery(NULL, channel, wquery, EvtQueryChannelPath | EvtQueryReverseDirection);
@@ -245,14 +249,12 @@ namespace EventLogs {
 			if (ERROR_EVT_CHANNEL_NOT_FOUND == status)
 				LOG_ERROR("EventLogs::QueryEvents: The channel was not found.");
 			else if (ERROR_EVT_INVALID_QUERY == status)
-				// You can call the EvtGetExtendedStatus function to try to get 
-				// additional information as to what is wrong with the query.
 				LOG_ERROR(L"EventLogs::QueryEvents: The query " + query + L" is not valid.");
 			else
 				LOG_ERROR("EventLogs::QueryEvents: EvtQuery failed with " + std::to_string(status));
 		}
 		else {
-			items = ProcessResults(hResults, params);
+			items = ProcessResults(hResults, filters);
 		}
 
 		if (hResults)
@@ -261,11 +263,13 @@ namespace EventLogs {
 		return items;
 	}
 
-	std::unique_ptr<EventSubscription> EventLogs::SubscribeToEvent(LPWSTR pwsPath, unsigned int id, std::function<void(EventLogItem)> callback, DWORD* pStatus) {
+	std::unique_ptr<EventSubscription> EventLogs::SubscribeToEvent(LPWSTR pwsPath, unsigned int id, const std::function<void(EventLogItem)>& callback, DWORD* pStatus, const std::vector<XpathQuery>& filters) {
 		*pStatus = ERROR_SUCCESS;
 		EVT_HANDLE hSubscription = NULL;
 
 		auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
+		for (auto param : filters)
+			query += L" and " + param.ToString();
 		auto wquery = query.c_str();
 
 		auto eventSub = std::make_unique<EventSubscription>(callback);
@@ -291,7 +295,7 @@ namespace EventLogs {
 
 	std::shared_ptr<EVENT_DETECTION> EventLogs::EventLogItemToDetection(EventLogItem& pItem) {
 		auto detect = std::make_shared<EVENT_DETECTION>(0, 0, L"", L"", L"");
-		
+
 		detect->eventID = pItem.GetEventID();
 		detect->channel = pItem.GetChannel();
 		detect->eventRecordID = pItem.GetEventRecordID();
