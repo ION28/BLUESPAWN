@@ -86,7 +86,7 @@ public:
 
 class AllocationWrapper {
 	std::optional<std::shared_ptr<char[]>> Memory;
-	PCHAR pointer;
+	const PCHAR pointer;
 	SIZE_T AllocationSize;
 
 public:
