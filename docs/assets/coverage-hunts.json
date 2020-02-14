@@ -86,7 +86,12 @@
 			"color": "#5AADFF",
 			"comment": "Covered by checking Registry keys for Image File Execution Options.",
 			"techniqueID": "T1183"
-		}
+		},
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by registry checking looking for Debuggers and YARA scanning Accessibility Files",
+            "techniqueID": "T1015"
+        }
     ],
     "legendItems": [
         {
