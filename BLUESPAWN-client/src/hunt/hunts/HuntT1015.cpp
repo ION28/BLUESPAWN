@@ -39,9 +39,27 @@ namespace Hunts {
 
 		for (const auto& key : keys) {
 			for (const auto& value : key.second) {
+				detections++;
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
 				LOG_INFO(key.first.GetName() << L" is configured with a Debugger value of " << value);
-				detections++;
+
+				auto& yara = YaraScanner::GetInstance();
+
+				FileSystem::File file = FileSystem::File(value.ToString());
+				YaraScanResult result = yara.ScanFile(file);
+
+				if (!result) {
+					if (result.vKnownBadRules.size() > 0) {
+						detections++;
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+					}
+					for (auto identifier : result.vKnownBadRules) {
+						LOG_INFO(file.GetFilePath() << L" matches known malicious identifier " << identifier);
+					}
+					for (auto identifier : result.vIndicatorRules) {
+						LOG_INFO(file.GetFilePath() << L" matches known indicator identifier " << identifier);
+					}
+				}
 			}
 		}
 
@@ -75,7 +93,7 @@ namespace Hunts {
 	}
 
 	int HuntT1015::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO(L"Hunting for " << name  << L"at level Cursory");
+		LOG_INFO(L"Hunting for " << name  << L" at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
 		int results = EvaluateRegistry(reaction);
