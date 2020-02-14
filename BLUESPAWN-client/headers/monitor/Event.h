@@ -5,6 +5,7 @@
 #include "hunt/reaction/Reaction.h"
 #include "hunt/Scope.h"
 #include "util/eventlogs/EventSubscription.h"
+#include "util/eventlogs/XpathQuery.h"
 
 enum class EventType {
 	EventLog
@@ -30,7 +31,7 @@ class Event {
 
 class EventLogEvent : public Event {
 	public:
-		EventLogEvent(std::wstring channel, int eventID);
+		EventLogEvent(std::wstring channel, int eventID, std::vector<EventLogs::XpathQuery> queries = std::vector<EventLogs::XpathQuery>());
 
 		std::function<void(EventLogs::EventLogItem)> eventLogTrigger;
 
@@ -38,10 +39,12 @@ class EventLogEvent : public Event {
 
 		std::wstring getChannel();
 		int getEventID();
+		std::vector<EventLogs::XpathQuery> getQueries();
 
 	private:
 		void eventLogCallback(EventLogs::EventLogItem item);
 		std::unique_ptr< EventSubscription> eventSub;
 		std::wstring channel;
 		int eventID;
+		std::vector<EventLogs::XpathQuery> queries;
 };

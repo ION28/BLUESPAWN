@@ -78,6 +78,7 @@
     <ClInclude Include="headers\util\eventlogs\EventLogItem.h" />
     <ClInclude Include="headers\util\eventlogs\EventLogs.h" />
     <ClInclude Include="headers\util\eventlogs\EventSubscription.h" />
+    <ClInclude Include="headers\util\eventlogs\XpathQuery.h" />
     <ClInclude Include="headers\util\filesystem\FileSystem.h" />
     <ClInclude Include="headers\util\filesystem\YaraScanner.h" />
     <ClInclude Include="headers\util\log\CLISink.h" />
@@ -188,6 +189,7 @@
     <ClCompile Include="src\util\configurations\RegistryKey.cpp" />
     <ClCompile Include="src\util\configurations\RegistryValue.cpp" />
     <ClCompile Include="src\util\eventlogs\EventSubscription.cpp" />
+    <ClCompile Include="src\util\eventlogs\XpathQuery.cpp" />
     <ClCompile Include="src\util\filesystem\FileSystem.cpp" />
     <ClCompile Include="src\util\filesystem\YaraScanner.cpp" />
     <ClCompile Include="src\util\log\CLISink.cpp" />
