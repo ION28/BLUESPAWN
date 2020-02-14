@@ -25,7 +25,7 @@ EventLogEvent::EventLogEvent(const std::wstring& channel, int eventID, const std
 
 bool EventLogEvent::Subscribe(){
 	DWORD status{};
-	auto subscription = EventLogs::SubscribeToEvent(const_cast<LPWSTR>(GetChannel().c_str()), GetEventID(), eventLogTrigger, &status, queries);
+	auto subscription = EventLogs::SubscribeToEvent(GetChannel(), GetEventID(), eventLogTrigger, queries);
 	if(subscription){
 		eventSub = *subscription;
 	}

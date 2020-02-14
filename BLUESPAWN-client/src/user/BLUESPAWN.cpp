@@ -123,7 +123,17 @@ void Bluespawn::monitor_system(Aggressiveness aHuntLevel) {
 	while (true) {}
 }
 
-int main(int argc, char* argv[]){
+int main(int argc, char* argb[]){
+	argc = 5;
+	char* argh[5] = {
+		"BLUESPAWN-client.exe",
+		"--monitor",
+		"-l",
+		"Cursory",
+		"--debug"
+	};
+	char** argv = (char**) argh;
+
 	Linker::LinkFunctions();
 
 	Log::DebugSink DebugOutput{};

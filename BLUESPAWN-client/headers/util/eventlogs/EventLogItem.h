@@ -1,8 +1,17 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+#include <Windows.h>
+#include <winevt.h>
+#include "common/wrappers.hpp"
 
 namespace EventLogs {
+
+	class EventWrapper : public GenericWrapper<EVT_HANDLE> {
+	public:
+		EventWrapper(EVT_HANDLE handle) :
+			GenericWrapper(handle, std::function<void(EVT_HANDLE)>(EvtClose), INVALID_HANDLE_VALUE){};
+	};
 
 	class EventLogItem {
 		public:

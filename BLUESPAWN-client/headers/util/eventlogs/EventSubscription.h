@@ -15,8 +15,6 @@
 class EventSubscription {
 	public:
 		EventSubscription(std::function<void(EventLogs::EventLogItem)> callback);
-		// Have a destructor to ensure we can clean up when this object is deleted
-		~EventSubscription();
 
 		/**
 		* The function called by the underlying Windows OS as a callback.
@@ -27,9 +25,9 @@ class EventSubscription {
 		/**
 		* Set the event handle so it can be closed when this object is deleted
 		*/
-		void setSubHandle(EVT_HANDLE hSubscription);
+		void setSubHandle(const EventLogs::EventWrapper& hSubscription);
 
 	private:
 		std::function<void(EventLogs::EventLogItem)> callback;
-		EVT_HANDLE hSubscription;
+		EventLogs::EventWrapper hSubscription;
 };
