@@ -44,6 +44,8 @@ namespace Hunts {
 		FileSystem::FileSearchAttribs attribs;
 		attribs.extensions = web_exts;
 		std::vector<FileSystem::File> files = f.GetFiles(attribs, -1);
+		
+		auto& yara = YaraScanner::GetInstance();
 
 		for (const auto& entry : files) {
 			int k = identified;
@@ -83,11 +85,12 @@ namespace Hunts {
 
 			// Use YARA to also scan the files if our regex didn't detect anything suspicious
 			if (k == identified) {
-				auto& yara = YaraScanner::GetInstance();
 				YaraScanResult result = yara.ScanFile(entry);
 				if (!result) {
-					identified++;
-					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath()));
+					if(result.vKnownBadRules.size() > 0) {
+						identified++;
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath()));
+					}
 					for (auto identifier : result.vKnownBadRules) {
 						LOG_INFO(entry.GetFilePath() << L" matches known malicious identifier " << identifier);
 					}
