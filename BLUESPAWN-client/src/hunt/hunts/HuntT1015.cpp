@@ -58,7 +58,7 @@ namespace Hunts {
 			YaraScanResult result = yara.ScanFile(file);
 
 			if (!result) {
-				if (result.vKnownBadRules.size() > 0 || result.vIndicatorRules.size() >= 2) {
+				if (result.vKnownBadRules.size() > 0) {
 					detections++;
 					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 				}
