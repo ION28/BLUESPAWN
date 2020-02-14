@@ -82,6 +82,6 @@ public:
 };
 
 struct RegistryEventThreadArgs {
-	std::optional<HandleWrapper> WaitObjects[MAXIMUM_WAIT_OBJECTS];
-	std::optional<RegistryEvent> Events[MAXIMUM_WAIT_OBJECTS - 1];
+	HandleWrapper Notify;
+	std::optional<RegistryEvent>* Events;
 };

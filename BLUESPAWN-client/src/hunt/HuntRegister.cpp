@@ -2,6 +2,7 @@
 #include <iostream>
 #include <functional>
 #include "monitor/EventManager.h"
+#include "util/log/Log.h"
 
 HuntRegister::HuntRegister(IOBase& io) : io(io) {}
 
@@ -86,11 +87,13 @@ void HuntRegister::SetupMonitoring(Aggressiveness aggressiveness, const Reaction
 	auto& EvtManager = EventManager::GetInstance();
 	for (auto name : vRegisteredHunts) {
 		auto level = getLevelForHunt(*name, aggressiveness);
-		for (auto event : name->GetMonitoringEvents()) {
+		if(name->SupportsScan(level)) {
+			io.InformUser(L"Setting up monitoring for " + name->GetName());
+			for(auto event : name->GetMonitoringEvents()) {
 
-			std::function<void()> callback;
+				std::function<void()> callback;
 
-			switch (level) {
+				switch(level) {
 				case Aggressiveness::Intensive:
 					callback = std::bind(&Hunt::ScanIntensive, name.get(), Scope{}, reaction);
 					break;
@@ -100,14 +103,14 @@ void HuntRegister::SetupMonitoring(Aggressiveness aggressiveness, const Reaction
 				case Aggressiveness::Cursory:
 					callback = std::bind(&Hunt::ScanCursory, name.get(), Scope{}, reaction);
 					break;
-			}
+				}
 
-			if (name->SupportsScan(level)) {
-				DWORD status = EvtManager.SubscribeToEvent(event, callback);
-				if (status == ERROR_SUCCESS)
-					io.InformUser(L"Monitoring for " + name->GetName());
-				else
-					io.AlertUser(L"Monitoring for " + name->GetName() + L" failed with error code " + std::to_wstring(status));
+				if(name->SupportsScan(level)) {
+					DWORD status = EvtManager.SubscribeToEvent(event, callback);
+					if(status != ERROR_SUCCESS){
+						LOG_ERROR(L"Monitoring for " << name->GetName() << L" failed with error code " << status);
+					}
+				}
 			}
 		}
 	}

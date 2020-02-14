@@ -52,13 +52,11 @@ bool EventLogEvent::operator==(const Event& e) const {
 }
 
 void RegistryEvent::DispatchRegistryThread(){
-	std::optional<HandleWrapper> hEvents[MAXIMUM_WAIT_OBJECTS] = {};
-	std::optional<RegistryEvent> RegistryEvents[MAXIMUM_WAIT_OBJECTS - 1] = {};
-	RegistryEvent::hListener = hEvents[0] = CreateEventW(nullptr, false, false, nullptr);
-	hEvents[1] = RegistryEvent::subscribe->GetEvent();
+	std::optional<RegistryEvent>* RegistryEvents = new std::optional<RegistryEvent>[MAXIMUM_WAIT_OBJECTS - 1]{};
+	RegistryEvent::hListener = CreateEventW(nullptr, false, false, nullptr);
 	RegistryEvents[0] = *RegistryEvent::subscribe;
 	RegistryEvent::subscribe = std::nullopt;
-	RegistryEventThreadArgs ThreadArgs = { &hEvents, &RegistryEvents };
+	RegistryEventThreadArgs ThreadArgs = { *RegistryEvent::hListener, RegistryEvents };
 	HandleWrapper thread = CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(RegistryEvent::RegistryEventThreadFunction), &ThreadArgs, 0, nullptr);
 	WaitForSingleObject(RegistryEvent::hSubscribed, INFINITE);
 }
@@ -68,33 +66,36 @@ void RegistryEvent::RegistryEventThreadFunction(RegistryEventThreadArgs* argumen
 	SetEvent(RegistryEvent::hSubscribed);
 	int errors = 0;
 	while(true){
-		int count = 0;
-		while(count < MAXIMUM_WAIT_OBJECTS){
-			if(args.WaitObjects[count]){
+		int count = args.Notify ? 1 : 0;
+		int idx = 0;
+		while(idx < MAXIMUM_WAIT_OBJECTS){
+			if(args.Events[idx++]){
 				count++;
 			}
 		}
 
 		if(count <= 1){
-			if(args.WaitObjects[0] && hListener == args.WaitObjects[0]->Get()){
+			if(args.Notify && hListener == args.Notify){
 				hListener = std::nullopt;
 			}
-
+			delete[] args.Events;
 			return;
 		}
 
 		HANDLE* handles = new HANDLE[count];
 		int index = 0;
+		if(args.Notify){
+			handles[index++] = args.Notify;
+		}
+		int valid_idx = 0;
 		for(int i = 0; i < count; i++){
-			if(args.WaitObjects[i]){
-				handles[index] = *args.WaitObjects[i];
-				if(i != index){
-					args.WaitObjects[index] = *args.WaitObjects[i];
-					args.WaitObjects[i] = std::nullopt;
-					args.Events[index - 1] = *args.Events[i - 1];
-					args.Events[i - 1] = std::nullopt;
+			if(args.Events[i]){
+				handles[index++] = args.Events[i]->GetEvent();
+				if(i != valid_idx){
+					args.Events[valid_idx] = *args.Events[i];
+					args.Events[i] = std::nullopt;
 				}
-				index++;
+				valid_idx++;
 			}
 		}
 		
@@ -104,7 +105,6 @@ void RegistryEvent::RegistryEventThreadFunction(RegistryEventThreadArgs* argumen
 				if(count == MAXIMUM_WAIT_OBJECTS){
 					DispatchRegistryThread();
 				} else {
-					args.WaitObjects[count] = RegistryEvent::subscribe->GetEvent();
 					args.Events[count - 1] = *RegistryEvent::subscribe;
 					RegistryEvent::subscribe = std::nullopt;
 					SetEvent(RegistryEvent::hSubscribed);
@@ -116,17 +116,23 @@ void RegistryEvent::RegistryEventThreadFunction(RegistryEventThreadArgs* argumen
 
 			if(args.Events[index - 1]){
 				args.Events[index - 1]->RunCallbacks();
+				if(ERROR_SUCCESS != RegNotifyChangeKeyValue(args.Events[index - 1]->key, args.Events[index - 1]->WatchSubkeys,
+					REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_THREAD_AGNOSTIC, args.Events[index - 1]->hEvent, true)){
+					LOG_ERROR("Unable to reset listener on key " << args.Events[index - 1]->key << ". Unable to continue to monitor changes to this key.");
+					args.Events[index - 1] = std::nullopt;
+				}
 			}
 			errors = 0;
+		} else if(result == WAIT_ABANDONED_0){
+			args.Notify = INVALID_HANDLE_VALUE;
 		} else if(result > WAIT_ABANDONED_0 && result < WAIT_ABANDONED_0 + MAXIMUM_WAIT_OBJECTS) {
-			LOG_WARNING("A registry event appears to have been abandoned");
+			LOG_WARNING("Registry listener on " << args.Events[index - 1]->key << " appears to have been abandoned");
 			auto index = result - WAIT_ABANDONED_0;
 			args.Events[index - 1] = std::nullopt;
-			args.WaitObjects[index] = std::nullopt;
 			errors = 0;
 		} else {
 			errors += 1;
-			LOG_ERROR("Error " << result << " occured in the registry monitor function");
+			LOG_ERROR("Error " << GetLastError() << " occured in the registry monitor function");
 			if(errors > 5){
 				LOG_ERROR(5 << " consecutive errors occured in the registry monitor function; exiting (" << count << " monitor events discarded)");
 				return;
