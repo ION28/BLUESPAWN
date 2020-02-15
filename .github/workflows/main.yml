@@ -36,6 +36,18 @@ jobs:
         "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN.sln /p:Configuration=${{ matrix.buildtype }} /p:Platform=${{ matrix.buildarch }}
       shell: cmd
 
+    - name: Set PowerShell Execution Policy
+      run: powershell set-executionpolicy Unrestricted
+      shell: powershell
+      
+    - name: Run Atomic Red Team Tests
+      run: testing\run-atomic-tests.ps1
+      shell: powershell
+      
+    - name: Run BLUESPAWN Hunt
+      run: artifacts\x64\Release\BLUESPAWN-client.exe --hunt -l Cursory
+      shell: cmd
+
     - uses: actions/upload-artifact@master
       with:
         name: BLUESPAWN-client-${{ matrix.buildarch }}-${{ matrix.buildtype }}
