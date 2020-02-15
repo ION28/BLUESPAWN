@@ -80,7 +80,7 @@ std::wstring CLI::GetUserSelection(const std::wstring& prompt, const std::vector
 	Print(L"Please enter a number 1 through " + std::to_wstring(i) + L" to continue. ", MessageColor::LIGHTGRAY, false);
 
 	while(true){
-		int userIn = 0;
+		size_t userIn = 0;
 		std::wstringstream stream{};
 		auto input = GetInput(dwMaximumDelay);
 		if(!input){

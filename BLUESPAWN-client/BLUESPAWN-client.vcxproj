@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\pe-sieve\include\pe_sieve_types.h" />
+    <ClInclude Include="external\tinyxml2\tinyxml2.h" />
     <ClInclude Include="headers\hunt\Hunt.h" />
     <ClInclude Include="headers\hunt\HuntInfo.h" />
     <ClInclude Include="headers\hunt\HuntRegister.h" />
@@ -135,6 +136,7 @@
     <ClInclude Include="headers\util\processes\ProcessUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="external\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="src\hunt\Hunt.cpp" />
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1004.cpp" />
@@ -199,6 +201,7 @@
     <ClCompile Include="src\util\log\Log.cpp" />
     <ClCompile Include="src\util\log\LogLevel.cpp" />
     <ClCompile Include="src\util\log\ServerSink.cpp" />
+    <ClCompile Include="src\util\log\XMLSink.cpp" />
     <ClCompile Include="src\util\pe\Export_Section.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

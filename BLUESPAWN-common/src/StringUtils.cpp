@@ -9,7 +9,9 @@
 std::wstring StringToWidestring(const std::string& str){
 	WCHAR* wstr = new WCHAR[str.length() + 1];
 	MultiByteToWideChar(CP_ACP, 0, str.c_str(), static_cast<int>(str.length()), wstr, static_cast<int>(str.length() + 1));
-	return wstr;
+	std::wstring s = { str.begin(), str.end() };
+	delete[] wstr;
+	return s;
 }
 
 std::string WidestringToString(const std::wstring& wstr){
@@ -17,7 +19,9 @@ std::string WidestringToString(const std::wstring& wstr){
 	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), static_cast<int>(wstr.length()), nullptr, 0, nullptr, &size);
 	CHAR* str = new CHAR[size];
 	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), static_cast<int>(wstr.length()), str, size, nullptr, nullptr);
-	return str;
+	std::string s = { wstr.begin(), wstr.end() };
+	delete[] str;
+	return s;
 }
 
 template<class T>

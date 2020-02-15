@@ -2,6 +2,7 @@
 #include "user/CLI.h"
 #include "util/log/HuntLogMessage.h"
 #include "util/log/DebugSink.h"
+#include "util/log/XMLSink.h"
 #include "common/DynamicLinker.h"
 #include "common/StringUtils.h"
 #include "util/eventlogs/EventLogs.h"
@@ -140,9 +141,10 @@ int main(int argc, char* argv[]){
 	Bluespawn bluespawn;
 	Log::DebugSink DebugOutput{};
 	Log::CLISink ConsoleOutput{ reinterpret_cast<const CLI*>(&bluespawn.io)->GetMutex() };
+	Log::XMLSink XMLOutput{};
 	Log::AddSink(DebugOutput);
 	Log::AddHuntSink(ConsoleOutput);
-
+	Log::AddHuntSink(XMLOutput);
 
 	print_banner();
 
