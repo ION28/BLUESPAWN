@@ -43,21 +43,17 @@ jobs:
     - name: Run Atomic Red Team Tests
       run: testing\run-atomic-tests.ps1
       shell: powershell
-    
-    - name: Get Current location
-      run: dir
-      shell: cmd
 
     - name: Run BLUESPAWN Hunt
-      run: d:\a\BLUESPAWN\BLUESPAWN\artifacts\x64\Release\BLUESPAWN-client.exe --hunt -l Cursory --log-only
+      run: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe --hunt -l Cursory --log-only
       shell: cmd
 
     - uses: actions/upload-artifact@master
       with:
         name: BLUESPAWN-client-${{ matrix.buildarch }}-${{ matrix.buildtype }}
-        path: d:\a\BLUESPAWN\BLUESPAWN\artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe
+        path: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe
 
     - uses: actions/upload-artifact@master
       with:
-        name: AtomicTestsResults.csv
-        path: d:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv
+        name: AtomicTestsResults-${{ matrix.buildarch }}-${{ matrix.buildtype }}.csv
+        path: AtomicTestsResults.csv
