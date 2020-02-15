@@ -41,6 +41,9 @@ class Bluespawn {
 		static HuntRegister huntRecord;
 		static MitigationRegister mitigationRecord;
 		static const IOBase& io;
+		static IOBase& io;
+
+		bool bLogOnly = false;
 };
 
 void print_help(cxxopts::ParseResult result, cxxopts::Options options);
