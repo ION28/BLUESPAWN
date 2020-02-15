@@ -89,6 +89,7 @@
     <ClInclude Include="headers\util\log\LogLevel.h" />
     <ClInclude Include="headers\util\log\LogSink.h" />
     <ClInclude Include="headers\util\log\ServerSink.h" />
+    <ClInclude Include="headers\util\log\XMLSink.h" />
     <ClInclude Include="headers\util\pe\Export_Section.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

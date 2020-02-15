@@ -136,3 +136,7 @@ DWORD CLI::GetUserConfirm(const std::wstring& prompt, DWORD dwMaximumDelay, Impo
 		}
 	}
 }
+
+const HandleWrapper& CLI::GetMutex() const {
+	return hMutex;
+}

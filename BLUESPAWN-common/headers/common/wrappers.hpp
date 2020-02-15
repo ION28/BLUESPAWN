@@ -86,7 +86,7 @@ public:
 
 class AcquireMutex : public GenericWrapper<HANDLE> {
 public:
-	AcquireMutex(HANDLE hMutex) :
+	explicit AcquireMutex(HANDLE hMutex) :
 		GenericWrapper(hMutex, std::function<void(HANDLE)>(ReleaseMutex), INVALID_HANDLE_VALUE){
 		WaitForSingleObject(hMutex, INFINITE);
 	};
