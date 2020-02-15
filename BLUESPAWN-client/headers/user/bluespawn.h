@@ -40,7 +40,7 @@ class Bluespawn {
 
 		static HuntRegister huntRecord;
 		static MitigationRegister mitigationRecord;
-		static IOBase& io;
+		static const IOBase& io;
 
 		bool bLogOnly = false;
 };
