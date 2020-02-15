@@ -137,12 +137,12 @@ int main(int argc, char* argv[]){
 
 	Linker::LinkFunctions();
 
+	Bluespawn bluespawn;
 	Log::DebugSink DebugOutput{};
-	Log::CLISink ConsoleOutput{};
+	Log::CLISink ConsoleOutput{ reinterpret_cast<const CLI*>(&bluespawn.io)->GetMutex() };
 	Log::AddSink(DebugOutput);
 	Log::AddHuntSink(ConsoleOutput);
 
-	Bluespawn bluespawn;
 
 	print_banner();
 

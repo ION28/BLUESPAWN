@@ -72,6 +72,8 @@ public:
 	 * returned. If the user responds yes, 1 is returned.
 	 */
 	virtual DWORD GetUserConfirm(const std::wstring& prompt, DWORD dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const;
+
+	const HandleWrapper& GetMutex() const;
 };
 enum class MessageColor {
 	BLACK = 0x0,
