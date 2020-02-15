@@ -82,6 +82,8 @@ Bluespawn::Bluespawn() {
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
+
+	bLogOnly = false;
 }
 
 void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
@@ -91,11 +93,19 @@ void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
 	Reaction logreact = Reactions::LogReaction();
-	Reaction suspendreact = Reactions::SuspendProcessReaction(io);
-	Reaction logsuspend = logreact.Combine(suspendreact);
-	Reaction removereact = Reactions::RemoveValueReaction(io);
-	auto reaction = logsuspend.Combine(removereact);
-	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+
+	if (!bLogOnly) {
+		Reaction suspendreact = Reactions::SuspendProcessReaction(io);
+		Reaction logsuspend = logreact.Combine(suspendreact);
+		Reaction removereact = Reactions::RemoveValueReaction(io);
+		auto reaction = logsuspend.Combine(removereact);
+
+		huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+	}
+	else {
+		huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, logreact);
+	}
+
 }
 
 void Bluespawn::dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce) {
@@ -143,6 +153,7 @@ int main(int argc, char* argv[]){
 		("m,mitigate", "Mitigates vulnerabilities by applying security settings. Available options are audit and enforce.", cxxopts::value<std::string>()->implicit_value("audit"))
 		("help", "Help Information. You can also specify a category for help on a specific module such as hunt"
 			, cxxopts::value<std::string>()->implicit_value("general"))
+		("log-only", "Log only and do not prompt for input", cxxopts::value<bool>())
 		("v,verbose", "Verbosity", cxxopts::value<int>()->default_value("0"))
 		("debug", "Enable Debug Output", cxxopts::value<bool>())
 		;
@@ -160,6 +171,10 @@ int main(int argc, char* argv[]){
 	options.parse_positional({ "level" });
 	try {
 		auto result = options.parse(argc, argv);
+
+		if (result.count("log-only")) {
+			bluespawn.bLogOnly = true;
+		}
 
 		if (result.count("debug")) {
 			Log::AddSink(ConsoleOutput);
