@@ -143,7 +143,6 @@ int main(int argc, char* argv[]){
 	Log::AddHuntSink(ConsoleOutput);
 
 	Bluespawn bluespawn;
-	bluespawn.io.GetUserConfirm(L"Test", 1000, ImportanceLevel::MEDIUM);
 
 	print_banner();
 
