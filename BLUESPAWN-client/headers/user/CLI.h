@@ -1,19 +1,9 @@
 #pragma once
 
 #include "user/iobase.h"
+#include "common/wrappers.hpp"
 
 #include <map>
-
-
-struct ImportanceLevel {
-	MessageColor color;
-	wstring description;
-	const static ImportanceLevel LOW;
-	const static  ImportanceLevel MEDIUM;
-	const static ImportanceLevel HIGH;
-};
-
-
 
 /**
  * This class serves as a way for BLUESPAWN's modules to interact with the user through a command line interface.
@@ -21,19 +11,19 @@ struct ImportanceLevel {
  */
 class CLI : public IOBase {
 private:
-	static std::map<std::pair<HANDLE, HANDLE>, CLI> instances;
-	static const HANDLE hDefaultOutput;
-	static const HANDLE hDefaultInput;
+	HandleWrapper hMutex;
 
-	const HANDLE input;
-	const HANDLE output;
 	/**
 	 * Creates a new CLI object with a given input and output handle.
 	 *
 	 */
 	CLI();
 
+	static const CLI instance;
+
 public:
+
+	static const CLI& GetInstance();
 
 	/**
 	 * This method displays a prompt to the user and presents a number of options. The user may select from among the provided

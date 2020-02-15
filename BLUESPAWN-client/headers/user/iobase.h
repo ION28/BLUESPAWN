@@ -6,6 +6,12 @@
 #include <string>
 #include <set>
 
+enum class ImportanceLevel {
+	LOW = 0,
+	MEDIUM = 1,
+	HIGH = 2
+};
+
 /**
  * This class is used to serve as an abstract interface for all user interfaces. User interfaces will
  * implement at least the methods defined here, either in GUI form or in CLI form.

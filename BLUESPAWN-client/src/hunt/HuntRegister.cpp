@@ -4,7 +4,7 @@
 #include "monitor/EventManager.h"
 #include "util/log/Log.h"
 
-HuntRegister::HuntRegister(IOBase& io) : io(io) {}
+HuntRegister::HuntRegister(const IOBase& io) : io(io) {}
 
 void HuntRegister::RegisterHunt(std::shared_ptr<Hunt> hunt) {
 	// The actual hunt itself is stored in the vector here!

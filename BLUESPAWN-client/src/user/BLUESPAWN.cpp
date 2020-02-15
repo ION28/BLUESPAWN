@@ -44,7 +44,7 @@
 
 #include <iostream>
 
-IOBase& Bluespawn::io = CLI();
+const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{ io };
 MitigationRegister Bluespawn::mitigationRecord{ io };
 
@@ -123,16 +123,7 @@ void Bluespawn::monitor_system(Aggressiveness aHuntLevel) {
 	while (true) {}
 }
 
-int main(int argc, char* argb[]){
-	argc = 5;
-	char* argh[5] = {
-		"BLUESPAWN-client.exe",
-		"--monitor",
-		"-l",
-		"Cursory",
-		"--debug"
-	};
-	char** argv = (char**) argh;
+int main(int argc, char* argv[]){
 
 	Linker::LinkFunctions();
 
@@ -142,6 +133,7 @@ int main(int argc, char* argb[]){
 	Log::AddHuntSink(ConsoleOutput);
 
 	Bluespawn bluespawn;
+	bluespawn.io.GetUserConfirm(L"Test", 1000, ImportanceLevel::MEDIUM);
 
 	print_banner();
 

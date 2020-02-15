@@ -1,7 +1,7 @@
 #include "mitigation/MitigationRegister.h"
 #include "util/log/Log.h"
 
-MitigationRegister::MitigationRegister(IOBase& io) : io(io) {}
+MitigationRegister::MitigationRegister(const IOBase& io) : io(io) {}
 
 void MitigationRegister::RegisterMitigation(std::shared_ptr<Mitigation> mitigation) {
 	vRegisteredMitigations.emplace_back(mitigation);
