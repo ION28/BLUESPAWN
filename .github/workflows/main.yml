@@ -43,7 +43,11 @@ jobs:
     - name: Run Atomic Red Team Tests
       run: testing\run-atomic-tests.ps1
       shell: powershell
-      
+    
+    - name: Get Current location
+      run: dir
+      shell: cmd
+
     - name: Run BLUESPAWN Hunt
       run: d:\a\BLUESPAWN\BLUESPAWN\artifacts\x64\Release\BLUESPAWN-client.exe --hunt -l Cursory --log-only
       shell: cmd
