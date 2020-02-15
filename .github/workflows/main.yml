@@ -17,7 +17,7 @@ jobs:
         buildtype: [Release, Debug]
         buildarch: [x64, x86]
 
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -52,3 +52,8 @@ jobs:
       with:
         name: BLUESPAWN-client-${{ matrix.buildarch }}-${{ matrix.buildtype }}
         path: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: AtomicTestsResults.csv
+        path: AtomicTestsResults.csv
