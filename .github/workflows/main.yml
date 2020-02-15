@@ -44,20 +44,16 @@ jobs:
       run: testing\run-atomic-tests.ps1
       shell: powershell
       
-    - name: Return to BLUESPAWN directory
-      run: cd d:\a\BLUESPAWN\BLUESPAWN
-      shell: cmd
-      
     - name: Run BLUESPAWN Hunt
-      run: artifacts\x64\Release\BLUESPAWN-client.exe --hunt -l Cursory --log-only
+      run: d:\a\BLUESPAWN\BLUESPAWN\artifacts\x64\Release\BLUESPAWN-client.exe --hunt -l Cursory --log-only
       shell: cmd
 
     - uses: actions/upload-artifact@master
       with:
         name: BLUESPAWN-client-${{ matrix.buildarch }}-${{ matrix.buildtype }}
-        path: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe
+        path: d:\a\BLUESPAWN\BLUESPAWN\artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe
 
     - uses: actions/upload-artifact@master
       with:
         name: AtomicTestsResults.csv
-        path: AtomicTestsResults.csv
+        path: d:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv
