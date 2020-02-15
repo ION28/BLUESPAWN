@@ -5,29 +5,27 @@
 
 EventManager EventManager::manager;
 
-EventManager::EventManager() {
+EventManager::EventManager(){}
 
+EventManager& EventManager::GetInstance(){
+	return manager;
 }
 
-DWORD EventManager::subscribeToEvent(std::shared_ptr<Event> e, std::function<void(const Scope & scope, Reaction reaction)> callback) {
+DWORD EventManager::SubscribeToEvent(const std::shared_ptr<Event>& e, const std::function<void()>& callback) {
 	DWORD status = ERROR_SUCCESS;
 
-	e->addCallback(callback);
+	for(auto evt : vEventList){
+		if(*evt == *e){
+			evt->AddCallback(callback);
+			return status;
+		}
+	} 
 
-	if (e->type == EventType::EventLog) 
-		status = EventManager::manager.setupEventLogEvent(e);
+	std::shared_ptr<Event> evt = e;
+	evt->AddCallback(callback);
+	evt->Subscribe();
 
-	EventManager::manager.eventList.push_back(e);
-
-	return status;
-}
-
-DWORD EventManager::setupEventLogEvent(std::shared_ptr<Event> e) {
-	auto logEvent = std::static_pointer_cast<EventLogEvent>(e);
-
-	DWORD status;
-	auto subscription = EventLogs::subscribe((LPWSTR)logEvent->getChannel().c_str(), logEvent->getEventID(), logEvent->eventLogTrigger, &status, logEvent->getQueries());
-	logEvent->setEventSub(move(subscription));
+	vEventList.push_back(evt);
 
 	return status;
 }

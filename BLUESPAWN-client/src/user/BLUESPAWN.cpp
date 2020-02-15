@@ -124,6 +124,7 @@ void Bluespawn::monitor_system(Aggressiveness aHuntLevel) {
 }
 
 int main(int argc, char* argv[]){
+
 	Linker::LinkFunctions();
 
 	Log::DebugSink DebugOutput{};

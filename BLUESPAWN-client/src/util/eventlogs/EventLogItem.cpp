@@ -2,7 +2,7 @@
 
 namespace EventLogs {
 
-	std::wstring EventLogItem::GetProperty(std::wstring prop) {
+	std::wstring EventLogItem::GetProperty(std::wstring prop) const {
 		std::wstring val;
 
 		auto it = this->props.find(prop);
@@ -11,22 +11,22 @@ namespace EventLogs {
 
 		return val;
 	}
-	std::unordered_map<std::wstring, std::wstring> EventLogItem::GetProperties() {
+	std::unordered_map<std::wstring, std::wstring> EventLogItem::GetProperties() const {
 		return this->props;
 	}
-	std::wstring EventLogItem::GetChannel() {
+	std::wstring EventLogItem::GetChannel() const {
 		return this->channel;
 	}
-	std::wstring EventLogItem::GetTimeCreated() {
+	std::wstring EventLogItem::GetTimeCreated() const {
 		return this->timeCreated;
 	}
-	std::wstring EventLogItem::GetXML() {
+	std::wstring EventLogItem::GetXML() const {
 		return this->rawXML;
 	}
-	unsigned int EventLogItem::GetEventID() {
+	unsigned int EventLogItem::GetEventID() const {
 		return this->eventID;
 	}
-	unsigned int EventLogItem::GetEventRecordID() {
+	unsigned int EventLogItem::GetEventRecordID() const {
 		return this->eventRecordID;
 	}
 

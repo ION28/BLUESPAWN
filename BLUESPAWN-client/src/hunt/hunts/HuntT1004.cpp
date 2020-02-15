@@ -26,13 +26,13 @@ namespace Hunts {
 		auto HKLMWinlogon = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" };
 		keys.emplace(HKLMWinlogon, CheckValues(HKLMWinlogon, {
 			{ L"Shell", RegistryType::REG_SZ_T, L"explorer\\.exe,?", true, CheckSzRegexMatch },
-			{ L"UserInit", RegistryType::REG_SZ_T, L"C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\(U|u)(SERINIT|serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch }
+			{ L"UserInit", RegistryType::REG_SZ_T, L"(C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\)?(U|u)(SERINIT|serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch }
 		}));
 
 		auto HKLMWinlogonWoW64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" };
 		keys.emplace(HKLMWinlogonWoW64, CheckValues(HKLMWinlogonWoW64, {
 			{ L"Shell", RegistryType::REG_SZ_T, L"explorer\\.exe,?", true, CheckSzRegexMatch },
-			{ L"UserInit", RegistryType::REG_SZ_T, L"C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\(U|u)(SERINIT|serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch }
+			{ L"UserInit", RegistryType::REG_SZ_T, L"(C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\)?(U|u)(SERINIT|serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch }
 		}));
 
 		auto HKCUWinlogon = RegistryKey{ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" };
@@ -79,5 +79,18 @@ namespace Hunts {
 
 		reaction.EndHunt();
 		return detections;
+	}
+
+	std::vector<std::shared_ptr<Event>> HuntT1004::GetMonitoringEvents() {
+		std::vector<std::shared_ptr<Event>> events;
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_CURRENT_USER, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_CURRENT_USER, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" }));
+		return events;
 	}
 }

@@ -10,13 +10,22 @@
 class EventManager {
 
 	public:
-		static DWORD subscribeToEvent(std::shared_ptr<Event> e, std::function<void(const Scope & scope, Reaction reaction)> callback);
+		DWORD SubscribeToEvent(const std::shared_ptr<Event>& e, const std::function<void()>& callback);
+		
+		// EventManager is a singleton class; call GetInstance() to get an instance of it.
+		static EventManager& GetInstance();
 
 	private:
+
+		// Make constructor private for singleton class
 		EventManager();
 
-		DWORD setupEventLogEvent(std::shared_ptr<Event> e);
+		// Delete copy and move constructors
+		EventManager(const EventManager&) = delete;
+		EventManager(EventManager&&) = delete;
+		EventManager operator=(const EventManager&) = delete;
+		EventManager operator=(EventManager&&) = delete;
 
 		static EventManager manager;
-		std::vector<std::shared_ptr<Event>> eventList;
+		std::vector<std::shared_ptr<Event>> vEventList;
 };

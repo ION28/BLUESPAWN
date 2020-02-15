@@ -97,7 +97,7 @@ namespace Registry {
 	RegistryKey::RegistryKey(HKEY hive, std::wstring path){
 		LSTATUS status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_ALL_ACCESS, &hkBackingKey);
 		if(status == ERROR_ACCESS_DENIED){
-			status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_READ, &hkBackingKey);
+			status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_READ | KEY_NOTIFY, &hkBackingKey);
 		}
 
 		if(status != ERROR_SUCCESS){
@@ -141,7 +141,7 @@ namespace Registry {
 
 				LSTATUS status = RegOpenKeyEx(hkHive, path.c_str(), 0, KEY_ALL_ACCESS, &hkBackingKey);
 				if(status == ERROR_ACCESS_DENIED){
-					status = RegOpenKeyEx(hkHive, path.c_str(), 0, KEY_READ, &hkBackingKey);
+					status = RegOpenKeyEx(hkHive, path.c_str(), 0, KEY_READ | KEY_NOTIFY, &hkBackingKey);
 				}
 
 				if(status == ERROR_SUCCESS){
@@ -487,5 +487,9 @@ namespace Registry {
 		auto status = RegDeleteValueW(hkBackingKey, wsValueName.c_str());
 		SetLastError(status);
 		return status == ERROR_SUCCESS;
+	}
+
+	RegistryKey::operator HKEY() const {
+		return hkBackingKey;
 	}
 }
