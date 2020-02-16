@@ -12,6 +12,7 @@ namespace Log {
 		HandleWrapper hMutex;
 
 		tinyxml2::XMLDocument XMLDoc;
+		tinyxml2::XMLElement* Root;
 
 		std::wstring wFileName;
 

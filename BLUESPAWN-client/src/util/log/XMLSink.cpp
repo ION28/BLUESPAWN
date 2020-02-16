@@ -15,16 +15,21 @@ namespace Log{
 	}
 
 	XMLSink::XMLSink() :
-		hMutex{ CreateMutexW(nullptr, false, nullptr) } {
+		hMutex{ CreateMutexW(nullptr, false, nullptr) } ,
+		Root{ XMLDoc.NewElement("bluespawn") } {
 		SYSTEMTIME time{};
 		GetLocalTime(&time);
 		wFileName = L"bluespawn-" + ToWstringPad(time.wMonth) + L"-" + ToWstringPad(time.wDay) + L"-" + ToWstringPad(time.wYear, 4) + L"-"
 			+ ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + L"-" + ToWstringPad(time.wSecond) + L".xml";
+		XMLDoc.InsertEndChild(Root);
 	}
 
 	XMLSink::XMLSink(const std::wstring& wFileName) :
 		hMutex{ CreateMutexW(nullptr, false, nullptr) },
-		wFileName{ wFileName }{}
+		Root { XMLDoc.NewElement("bluespawn") },
+		wFileName{ wFileName }{
+		XMLDoc.InsertEndChild(Root);
+	}
 
 	XMLSink::~XMLSink(){
 		XMLDoc.SaveFile(WidestringToString(wFileName).c_str());
@@ -108,7 +113,9 @@ namespace Log{
 			detect->InsertEndChild(Channel);
 			detect->InsertEndChild(Raw);
 			for(auto key : EventDetection->params){
-				auto tag = XMLDoc.NewElement(WidestringToString(key.first).c_str());
+				auto name = WidestringToString(key.first);
+				auto idx1 = name.find("'") + 1;
+				auto tag = XMLDoc.NewElement(name.substr(idx1, name.find_last_of("'") - idx1).c_str());
 				tag->SetText(WidestringToString(key.second).c_str());
 				detect->InsertEndChild(tag);
 			}
@@ -140,12 +147,12 @@ namespace Log{
 				hunt->InsertEndChild(CreateDetctionXML(detection, XMLDoc));
 			}
 
-			XMLDoc.InsertEndChild(hunt);
+			Root->InsertEndChild(hunt);
 		} else if(level.Enabled()) {
 			auto msg = XMLDoc.NewElement(MessageTags[static_cast<DWORD>(level.severity)].c_str());
 			msg->SetAttribute("time", (long) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
 			msg->SetText(message.c_str());
-			XMLDoc.InsertEndChild(msg);
+			Root->InsertEndChild(msg);
 		}
 	}
 
