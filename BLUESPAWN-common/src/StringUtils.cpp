@@ -7,17 +7,13 @@
 #include <algorithm>
 
 std::wstring StringToWidestring(const std::string& str){
-	WCHAR* wstr = new WCHAR[str.length() + 1];
-	MultiByteToWideChar(CP_ACP, 0, str.c_str(), static_cast<int>(str.length()), wstr, static_cast<int>(str.length() + 1));
-	return wstr;
+	std::wstring s = { str.begin(), str.end() };
+	return s;
 }
 
 std::string WidestringToString(const std::wstring& wstr){
-	int size = 0;
-	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), static_cast<int>(wstr.length()), nullptr, 0, nullptr, &size);
-	CHAR* str = new CHAR[size];
-	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), static_cast<int>(wstr.length()), str, size, nullptr, nullptr);
-	return str;
+	std::string s = { wstr.begin(), wstr.end() };
+	return s;
 }
 
 template<class T>

@@ -28,7 +28,7 @@ struct DETECTION {
 struct FILE_DETECTION : public DETECTION {
 	std::wstring wsFileName;
 	std::wstring wsFilePath;
-	BYTE hash[256];
+	std::string hash;
 	FILE_DETECTION(const std::wstring& wsFilePath) : 
 		DETECTION{ DetectionType::File },
 		wsFilePath{ wsFilePath },
