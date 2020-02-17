@@ -52,7 +52,7 @@ jobs:
       run: Get-ChildItem "bluespawn*.xml" | Rename-Item -NewName BLUESPAWNHuntResults.xml
       shell: powershell
 
-    - name: TESTS: Check BLUESPAWN Hunt Results against Atomic Red Team Results
+    - name: TESTS - Check BLUESPAWN Hunt Results against Atomic Red Team Results
       run: testing\run-hunt-results-comparison.ps1
       shell: powershell
 
