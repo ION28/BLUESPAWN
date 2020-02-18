@@ -30,6 +30,10 @@ namespace EventLogs {
 				auto pRenderedValues = AllocationWrapper{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwBufferSize), dwBufferSize, AllocationWrapper::HEAP_ALLOC };
 				if(pRenderedValues){
 					if(EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferSize, nullptr)){
+						/*
+						Table of variant members found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ns-winevt-evt_variant
+						Table of type values found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ne-winevt-evt_variant_type
+						*/
 						PEVT_VARIANT result = reinterpret_cast<PEVT_VARIANT>((LPVOID) pRenderedValues);
 						if(result->Type == EvtVarTypeString)
 							return std::wstring(result->StringVal);
@@ -39,6 +43,8 @@ namespace EventLogs {
 							return ar;
 						} else if(result->Type == EvtVarTypeUInt16) {
 							return std::to_wstring(result->UInt16Val);
+						} else if (result->Type == EvtVarTypeUInt32) {
+							return std::to_wstring(result->UInt32Val);
 						} else if(result->Type == EvtVarTypeUInt64) {
 							return std::to_wstring(result->UInt64Val);
 						} else if(result->Type == EvtVarTypeNull)
