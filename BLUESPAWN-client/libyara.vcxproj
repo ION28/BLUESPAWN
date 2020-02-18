@@ -196,6 +196,7 @@
     <ClCompile Include="external\yara\libyara\ahocorasick.c" />
     <ClCompile Include="external\yara\libyara\arena.c" />
     <ClCompile Include="external\yara\libyara\atoms.c" />
+    <ClCompile Include="external\yara\libyara\base64.c" />
     <ClCompile Include="external\yara\libyara\bitmask.c" />
     <ClCompile Include="external\yara\libyara\compiler.c" />
     <ClCompile Include="external\yara\libyara\exec.c" />
