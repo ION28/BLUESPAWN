@@ -50,7 +50,7 @@ namespace Log {
 
 	public:
 
-		CLISink(const HandleWrapper& hMutex);
+		CLISink();
 
 		/**
 		 * Outputs a message to the console if its logging level is enabled. The log message

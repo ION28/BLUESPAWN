@@ -11,7 +11,7 @@ namespace Log {
 		SetConsoleTextAttribute(hConsole, static_cast<WORD>(color));
 	}
 
-	CLISink::CLISink(const HandleWrapper& hMutex) : hMutex{ hMutex } {}
+	CLISink::CLISink() : hMutex{ CreateMutexW(nullptr, false, L"Local\\CLI-Mutex") } {}
 
 	void CLISink::LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info, const std::vector<std::shared_ptr<DETECTION>>& detections){
 		auto mutex = AcquireMutex(hMutex);
