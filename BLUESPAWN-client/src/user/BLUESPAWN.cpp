@@ -225,7 +225,7 @@ int main(int argc, char* argv[]){
 		else if (result.count("hunt") || result.count("monitor")) {
 			std::map<std::string, Reaction> reactions = {
 				{"log", Reactions::LogReaction{}},
-				{"remmove-value", Reactions::RemoveValueReaction{ bluespawn.io }},
+				{"remove-value", Reactions::RemoveValueReaction{ bluespawn.io }},
 				{"suspend", Reactions::SuspendProcessReaction{ bluespawn.io }},
 			};
 
