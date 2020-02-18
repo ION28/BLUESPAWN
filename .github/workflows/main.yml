@@ -45,7 +45,7 @@ jobs:
       shell: powershell
 
     - name: Run BLUESPAWN Hunt
-      run: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe --hunt -l Normal --log-only
+      run: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe --hunt -l Normal --log=xml --reaction=log
       shell: cmd
 
     - name: Rename BLUESPAWN XML output file

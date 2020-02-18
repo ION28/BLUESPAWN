@@ -29,7 +29,7 @@ namespace Log {
 
 	// A vector containing the set of sinks to be used when LOG_HUNT is used.
 	// This vector is updated by the AddHuntSink and RemoveHuntSink functions.
-	extern std::vector<std::reference_wrapper<LogSink>> _LogHuntSinks;
+	extern std::vector<std::shared_ptr<LogSink>> _LogHuntSinks;
 
 	/**
 	 * This class is a specialization of the LogMessage class designed to handle detections
@@ -50,7 +50,7 @@ namespace Log {
 		 * @param Hunt A HuntInfo struct containing information about the hunt.
 		 * @param sinks The sinks that this message will log itself to.
 		 */
-		HuntLogMessage(const HuntInfo& Hunt, const std::vector<std::reference_wrapper<LogSink>>& sinks);
+		HuntLogMessage(const HuntInfo& Hunt, const std::vector<std::shared_ptr<LogSink>>& sinks);
 
 		/**
 		 * Creates a log message at a given level and with a sink.
@@ -58,7 +58,7 @@ namespace Log {
 		 * @param Hunt A HuntInfo struct containing information about the hunt.
 		 * @param sink The sink that this message will log itself to.
 		 */
-		HuntLogMessage(const HuntInfo& Hunt, const LogSink& sink);
+		HuntLogMessage(const HuntInfo& Hunt, const std::shared_ptr<LogSink>& sink);
 
 		/**
 		 * Records a detection to the hunt.
@@ -102,7 +102,7 @@ namespace Log {
 	 *
 	 * @return A boolean indicating whether or not the sink was added
 	 */
-	bool AddHuntSink(const LogSink& sink);
+	bool AddHuntSink(const std::shared_ptr<LogSink>& sink);
 
 	/**
 	 * Removes a sink from the vector of default sinks to be used in LOG_ERROR, LOG_WARNING, etc.
@@ -113,5 +113,5 @@ namespace Log {
 	 *
 	 * @return A boolean indicating whether or not the sink was removed
 	 */
-	bool RemoveHuntSink(const LogSink& sink);
+	bool RemoveHuntSink(const std::shared_ptr<LogSink>& sink);
 }

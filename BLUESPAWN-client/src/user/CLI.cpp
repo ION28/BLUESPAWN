@@ -34,7 +34,7 @@ const MessageColor colors[3] = {
 	MessageColor::RED
 };
 
-CLI::CLI() : hMutex{ CreateMutexW(nullptr, false, nullptr) } {}
+CLI::CLI() : hMutex{ CreateMutexW(nullptr, false, L"Local\\CLI-Mutex") } {}
 
 void Print(const std::wstring& wMessage, MessageColor color = TEXT_COLOR, bool newline=true){
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
