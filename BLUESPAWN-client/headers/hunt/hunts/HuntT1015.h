@@ -15,8 +15,10 @@ namespace Hunts {
 	 */
 	class HuntT1015 : public Hunt {
 	private:
-		std::vector<std::wstring> vAccessibilityBinaries = { L"sethc.exe", L"utilman.exe", L"osk.exe", L"Magnify.exe", 
+		std::vector<std::wstring> vAccessibilityBinaries = { L"sethc.exe", L"utilman.exe", L"osk.exe", L"Magnify.exe",
 			L"Narrator.exe", L"DisplaySwitch.exe", L"AtBroker.exe" };
+		std::wstring wsIFEO = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
+		std::wstring wsIFEOWow64 = L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
 
 		int HuntT1015::EvaluateRegistry(Reaction reaction);
 		int HuntT1015::EvaluateFiles(Reaction reaction);
@@ -25,5 +27,6 @@ namespace Hunts {
 
 		virtual int ScanCursory(const Scope& scope, Reaction reaction);
 		virtual int ScanNormal(const Scope& scope, Reaction reaction);
+		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
 	};
 }
