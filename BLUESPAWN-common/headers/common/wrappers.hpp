@@ -10,54 +10,19 @@
 template<class T>
 class GenericWrapper {
 protected:
-	static inline std::map<T, DWORD> mReferenceCounts{};
+	std::shared_ptr<void> ReferenceCounter;
 
 	T WrappedObject;
 	T BadValue;
-	bool bFreeOnDestruction = true;
-
-	std::function<void(T)> freeResource;
-
-	void DestroyReference(){
-		mReferenceCounts[WrappedObject]--;
-		if(mReferenceCounts[WrappedObject] == 0){
-			mReferenceCounts.erase(WrappedObject);
-			if(bFreeOnDestruction && operator bool()){
-				freeResource(WrappedObject);
-			}
-		}
-		WrappedObject = BadValue;
-	}
-
-	void SetReference(T object){
-		WrappedObject = object;
-		if(mReferenceCounts.find(object) == mReferenceCounts.end()){
-			mReferenceCounts.emplace(object, 1);
-		} else {
-			mReferenceCounts[object]++;
-		}
-	}
 
 public:
 
-	GenericWrapper(T object, std::function<void(T)> freeFunction = [](T object){ delete object; }, T BadValue = nullptr)
-		: WrappedObject{ object }, freeResource{ freeFunction }, BadValue{ BadValue } { SetReference(object); }
-
-	GenericWrapper(const GenericWrapper& copy)
-		: freeResource{ copy.freeResource } { SetReference(copy.WrappedObject); }
-
-	GenericWrapper(GenericWrapper&& move)
-		: freeResource{ move.freeResource } { SetReference(move.WrappedObject); move.DestroyReference(); }
-
-	GenericWrapper& operator=(const GenericWrapper& copy){ 
-		freeResource = copy.freeResource; 
-		DestroyReference();
-		SetReference(copy.WrappedObject); 
-		return *this;
-	}
-	GenericWrapper&& operator=(GenericWrapper&& move) = delete;
-
-	~GenericWrapper(){ DestroyReference(); }
+	GenericWrapper(T object, std::function<void(T)> freeFunction = [](T object){ delete object; }, T BadValue = nullptr) : 
+		WrappedObject{ object }, 
+		BadValue{ BadValue },
+		ReferenceCounter{ nullptr, [object, BadValue, freeFunction](LPVOID memory){ 
+		    if(object != BadValue){ freeFunction(object); } 
+	    }}{}
 
 	operator T() const { return WrappedObject; }
 	T* operator *(){ return *WrappedObject; }
@@ -67,9 +32,6 @@ public:
 	operator bool(){ return !operator!(); }
 
 	T Get() const { return WrappedObject; }
-	bool Release(){ return bFreeOnDestruction != (bFreeOnDestruction = false); }
-	bool Lock(){ return bFreeOnDestruction != (bFreeOnDestruction = true);  }
-	DWORD GetReferenceCount(){ return mReferenceCounts[WrappedObject]; }
 };
 
 class HandleWrapper : public GenericWrapper<HANDLE> {
@@ -84,10 +46,11 @@ public:
 		GenericWrapper(handle, std::function<void(HANDLE)>(FindClose), INVALID_HANDLE_VALUE){};
 };
 
-class AcquireMutex : public GenericWrapper<HANDLE> {
+typedef HandleWrapper MutexType;
+class AcquireMutex : public GenericWrapper<MutexType> {
 public:
-	explicit AcquireMutex(HANDLE hMutex) :
-		GenericWrapper(hMutex, std::function<void(HANDLE)>(ReleaseMutex), INVALID_HANDLE_VALUE){
+	explicit AcquireMutex(MutexType hMutex) :
+		GenericWrapper(hMutex, std::function<void(MutexType)>(ReleaseMutex), INVALID_HANDLE_VALUE){
 		WaitForSingleObject(hMutex, INFINITE);
 	};
 };

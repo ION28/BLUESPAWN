@@ -13,7 +13,7 @@
 #include "util/log/Loggable.h"
 #include "util/configurations/RegistryValue.h"
 
-DEFINE_FUNCTION(DWORD, NtQueryKey, __stdcall, HANDLE KeyHandle, int KeyInformationClass, PVOID KeyInformation, ULONG Length, PULONG ResultLength);
+DEFINE_FUNCTION(DWORD, NtQueryKey, NTAPI, HANDLE KeyHandle, int KeyInformationClass, PVOID KeyInformation, ULONG Length, PULONG ResultLength);
 
 namespace Registry {
 	extern std::map<std::wstring, HKEY> vHiveNames;
@@ -51,14 +51,14 @@ namespace Registry {
 		 * @param base The base key.
 		 * @param path The path relative to the base key.
 		 */
-		RegistryKey(HKEY base, std::wstring path);
+		RegistryKey(HKEY base, std::wstring path, bool WoW64 = false);
 
 		/**
 		 * Creates a RegistryKey object to reference a key at a given path.
 		 *
 		 * @param path The path of the registry key to reference.
 		 */
-		RegistryKey(std::wstring path);
+		RegistryKey(std::wstring path, bool WoW64 = false);
 
 		/** Copy operator overload */
 		RegistryKey& operator=(const RegistryKey& key) noexcept;
