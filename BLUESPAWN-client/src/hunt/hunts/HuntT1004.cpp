@@ -18,7 +18,7 @@ namespace Hunts {
 	}
 
 	int HuntT1004::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for T1004 - Winlogon Helper DLL at level Cursory");
+		LOG_INFO("Hunting for " << name << " at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
 		std::map<RegistryKey, std::vector<RegistryValue>> keys;
@@ -37,35 +37,66 @@ namespace Hunts {
 
 		auto HKCUWinlogon = RegistryKey{ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" };
 		keys.emplace(HKCUWinlogon, CheckValues(HKCUWinlogon, {
-			{ L"Shell", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
+			{ L"Shell", RegistryType::REG_SZ_T, L"explorer\\.exe,?", false, CheckSzRegexMatch },
+			{ L"UserInit", RegistryType::REG_SZ_T, L"(C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\)?(U|u)(SERINIT|serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch }
 		}));
 
 		auto HKCUWinlogonWow64 = RegistryKey{ HKEY_CURRENT_USER, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" };
 		keys.emplace(HKCUWinlogonWow64, CheckValues(HKCUWinlogonWow64, {
-			{ L"Shell", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
+			{ L"Shell", RegistryType::REG_SZ_T, L"explorer\\.exe,?", false, CheckSzRegexMatch },
+			{ L"UserInit", RegistryType::REG_SZ_T, L"(C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\)?(U|u)(SERINIT|serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch }
 		}));
 
-		for(const auto& subkey : CheckSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" })){
-			if(subkey.ValueExists(L"DllName")){
-				keys.emplace(subkey, std::vector<RegistryValue>{ { L"DllName", RegistryType::REG_SZ_T, * subkey.GetValue<std::wstring>(L"DllName") }});
+		auto HKLMNotify = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" };
+		auto HKLMNotifyWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" };
+		auto HKCUNotify = RegistryKey{ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" };
+		auto HKCUNotifyWow64 = RegistryKey{ HKEY_CURRENT_USER, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" };
+
+		for (auto value : HKLMNotify.EnumerateValues()) {
+			RegistryValue reg = { value, RegistryType::REG_SZ_T, *HKLMNotify.GetValue<std::wstring>(value) };
+			keys.emplace(HKLMNotify, std::vector<RegistryValue>{ reg });
+		}
+
+		for (auto value : HKLMNotifyWow64.EnumerateValues()) {
+			RegistryValue reg = { value, RegistryType::REG_SZ_T, *HKLMNotifyWow64.GetValue<std::wstring>(value) };
+			keys.emplace(HKLMNotifyWow64, std::vector<RegistryValue>{ reg });
+		}
+
+		for (auto value : HKCUNotify.EnumerateValues()) {
+			RegistryValue reg = { value, RegistryType::REG_SZ_T, *HKCUNotify.GetValue<std::wstring>(value) };
+			keys.emplace(HKCUNotify, std::vector<RegistryValue>{ reg });
+		}
+
+		for (auto value : HKCUNotifyWow64.EnumerateValues()) {
+			RegistryValue reg = { value, RegistryType::REG_SZ_T, *HKCUNotifyWow64.GetValue<std::wstring>(value) };
+			keys.emplace(HKCUNotifyWow64, std::vector<RegistryValue>{ reg });
+		}
+
+		for (auto subkey : HKLMNotify.EnumerateSubkeys()) {
+			for (auto value : subkey.EnumerateValues()) {
+				RegistryValue reg = { value, RegistryType::REG_SZ_T, *subkey.GetValue<std::wstring>(value) };
+				keys.emplace(subkey, std::vector<RegistryValue>{ reg });
 			}
 		}
 
-		for(const auto& subkey : CheckSubkeys({ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" })){
-			if(subkey.ValueExists(L"DllName")){
-				keys.emplace(subkey, std::vector<RegistryValue>{ { L"DllName", RegistryType::REG_SZ_T, * subkey.GetValue<std::wstring>(L"DllName") }});
+		for (auto subkey : HKLMNotifyWow64.EnumerateSubkeys()) {
+			for (auto value : subkey.EnumerateValues()) {
+				RegistryValue reg = { value, RegistryType::REG_SZ_T, *subkey.GetValue<std::wstring>(value) };
+				keys.emplace(subkey, std::vector<RegistryValue>{ reg });
 			}
 		}
 
-		for(const auto& subkey : CheckSubkeys({ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" })){
-			if(subkey.ValueExists(L"DllName")){
-				keys.emplace(subkey, std::vector<RegistryValue>{ { L"DllName", RegistryType::REG_SZ_T, * subkey.GetValue<std::wstring>(L"DllName") }});
+		for (auto subkey : HKCUNotify.EnumerateSubkeys()) {
+			for (auto value : subkey.EnumerateValues()) {
+				RegistryValue reg = { value, RegistryType::REG_SZ_T, *subkey.GetValue<std::wstring>(value) };
+				keys.emplace(subkey, std::vector<RegistryValue>{ reg });
 			}
 		}
 
-		for(const auto& subkey : CheckSubkeys({ HKEY_CURRENT_USER, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" })){
-			if(subkey.ValueExists(L"DllName")){
-				keys.emplace(subkey, std::vector<RegistryValue>{ { L"DllName", RegistryType::REG_SZ_T, * subkey.GetValue<std::wstring>(L"DllName") }});
+		for (auto subkey : HKCUNotifyWow64.EnumerateSubkeys()) {
+			for (auto value : subkey.EnumerateValues()) {
+				RegistryValue reg = { value, RegistryType::REG_SZ_T, *subkey.GetValue<std::wstring>(value) };
+				keys.emplace(subkey, std::vector<RegistryValue>{ reg });
 			}
 		}
 
