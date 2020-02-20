@@ -18,5 +18,7 @@ namespace Mitigations {
 		virtual bool MitigationIsEnforced(SecurityLevel level) override;
 		virtual bool EnforceMitigation(SecurityLevel level) override;
 		virtual bool MitigationApplies() override;
+	private:
+		std::vector<std::wstring> channelList;
 	};
 }
