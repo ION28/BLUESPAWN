@@ -21,9 +21,6 @@ namespace Hunts {
 		// Check Registry Debuggers
 		std::map<RegistryKey, std::vector<RegistryValue>> keys;
 
-		std::wstring wsIFEO = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
-		std::wstring wsIFEOWow64 = L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
-
 		for (auto key : vAccessibilityBinaries) {
 			auto subkey = RegistryKey{ HKEY_LOCAL_MACHINE, wsIFEO + key };
 			auto subkey2 = RegistryKey{ HKEY_LOCAL_MACHINE, wsIFEOWow64 + key };
@@ -112,5 +109,16 @@ namespace Hunts {
 		
 		reaction.EndHunt();
 		return results;
+	}
+
+	std::vector<std::shared_ptr<Event>> HuntT1015::GetMonitoringEvents() {
+		std::vector<std::shared_ptr<Event>> events;
+
+		for (auto key : vAccessibilityBinaries) {
+			events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, wsIFEO + key }, false));
+			events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, wsIFEOWow64 + key }, false));
+		}
+
+		return events;
 	}
 }

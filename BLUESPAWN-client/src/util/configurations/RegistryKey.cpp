@@ -94,7 +94,7 @@ namespace Registry {
 		}
 	}
 
-	RegistryKey::RegistryKey(HKEY hive, std::wstring path){
+	RegistryKey::RegistryKey(HKEY hive, std::wstring path, bool WoW64){
 		LSTATUS status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_ALL_ACCESS, &hkBackingKey);
 		if(status == ERROR_ACCESS_DENIED){
 			status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_READ | KEY_NOTIFY, &hkBackingKey);
@@ -116,7 +116,7 @@ namespace Registry {
 		}
 	}
 	
-	RegistryKey::RegistryKey(std::wstring name){
+	RegistryKey::RegistryKey(std::wstring name, bool WoW64){
 		name = ToUpperCase(name);
 
 		SIZE_T slash = name.find_first_of(L"/\\");
