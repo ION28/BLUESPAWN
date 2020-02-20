@@ -6,7 +6,7 @@
 
 namespace Mitigations {
 	/**
-	* Mitigation M1035 Limits access to RDP over network by ensuring that RDP is enabled
+	* Mitigation M1035 Limits access to RDP over network by ensuring that NLA is enabled.
 	*/
 	class MitigateM1035 : public Mitigation {
 	public:

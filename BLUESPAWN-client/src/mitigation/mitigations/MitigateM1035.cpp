@@ -1,8 +1,7 @@
 #include "mitigation/mitigations/MitigateM1035.h"
 
 #include "util/configurations/Registry.h"
-#include "util/log/Log.h"
-
+#include "util/log/Log.
 using namespace Registry;
 namespace Mitigations {
 	MitigateM1035::MitigateM1035() :
