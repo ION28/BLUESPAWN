@@ -18,6 +18,9 @@ namespace Hunts {
 	public:
 		HuntT1037();
 
+		int AnalyzeRegistryStartupKey(Reaction reaction);
+		int AnalayzeStartupFolders(Reaction reaction);
+
 		virtual int ScanCursory(const Scope& scope, Reaction reaction);
 	};
 }
