@@ -1,19 +1,44 @@
 #pragma once
+
 #include "LogSink.h"
+#include "../external/tinyxml2/tinyxml2.h"
 
 namespace Log {
 
 	/**
-	 * DebugSink provides a sink for the logger that directs output to the debug console.
-	 *
-	 * Each log message is prepended with the severity of the log, as defined in
-	 * MessagePrepends.
+	 * XMLSink provides a sink for the logger that saves log messages to an XML file.
 	 */
-	class DebugSink : public LogSink {
-	private:
-		std::string MessagePrepends[5] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]", "[HUNT]" };
+	class XMLSink : public LogSink {
+		HandleWrapper hMutex;
+
+		tinyxml2::XMLDocument XMLDoc;
+		tinyxml2::XMLElement* Root;
+
+		std::wstring wFileName;
+
+		std::string MessageTags[5] = { "error", "warning", "info", "other", "hunt" };
 
 	public:
+
+		/**
+		 * Default constructor for XMLSink. By default, the log will be saved to a file
+		 * named bluespawn-MM-DD-YYYY-HHMM-SS.xml
+		 */
+		XMLSink();
+
+		/**
+		 * Constructor for XMLSink. The log will be saved with the name passed as the argument
+		 *
+		 * @param wFileName The name of the file to save the log as.
+		 */
+		XMLSink(const std::wstring& wFileName);
+
+		XMLSink operator=(const XMLSink&) = delete;
+		XMLSink operator=(XMLSink&&) = delete;
+		XMLSink(const XMLSink&) = delete;
+		XMLSink(XMLSink&&) = delete;
+
+		~XMLSink();
 
 		/**
 		 * Outputs a message to the debug console if its logging level is enabled. The log message

@@ -11,7 +11,10 @@ namespace Log {
 		SetConsoleTextAttribute(hConsole, static_cast<WORD>(color));
 	}
 
+	CLISink::CLISink() : hMutex{ CreateMutexW(nullptr, false, L"Local\\CLI-Mutex") } {}
+
 	void CLISink::LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info, const std::vector<std::shared_ptr<DETECTION>>& detections){
+		auto mutex = AcquireMutex(hMutex);
 		if(level.Enabled()){
 			SetConsoleColor(CLISink::PrependColors[static_cast<WORD>(level.severity)]);
 
@@ -24,7 +27,7 @@ namespace Log {
 				for(auto detection : detections){
 					if(detection->Type == DetectionType::File){
 						auto lpFileDetection = std::static_pointer_cast<FILE_DETECTION>(detection); 
-						std::wcout << L"\tPotentially malicious file detected - " << lpFileDetection->wsFilePath << L" (hash is " << lpFileDetection->hash << L")" << std::endl;
+						std::wcout << L"\tPotentially malicious file detected - " << lpFileDetection->wsFilePath << L" (hash is " << StringToWidestring(lpFileDetection->hash) << L")" << std::endl;
 					} else if(detection->Type == DetectionType::Process){
 						auto lpProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);
 						std::wcout << L"\tPotentially malicious process detected - " << lpProcessDetection->wsImageName << L" (PID is " << lpProcessDetection->PID << L")" << std::endl;

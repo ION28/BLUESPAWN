@@ -2,8 +2,9 @@
 #include <iostream>
 #include <functional>
 #include "monitor/EventManager.h"
+#include "util/log/Log.h"
 
-HuntRegister::HuntRegister(IOBase& io) : io(io) {}
+HuntRegister::HuntRegister(const IOBase& io) : io(io) {}
 
 void HuntRegister::RegisterHunt(std::shared_ptr<Hunt> hunt) {
 	// The actual hunt itself is stored in the vector here!
@@ -83,33 +84,33 @@ void HuntRegister::RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggres
 }
 
 void HuntRegister::SetupMonitoring(Aggressiveness aggressiveness, const Reaction& reaction) {
-	using namespace std::placeholders;
-
+	auto& EvtManager = EventManager::GetInstance();
 	for (auto name : vRegisteredHunts) {
 		auto level = getLevelForHunt(*name, aggressiveness);
-		for (auto event : name->GetMonitoringEvents()) {
+		if(name->SupportsScan(level)) {
+			io.InformUser(L"Setting up monitoring for " + name->GetName());
+			for(auto event : name->GetMonitoringEvents()) {
 
-			std::function<void(const Scope & scope, Reaction reaction)> callback;
-			event->setReaction(reaction);
+				std::function<void()> callback;
 
-			switch (level) {
+				switch(level) {
 				case Aggressiveness::Intensive:
-					callback = std::bind(&Hunt::ScanIntensive, name.get(), _1, _2);
+					callback = std::bind(&Hunt::ScanIntensive, name.get(), Scope{}, reaction);
 					break;
 				case Aggressiveness::Normal:
-					callback = std::bind(&Hunt::ScanNormal, name.get(), _1, _2);
+					callback = std::bind(&Hunt::ScanNormal, name.get(), Scope{}, reaction);
 					break;
 				case Aggressiveness::Cursory:
-					callback = std::bind(&Hunt::ScanCursory, name.get(), _1, _2);
+					callback = std::bind(&Hunt::ScanCursory, name.get(), Scope{}, reaction);
 					break;
-			}
+				}
 
-			if (name->SupportsScan(level)) {
-				DWORD status = EventManager::subscribeToEvent(event, callback);
-				if (status == ERROR_SUCCESS)
-					io.InformUser(L"Monitoring for " + name->GetName());
-				else
-					io.AlertUser(L"Monitoring for " + name->GetName() + L" failed with error code " + std::to_wstring(status));
+				if(name->SupportsScan(level)) {
+					DWORD status = EvtManager.SubscribeToEvent(event, callback);
+					if(status != ERROR_SUCCESS){
+						LOG_ERROR(L"Monitoring for " << name->GetName() << L" failed with error code " << status);
+					}
+				}
 			}
 		}
 	}

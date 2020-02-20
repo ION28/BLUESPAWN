@@ -20,14 +20,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\pe-sieve\include\pe_sieve_types.h" />
+    <ClInclude Include="external\tinyxml2\tinyxml2.h" />
     <ClInclude Include="headers\hunt\Hunt.h" />
     <ClInclude Include="headers\hunt\HuntInfo.h" />
     <ClInclude Include="headers\hunt\HuntRegister.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1004.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1015.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1037.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1050.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1055.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1060.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1099.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1100.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1101.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1103.h" />
@@ -46,7 +49,7 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-LLMNR.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-NBT.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-WSH.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateM1047.h" />
+	<ClInclude Include="headers\mitigation\mitigations\MitigateM1047.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV1153.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h" />
@@ -89,6 +92,7 @@
     <ClInclude Include="headers\util\log\LogLevel.h" />
     <ClInclude Include="headers\util\log\LogSink.h" />
     <ClInclude Include="headers\util\log\ServerSink.h" />
+    <ClInclude Include="headers\util\log\XMLSink.h" />
     <ClInclude Include="headers\util\pe\Export_Section.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -134,13 +138,16 @@
     <ClInclude Include="headers\util\processes\ProcessUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="external\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="src\hunt\Hunt.cpp" />
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1004.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1015.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1037.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1050.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1055.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1060.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1099.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1100.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1101.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1103.cpp" />
@@ -159,7 +166,7 @@
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-LLMNR.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-NBT.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-WSH.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateM1047.cpp" />
+	<ClCompile Include="src\mitigation\mitigations\MitigateM1047.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV1153.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp" />
@@ -198,6 +205,7 @@
     <ClCompile Include="src\util\log\Log.cpp" />
     <ClCompile Include="src\util\log\LogLevel.cpp" />
     <ClCompile Include="src\util\log\ServerSink.cpp" />
+    <ClCompile Include="src\util\log\XMLSink.cpp" />
     <ClCompile Include="src\util\pe\Export_Section.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

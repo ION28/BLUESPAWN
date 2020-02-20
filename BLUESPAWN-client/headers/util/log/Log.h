@@ -35,7 +35,7 @@ namespace Log {
 
 	// A vector containing the set of sinks to be used when LOG_ERROR, LOG_WARNING, etc are used.
 	// This vector is updated by the AddSink and RemoveSink functions.
-	extern std::vector<std::reference_wrapper<LogSink>> _LogCurrentSinks;
+	extern std::vector<std::shared_ptr<LogSink>> _LogCurrentSinks;
 
 	// A dummy class to indicate the termination of a log message.
 	class LogTerminator {};
@@ -56,13 +56,13 @@ namespace Log {
 		LogLevel Level;
 
 		// A vector containing the sinks to which this message is being logged.
-		std::vector<std::reference_wrapper<LogSink>> Sinks{};
+		std::vector<std::shared_ptr<LogSink>> Sinks{};
 
 		/**
 		 * An internal constructor used create a log message based off of an already existing
 		 * stream.
 		 */
-		LogMessage(std::vector<std::reference_wrapper<LogSink>>, LogLevel, std::stringstream);
+		LogMessage(std::vector<std::shared_ptr<LogSink>>, LogLevel, std::stringstream);
 
 	public:
 
@@ -72,7 +72,7 @@ namespace Log {
 		 * @param sinks The sinks that this message will log itself to.
 		 * @param level The log level at which this message is logged.
 		 */
-		LogMessage(std::vector<std::reference_wrapper<LogSink>> sinks, LogLevel level);
+		LogMessage(std::vector<std::shared_ptr<LogSink>> sinks, LogLevel level);
 
 		/**
 		 * Creates a log message at a given level and with a sink
@@ -80,7 +80,7 @@ namespace Log {
 		 * @param sink The sink that this message will log itself to.
 		 * @param level The log level at which this message is logged.
 		 */
-		LogMessage(const LogSink& sink, LogLevel level);
+		LogMessage(const std::shared_ptr<LogSink>& sink, LogLevel level);
 
 		/**
 		 * When the LogTerminator is supplied to the stream, the stream is terminated and forwarded to
@@ -160,7 +160,7 @@ namespace Log {
 	 *
 	 * @return A boolean indicating whether or not the sink was added
 	 */
-	bool AddSink(const LogSink& sink);
+	bool AddSink(const std::shared_ptr<LogSink>& Sink);
 
 	/**
 	 * Removes a sink from the vector of default sinks to be used in LOG_ERROR, LOG_WARNING, etc.
@@ -171,5 +171,5 @@ namespace Log {
 	 *
 	 * @return A boolean indicating whether or not the sink was removed
 	 */
-	bool RemoveSink(const LogSink& sink);
+	bool RemoveSink(const std::shared_ptr<LogSink>& Sink);
 }

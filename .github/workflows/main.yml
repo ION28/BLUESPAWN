@@ -17,7 +17,7 @@ jobs:
         buildtype: [Release, Debug]
         buildarch: [x64, x86]
 
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -36,7 +36,37 @@ jobs:
         "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe" BLUESPAWN.sln /p:Configuration=${{ matrix.buildtype }} /p:Platform=${{ matrix.buildarch }}
       shell: cmd
 
+    - name: Set PowerShell Execution Policy
+      run: powershell set-executionpolicy Unrestricted
+      shell: powershell
+      
+    - name: Run Atomic Red Team Tests
+      run: testing\run-atomic-tests.ps1
+      shell: powershell
+
+    - name: Run BLUESPAWN Hunt
+      run: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe --hunt -l Normal --log=xml --reaction=log
+      shell: cmd
+
+    - name: Rename BLUESPAWN XML output file
+      run: Get-ChildItem "bluespawn*.xml" | Rename-Item -NewName BLUESPAWNHuntResults.xml
+      shell: powershell
+
+    - name: TESTS - Check BLUESPAWN Hunt Results against Atomic Red Team Results
+      run: testing\run-hunt-results-comparison.ps1
+      shell: powershell
+
     - uses: actions/upload-artifact@master
       with:
         name: BLUESPAWN-client-${{ matrix.buildarch }}-${{ matrix.buildtype }}
         path: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: AtomicTestsResults-${{ matrix.buildarch }}-${{ matrix.buildtype }}.csv
+        path: AtomicTestsResults.csv
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: BLUESPAWNHuntResults-${{ matrix.buildarch }}-${{ matrix.buildtype }}.xml
+        path: BLUESPAWNHuntResults.xml

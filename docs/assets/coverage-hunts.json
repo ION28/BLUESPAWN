@@ -86,6 +86,16 @@
 			"color": "#5AADFF",
 			"comment": "Covered by checking Registry keys for Image File Execution Options.",
 			"techniqueID": "T1183"
+		},
+		{
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking looking for Debuggers and YARA scanning Accessibility Files",
+			"techniqueID": "T1015"
+		},
+		{
+			"color": "#5AADFF",
+			"comment": "Covered by checking Sysmon Logs for EID 2 events, YARA scanning those files, and monitoring for these events",
+			"techniqueID": "T1099"
 		}
     ],
     "legendItems": [

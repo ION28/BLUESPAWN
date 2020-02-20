@@ -15,7 +15,7 @@ using namespace std;
 class HuntRegister {
 private:
 	vector<std::shared_ptr<Hunt>> vRegisteredHunts{};
-	IOBase& io;
+	const IOBase& io;
 
 	map<Tactic, vector<reference_wrapper<Hunt>>> mTactics{};
 	map<DataSource, vector<reference_wrapper<Hunt>>> mDataSources{};
@@ -24,7 +24,7 @@ private:
 	Aggressiveness getLevelForHunt(Hunt& hunt, Aggressiveness aggressiveness);
 
 public:
-	HuntRegister(IOBase& oIo);
+	HuntRegister(const IOBase& oIo);
 
 	void RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
 	void RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);

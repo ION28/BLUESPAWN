@@ -4,14 +4,14 @@
 
 namespace Log {
 
-	std::vector<std::reference_wrapper<LogSink>> _LogHuntSinks{};
+	std::vector<std::shared_ptr<LogSink>> _LogHuntSinks{};
 
-	HuntLogMessage::HuntLogMessage(const HuntInfo& Hunt, const std::vector<std::reference_wrapper<LogSink>>& sinks) :
+	HuntLogMessage::HuntLogMessage(const HuntInfo& Hunt, const std::vector<std::shared_ptr<LogSink>>& sinks) :
 		LogMessage(sinks, LogLevel::LogHunt),
 		HuntName{ Hunt },
 		Detections{}{}
 
-	HuntLogMessage::HuntLogMessage(const HuntInfo& Hunt, const LogSink& sink) :
+	HuntLogMessage::HuntLogMessage(const HuntInfo& Hunt, const std::shared_ptr<LogSink>& sink) :
 		LogMessage(sink, LogLevel::LogHunt),
 		HuntName{ Hunt },
 		Detections{}{}
@@ -25,7 +25,7 @@ namespace Log {
 
 		InternalStream.str(std::string{});
 		for(int idx = 0; idx < Sinks.size(); idx++){
-			Sinks[idx].get().LogMessage(Level, message, HuntName, Detections);
+			Sinks[idx]->LogMessage(Level, message, HuntName, Detections);
 		}
 
 		Detections = {};
@@ -33,20 +33,20 @@ namespace Log {
 		return *this;
 	}
 
-	bool AddHuntSink(const LogSink& sink){
+	bool AddHuntSink(const std::shared_ptr<LogSink>& sink){
 		for(int idx = 0; idx < _LogHuntSinks.size(); idx++){
-			if(_LogHuntSinks[idx].get() == sink){
+			if(*_LogHuntSinks[idx] == *sink){
 				return false;
 			}
 		}
 
-		_LogHuntSinks.emplace_back(std::reference_wrapper<LogSink>(const_cast<LogSink&>(sink)));
+		_LogHuntSinks.emplace_back(sink);
 		return true;
 	}
 
-	bool RemoveHuntSink(const LogSink& sink){
+	bool RemoveHuntSink(const std::shared_ptr<LogSink>& sink){
 		for(int idx = 0; idx < _LogHuntSinks.size(); idx++){
-			if(_LogHuntSinks[idx].get() == sink){
+			if(*_LogHuntSinks[idx] == *sink){
 				_LogHuntSinks.erase(_LogHuntSinks.begin() + idx);
 				return true;
 			}

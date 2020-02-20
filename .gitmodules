@@ -13,3 +13,6 @@
 [submodule "BLUESPAWN-client/external/yara-rules"]
 	path = BLUESPAWN-client/external/yara-rules
 	url = https://github.com/Yara-Rules/rules.git
+[submodule "BLUESPAWN-client/external/tinyxml2"]
+	path = BLUESPAWN-client/external/tinyxml2
+	url = https://github.com/leethomason/tinyxml2

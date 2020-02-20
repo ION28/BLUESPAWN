@@ -84,6 +84,14 @@ public:
 		GenericWrapper(handle, std::function<void(HANDLE)>(FindClose), INVALID_HANDLE_VALUE){};
 };
 
+class AcquireMutex : public GenericWrapper<HANDLE> {
+public:
+	explicit AcquireMutex(HANDLE hMutex) :
+		GenericWrapper(hMutex, std::function<void(HANDLE)>(ReleaseMutex), INVALID_HANDLE_VALUE){
+		WaitForSingleObject(hMutex, INFINITE);
+	};
+};
+
 class AllocationWrapper {
 	std::optional<std::shared_ptr<char[]>> Memory;
 	const PCHAR pointer;
