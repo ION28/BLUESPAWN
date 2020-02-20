@@ -8,9 +8,8 @@ namespace Mitigations {
 		Mitigation(
 			L"M-1035 Limit Access to Resource over Network.",
 			L"This is a High severity finding due to the Bluekeep vulnerability that allows for a worm to quickly move through "
-				"a network when NLA is disabled. RDP is a service that allows remote access to Windows computers. Network Level "
-				"Authentication or NLA requires that any user attempting to RDP to this computer to authenticate with the network "
-				"before making contact.",
+				"a network when NLA is disabled. RDP is a service that allows remote access to Windows computers.",
+			L"RDP",
 			SoftwareAffected::ExposedService,
 			MitigationSeverity::High
 		) {}
@@ -18,11 +17,11 @@ namespace Mitigations {
 	bool MitigateM1035::MitigationIsEnforced(SecurityLevel level) {
 		LOG_INFO(L"Checking for presence of " << name);
 
-		auto key = RegistryKey{ HKLM, "SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp" };
+		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp" };
 		if (key.ValueExists(L"UserAuthentication")) {
 			auto value = *key.GetValue<DWORD>(L"UserAuthentication");
 			if (value == 1) {
-				LOG_VERBOSE(1, "NLA is enabled for RDP.")''
+				LOG_VERBOSE(1, "NLA is enabled for RDP.");
 				return true;
 			}
 		}
@@ -32,7 +31,7 @@ namespace Mitigations {
 
 	bool MitigateM1035::EnforceMitigation(SecurityLevel level) {
 		LOG_INFO(L"Enforcing mitigation " << name);
-		auto key = RegistryKey{ HKLM, "SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp" };
+		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp" };
 		if (key.SetValue<DWORD>(L"UserAuthentication", 1)) {
 			LOG_VERBOSE(1, "NLA successfully enabled for RDP.");
 			return true;
