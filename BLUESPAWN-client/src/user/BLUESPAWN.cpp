@@ -44,6 +44,7 @@
 #include "mitigation/mitigations/MitigateV63829.h"
 #include "mitigation/mitigations/MitigateV72753.h"
 #include "mitigation/mitigations/MitigateV73519.h"
+#include "mitigation/mitigations/MitigateM1035.h"
 
 #pragma warning(push)
 
@@ -95,6 +96,7 @@ Bluespawn::Bluespawn(){
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1035>());
 }
 
 void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
