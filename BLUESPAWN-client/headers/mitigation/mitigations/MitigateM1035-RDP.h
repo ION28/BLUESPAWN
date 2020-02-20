@@ -8,9 +8,9 @@ namespace Mitigations {
 	/**
 	* Mitigation M1035 Limits access to RDP over network by ensuring that NLA is enabled.
 	*/
-	class MitigateM1035 : public Mitigation {
+	class MitigateM1035RDP : public Mitigation {
 	public:
-		MitigateM1035();
+		MitigateM1035RDP();
 
 		virtual bool MitigationIsEnforced(SecurityLevel level) override;
 		virtual bool EnforceMitigation(SecurityLevel level) override;

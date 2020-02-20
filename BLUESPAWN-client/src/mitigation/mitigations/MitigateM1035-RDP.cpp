@@ -1,10 +1,10 @@
-#include "mitigation/mitigations/MitigateM1035.h"
+#include "mitigation/mitigations/MitigateM1035-RDP.h"
 
 #include "util/configurations/Registry.h"
 #include "util/log/Log.h"
 using namespace Registry;
 namespace Mitigations {
-	MitigateM1035::MitigateM1035() :
+	MitigateM1035RDP::MitigateM1035RDP() :
 		Mitigation(
 			L"M-1035 Limit Access to Resource over Network.",
 			L"This is a High severity finding due to the Bluekeep vulnerability that allows for a worm to quickly move through "
@@ -14,7 +14,7 @@ namespace Mitigations {
 			MitigationSeverity::High
 		) {}
 
-	bool MitigateM1035::MitigationIsEnforced(SecurityLevel level) {
+	bool MitigateM1035RDP::MitigationIsEnforced(SecurityLevel level) {
 		LOG_INFO(L"Checking for presence of " << name);
 
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp" };
@@ -29,7 +29,7 @@ namespace Mitigations {
 		return false;
 	}
 
-	bool MitigateM1035::EnforceMitigation(SecurityLevel level) {
+	bool MitigateM1035RDP::EnforceMitigation(SecurityLevel level) {
 		LOG_INFO(L"Enforcing mitigation " << name);
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp" };
 		if (key.SetValue<DWORD>(L"UserAuthentication", 1)) {
@@ -42,7 +42,7 @@ namespace Mitigations {
 		}
 	}
 
-	bool MitigateM1035::MitigationApplies() {
+	bool MitigateM1035RDP::MitigationApplies() {
 		return true;
 	}
 }
