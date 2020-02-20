@@ -217,4 +217,85 @@ namespace EventLogs {
 		return detect;
 	}
 
+	bool IsChannelOpen(const std::wstring& channel) {
+		EVT_HANDLE hChannel = NULL;
+		DWORD status = ERROR_SUCCESS;
+		PEVT_VARIANT pProperty = NULL;  
+		PEVT_VARIANT pTemp = NULL;
+		DWORD dwBufferSize = 0;
+		DWORD dwBufferUsed = 0;
+
+		// Open the channel config
+		hChannel = EvtOpenChannelConfig(NULL, channel.c_str(), 0);
+		if (NULL == hChannel)
+		{
+			LOG_ERROR(L"EventLogs::IsChannelOpen: EvtOpenChannelConfig failed with " + std::to_wstring(GetLastError()) + L" for channel " + channel);
+			return false;
+		}
+
+		// Attempt to get the channel property
+		if (!EvtGetChannelConfigProperty(hChannel, EvtChannelConfigEnabled, 0, dwBufferSize, pProperty, &dwBufferUsed))
+		{
+			status = GetLastError();
+			if (ERROR_INSUFFICIENT_BUFFER == status) {
+				dwBufferSize = dwBufferUsed;
+				pTemp = (PEVT_VARIANT)realloc(pProperty, dwBufferSize);
+
+				if (pTemp) {
+					pProperty = pTemp;
+					pTemp = NULL;
+					EvtGetChannelConfigProperty(hChannel, EvtChannelConfigEnabled, 0, dwBufferSize, pProperty, &dwBufferUsed);
+				}
+				else {
+					if (pProperty)
+						free(pProperty);
+
+					LOG_ERROR(L"EventLogs::IsChannelOpen: realloc failed for channel " + channel);
+					return false;
+				}
+			}
+
+			if (ERROR_SUCCESS != (status = GetLastError())) {
+				LOG_ERROR(L"EventLogs::IsChannelOpen: EvtGetChannelConfigProperty failed with " + std::to_wstring(GetLastError()) + L" for channel " + channel);
+				return false;
+			}
+
+		}
+		if (pProperty)
+			free(pProperty);
+
+		return pProperty->BooleanVal;
+	}
+
+	bool OpenChannel(const std::wstring& channel) {
+		EVT_HANDLE hChannel = NULL;
+		DWORD status = ERROR_SUCCESS;
+		EVT_VARIANT ChannelProperty;
+		DWORD dwBufferSize = sizeof(EVT_VARIANT);
+		DWORD dwBufferUsed = 0;
+		hChannel = EvtOpenChannelConfig(NULL, channel.c_str(), 0);
+		if (NULL == hChannel)
+		{
+			LOG_ERROR(L"EventLogs::OpenChannel: EvtOpenChannelConfig failed with " + std::to_wstring(GetLastError()) + L" for channel " + channel);
+			return false;
+		}
+		RtlZeroMemory(&ChannelProperty, dwBufferSize);
+
+		ChannelProperty.Type = EvtVarTypeBoolean;
+		ChannelProperty.BooleanVal = TRUE;
+
+		if (!EvtSetChannelConfigProperty(hChannel, EvtChannelConfigEnabled, 0, &ChannelProperty))
+		{
+			LOG_ERROR(L"EventLogs::OpenChannel: EvtSetChannelConfigProperty failed with " + std::to_wstring(GetLastError()) + L" for channel " + channel);
+			return false;
+		}
+		if (!EvtSaveChannelConfig(hChannel, 0))
+		{
+			LOG_ERROR(L"EventLogs::OpenChannel: EvtSaveChannelConfig failed with " + std::to_wstring(GetLastError()) + L" for channel " + channel);
+			return false;
+		}
+
+		return true;
+	}
+
 }

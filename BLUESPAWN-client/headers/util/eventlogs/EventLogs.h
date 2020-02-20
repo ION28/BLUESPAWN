@@ -72,4 +72,7 @@ namespace EventLogs {
 	*/
 	std::vector<EventLogItem> ProcessResults(const EventWrapper& hEvent, const std::vector<XpathQuery>& filters);
 
+	bool IsChannelOpen(const std::wstring& channel);
+	bool OpenChannel(const std::wstring& channel);
+
 }
