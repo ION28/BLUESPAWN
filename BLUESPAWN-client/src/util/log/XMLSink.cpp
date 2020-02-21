@@ -14,25 +14,37 @@ namespace Log{
 		return str;
 	}
 
+	void UpdateLog(XMLSink* sink){
+		HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, L"Local\\FlushLogs") };
+		while(true){
+			WaitForSingleObject(hRecordEvent, INFINITE);
+			sink->Flush();
+		}
+	}
+
 	XMLSink::XMLSink() :
 		hMutex{ CreateMutexW(nullptr, false, nullptr) } ,
-		Root{ XMLDoc.NewElement("bluespawn") } {
+		Root{ XMLDoc.NewElement("bluespawn") },
+		thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr) }{
 		SYSTEMTIME time{};
 		GetLocalTime(&time);
 		wFileName = L"bluespawn-" + ToWstringPad(time.wMonth) + L"-" + ToWstringPad(time.wDay) + L"-" + ToWstringPad(time.wYear, 4) + L"-"
 			+ ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + L"-" + ToWstringPad(time.wSecond) + L".xml";
 		XMLDoc.InsertEndChild(Root);
+		ResumeThread(thread);
 	}
 
 	XMLSink::XMLSink(const std::wstring& wFileName) :
 		hMutex{ CreateMutexW(nullptr, false, nullptr) },
 		Root { XMLDoc.NewElement("bluespawn") },
-		wFileName{ wFileName }{
+		wFileName{ wFileName },
+		thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr) }{
 		XMLDoc.InsertEndChild(Root);
 	}
 
 	XMLSink::~XMLSink(){
 		XMLDoc.SaveFile(WidestringToString(wFileName).c_str());
+		TerminateThread(thread, 0);
 	}
 
 	tinyxml2::XMLElement* CreateDetctionXML(const std::shared_ptr<DETECTION>& detection, tinyxml2::XMLDocument& XMLDoc){
@@ -158,5 +170,9 @@ namespace Log{
 
 	bool XMLSink::operator==(const LogSink& sink) const {
 		return (bool) dynamic_cast<const XMLSink*>(&sink) && dynamic_cast<const XMLSink*>(&sink)->wFileName == wFileName;
+	}
+
+	void XMLSink::Flush(){
+		XMLDoc.SaveFile(WidestringToString(wFileName).c_str());
 	}
 };

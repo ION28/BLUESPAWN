@@ -125,12 +125,15 @@ void Bluespawn::monitor_system(Aggressiveness aHuntLevel) {
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
-	Reaction reaction = Reactions::LogReaction();
 
 	Bluespawn::io.InformUser(L"Monitoring the system");
 	huntRecord.SetupMonitoring(aHuntLevel, reaction);
 
-	while (true) {}
+	HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, L"Local\\FlushLogs") };
+	while (true) {
+		SetEvent(hRecordEvent);
+		Sleep(5000);
+	}
 }
 
 void Bluespawn::SetReaction(const Reaction& reaction){
