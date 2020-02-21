@@ -28,6 +28,7 @@
 #include "monitor/ETW_Wrapper.h"
 
 #include "mitigation/mitigations/MitigateM1025.h"
+#include "mitigation/mitigations/MitigateM1035-RDP.h"
 #include "mitigation/mitigations/MitigateM1042-LLMNR.h"
 #include "mitigation/mitigations/MitigateM1042-NBT.h"
 #include "mitigation/mitigations/MitigateM1042-WSH.h"
@@ -95,6 +96,7 @@ Bluespawn::Bluespawn(){
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1035RDP>());
 }
 
 void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
