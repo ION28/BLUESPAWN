@@ -41,10 +41,10 @@ namespace FileSystem{
 			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
 		if(!hFile){
 			LOG_VERBOSE(2, "Couldn't open file " << path << ".");
-			FileExists = false;
+			bFileExists = false;
 		} else {
 			LOG_VERBOSE(2, "File " << path << " opened.");
-			FileExists = true;
+			bFileExists = true;
 		}
 		Attribs.extension = PathFindExtension(path.c_str());
 	}
@@ -53,7 +53,7 @@ namespace FileSystem{
 		SCOPE_LOCK(SetFilePointer(0), ResetFilePointer);
 		LOG_VERBOSE(2, "Writing to file " << FilePath << " at " << offset << ". Insert = " << insert);
 
-		if(!FileExists) {
+		if(!bFileExists) {
 			LOG_ERROR("Can't write to file " << FilePath << ". File doesn't exist");
 			return false;
 		}
@@ -106,7 +106,7 @@ namespace FileSystem{
 	bool File::Read(OUT LPVOID buffer, __in_opt const unsigned long amount, __in_opt const long offset, __out_opt PDWORD amountRead) const {
 		SCOPE_LOCK(SetFilePointer(0), ResetFilePointer);
 		LOG_VERBOSE(2, "Attempting to read " << amount << " bytes from " << FilePath << " at offset " << offset);
-		if(!FileExists) {
+		if(!bFileExists) {
 			LOG_ERROR("Can't write to " << FilePath << ". File doesn't exist.");
 			SetLastError(ERROR_FILE_NOT_FOUND);
 			return false;
@@ -178,7 +178,7 @@ namespace FileSystem{
 
 	std::optional<std::string> File::GetMD5Hash() const {
 		LOG_VERBOSE(3, "Attempting to get MD5 hash of " << FilePath);
-		if(!FileExists) {
+		if(!bFileExists) {
 			LOG_ERROR("Can't get MD5 hash of " << FilePath << ". File doesn't exist");
 			return std::nullopt;
 		}
@@ -266,7 +266,7 @@ namespace FileSystem{
 
 	bool File::Create() {
 		LOG_VERBOSE(1, "Attempting to create file: " << FilePath);
-		if(FileExists) {
+		if(bFileExists) {
 			LOG_ERROR("Can't create " << FilePath << ". File already exists.");
 			return false;
 		}
@@ -281,17 +281,17 @@ namespace FileSystem{
 		{
 			DWORD dwStatus = GetLastError();
 			LOG_ERROR("Error creating file " << FilePath << ". Error code = " << dwStatus);
-			FileExists = false;
+			bFileExists = false;
 			return false;
 		}
 		LOG_VERBOSE(1, FilePath << " successfully created.");
-		FileExists = true;
+		bFileExists = true;
 		return true;
 	}
 
 	bool File::Delete() {
 		LOG_VERBOSE(1, "Attempting to delete file " << FilePath);
-		if(!FileExists) {
+		if(!bFileExists) {
 			LOG_ERROR("Can't delete file " << FilePath << ". File doesn't exist");
 			return false;
 		}
@@ -310,14 +310,14 @@ namespace FileSystem{
 			{
 				DWORD dwStatus = GetLastError();
 				LOG_ERROR("Couldn't reopen " << FilePath << ". Error = " << dwStatus);
-				FileExists = false;
+				bFileExists = false;
 				return false;
 			}
-			FileExists = true;
+			bFileExists = true;
 			return false;
 		}
 		LOG_VERBOSE(1, FilePath << "deleted.");
-		FileExists = false;
+		bFileExists = false;
 		return true;
 	}
 
@@ -352,25 +352,25 @@ namespace FileSystem{
 		FolderPath = path;
 		std::wstring searchName = FolderPath;
 		searchName += L"\\*";
-		FolderExists = true;
+		bFolderExists = true;
 		hCurFile = FindFirstFileW(searchName.c_str(), &ffd);
 		if(hCurFile == INVALID_HANDLE_VALUE) {
 			LOG_ERROR("Couldn't open folder " << path);
-			FolderExists = false;
+			bFolderExists = false;
 		}
 		if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-			IsFile = false;
+			bIsFile = false;
 		} else {
-			IsFile = true;
+			bIsFile = true;
 		}
 	}
 
 	bool Folder::MoveToNextFile() {
 		if(FindNextFileW(hCurFile, &ffd) != 0) {
 			if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-				IsFile = false;
+				bIsFile = false;
 			} else {
-				IsFile = true;
+				bIsFile = true;
 			}
 			return true;
 		}
@@ -386,15 +386,15 @@ namespace FileSystem{
 			return false;
 		}
 		if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-			IsFile = false;
+			bIsFile = false;
 		} else {
-			IsFile = true;
+			bIsFile = true;
 		}
 		return true;
 	}
 
 	std::optional<File> Folder::Open() const {
-		if(IsFile) {
+		if(bIsFile) {
 			std::wstring fileName(ffd.cFileName);
 			std::wstring filePath(FolderPath);
 			filePath += std::wstring(L"\\") + fileName;
@@ -408,7 +408,7 @@ namespace FileSystem{
 	}
 
 	std::optional<Folder> Folder::EnterDir() {
-		if(!IsFile) {
+		if(!bIsFile) {
 			std::wstring folderName = FolderPath;
 			folderName += L"\\";
 			folderName += ffd.cFileName;
@@ -493,16 +493,17 @@ namespace FileSystem{
 			if(!GetCurIsFile() && recurDepth != 0 && ffd.cFileName != std::wstring{ L"." } && ffd.cFileName != std::wstring{ L".." }){
 				std::vector<Folder> temp;
 				std::optional<Folder> f = EnterDir();
-				if(f) {
+				if(f.has_value()) {
+					toRet.emplace_back(f.value());
 					if(recurDepth == -1) {
 						temp = f->GetSubdirectories(recurDepth);
 					} else {
 						temp = f->GetSubdirectories(recurDepth - 1);
 					}
 					while(!temp.empty()) {
-						auto file = temp.at(temp.size() - 1);
+						auto folder = temp.at(temp.size() - 1);
 						temp.pop_back();
-						toRet.emplace_back(file);
+						toRet.emplace_back(folder);
 					}
 				}
 			}

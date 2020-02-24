@@ -26,7 +26,7 @@ namespace FileSystem {
 	class File : public Loggable {
 
 		//Whether or not this current file actually exists on the filesystem
-		bool FileExists; 
+		bool bFileExists; 
 
 		//Path to the file
 		std::wstring FilePath;
@@ -78,7 +78,7 @@ namespace FileSystem {
 		* return true if file exists, false otherwise
 		*/
 		bool GetFileExists() const {
-			return FileExists;
+			return bFileExists;
 		}
 
 		/**
@@ -187,13 +187,13 @@ namespace FileSystem {
 		std::wstring FolderPath;
 
 		//Whether or not the current folder exists
-		bool FolderExists;
+		bool bFolderExists;
 
 		//Handle to current file or directory
 		FindWrapper hCurFile;
 
 		//Is the current handle a file or directory
-		bool IsFile;
+		bool bIsFile;
 
 		//Information about found files
 		WIN32_FIND_DATA ffd;
@@ -205,6 +205,13 @@ namespace FileSystem {
 		* @param path - the path to the folder
 		*/
 		Folder(const std::wstring& path);
+
+		/**
+		* Return the path to the file
+		*/
+		std::wstring GetFolderPath() const {
+			return FolderPath;
+		}
 		
 		/**
 		* Function to move to the next file
@@ -227,7 +234,7 @@ namespace FileSystem {
 		* @return whether or not the folder exists.
 		*/
 		bool GetFolderExists() const {
-			return FolderExists;
+			return bFolderExists;
 		}
 
 		/**
@@ -236,7 +243,7 @@ namespace FileSystem {
 		* @return true if current is a file, false otherwise. 
 		*/
 		bool GetCurIsFile() const {
-			return IsFile;
+			return bIsFile;
 		}
 
 		/**
@@ -273,7 +280,7 @@ namespace FileSystem {
 		/**
 		* Function to return all files matching some attributes
 		*
-		* @param attribs - the attributes for returned files to match, NULL gets everything
+		* @param attribs - the attributes for returned files to match, std::nullopt gets everything
 		* @param recurDepth - the depth to recursively search, -1 recurses infinitely
 		*
 		* @return all files that match the given parameters

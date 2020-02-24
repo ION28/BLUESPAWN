@@ -86,17 +86,9 @@ namespace Hunts {
 			// Use YARA to also scan the files if our regex didn't detect anything suspicious
 			if (k == identified) {
 				YaraScanResult result = yara.ScanFile(entry);
-				if (!result) {
-					if(result.vKnownBadRules.size() > 0) {
-						identified++;
-						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath()));
-					}
-					for (auto identifier : result.vKnownBadRules) {
-						LOG_INFO(entry.GetFilePath() << L" matches known malicious identifier " << identifier);
-					}
-					for (auto identifier : result.vIndicatorRules) {
-						LOG_INFO(entry.GetFilePath() << L" matches known indicator identifier " << identifier);
-					}
+				if (!result && result.vKnownBadRules.size() > 0) {
+					identified++;
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath()));
 				}
 			}
 		}
