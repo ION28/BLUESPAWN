@@ -18,6 +18,8 @@ namespace Log {
 
 		std::string MessageTags[5] = { "error", "warning", "info", "other", "hunt" };
 
+		HandleWrapper thread;
+
 	public:
 
 		/**
@@ -60,5 +62,10 @@ namespace Log {
 		 * @return Whether or not the argument and this sink are considered equal.
 		 */
 		virtual bool operator==(const LogSink& sink) const;
+
+		/**
+		 * Flushes the log to the file.
+		 */
+		void Flush();
 	};
 }
