@@ -114,4 +114,12 @@ namespace Hunts {
 		reaction.EndHunt();
 		return detections;
 	}
+
+	std::vector<std::shared_ptr<Event>> HuntT1037::GetMonitoringEvents() {
+		std::vector<std::shared_ptr<Event>> events;
+
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_CURRENT_USER, L"Environment" }, false));
+		
+		return events;
+	}
 }

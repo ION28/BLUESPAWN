@@ -9,11 +9,11 @@
 namespace Hunts {
 
 	/**
-	 * HuntT1037 examines the registry for logon scripts
+	 * HuntT1037 examines the registry and filesystem for logon scripts
 	 * 
-	 * @scans Cursory checks the value of the UserInitMprLogonScript key for scripts
-	 * @scans Normal Scan not supported.
-	 * @scans Intensive Scan not supported.
+	 * @scans Cursory checks the value of the UserInitMprLogonScript key for scripts, scans with YARA
+	 * @scans Normal Scans Registry + Filesystem with YARA and suspicious extensions
+	 * @scans Intensive Scans Registry and FileSystem and alerts on everything
 	 */
 	class HuntT1037 : public Hunt {
 	private:
@@ -30,5 +30,6 @@ namespace Hunts {
 		virtual int ScanCursory(const Scope& scope, Reaction reaction);
 		virtual int ScanNormal(const Scope& scope, Reaction reaction);
 		virtual int ScanIntensive(const Scope& scope, Reaction reaction);
+		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
 	};
 }
