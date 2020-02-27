@@ -6,7 +6,7 @@ using namespace Registry;
 namespace Mitigations {
 	MitigateM1035RDP::MitigateM1035RDP() :
 		Mitigation(
-			L"M-1035 Limit Access to Resource over Network.",
+			L"M1035-RDP - Limit Access to Resource over Network",
 			L"This is a High severity finding due to the Bluekeep vulnerability that allows for a worm to quickly move through "
 				"a network when NLA is disabled. RDP is a service that allows remote access to Windows computers.",
 			L"RDP",
