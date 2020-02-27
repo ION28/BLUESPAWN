@@ -45,17 +45,9 @@ namespace Hunts {
 				FileSystem::File file = FileSystem::File(value.ToString());
 				YaraScanResult result = yara.ScanFile(file);
 
-				if (!result) {
-					if (result.vKnownBadRules.size() > 0) {
-						detections++;
-						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
-					}
-					for (auto identifier : result.vKnownBadRules) {
-						LOG_INFO(file.GetFilePath() << L" matches known malicious identifier " << identifier);
-					}
-					for (auto identifier : result.vIndicatorRules) {
-						LOG_INFO(file.GetFilePath() << L" matches known indicator identifier " << identifier);
-					}
+				if (!result && result.vKnownBadRules.size() > 0) {
+					detections++;
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 				}
 			}
 		}
@@ -72,17 +64,9 @@ namespace Hunts {
 			FileSystem::File file = FileSystem::File(L"C:\\Windows\\System32\\" + key);
 			YaraScanResult result = yara.ScanFile(file);
 
-			if (!result) {
-				if (result.vKnownBadRules.size() > 0) {
-					detections++;
-					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
-				}
-				for (auto identifier : result.vKnownBadRules) {
-					LOG_INFO(file.GetFilePath() << L" matches known malicious identifier " << identifier);
-				}
-				for (auto identifier : result.vIndicatorRules) {
-					LOG_INFO(file.GetFilePath() << L" matches known indicator identifier " << identifier);
-				}
+			if (!result && result.vKnownBadRules.size() > 0) {
+				detections++;
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 			}
 		}
 

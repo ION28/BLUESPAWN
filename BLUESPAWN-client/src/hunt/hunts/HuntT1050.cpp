@@ -17,7 +17,7 @@ namespace Hunts {
 	}
 
 	int HuntT1050::ScanNormal(const Scope& scope, Reaction reaction) {
-		LOG_INFO("Hunting for T1050 - New Service at level Intensive");
+		LOG_INFO("Hunting for T1050 - New Service at level Normal");
 		reaction.BeginHunt(GET_INFO());
 
 		// Create existance queries so interesting data is output
@@ -45,18 +45,10 @@ namespace Hunts {
 			FileSystem::File file = FileSystem::File(query.GetProperty(L"Event/EventData/Data[@Name='ImagePath']"));
 			YaraScanResult result = yara.ScanFile(file);
 
-			if (!result) {
-				if (result.vKnownBadRules.size() > 0) {
-					detections++;
-					reaction.EventIdentified(EventLogs::EventLogItemToDetection(query));
-					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
-				}
-				for (auto identifier : result.vKnownBadRules) {
-					LOG_INFO(file.GetFilePath() << L" matches known malicious identifier " << identifier);
-				}
-				for (auto identifier : result.vIndicatorRules) {
-					LOG_INFO(file.GetFilePath() << L" matches known indicator identifier " << identifier);
-				}
+			if (!result && result.vKnownBadRules.size() > 0) {
+				detections++;
+				reaction.EventIdentified(EventLogs::EventLogItemToDetection(query));
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 			}
 		}
 

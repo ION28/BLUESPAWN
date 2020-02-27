@@ -1,6 +1,7 @@
 #include "util/filesystem/YaraScanner.h"
 #include "../resources/resource.h"
 #include "common/wrappers.hpp"
+#include "util/log/Log.h"
 
 const YaraScanner YaraScanner::instance{};
 
@@ -129,6 +130,13 @@ YaraScanResult YaraScanner::ScanFile(const FileSystem::File& file) const {
 	status = yr_rules_scan_mem(Indicators, reinterpret_cast<const uint8_t*>((LPVOID) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
 	if(status != ERROR_SUCCESS){
 		arg.result.status = YaraStatus::Failure;
+	}
+
+	for (auto identifier : arg.result.vKnownBadRules) {
+		LOG_INFO(file.GetFilePath() << L" matches known malicious identifier " << StringToWidestring(identifier));
+	}
+	for (auto identifier : arg.result.vIndicatorRules) {
+		LOG_INFO(file.GetFilePath() << L" matches known indicator identifier " << StringToWidestring(identifier));
 	}
 
 	return arg.result;
