@@ -11,10 +11,9 @@ namespace Hunts {
 	 * function hooks, and doppelganging. This individual hunt will eventually be broken
 	 * into separate hunts
 	 *
-	 * @scans Cursory checks System logs for event id 7045 for new events
-	 * @scans Moderate Scan not supported.
-	 * @scans Careful Scan not supported.
-	 * @scans Aggressive Scan not supported.
+	 * @scans Cursory Scan not supported.
+	 * @scans Normal Scans all processes running on the system for evidence of process injection
+	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1055 : public Hunt {
 

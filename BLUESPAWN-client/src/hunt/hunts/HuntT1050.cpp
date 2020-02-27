@@ -11,8 +11,8 @@ namespace Hunts {
 	HuntT1050::HuntT1050() : Hunt(L"T1050 - New Service") {
 		// TODO: update these categories
 		dwSupportedScans = (DWORD) Aggressiveness::Normal | (DWORD) Aggressiveness::Intensive;
-		dwCategoriesAffected = (DWORD)Category::Configurations | (DWORD) Category::Files;
-		dwSourcesInvolved = (DWORD)DataSource::Registry | (DWORD)DataSource::FileSystem;
+		dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Files;
+		dwSourcesInvolved = (DWORD) DataSource::Registry | (DWORD) DataSource::FileSystem;
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 

@@ -15,7 +15,7 @@ namespace Hunts {
 	}
 
 	int HuntT1060::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for T1060 - Registry Run Keys / Startup Folder at level Cursory");
+		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
 		std::map<RegistryKey, std::vector<RegistryValue>> keys;
@@ -62,6 +62,21 @@ namespace Hunts {
 		keys.emplace(HKLMShell, CheckValues(HKLMShell, {
 			{ L"Common Startup", RegistryType::REG_EXPAND_SZ_T, L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", false, CheckSzEqual }
 		}));
+
+
+		auto HKLMCMDRun = RegistryKey{ HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Command Processor" };
+		auto HKLMCMDRunWow64 = RegistryKey{ HKEY_CURRENT_USER, L"SOFTWARE\\WOW6432Node\\Microsoft\\Command Processor" };
+		auto HKCUCMDRun = RegistryKey{ HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Command Processor" };
+		auto HKCUCMDRunWow64 = RegistryKey{ HKEY_CURRENT_USER, L"SOFTWARE\\WOW6432Node\\Microsoft\\Command Processor" };
+		
+		std::vector<RegistryKey> CMDKeys = {
+			HKLMCMDRun, HKLMCMDRunWow64, HKCUCMDRun, HKCUCMDRunWow64
+		};
+		for (auto key : CMDKeys) {
+			keys.emplace(key, CheckValues(key, {
+				{ L"AutoRun", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty }
+			}));
+		}		
 
 		int detections = 0;
 		for(const auto& key : keys){
