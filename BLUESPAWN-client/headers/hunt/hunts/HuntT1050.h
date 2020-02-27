@@ -17,6 +17,8 @@ namespace Hunts {
 	public:
 		HuntT1050();
 
+		std::vector<EventLogs::EventLogItem> Get7045Events();
+
 		virtual int ScanNormal(const Scope& scope, Reaction reaction) override;
 		virtual int ScanIntensive(const Scope& scope, Reaction reaction) override;
 		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;

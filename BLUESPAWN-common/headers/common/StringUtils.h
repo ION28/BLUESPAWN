@@ -3,6 +3,15 @@
 #include <string>
 
 /**
+* Gets the Shannon Entropy of a string
+* 
+* @param in The string of which to calculate the entropy
+*
+* @return A double storing the Shannon Entropy of the string
+*/
+double GetShannonEntropy(const std::wstring& in);
+
+/**
  * Converts a wide-string to a UTF-8 encoded string
  *
  * @param in The widestring to convert
