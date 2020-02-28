@@ -51,6 +51,7 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-NBT.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-WSH.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1047.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1054-RDP.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV1153.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-NBT.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-WSH.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1047.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1054-RDP.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV1153.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp" />
