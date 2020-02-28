@@ -33,6 +33,7 @@
 #include "mitigation/mitigations/MitigateM1042-NBT.h"
 #include "mitigation/mitigations/MitigateM1042-WSH.h"
 #include "mitigation/mitigations/MitigateM1047.h"
+#include "mitigation/mitigations/MitigateM1054-RDP.h"
 #include "mitigation/mitigations/MitigateV1093.h"
 #include "mitigation/mitigations/MitigateV1153.h"
 #include "mitigation/mitigations/MitigateV3338.h"
@@ -85,6 +86,7 @@ Bluespawn::Bluespawn(){
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042NBT>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042WSH>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1047>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1054RDP>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1093>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1153>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3338>());
