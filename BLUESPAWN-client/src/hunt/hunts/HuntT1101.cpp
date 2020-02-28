@@ -15,7 +15,7 @@ namespace Hunts {
 	}
 
 	int HuntT1101::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for T1101 - Security Support Provider at level Cursory");
+		LOG_INFO(L"Hunting for " << name << " at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
 		std::map<RegistryKey, std::vector<RegistryValue>> keys;
@@ -42,4 +42,10 @@ namespace Hunts {
 		return detections;
 	}
 
+	std::vector<std::shared_ptr<Event>> HuntT1101::GetMonitoringEvents() {
+		std::vector<std::shared_ptr<Event>> events;
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig" }));
+		return events;
+	}
 }

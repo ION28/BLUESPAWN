@@ -11,7 +11,7 @@ namespace Log {
 	 */
 	class DebugSink : public LogSink {
 	private:
-		std::string MessagePrepends[4] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]" };
+		std::string MessagePrepends[5] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]", "[HUNT]" };
 
 	public:
 

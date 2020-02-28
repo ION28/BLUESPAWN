@@ -32,7 +32,7 @@ class MitigationRegister;
 class Mitigation {
 
 public:
-	Mitigation(MitigationRegister& reg, const std::wstring& name, const std::wstring& description, const std::wstring& software, 
+	Mitigation(const std::wstring& name, const std::wstring& description, const std::wstring& software, 
 		SoftwareAffected category, MitigationSeverity severity);
 
 	// Query if the mitigation is currently enforced on the host system

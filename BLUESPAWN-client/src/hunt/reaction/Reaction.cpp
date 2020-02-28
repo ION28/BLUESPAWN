@@ -60,80 +60,42 @@ void Reaction::AddEventReaction(DetectEvent handler) {
 	vEventReactions.emplace_back(handler);
 }
 
-Reaction Reaction::Combine(const Reaction& reaction) const {
-	Reaction combined{};
-
-	for(auto function : vStartHuntProcs)
-		combined.vStartHuntProcs.emplace_back(function);
-	for(auto function : vEndHuntProcs)
-		combined.vEndHuntProcs.emplace_back(function);
-
-	for(auto function : vFileReactions)
-		combined.vFileReactions.emplace_back(function);
-	for(auto function : vRegistryReactions)
-		combined.vRegistryReactions.emplace_back(function);
-	for(auto function : vProcessReactions)
-		combined.vProcessReactions.emplace_back(function);
-	for(auto function : vServiceReactions)
-		combined.vServiceReactions.emplace_back(function);
-	for (auto function : vEventReactions)
-		combined.vEventReactions.emplace_back(function);
-
+Reaction& Reaction::Combine(const Reaction& reaction){
 
 	for(auto function : reaction.vStartHuntProcs)
-		combined.vStartHuntProcs.emplace_back(function);
+		vStartHuntProcs.emplace_back(function);
 	for(auto function : reaction.vEndHuntProcs)
-		combined.vEndHuntProcs.emplace_back(function);
-
+		vEndHuntProcs.emplace_back(function);
 	for(auto function : reaction.vFileReactions)
-		combined.vFileReactions.emplace_back(function);
+		vFileReactions.emplace_back(function);
 	for(auto function : reaction.vRegistryReactions)
-		combined.vRegistryReactions.emplace_back(function);
+		vRegistryReactions.emplace_back(function);
 	for(auto function : reaction.vProcessReactions)
-		combined.vProcessReactions.emplace_back(function);
+		vProcessReactions.emplace_back(function);
 	for(auto function : reaction.vServiceReactions)
-		combined.vServiceReactions.emplace_back(function);
+		vServiceReactions.emplace_back(function);
 	for (auto function : reaction.vEventReactions)
-		combined.vEventReactions.emplace_back(function);
+		vEventReactions.emplace_back(function);
 
-	return combined;
+	return *this;
 }
 
-Reaction Reaction::Combine(Reaction&& reaction) const {
-	Reaction combined{};
-
-	for(auto function : vStartHuntProcs)
-		combined.vStartHuntProcs.emplace_back(function);
-	for(auto function : vEndHuntProcs)
-		combined.vEndHuntProcs.emplace_back(function);
-
-	for(auto function : vFileReactions)
-		combined.vFileReactions.emplace_back(function);
-	for(auto function : vRegistryReactions)
-		combined.vRegistryReactions.emplace_back(function);
-	for(auto function : vProcessReactions)
-		combined.vProcessReactions.emplace_back(function);
-	for(auto function : vServiceReactions)
-		combined.vServiceReactions.emplace_back(function);
-	for (auto function : vEventReactions)
-		combined.vEventReactions.emplace_back(function);
-
+Reaction& Reaction::Combine(Reaction&& reaction){
 
 	for(auto function : reaction.vStartHuntProcs)
-		combined.vStartHuntProcs.emplace_back(function);
+		vStartHuntProcs.emplace_back(function);
 	for(auto function : reaction.vEndHuntProcs)
-		combined.vEndHuntProcs.emplace_back(function);
-
+		vEndHuntProcs.emplace_back(function);
 	for(auto function : reaction.vFileReactions)
-		combined.vFileReactions.emplace_back(function);
+		vFileReactions.emplace_back(function);
 	for(auto function : reaction.vRegistryReactions)
-		combined.vRegistryReactions.emplace_back(function);
+		vRegistryReactions.emplace_back(function);
 	for(auto function : reaction.vProcessReactions)
-		combined.vProcessReactions.emplace_back(function);
+		vProcessReactions.emplace_back(function);
 	for(auto function : reaction.vServiceReactions)
-		combined.vServiceReactions.emplace_back(function);
+		vServiceReactions.emplace_back(function);
 	for (auto function : reaction.vEventReactions)
-		combined.vEventReactions.emplace_back(function);
+		vEventReactions.emplace_back(function);
 
-	return combined;
+	return *this;
 }

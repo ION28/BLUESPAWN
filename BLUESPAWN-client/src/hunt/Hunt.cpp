@@ -43,7 +43,9 @@ int Hunt::ScanIntensive(const Scope& scope, Reaction reaction){
 	return 0;
 }
 
-void Hunt::SetupMonitoring(HuntRegister& record, const Scope& scope, Aggressiveness level, Reaction reaction) {}
+std::vector<std::shared_ptr<Event>> Hunt::GetMonitoringEvents() {
+	return std::vector<std::shared_ptr<Event>>();
+}
 
 bool Hunt::AffectsCategory(DWORD dwStuff){
 	return (dwStuff && dwCategoriesAffected) == dwStuff;

@@ -3,7 +3,9 @@
 #include "windows.h"
 #include <stdio.h>
 #include <winevt.h>
-#include "hunt/reaction/HuntTrigger.h"
+#include <functional>
+#include "hunt/reaction/Detections.h"
+#include "util/eventlogs/EventLogItem.h"
 
 #pragma comment(lib, "wevtapi.lib")
 
@@ -12,9 +14,7 @@
 */
 class EventSubscription {
 	public:
-		EventSubscription(Reactions::HuntTriggerReaction& reaction);
-		// Have a destructor to ensure we can clean up when this object is deleted
-		~EventSubscription();
+		EventSubscription(std::function<void(EventLogs::EventLogItem)> callback);
 
 		/**
 		* The function called by the underlying Windows OS as a callback.
@@ -25,9 +25,9 @@ class EventSubscription {
 		/**
 		* Set the event handle so it can be closed when this object is deleted
 		*/
-		void setSubHandle(EVT_HANDLE hSubscription);
+		void setSubHandle(const EventLogs::EventWrapper& hSubscription);
 
 	private:
-		std::unique_ptr<Reactions::HuntTriggerReaction> reaction;
-		EVT_HANDLE hSubscription;
+		std::function<void(EventLogs::EventLogItem)> callback;
+		EventLogs::EventWrapper hSubscription;
 };

@@ -94,10 +94,10 @@ namespace Registry {
 		}
 	}
 
-	RegistryKey::RegistryKey(HKEY hive, std::wstring path){
+	RegistryKey::RegistryKey(HKEY hive, std::wstring path, bool WoW64){
 		LSTATUS status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_ALL_ACCESS, &hkBackingKey);
 		if(status == ERROR_ACCESS_DENIED){
-			status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_READ, &hkBackingKey);
+			status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_READ | KEY_NOTIFY, &hkBackingKey);
 		}
 
 		if(status != ERROR_SUCCESS){
@@ -116,7 +116,7 @@ namespace Registry {
 		}
 	}
 	
-	RegistryKey::RegistryKey(std::wstring name){
+	RegistryKey::RegistryKey(std::wstring name, bool WoW64){
 		name = ToUpperCase(name);
 
 		SIZE_T slash = name.find_first_of(L"/\\");
@@ -141,7 +141,7 @@ namespace Registry {
 
 				LSTATUS status = RegOpenKeyEx(hkHive, path.c_str(), 0, KEY_ALL_ACCESS, &hkBackingKey);
 				if(status == ERROR_ACCESS_DENIED){
-					status = RegOpenKeyEx(hkHive, path.c_str(), 0, KEY_READ, &hkBackingKey);
+					status = RegOpenKeyEx(hkHive, path.c_str(), 0, KEY_READ | KEY_NOTIFY, &hkBackingKey);
 				}
 
 				if(status == ERROR_SUCCESS){
@@ -162,7 +162,6 @@ namespace Registry {
 	RegistryKey::~RegistryKey(){
 		if(_ReferenceCounts.find(hkBackingKey) != _ReferenceCounts.end()){
 			if(!--_ReferenceCounts[hkBackingKey]){
-				_ReferenceCounts.erase(hkBackingKey);
 				CloseHandle(hkBackingKey);
 			}
 		}
@@ -487,5 +486,9 @@ namespace Registry {
 		auto status = RegDeleteValueW(hkBackingKey, wsValueName.c_str());
 		SetLastError(status);
 		return status == ERROR_SUCCESS;
+	}
+
+	RegistryKey::operator HKEY() const {
+		return hkBackingKey;
 	}
 }

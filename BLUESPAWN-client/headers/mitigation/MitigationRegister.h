@@ -7,13 +7,13 @@
 class MitigationRegister {
 
 public:
-	MitigationRegister(IOBase& oIo);
-	void RegisterMitigation(Mitigation* mitigation);
+	MitigationRegister(const IOBase& oIo);
+	void RegisterMitigation(std::shared_ptr<Mitigation> mitigation);
 	void AuditMitigations(SecurityLevel securityLevel);
 	void EnforceMitigations(SecurityLevel securityLevel, bool bForceEnforce);
 
 private:
-	std::vector<Mitigation*> vRegisteredMitigations{};
-	IOBase& io;
+	std::vector<std::shared_ptr<Mitigation>> vRegisteredMitigations{};
+	const IOBase& io;
 };
 

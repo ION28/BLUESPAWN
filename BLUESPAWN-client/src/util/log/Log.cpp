@@ -2,7 +2,7 @@
 #include <iostream>
 
 namespace Log {
-	std::vector<std::reference_wrapper<Log::LogSink>> _LogCurrentSinks; 
+	std::vector<std::shared_ptr<Log::LogSink>> _LogCurrentSinks; 
 	LogTerminator endlog{};
 
 	LogMessage& LogMessage::operator<<(const std::wstring& message){
@@ -21,35 +21,35 @@ namespace Log {
 
 		InternalStream = std::stringstream();
 		for(int idx = 0; idx < Sinks.size(); idx++){
-			Sinks[idx].get().LogMessage(Level, message);
+			Sinks[idx]->LogMessage(Level, message);
 		}
 		return *this;
 	}
 
-	LogMessage::LogMessage(const LogSink& Sink, LogLevel Level) : Level{ Level } {
-		Sinks.emplace_back(std::reference_wrapper<LogSink>(const_cast<LogSink&>(Sink)));
+	LogMessage::LogMessage(const std::shared_ptr<LogSink>& Sink, LogLevel Level) : Level{ Level } {
+		Sinks.emplace_back(Sink);
 	}
-	LogMessage::LogMessage(std::vector<std::reference_wrapper<LogSink>> Sinks, LogLevel Level) : LogMessage(Sinks, Level, std::stringstream{}) {}
-	LogMessage::LogMessage(std::vector<std::reference_wrapper<LogSink>> Sinks, LogLevel Level, std::stringstream Stream) : Level{ Level } {
+	LogMessage::LogMessage(std::vector<std::shared_ptr<LogSink>> Sinks, LogLevel Level) : LogMessage(Sinks, Level, std::stringstream{}) {}
+	LogMessage::LogMessage(std::vector<std::shared_ptr<LogSink>> Sinks, LogLevel Level, std::stringstream Stream) : Level{ Level } {
 		this->Sinks = Sinks;
 		std::string StreamContents = Stream.str();
 		InternalStream << StreamContents;
 	}
 
-	bool AddSink(const LogSink& sink){
+	bool AddSink(const std::shared_ptr<LogSink>& Sink){
 		for(int idx = 0; idx < _LogCurrentSinks.size(); idx++){
-			if(_LogCurrentSinks[idx].get() == sink){
+			if(*_LogCurrentSinks[idx] == *Sink){
 				return false;
 			}
 		}
 
-		_LogCurrentSinks.emplace_back(std::reference_wrapper<LogSink>(const_cast<LogSink&>(sink)));
+		_LogCurrentSinks.emplace_back(Sink);
 		return true;
 	}
 
-	bool RemoveSink(const LogSink& sink){
+	bool RemoveSink(const std::shared_ptr<LogSink>& Sink){
 		for(int idx = 0; idx < _LogCurrentSinks.size(); idx++){
-			if(_LogCurrentSinks[idx].get() == sink){
+			if(*_LogCurrentSinks[idx] == *Sink){
 				_LogCurrentSinks.erase(_LogCurrentSinks.begin() + idx);
 				return true;
 			}

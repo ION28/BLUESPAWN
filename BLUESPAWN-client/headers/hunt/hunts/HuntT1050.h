@@ -2,7 +2,6 @@
 #include "../Hunt.h"
 #include "hunt/reaction/Reaction.h"
 #include "hunt/reaction/Log.h"
-#include "util/eventlogs/EventSubscription.h"
 
 namespace Hunts {
 
@@ -18,10 +17,10 @@ namespace Hunts {
 	public:
 		HuntT1050();
 
-		virtual int ScanIntensive(const Scope& scope, Reaction reaction) override;
-		virtual void SetupMonitoring(HuntRegister& record, const Scope& scope, Aggressiveness level, Reaction reaction) override;
+		std::vector<EventLogs::EventLogItem> Get7045Events();
 
-	private:
-		std::vector<std::unique_ptr<EventSubscription>> eventSubscriptions;
+		virtual int ScanNormal(const Scope& scope, Reaction reaction) override;
+		virtual int ScanIntensive(const Scope& scope, Reaction reaction) override;
+		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

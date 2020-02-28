@@ -10,9 +10,8 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateV63817::MitigateV63817(MitigationRegister& record) :
+	MitigateV63817::MitigateV63817() :
 		Mitigation(
-			record,
 			L"V-63817 - User Account Control approval mode for the built-in Administrator must be enabled",
 			L"User Account Control (UAC) is a security mechanism for limiting the elevation of privileges, "
 			"including administrative accounts, unless authorized. This setting configures the built-in "

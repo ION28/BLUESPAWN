@@ -12,6 +12,7 @@
 #include <fileapi.h>
 #include <vector>
 #include <Shlwapi.h>
+#include <SoftPub.h>
 #include "common/wrappers.hpp"
 
 namespace FileSystem{
@@ -40,10 +41,10 @@ namespace FileSystem{
 			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
 		if(!hFile){
 			LOG_VERBOSE(2, "Couldn't open file " << path << ".");
-			FileExists = false;
+			bFileExists = false;
 		} else {
 			LOG_VERBOSE(2, "File " << path << " opened.");
-			FileExists = true;
+			bFileExists = true;
 		}
 		Attribs.extension = PathFindExtension(path.c_str());
 	}
@@ -52,7 +53,7 @@ namespace FileSystem{
 		SCOPE_LOCK(SetFilePointer(0), ResetFilePointer);
 		LOG_VERBOSE(2, "Writing to file " << FilePath << " at " << offset << ". Insert = " << insert);
 
-		if(!FileExists) {
+		if(!bFileExists) {
 			LOG_ERROR("Can't write to file " << FilePath << ". File doesn't exist");
 			return false;
 		}
@@ -105,7 +106,7 @@ namespace FileSystem{
 	bool File::Read(OUT LPVOID buffer, __in_opt const unsigned long amount, __in_opt const long offset, __out_opt PDWORD amountRead) const {
 		SCOPE_LOCK(SetFilePointer(0), ResetFilePointer);
 		LOG_VERBOSE(2, "Attempting to read " << amount << " bytes from " << FilePath << " at offset " << offset);
-		if(!FileExists) {
+		if(!bFileExists) {
 			LOG_ERROR("Can't write to " << FilePath << ". File doesn't exist.");
 			SetLastError(ERROR_FILE_NOT_FOUND);
 			return false;
@@ -132,9 +133,52 @@ namespace FileSystem{
 		return success ? memory : AllocationWrapper{ nullptr, 0 };
 	}
 
+	bool File::MatchesAttributes(IN const FileSearchAttribs& searchAttribs) const {
+		if (searchAttribs.extensions.size() > 0) {
+			std::wstring ext = ToLowerCaseW(GetFileAttribs().extension);
+			if (std::count(searchAttribs.extensions.begin(), searchAttribs.extensions.end(), ext) == 0) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool File::GetFileSigned() const {
+
+		WINTRUST_FILE_INFO FileData{};
+		FileData.cbStruct = sizeof(WINTRUST_FILE_INFO);
+		FileData.pcwszFilePath = FilePath.c_str();
+		FileData.hFile = hFile;
+		FileData.pgKnownSubject = NULL;
+
+		GUID verification = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+
+		WINTRUST_DATA WinTrustData{};
+
+		WinTrustData.cbStruct = sizeof(WinTrustData);
+		WinTrustData.pPolicyCallbackData = NULL;
+		WinTrustData.pSIPClientData = NULL;
+		WinTrustData.dwUIChoice = WTD_UI_NONE;
+		WinTrustData.fdwRevocationChecks = WTD_REVOKE_NONE;
+		WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
+		WinTrustData.dwStateAction = WTD_STATEACTION_VERIFY;
+		WinTrustData.hWVTStateData = NULL;
+		WinTrustData.pwszURLReference = NULL;
+		WinTrustData.dwUIContext = 0;
+		WinTrustData.pFile = &FileData;
+
+		LONG result = WinVerifyTrust((HWND) INVALID_HANDLE_VALUE, &verification, &WinTrustData);
+		if(result){
+			return false;
+		}
+
+		return true;
+	}
+
 	std::optional<std::string> File::GetMD5Hash() const {
 		LOG_VERBOSE(3, "Attempting to get MD5 hash of " << FilePath);
-		if(!FileExists) {
+		if(!bFileExists) {
 			LOG_ERROR("Can't get MD5 hash of " << FilePath << ". File doesn't exist");
 			return std::nullopt;
 		}
@@ -222,7 +266,7 @@ namespace FileSystem{
 
 	bool File::Create() {
 		LOG_VERBOSE(1, "Attempting to create file: " << FilePath);
-		if(FileExists) {
+		if(bFileExists) {
 			LOG_ERROR("Can't create " << FilePath << ". File already exists.");
 			return false;
 		}
@@ -237,17 +281,17 @@ namespace FileSystem{
 		{
 			DWORD dwStatus = GetLastError();
 			LOG_ERROR("Error creating file " << FilePath << ". Error code = " << dwStatus);
-			FileExists = false;
+			bFileExists = false;
 			return false;
 		}
 		LOG_VERBOSE(1, FilePath << " successfully created.");
-		FileExists = true;
+		bFileExists = true;
 		return true;
 	}
 
 	bool File::Delete() {
 		LOG_VERBOSE(1, "Attempting to delete file " << FilePath);
-		if(!FileExists) {
+		if(!bFileExists) {
 			LOG_ERROR("Can't delete file " << FilePath << ". File doesn't exist");
 			return false;
 		}
@@ -266,14 +310,14 @@ namespace FileSystem{
 			{
 				DWORD dwStatus = GetLastError();
 				LOG_ERROR("Couldn't reopen " << FilePath << ". Error = " << dwStatus);
-				FileExists = false;
+				bFileExists = false;
 				return false;
 			}
-			FileExists = true;
+			bFileExists = true;
 			return false;
 		}
 		LOG_VERBOSE(1, FilePath << "deleted.");
-		FileExists = false;
+		bFileExists = false;
 		return true;
 	}
 
@@ -285,6 +329,7 @@ namespace FileSystem{
 			LOG_ERROR("Couldn't change file pointer to " << length << " in file " << FilePath);
 			return false;
 		}
+
 		if(!SetEndOfFile(hFile)) {
 			LOG_ERROR("Couldn't change the length of file " << FilePath);
 			return false;
@@ -299,29 +344,34 @@ namespace FileSystem{
 		return (static_cast<DWORD64>(high) << 32) + size;
 	}
 
+	std::wstring File::ToString() const {
+		return FilePath;
+	}
+
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
 		FolderPath = path;
 		std::wstring searchName = FolderPath;
 		searchName += L"\\*";
-		FolderExists = true;
-		hCurFile = HandleWrapper(FindFirstFile(searchName.c_str(), &ffd));
+		bFolderExists = true;
+		auto f = FindFirstFileW(searchName.c_str(), &ffd);
+		hCurFile = { f };
 		if(hCurFile == INVALID_HANDLE_VALUE) {
 			LOG_ERROR("Couldn't open folder " << path);
-			FolderExists = false;
+			bFolderExists = false;
 		}
 		if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-			IsFile = false;
+			bIsFile = false;
 		} else {
-			IsFile = true;
+			bIsFile = true;
 		}
 	}
 
 	bool Folder::MoveToNextFile() {
 		if(FindNextFileW(hCurFile, &ffd) != 0) {
 			if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-				IsFile = false;
+				bIsFile = false;
 			} else {
-				IsFile = true;
+				bIsFile = true;
 			}
 			return true;
 		}
@@ -337,15 +387,15 @@ namespace FileSystem{
 			return false;
 		}
 		if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-			IsFile = false;
+			bIsFile = false;
 		} else {
-			IsFile = true;
+			bIsFile = true;
 		}
 		return true;
 	}
 
 	std::optional<File> Folder::Open() const {
-		if(IsFile) {
+		if(bIsFile) {
 			std::wstring fileName(ffd.cFileName);
 			std::wstring filePath(FolderPath);
 			filePath += std::wstring(L"\\") + fileName;
@@ -359,7 +409,7 @@ namespace FileSystem{
 	}
 
 	std::optional<Folder> Folder::EnterDir() {
-		if(!IsFile) {
+		if(!bIsFile) {
 			std::wstring folderName = FolderPath;
 			folderName += L"\\";
 			folderName += ffd.cFileName;
@@ -395,7 +445,7 @@ namespace FileSystem{
 		return false;
 	}
 
-	std::vector<File> Folder::GetFiles(IN std::optional<FileSearchAttribs> attribs, IN int recurDepth) {
+	std::vector<File> Folder::GetFiles(__in_opt std::optional<FileSearchAttribs> attribs, __in_opt int recurDepth) {
 		if(MoveToBeginning() == 0) {
 			LOG_ERROR("Couldn't get to beginning of folder " << FolderPath);
 			return std::vector<File>();
@@ -408,8 +458,13 @@ namespace FileSystem{
 					if(!attribs) {
 						toRet.emplace_back(*f);
 					}
+					else {
+						if (f->MatchesAttributes(attribs.value())) {
+							toRet.emplace_back(*f);
+						}
+					}
 				}
-			} else if(recurDepth != 0 && ffd.cFileName != L"." && ffd.cFileName != L".."){
+			} else if(recurDepth != 0 && ffd.cFileName != std::wstring{ L"." } && ffd.cFileName != std::wstring{ L".." }){
 				std::vector<File> temp;
 				std::optional<Folder> f = EnterDir();
 				if(f) {
@@ -436,19 +491,20 @@ namespace FileSystem{
 		}
 		std::vector<Folder> toRet = {};
 		do {
-			if(!GetCurIsFile() && recurDepth != 0 && ffd.cFileName != L"." && ffd.cFileName != L".."){
+			if(!GetCurIsFile() && recurDepth != 0 && ffd.cFileName != std::wstring{ L"." } && ffd.cFileName != std::wstring{ L".." }){
 				std::vector<Folder> temp;
 				std::optional<Folder> f = EnterDir();
-				if(f) {
+				if(f.has_value()) {
+					toRet.emplace_back(f.value());
 					if(recurDepth == -1) {
 						temp = f->GetSubdirectories(recurDepth);
 					} else {
 						temp = f->GetSubdirectories(recurDepth - 1);
 					}
 					while(!temp.empty()) {
-						auto file = temp.at(temp.size() - 1);
+						auto folder = temp.at(temp.size() - 1);
 						temp.pop_back();
-						toRet.emplace_back(file);
+						toRet.emplace_back(folder);
 					}
 				}
 			}

@@ -6,6 +6,7 @@
 #include <vector>
 #include <optional>
 
+#include "util/log/Loggable.h"
 #include "common/wrappers.hpp"
 
 #define BUFSIZE 1024
@@ -22,10 +23,10 @@ namespace FileSystem {
 		std::vector<std::wstring> extensions;
 	};
 
-	class File {
+	class File : public Loggable {
 
 		//Whether or not this current file actually exists on the filesystem
-		bool FileExists; 
+		bool bFileExists; 
 
 		//Path to the file
 		std::wstring FilePath;
@@ -77,7 +78,7 @@ namespace FileSystem {
 		* return true if file exists, false otherwise
 		*/
 		bool GetFileExists() const {
-			return FileExists;
+			return bFileExists;
 		}
 
 		/**
@@ -115,7 +116,7 @@ namespace FileSystem {
 		*
 		* @return true if read successful, false if read unsuccessful
 		*/
-		AllocationWrapper Read(__in_opt unsigned long amount, __in_opt long offset = 0, __out_opt PDWORD amountRead = nullptr) const;
+		AllocationWrapper Read(__in_opt unsigned long amount = -1, __in_opt long offset = 0, __out_opt PDWORD amountRead = nullptr) const;
 
 		/**
 		* Function to compute the MD5 hash of the file
@@ -125,6 +126,22 @@ namespace FileSystem {
 		* @return true if hashing successful, false if hashing unsuccessful
 		*/
 		std::optional<std::string> GetMD5Hash() const;
+
+		/**
+		* Function to see if a file matches a given set of search criteria
+		*
+		* @param searchAttribs - a FileSearchAttribs object
+		*
+		* @return a boolean indicating if the file matched the criteria
+		*/
+		bool MatchesAttributes(IN const FileSearchAttribs& searchAttribs) const;
+
+		/**
+		 * Returns whether or not the current file is signed.
+		 *
+		 * @return true if the file is properly signed; false if not signed or an error occured.
+		 */
+		bool GetFileSigned() const;
 
 		/**
 		* Function to create the file if it doesn't exist
@@ -155,6 +172,13 @@ namespace FileSystem {
 		 * @return The size of the referenced file
 		 */
 		DWORD64 GetFileSize() const;
+
+		/**
+		 * Gets the file path (and thus its name)
+		 *
+		 * @return The file path of the object
+		 */
+		virtual std::wstring ToString() const;
 	};
 
 	class Folder {
@@ -163,13 +187,13 @@ namespace FileSystem {
 		std::wstring FolderPath;
 
 		//Whether or not the current folder exists
-		bool FolderExists;
+		bool bFolderExists;
 
 		//Handle to current file or directory
-		HandleWrapper hCurFile;
+		FindWrapper hCurFile;
 
 		//Is the current handle a file or directory
-		bool IsFile;
+		bool bIsFile;
 
 		//Information about found files
 		WIN32_FIND_DATA ffd;
@@ -181,6 +205,13 @@ namespace FileSystem {
 		* @param path - the path to the folder
 		*/
 		Folder(const std::wstring& path);
+
+		/**
+		* Return the path to the file
+		*/
+		std::wstring GetFolderPath() const {
+			return FolderPath;
+		}
 		
 		/**
 		* Function to move to the next file
@@ -203,7 +234,7 @@ namespace FileSystem {
 		* @return whether or not the folder exists.
 		*/
 		bool GetFolderExists() const {
-			return FolderExists;
+			return bFolderExists;
 		}
 
 		/**
@@ -212,7 +243,7 @@ namespace FileSystem {
 		* @return true if current is a file, false otherwise. 
 		*/
 		bool GetCurIsFile() const {
-			return IsFile;
+			return bIsFile;
 		}
 
 		/**
@@ -249,7 +280,7 @@ namespace FileSystem {
 		/**
 		* Function to return all files matching some attributes
 		*
-		* @param attribs - the attributes for returned files to match, NULL gets everything
+		* @param attribs - the attributes for returned files to match, std::nullopt gets everything
 		* @param recurDepth - the depth to recursively search, -1 recurses infinitely
 		*
 		* @return all files that match the given parameters

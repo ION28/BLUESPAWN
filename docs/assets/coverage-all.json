@@ -12,6 +12,11 @@
     "name": "BLUESPAWN Overall",
     "domain": "mitre-enterprise",
     "techniques": [
+		{
+            "color": "#5AADFF",
+			"comment": "Covered by checking EventLogs for Security/4720 events and monitoring for these events",
+            "techniqueID": "T1136"
+        },
         {
             "color": "#5AADFF",
 			"comment": "Covered by registry checking HKCU\\Environment\\UserInitMprLogonScript",
@@ -116,7 +121,17 @@
             "color": "#5AADFF",
 			"comment": "A number of settings to strengthen UAC are applied (V-63817)",
             "techniqueID": "T1088"
-        }
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by registry checking looking for Debuggers and YARA scanning Accessibility Files",
+            "techniqueID": "T1015"
+        },
+		{
+			"color": "#5AADFF",
+			"comment": "Covered by checking Sysmon Logs for EID 2 events, YARA scanning those files, and monitoring for these events",
+			"techniqueID": "T1099"
+		}
     ],
     "legendItems": [
         {

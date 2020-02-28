@@ -50,7 +50,7 @@ public:
 	void AddServiceReaction(DetectService handler);
 	void AddEventReaction(DetectEvent handler);
 
-	/// Combines two reactions, returning a new reaction object that has the handlers present in both
-	Reaction Combine(const Reaction& reaction) const;
-	Reaction Combine(Reaction&& reaction) const;
+	/// Merges the given reaction into the current reaction
+	Reaction& Combine(const Reaction& reaction);
+	Reaction& Combine(Reaction&& reaction);
 };

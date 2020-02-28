@@ -6,79 +6,73 @@
 #include <stdio.h>
 #include <winevt.h>
 #include "hunt/reaction/Reaction.h"
-#include "hunt/reaction/HuntTrigger.h"
-#include <set>
+#include <vector>
 #include "util/eventlogs/EventSubscription.h"
+#include "util/eventlogs/EventLogItem.h"
+#include "common/wrappers.hpp"
+#include "XpathQuery.h"
 
 #pragma comment(lib, "wevtapi.lib")
 
-class EventLogs {
-	public:
-		static EventLogs* getLogs() {
-			if (!logs)
-				logs = new EventLogs;
-			return logs;
-		}
+namespace EventLogs {
 
-		/**
-		* @param channel the channel to look for the event log (exe, 'Microsoft-Windows-Sysmon/Operational')
-		* @param id the event ID to filter for
-		* @param reaction the reaction to use when an event is detected
-		* @return the number of events detected, or -1 if something went wrong.
-		*/
-		int QueryEvents(const wchar_t* channel, unsigned int id, Reaction& reaction);
+	typedef std::vector<std::pair<std::wstring, std::wstring>> ParamList;
 
-		/**
-		* @param channel the channel to look for the event log (exe, 'Microsoft-Windows-Sysmon/Operational')
-		* @param id the event ID to filter for
-		* @param reaction the reaction to use when an event is detected
-		* @param params extra parameters to print in the output
-		* @return the number of events detected, or -1 if something went wrong.
-		*/
-		int QueryEvents(const wchar_t* channel, unsigned int id, std::set<std::wstring>& params, Reaction& reaction);
+	/**
+	* @param channel the channel to look for the event log (exe, 'Microsoft-Windows-Sysmon/Operational')
+	* @param id the event ID to filter for
+	* @param params pair mappings of xpaths to values to filter the event log results by
+	* @return the number of events detected, or -1 if something went wrong.
+	*/
+	std::vector<EventLogItem> QueryEvents(const std::wstring& channel, unsigned int id, const std::vector<XpathQuery>& filters = {});
 
-		/**
-		* Get the string value of a parameter in an event
-		* 
-		* @param hEvent a handle to an event
-		* @param value a pointer to a wstring where the parameter value will be stored
-		* @param param the parameter whose value is being queried. Must be a valud XPATH query
-		* @return the status of the operation
-		*/
-		DWORD GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param);
-		/**
-		* Get the XML representation of an event
-		*
-		* @param hEvent a handle to an event
-		* @param data pointer to a wstring where the XML result will be stored
-		* @return the status of the operation
-		*/
-		DWORD GetEventXML(EVT_HANDLE hEvent, std::wstring* data);
+	/**
+	* Get the string value of a parameter in an event
+	*
+	* @param hEvent a handle to an event
+	* @param value a pointer to a wstring where the parameter value will be stored
+	* @param param the parameter whose value is being queried. Must be a valud XPATH query
+	* @return the status of the operation
+	*/
+	std::optional<std::wstring> GetEventParam(const EventWrapper& hEvent, const std::wstring& param);
+	/**
+	* Get the XML representation of an event
+	*
+	* @param hEvent a handle to an event
+	* @param data pointer to a wstring where the XML result will be stored
+	* @return the status of the operation
+	*/
+	std::optional<std::wstring> GetEventXML(const EventWrapper& hEvent);
 
-		/**
-		* Create an EVENT_DETECTION struct from an event handle
-		* 
-		* @param hEvent the handle being turned into a detection object
-		* @param pDetection a pointer to the detection struct to store the results
-		* @param params a list of XPATH parameters to include optionally in the struct
-		* @return the status of the operation
-		*/
-		DWORD EventToDetection(EVT_HANDLE hEvent, EVENT_DETECTION * pDetection, std::set<std::wstring>& params);
+	/**
+	* Create an EVENT_DETECTION struct from an event handle
+	*
+	* @param hEvent the handle being turned into a detection object
+	* @param pDetection a pointer to the detection struct to store the results
+	* @param params a list of XPATH parameters to include optionally in the struct
+	* @return the status of the operation
+	*/
+	std::optional<EventLogItem> EventToEventLogItem(const EventWrapper& hEvent, const std::vector<std::wstring>& params);
 
-		/**
-		* Subscribe a HuntTriggerReaction to a specific Windows event
-		*
-		* @param pwsPath the event channel to subscribe to
-		* @param id the id of the event to subscribe to
-		* @param reaction the reaction to call when an event is generated
-		* @param status the status of the operation
-		* @returns a shared pointer to the datasturctures storing the event subscription information
-		*/
-		std::unique_ptr<EventSubscription> subscribe(LPWSTR pwsPath, unsigned int id, Reactions::HuntTriggerReaction& reaction, DWORD* status);
+	std::shared_ptr<EVENT_DETECTION> EventLogItemToDetection(const EventLogItem& pItem);
 
-	private:
-		DWORD ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std::set<std::wstring>& params);
+	/**
+	* Subscribe a HuntTriggerReaction to a specific Windows event
+	*
+	* @param pwsPath the event channel to subscribe to
+	* @param id the id of the event to subscribe to
+	* @param callback the function to call when event subscriptions are returned
+	* @param status the status of the operation
+	* @returns a shared pointer to the datasturctures storing the event subscription information
+	*/
+	std::optional<std::reference_wrapper<EventSubscription>> SubscribeToEvent(const std::wstring& pwsPath, unsigned int id, const std::function<void(EventLogItem)>& callback, const std::vector<XpathQuery>& filters = {});
 
-		EventLogs() {};
-		static EventLogs* logs;
-};
+	/**
+	* A utility function called by QueryEvents
+	*/
+	std::vector<EventLogItem> ProcessResults(const EventWrapper& hEvent, const std::vector<XpathQuery>& filters);
+
+	bool IsChannelOpen(const std::wstring& channel);
+	bool OpenChannel(const std::wstring& channel);
+
+}

@@ -8,6 +8,7 @@
 #include "HuntInfo.h"
 
 #include "hunt/reaction/Reaction.h"
+#include "monitor/Event.h"
 
 class HuntRegister;
 
@@ -40,5 +41,5 @@ public:
 	virtual int ScanNormal(const Scope& scope, Reaction reaction);
 	virtual int ScanIntensive(const Scope& scope, Reaction reaction);
 
-	virtual void SetupMonitoring(HuntRegister& record, const Scope& scope, Aggressiveness level, Reaction reaction);
+	virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents();
 };

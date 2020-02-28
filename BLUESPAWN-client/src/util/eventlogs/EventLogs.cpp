@@ -6,296 +6,296 @@
 const int SIZE_DATA = 4096;
 const int ARRAY_SIZE = 10;
 
-EventLogs* EventLogs::logs = NULL;
+namespace EventLogs {
 
-/**
-The callback function directly called by event subscriptions.
-In turn it calls the EventSubscription::SubscriptionCallback of a specific class instance.
-*/
-DWORD WINAPI CallbackWrapper(EVT_SUBSCRIBE_NOTIFY_ACTION Action, PVOID UserContext, EVT_HANDLE Event) {
-	return reinterpret_cast<EventSubscription*>(UserContext)->SubscriptionCallback(Action, Event);
-}
-
-DWORD EventLogs::GetEventParam(EVT_HANDLE hEvent, std::wstring* value, std::wstring param) {
-	DWORD status = ERROR_SUCCESS;
-	EVT_HANDLE hContext = NULL;
-	DWORD dwBufferSize = 0;
-	DWORD dwBufferUsed = 0;
-	DWORD dwPropertyCount = 0;
-	PEVT_VARIANT pRenderedValues = NULL;
-	LPWSTR queryParam = (LPWSTR)(param.c_str());
-	LPWSTR ppValues[] = { queryParam };
-	DWORD count = sizeof(ppValues) / sizeof(LPWSTR);
-
-	// Identify the components of the event that you want to render. In this case,
-	// render the provider's name and channel from the system section of the event.
-	// To get user data from the event, you can specify an expression such as
-	// L"Event/EventData/Data[@Name=\"<data name goes here>\"]".
-	hContext = EvtCreateRenderContext(count, (LPCWSTR*)ppValues, EvtRenderContextValues);
-	if (NULL == hContext)
-	{
-		status = GetLastError();
-		LOG_ERROR("EventLogs::GetEventParam: EvtCreateRenderContext failed with " + std::to_string(status));
-		goto cleanup;
+	/**
+	 * The callback function directly called by event subscriptions.
+	 * In turn it calls the EventSubscription::SubscriptionCallback of a specific class instance.
+	 */
+	DWORD WINAPI CallbackWrapper(EVT_SUBSCRIBE_NOTIFY_ACTION Action, PVOID UserContext, EVT_HANDLE Event) {
+		return reinterpret_cast<EventSubscription*>(UserContext)->SubscriptionCallback(Action, Event);
 	}
 
-	// The function returns an array of variant values for each element or attribute that
-	// you want to retrieve from the event. The values are returned in the same order as 
-	// you requested them.
-	if (!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
-	{
-		if (ERROR_INSUFFICIENT_BUFFER == (status = GetLastError()))
-		{
-			dwBufferSize = dwBufferUsed;
-			pRenderedValues = (PEVT_VARIANT)malloc(dwBufferSize);
-			if (pRenderedValues)
-			{
-				EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount);
+	std::optional<std::wstring> EventLogs::GetEventParam(const EventWrapper& hEvent, const std::wstring& param) {
+		auto queryParam = param.c_str();
+		EventWrapper hContext = EvtCreateRenderContext(1, &queryParam, EvtRenderContextValues);
+		if (!hContext){
+			LOG_ERROR("EventLogs::GetEventParam: EvtCreateRenderContext failed with " + std::to_string(GetLastError()));
+			return std::nullopt;
+		}
+
+		DWORD dwBufferSize{};
+		if(!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, nullptr, &dwBufferSize, nullptr)){
+			if(ERROR_INSUFFICIENT_BUFFER == GetLastError()){
+				auto pRenderedValues = AllocationWrapper{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwBufferSize), dwBufferSize, AllocationWrapper::HEAP_ALLOC };
+				if(pRenderedValues){
+					if(EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferSize, nullptr)){
+						/*
+						Table of variant members found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ns-winevt-evt_variant
+						Table of type values found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ne-winevt-evt_variant_type
+						*/
+						PEVT_VARIANT result = reinterpret_cast<PEVT_VARIANT>((LPVOID) pRenderedValues);
+						if(result->Type == EvtVarTypeString)
+							return std::wstring(result->StringVal);
+						else if(result->Type == EvtVarTypeFileTime) {
+							wchar_t ar[30];
+							_ui64tow(result->FileTimeVal, ar, 10);
+							return ar;
+						} else if(result->Type == EvtVarTypeUInt16) {
+							return std::to_wstring(result->UInt16Val);
+						} else if (result->Type == EvtVarTypeUInt32) {
+							return std::to_wstring(result->UInt32Val);
+						} else if(result->Type == EvtVarTypeUInt64) {
+							return std::to_wstring(result->UInt64Val);
+						} else if(result->Type == EvtVarTypeNull)
+							return L"NULL";
+						else {
+							return L"Unknown VARIANT: " + std::to_wstring(result->Type);
+						}
+					}
+				}
 			}
+		}
+		return std::nullopt;
+	}
+
+	std::optional<std::wstring> EventLogs::GetEventXML(const EventWrapper& hEvent){
+		DWORD dwBufferSize = 0;
+		if(!EvtRender(NULL, hEvent, EvtRenderEventXml, dwBufferSize, nullptr, &dwBufferSize, nullptr)){
+			if (ERROR_INSUFFICIENT_BUFFER == GetLastError()){
+				auto pRenderedContent = AllocationWrapper{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwBufferSize), dwBufferSize, AllocationWrapper::HEAP_ALLOC };
+				if (pRenderedContent){
+					if(EvtRender(NULL, hEvent, EvtRenderEventXml, dwBufferSize, pRenderedContent, &dwBufferSize, nullptr)){
+						return reinterpret_cast<LPCWSTR>((LPVOID)pRenderedContent);
+					}
+				}
+			}
+		}
+
+		return std::nullopt;
+	}
+
+	// Enumerate all the events in the result set. 
+	std::vector<EventLogItem> EventLogs::ProcessResults(const EventWrapper& hResults, const std::vector<XpathQuery>& filters) {
+		EVT_HANDLE hEvents[ARRAY_SIZE];
+
+		std::vector<EventLogItem> results;
+		std::vector<std::wstring> params;
+		for(auto query : filters){
+			if(!query.SearchesByValue()){
+				params.push_back(query.ToString());
+			}
+		}
+
+		DWORD dwReturned{};
+		while(EvtNext(hResults, ARRAY_SIZE, hEvents, INFINITE, 0, &dwReturned)){
+			for(DWORD i = 0; i < dwReturned; i++) {
+
+				auto item = EventToEventLogItem(hEvents[i], params);
+				if(item){
+					results.push_back(*item);
+				}
+
+				EvtClose(hEvents[i]);
+				hEvents[i] = NULL;
+			}
+		}
+
+		for(unsigned i = 0; i < ARRAY_SIZE; i++){
+			if(hEvents[i]){
+				EvtClose(hEvents[i]);
+			}
+		}
+
+		if(GetLastError() != ERROR_NO_MORE_ITEMS){
+			LOG_ERROR("EventLogs::ProcessResults: EvtNext failed with " << GetLastError());
+		}
+
+		return results;
+	}
+
+	std::optional<EventLogItem> EventToEventLogItem(const EventWrapper& hEvent, const std::vector<std::wstring>& params){
+		DWORD status = ERROR_SUCCESS;
+
+		std::optional<std::wstring> eventIDStr, eventRecordIDStr, timeCreated, channel, rawXML;
+
+		if (std::nullopt == (eventIDStr = GetEventParam(hEvent, L"Event/System/EventID")))
+			return std::nullopt;
+		if (std::nullopt == (eventRecordIDStr = GetEventParam(hEvent, L"Event/System/EventRecordID")))
+			return std::nullopt;
+		if (std::nullopt == (timeCreated = GetEventParam(hEvent, L"Event/System/TimeCreated/@SystemTime")))
+			return std::nullopt;
+		if (std::nullopt == (channel = GetEventParam(hEvent, L"Event/System/Channel")))
+			return std::nullopt;
+		if (std::nullopt == (rawXML = GetEventXML(hEvent)))
+			return std::nullopt;
+
+		EventLogItem pItem{};
+
+		// Provide values for filtered parameters
+		for (std::wstring key : params) {
+			std::optional<std::wstring> val = GetEventParam(hEvent, key);
+			if (!val) {
+				return std::nullopt;
+			}
+
+			pItem.SetProperty(key, *val);
+		}
+
+		pItem.SetEventID(std::stoul(*eventIDStr));
+		pItem.SetEventRecordID(std::stoul(*eventRecordIDStr));
+		pItem.SetTimeCreated(*timeCreated);
+		pItem.SetChannel(*channel);
+		pItem.SetXML(*rawXML);
+
+		return pItem;
+	}
+
+	std::vector<EventLogItem> EventLogs::QueryEvents(const std::wstring& channel, unsigned int id, const std::vector<XpathQuery>& filters) {
+
+		std::vector<EventLogItem> items;
+
+		auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
+		for (auto param : filters)
+			query += L" and " + param.ToString();
+
+		EventWrapper hResults = EvtQuery(NULL, channel.c_str(), query.c_str(), EvtQueryChannelPath | EvtQueryReverseDirection);
+		if (NULL == hResults) {
+			if (ERROR_EVT_CHANNEL_NOT_FOUND == GetLastError())
+				LOG_ERROR("EventLogs::QueryEvents: The channel was not found.");
+			else if (ERROR_EVT_INVALID_QUERY == GetLastError())
+				LOG_ERROR(L"EventLogs::QueryEvents: The query " << query << L" is not valid.");
 			else
-			{
-				LOG_ERROR("EventLogs::GetEventParam: GetEventParam malloc failed");
-				status = ERROR_OUTOFMEMORY;
-				goto cleanup;
-			}
+				LOG_ERROR("EventLogs::QueryEvents: EvtQuery failed with " << GetLastError());
+		}
+		else {
+			items = ProcessResults(hResults, filters);
 		}
 
-		if (ERROR_SUCCESS != (status = GetLastError()))
-		{
-			LOG_ERROR("EventLogs::GetEventParam: EvtRender in GetEventParam failed with " + std::to_string(status));
-			goto cleanup;
-		}
+		return items;
 	}
 
-	/*
-	Table of variant members found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ns-winevt-evt_variant
-	Table of type values found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ne-winevt-evt_variant_type
-	*/
-	if (pRenderedValues[0].Type == EvtVarTypeString)
-		*value  = std::wstring(pRenderedValues[0].StringVal);
-	else if (pRenderedValues[0].Type == EvtVarTypeFileTime) {
-		wchar_t ar[30];
-		_ui64tow(pRenderedValues[0].FileTimeVal, ar, 10);
-		*value = std::wstring(ar);
-	}
-	else if (pRenderedValues[0].Type == EvtVarTypeUInt16) {
-		*value = std::to_wstring(pRenderedValues[0].UInt16Val);
-	}
-	else if (pRenderedValues[0].Type == EvtVarTypeUInt64) {
-		*value = std::to_wstring(pRenderedValues[0].UInt64Val);
-	}
-	else if(pRenderedValues[0].Type == EvtVarTypeNull)
-		*value = std::wstring(L"NULL");
-	else {
-		*value = std::wstring(L"Unknown VARIANT: " + std::to_wstring(pRenderedValues[0].Type));
-	}
-			
+	std::vector<EventSubscription> subscriptions = {};
 
-cleanup:
+	std::optional<std::reference_wrapper<EventSubscription>> EventLogs::SubscribeToEvent(const std::wstring& pwsPath, 
+		unsigned int id, const std::function<void(EventLogItem)>& callback, const std::vector<XpathQuery>& filters){
+		auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
+		for (auto param : filters)
+			query += L" and " + param.ToString();
 
-	if (hContext)
-		EvtClose(hContext);
+		subscriptions.emplace_back(EventSubscription{ callback });
+		auto& eventSub = subscriptions[subscriptions.size() - 1];
 
-	if (pRenderedValues)
-		free(pRenderedValues);
+		EventWrapper hSubscription = EvtSubscribe(NULL, NULL, pwsPath.c_str(), query.c_str(), NULL, &subscriptions[subscriptions.size() - 1], 
+			CallbackWrapper, EvtSubscribeToFutureEvents);
+		eventSub.setSubHandle(hSubscription);
 
-	return status;
-}
-
-DWORD EventLogs::GetEventXML(EVT_HANDLE hEvent, std::wstring * data)
-{
-	DWORD status = ERROR_SUCCESS;
-	DWORD dwBufferSize = 0;
-	DWORD dwBufferUsed = 0;
-	DWORD dwPropertyCount = 0;
-	LPWSTR pRenderedContent = NULL;
-
-	// The function returns an array of variant values for each element or attribute that
-	// you want to retrieve from the event. The values are returned in the same order as 
-	// you requested them.
-	if (!EvtRender(NULL, hEvent, EvtRenderEventXml, dwBufferSize, pRenderedContent, &dwBufferUsed, &dwPropertyCount))
-	{
-		if (ERROR_INSUFFICIENT_BUFFER == (status = GetLastError()))
-		{
-			dwBufferSize = dwBufferUsed;
-			pRenderedContent = (LPWSTR)malloc(dwBufferSize);
-			if (pRenderedContent)
-			{
-				EvtRender(NULL, hEvent, EvtRenderEventXml, dwBufferSize, pRenderedContent, &dwBufferUsed, &dwPropertyCount);
-			}
+		if(!hSubscription){
+			if (ERROR_EVT_CHANNEL_NOT_FOUND == GetLastError())
+				LOG_ERROR("EventLogs::SubscribeToEvent: Channel was not found.");
+			else if (ERROR_EVT_INVALID_QUERY == GetLastError())
+				LOG_ERROR(L"EventLogs::SubscribeToEvent: query " << query << L" is not valid.");
 			else
-			{
-				LOG_ERROR("EventLogs::GetEventXML: GetEventXML malloc failed");
-				status = ERROR_OUTOFMEMORY;
-				goto cleanup;
-			}
+				LOG_ERROR("EventLogs::SubscribeToEvent: EvtSubscribe failed with " << GetLastError());
+
+			return std::nullopt;
 		}
 
-		if (ERROR_SUCCESS != (status = GetLastError()))
+		return eventSub;
+	}
+
+	std::shared_ptr<EVENT_DETECTION> EventLogs::EventLogItemToDetection(const EventLogItem& pItem) {
+		auto detect = std::make_shared<EVENT_DETECTION>(0, 0, L"", L"", L"");
+
+		detect->eventID = pItem.GetEventID();
+		detect->channel = pItem.GetChannel();
+		detect->eventRecordID = pItem.GetEventRecordID();
+		detect->timeCreated = pItem.GetTimeCreated();
+		detect->rawXML = pItem.GetXML();
+		detect->params = pItem.GetProperties();
+
+		return detect;
+	}
+
+	bool IsChannelOpen(const std::wstring& channel) {
+		EVT_HANDLE hChannel = NULL;
+		DWORD status = ERROR_SUCCESS;
+		PEVT_VARIANT pProperty = NULL;  
+		PEVT_VARIANT pTemp = NULL;
+		DWORD dwBufferSize = 0;
+		DWORD dwBufferUsed = 0;
+
+		// Open the channel config
+		hChannel = EvtOpenChannelConfig(NULL, channel.c_str(), 0);
+		if (NULL == hChannel)
 		{
-			LOG_ERROR("EventLogs::GetEventXML: EvtRender in GetEventXML failed with " + std::to_string(GetLastError()));
-			goto cleanup;
-		}
-	}
-
-	*data = std::wstring(pRenderedContent);
-
-cleanup:
-
-	return status;
-}
-
-// Enumerate all the events in the result set. 
-DWORD EventLogs::ProcessResults(EVT_HANDLE hResults, Reaction& reaction, int* numFound, std::set<std::wstring> &params)
-{
-	DWORD status = ERROR_SUCCESS;
-	EVT_HANDLE hEvents[ARRAY_SIZE];
-	DWORD dwReturned = 0;
-
-	while (true)
-	{
-		// Get a block of events from the result set.
-		if (!EvtNext(hResults, ARRAY_SIZE, hEvents, INFINITE, 0, &dwReturned)) {
-			if (ERROR_NO_MORE_ITEMS != (status = GetLastError()))
-				LOG_ERROR("EventLogs::ProcessResults: EvtNext failed with " + std::to_string(status));
-
-			goto cleanup;
-		}
-		
-		for (DWORD i = 0; i < dwReturned; i++) {
-			EVENT_DETECTION detect(0, 0, L"", L"", L"");
-			if(ERROR_SUCCESS != (status = EventToDetection(hEvents[i], &detect, params)))
-				goto cleanup;
-			reaction.EventIdentified(std::make_shared<EVENT_DETECTION>(detect));
-
-			(*numFound) += 1;
-			EvtClose(hEvents[i]);
-			hEvents[i] = NULL;
-
-		}
-	}
-
-cleanup:
-
-	for (DWORD i = 0; i < dwReturned; i++)
-	{
-		if (NULL != hEvents[i])
-			EvtClose(hEvents[i]);
-	}
-
-	if (status == ERROR_NO_MORE_ITEMS)
-		return ERROR_SUCCESS;
-	return status;
-}
-
-DWORD EventLogs::EventToDetection(EVT_HANDLE hEvent, EVENT_DETECTION* pDetection, std::set<std::wstring>& params) {
-	DWORD status = ERROR_SUCCESS;
-
-	std::wstring eventIDStr;
-	std::wstring eventRecordIDStr;
-	std::wstring timeCreated;
-	std::wstring channel;
-	std::wstring rawXML;
-
-	if (ERROR_SUCCESS != (status = GetEventParam(hEvent, &eventIDStr, L"Event/System/EventID")))
-		return status;
-	if (ERROR_SUCCESS != (status = GetEventParam(hEvent, &eventRecordIDStr, L"Event/System/EventRecordID")))
-		return status;
-	if (ERROR_SUCCESS != (status = GetEventParam(hEvent, &timeCreated, L"Event/System/TimeCreated/@SystemTime")))
-		return status;
-	if (ERROR_SUCCESS != (status = GetEventParam(hEvent, &channel, L"Event/System/Channel")))
-		return status;
-	if (ERROR_SUCCESS != (status = GetEventXML(hEvent, &rawXML)))
-		return status;
-
-	// Specify extra parameters
-	std::unordered_map<std::wstring, std::wstring> extraParams;
-	for (std::wstring key : params) {
-		std::wstring val;
-		if (ERROR_SUCCESS != (status = GetEventParam(hEvent, &val, key))) {
-			LOG_ERROR(L"EventLogs::EventToDetection: Failed query parameter " + key + L" with code " + std::to_wstring(status));
-			return status;
+			LOG_ERROR(L"EventLogs::IsChannelOpen: EvtOpenChannelConfig failed with " + std::to_wstring(GetLastError()) + L" for channel " + channel);
+			return false;
 		}
 
-		extraParams.insert({ key, val });
+		// Attempt to get the channel property
+		if (!EvtGetChannelConfigProperty(hChannel, EvtChannelConfigEnabled, 0, dwBufferSize, pProperty, &dwBufferUsed))
+		{
+			status = GetLastError();
+			if (ERROR_INSUFFICIENT_BUFFER == status) {
+				dwBufferSize = dwBufferUsed;
+				pTemp = (PEVT_VARIANT)realloc(pProperty, dwBufferSize);
+
+				if (pTemp) {
+					pProperty = pTemp;
+					pTemp = NULL;
+					EvtGetChannelConfigProperty(hChannel, EvtChannelConfigEnabled, 0, dwBufferSize, pProperty, &dwBufferUsed);
+				}
+				else {
+					if (pProperty)
+						free(pProperty);
+
+					LOG_ERROR(L"EventLogs::IsChannelOpen: realloc failed for channel " + channel);
+					return false;
+				}
+			}
+
+			if (ERROR_SUCCESS != (status = GetLastError())) {
+				LOG_ERROR(L"EventLogs::IsChannelOpen: EvtGetChannelConfigProperty failed with " + std::to_wstring(GetLastError()) + L" for channel " + channel);
+				return false;
+			}
+
+		}
+		if (pProperty)
+			free(pProperty);
+
+		return pProperty->BooleanVal;
 	}
 
-	pDetection->eventID = std::stoul(eventIDStr);
-	pDetection->eventRecordID = std::stoul(eventRecordIDStr);
-	pDetection->timeCreated = timeCreated;
-	pDetection->channel = channel;
-	pDetection->rawXML = rawXML;
-	pDetection->params = extraParams;
+	bool OpenChannel(const std::wstring& channel) {
+		EVT_HANDLE hChannel = NULL;
+		DWORD status = ERROR_SUCCESS;
+		EVT_VARIANT ChannelProperty;
+		DWORD dwBufferSize = sizeof(EVT_VARIANT);
+		DWORD dwBufferUsed = 0;
+		hChannel = EvtOpenChannelConfig(NULL, channel.c_str(), 0);
+		if (NULL == hChannel)
+		{
+			LOG_ERROR(L"EventLogs::OpenChannel: EvtOpenChannelConfig failed with " + std::to_wstring(GetLastError()) + L" for channel " + channel);
+			return false;
+		}
+		RtlZeroMemory(&ChannelProperty, dwBufferSize);
 
-	return status;
-}
+		ChannelProperty.Type = EvtVarTypeBoolean;
+		ChannelProperty.BooleanVal = TRUE;
 
-int EventLogs::QueryEvents(const wchar_t* channel, unsigned int id, Reaction& reaction)
-{
-	return QueryEvents(channel, id, std::set<std::wstring>(), reaction);
-}
+		if (!EvtSetChannelConfigProperty(hChannel, EvtChannelConfigEnabled, 0, &ChannelProperty))
+		{
+			LOG_ERROR(L"EventLogs::OpenChannel: EvtSetChannelConfigProperty failed with " + std::to_wstring(GetLastError()) + L" for channel " + channel);
+			return false;
+		}
+		if (!EvtSaveChannelConfig(hChannel, 0))
+		{
+			LOG_ERROR(L"EventLogs::OpenChannel: EvtSaveChannelConfig failed with " + std::to_wstring(GetLastError()) + L" for channel " + channel);
+			return false;
+		}
 
-int EventLogs::QueryEvents(const wchar_t* channel, unsigned int id, std::set<std::wstring>& params, Reaction& reaction)
-{
-	DWORD status = ERROR_SUCCESS;
-	EVT_HANDLE hResults = NULL;
-
-	auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
-	auto wquery = query.c_str();
-
-	hResults = EvtQuery(NULL, channel, wquery, EvtQueryChannelPath | EvtQueryReverseDirection);
-	if (NULL == hResults)
-	{
-		status = GetLastError();
-
-		if (ERROR_EVT_CHANNEL_NOT_FOUND == status)
-			LOG_ERROR("EventLogs::QueryEvents: The channel was not found.");
-		else if (ERROR_EVT_INVALID_QUERY == status)
-			// You can call the EvtGetExtendedStatus function to try to get 
-			// additional information as to what is wrong with the query.
-			LOG_ERROR(L"EventLogs::QueryEvents: The query " + query + L" is not valid.");
-		else
-			LOG_ERROR("EventLogs::QueryEvents: EvtQuery failed with " + std::to_string(status));
-
-		goto cleanup;
+		return true;
 	}
 
-	int numFound = 0;
-	status = ProcessResults(hResults, reaction, &numFound, params);
-
-cleanup:
-
-	if (hResults)
-		EvtClose(hResults);
-
-	if (status == ERROR_SUCCESS)
-		return numFound;
-	return -1;
-}
-
-std::unique_ptr<EventSubscription> EventLogs::subscribe(LPWSTR pwsPath, unsigned int id, Reactions::HuntTriggerReaction& reaction, DWORD * pStatus) {
-	*pStatus = ERROR_SUCCESS;
-	EVT_HANDLE hSubscription = NULL;
-
-	auto query = std::wstring(L"Event/System[EventID=") + std::to_wstring(id) + std::wstring(L"]");
-	auto wquery = query.c_str();
-
-	auto eventSub = std::make_unique<EventSubscription>(reaction);
-
-	hSubscription = EvtSubscribe(NULL, NULL, pwsPath, wquery, NULL, reinterpret_cast<void*>(eventSub.get()),
-		CallbackWrapper, EvtSubscribeToFutureEvents);
-
-	if (hSubscription == NULL) {
-		// Cleanup a failed subscription
-		*pStatus = GetLastError();
-
-		if (ERROR_EVT_CHANNEL_NOT_FOUND == *pStatus)
-			LOG_ERROR("EventLogs::subscribe: Channel was not found.");
-		else if (ERROR_EVT_INVALID_QUERY == *pStatus)
-			LOG_ERROR(L"EventLogs::subscribe: query " + query + L" is not valid.");
-		else
-			LOG_ERROR("EventLogs::subscribe: EvtSubscribe failed with " + std::to_string(*pStatus));
-	}
-
-	return eventSub;
 }

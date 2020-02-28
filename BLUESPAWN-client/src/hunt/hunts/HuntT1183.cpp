@@ -15,7 +15,7 @@ namespace Hunts{
 	}
 
 	int HuntT1183::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for T1183 - Image File Execution Options at level Cursory");
+		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
 		std::map<RegistryKey, std::vector<RegistryValue>> keys;
@@ -68,4 +68,12 @@ namespace Hunts{
 		return detections;
 	}
 
+	std::vector<std::shared_ptr<Event>> HuntT1183::GetMonitoringEvents() {
+		std::vector<std::shared_ptr<Event>> events;
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options" }, true));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options" }, true));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit" }, true));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit" }, true));
+		return events;
+	}
 }

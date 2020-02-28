@@ -10,9 +10,8 @@ using namespace Registry;
 
 namespace Mitigations {
 
-	MitigateV63597::MitigateV63597(MitigationRegister& record) :
+	MitigateV63597::MitigateV63597() :
 		Mitigation(
-			record,
 			L"V-63597 - Apply UAC privileged token filtering for network logons",
 			L"With User Account Control enabled, filtering the privileged token for built-in "
 			"administrator accounts will prevent the elevated privileges of these accounts "

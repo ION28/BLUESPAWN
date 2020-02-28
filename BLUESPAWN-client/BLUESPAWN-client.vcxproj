@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -20,22 +20,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\pe-sieve\include\pe_sieve_types.h" />
+    <ClInclude Include="external\tinyxml2\tinyxml2.h" />
     <ClInclude Include="headers\hunt\Hunt.h" />
     <ClInclude Include="headers\hunt\HuntInfo.h" />
     <ClInclude Include="headers\hunt\HuntRegister.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1004.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1015.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1037.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1050.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1055.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1060.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1099.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1100.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1101.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1103.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1131.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1136.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1138.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h" />
-    <ClInclude Include="headers\hunt\reaction\HuntTrigger.h" />
     <ClInclude Include="headers\hunt\reaction\RemoveValue.h" />
     <ClInclude Include="headers\hunt\reaction\SuspendProcess.h" />
     <ClInclude Include="headers\hunt\RegistryHunt.h" />
@@ -43,13 +46,21 @@
     <ClInclude Include="headers\mitigation\Mitigation.h" />
     <ClInclude Include="headers\mitigation\MitigationRegister.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1025.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1035-RDP.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-LLMNR.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-NBT.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-WSH.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1047.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1054-RDP.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV1153.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV3340.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV3344.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV3379.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63597.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV63687.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV63753.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63817.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63825.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63829.h" />
@@ -61,6 +72,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="headers\monitor\Event.h" />
+    <ClInclude Include="headers\monitor\EventManager.h" />
     <ClInclude Include="headers\user\banners.h" />
     <ClInclude Include="headers\user\bluespawn.h" />
     <ClInclude Include="headers\user\CLI.h" />
@@ -69,9 +82,12 @@
     <ClInclude Include="headers\util\configurations\Registry.h" />
     <ClInclude Include="headers\util\configurations\RegistryValue.h" />
     <ClInclude Include="headers\util\configurations\ScheduledTasks.h" />
+    <ClInclude Include="headers\util\eventlogs\EventLogItem.h" />
     <ClInclude Include="headers\util\eventlogs\EventLogs.h" />
     <ClInclude Include="headers\util\eventlogs\EventSubscription.h" />
+    <ClInclude Include="headers\util\eventlogs\XpathQuery.h" />
     <ClInclude Include="headers\util\filesystem\FileSystem.h" />
+    <ClInclude Include="headers\util\filesystem\YaraScanner.h" />
     <ClInclude Include="headers\util\log\CLISink.h" />
     <ClInclude Include="headers\util\log\DebugSink.h" />
     <ClInclude Include="headers\util\log\HuntLogMessage.h" />
@@ -80,6 +96,7 @@
     <ClInclude Include="headers\util\log\LogLevel.h" />
     <ClInclude Include="headers\util\log\LogSink.h" />
     <ClInclude Include="headers\util\log\ServerSink.h" />
+    <ClInclude Include="headers\util\log\XMLSink.h" />
     <ClInclude Include="headers\util\pe\Export_Section.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -121,323 +138,28 @@
     <ClInclude Include="headers\hunt\reaction\Detections.h" />
     <ClInclude Include="headers\hunt\reaction\Log.h" />
     <ClInclude Include="headers\hunt\reaction\Reaction.h" />
-    <ClInclude Include="grpc\generated\grpc++\alarm.h" />
-    <ClInclude Include="grpc\generated\grpc++\channel.h" />
-    <ClInclude Include="grpc\generated\grpc++\client_context.h" />
-    <ClInclude Include="grpc\generated\grpc++\completion_queue.h" />
-    <ClInclude Include="grpc\generated\grpc++\create_channel.h" />
-    <ClInclude Include="grpc\generated\grpc++\create_channel_posix.h" />
-    <ClInclude Include="grpc\generated\grpc++\ext\health_check_service_server_builder_option.h" />
-    <ClInclude Include="grpc\generated\grpc++\ext\proto_server_reflection_plugin.h" />
-    <ClInclude Include="grpc\generated\grpc++\generic\async_generic_service.h" />
-    <ClInclude Include="grpc\generated\grpc++\generic\generic_stub.h" />
-    <ClInclude Include="grpc\generated\grpc++\grpc++.h" />
-    <ClInclude Include="grpc\generated\grpc++\health_check_service_interface.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\call.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\channel_argument_option.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\client_unary_call.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\async_stream.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\async_unary_call.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\byte_buffer.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\call.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\call_hook.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\channel_interface.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\client_context.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\client_unary_call.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\completion_queue.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\completion_queue_tag.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\config.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\config_protobuf.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\core_codegen.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\core_codegen_interface.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\create_auth_context.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\grpc_library.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\metadata_map.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\method_handler_impl.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\proto_utils.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\rpc_method.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\rpc_service_method.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\security\auth_context.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\serialization_traits.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\server_context.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\server_interface.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\service_type.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\slice.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\status.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\status_code_enum.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\string_ref.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\stub_options.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\sync_stream.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\codegen\time.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\grpc_library.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\method_handler_impl.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\rpc_method.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\rpc_service_method.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\serialization_traits.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\server_builder_option.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\server_builder_plugin.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\server_initializer.h" />
-    <ClInclude Include="grpc\generated\grpc++\impl\service_type.h" />
-    <ClInclude Include="grpc\generated\grpc++\resource_quota.h" />
-    <ClInclude Include="grpc\generated\grpc++\security\auth_context.h" />
-    <ClInclude Include="grpc\generated\grpc++\security\auth_metadata_processor.h" />
-    <ClInclude Include="grpc\generated\grpc++\security\credentials.h" />
-    <ClInclude Include="grpc\generated\grpc++\security\server_credentials.h" />
-    <ClInclude Include="grpc\generated\grpc++\server.h" />
-    <ClInclude Include="grpc\generated\grpc++\server_builder.h" />
-    <ClInclude Include="grpc\generated\grpc++\server_context.h" />
-    <ClInclude Include="grpc\generated\grpc++\server_posix.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\async_stream.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\async_unary_call.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\byte_buffer.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\channel_arguments.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\config.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\error_details.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\slice.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\status.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\status_code_enum.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\string_ref.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\stub_options.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\sync_stream.h" />
-    <ClInclude Include="grpc\generated\grpc++\support\time.h" />
-    <ClInclude Include="grpc\generated\grpcpp\alarm.h" />
-    <ClInclude Include="grpc\generated\grpcpp\alarm_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\channel.h" />
-    <ClInclude Include="grpc\generated\grpcpp\channel_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\client_context.h" />
-    <ClInclude Include="grpc\generated\grpcpp\completion_queue.h" />
-    <ClInclude Include="grpc\generated\grpcpp\completion_queue_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\create_channel.h" />
-    <ClInclude Include="grpc\generated\grpcpp\create_channel_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\create_channel_posix.h" />
-    <ClInclude Include="grpc\generated\grpcpp\create_channel_posix_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\ext\channelz_service_plugin.h" />
-    <ClInclude Include="grpc\generated\grpcpp\ext\channelz_service_plugin_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\ext\health_check_service_server_builder_option.h" />
-    <ClInclude Include="grpc\generated\grpcpp\ext\proto_server_reflection_plugin.h" />
-    <ClInclude Include="grpc\generated\grpcpp\ext\proto_server_reflection_plugin_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\generic\async_generic_service.h" />
-    <ClInclude Include="grpc\generated\grpcpp\generic\generic_stub.h" />
-    <ClInclude Include="grpc\generated\grpcpp\generic\generic_stub_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\grpcpp.h" />
-    <ClInclude Include="grpc\generated\grpcpp\health_check_service_interface.h" />
-    <ClInclude Include="grpc\generated\grpcpp\health_check_service_interface_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\call.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\channel_argument_option.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\client_unary_call.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\async_generic_service.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\async_stream.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\async_stream_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\async_unary_call.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\async_unary_call_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\byte_buffer.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\call.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\callback_common.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\call_hook.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\call_op_set.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\call_op_set_interface.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\channel_interface.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_callback.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_callback_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_context.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_context_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_interceptor.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\client_unary_call.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\completion_queue.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\completion_queue_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\completion_queue_tag.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\config.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\config_protobuf.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\core_codegen.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\core_codegen_interface.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\create_auth_context.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\grpc_library.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\intercepted_channel.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\interceptor.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\interceptor_common.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\message_allocator.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\metadata_map.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\method_handler_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\proto_buffer_reader.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\proto_buffer_writer.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\proto_utils.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\rpc_method.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\rpc_service_method.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\security\auth_context.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\serialization_traits.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_callback.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_callback_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_context.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_context_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_interceptor.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\server_interface.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\service_type.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\slice.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\status.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\status_code_enum.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\string_ref.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\stub_options.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\sync.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\sync_stream.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\sync_stream_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\codegen\time.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\grpc_library.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\method_handler_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\rpc_method.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\rpc_service_method.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\serialization_traits.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\server_builder_option.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\server_builder_option_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\server_builder_plugin.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\server_initializer.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\server_initializer_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\impl\service_type.h" />
-    <ClInclude Include="grpc\generated\grpcpp\resource_quota.h" />
-    <ClInclude Include="grpc\generated\grpcpp\resource_quota_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\security\auth_context.h" />
-    <ClInclude Include="grpc\generated\grpcpp\security\auth_metadata_processor.h" />
-    <ClInclude Include="grpc\generated\grpcpp\security\auth_metadata_processor_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\security\credentials.h" />
-    <ClInclude Include="grpc\generated\grpcpp\security\credentials_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\security\server_credentials.h" />
-    <ClInclude Include="grpc\generated\grpcpp\security\server_credentials_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\server.h" />
-    <ClInclude Include="grpc\generated\grpcpp\server_builder.h" />
-    <ClInclude Include="grpc\generated\grpcpp\server_builder_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\server_context.h" />
-    <ClInclude Include="grpc\generated\grpcpp\server_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\server_posix.h" />
-    <ClInclude Include="grpc\generated\grpcpp\server_posix_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\async_stream.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\async_stream_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\async_unary_call.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\async_unary_call_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\byte_buffer.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\channel_arguments.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\channel_arguments_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\client_callback.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\client_callback_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\client_interceptor.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\config.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\error_details.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\error_details_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\interceptor.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\message_allocator.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\proto_buffer_reader.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\proto_buffer_writer.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\server_callback.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\server_callback_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\server_interceptor.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\slice.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\status.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\status_code_enum.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\string_ref.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\stub_options.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\sync_stream.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\sync_stream_impl.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\time.h" />
-    <ClInclude Include="grpc\generated\grpcpp\support\validate_service_config.h" />
-    <ClInclude Include="grpc\generated\grpc\byte_buffer.h" />
-    <ClInclude Include="grpc\generated\grpc\byte_buffer_reader.h" />
-    <ClInclude Include="grpc\generated\grpc\census.h" />
-    <ClInclude Include="grpc\generated\grpc\compression.h" />
-    <ClInclude Include="grpc\generated\grpc\fork.h" />
-    <ClInclude Include="grpc\generated\grpc\grpc.h" />
-    <ClInclude Include="grpc\generated\grpc\grpc_cronet.h" />
-    <ClInclude Include="grpc\generated\grpc\grpc_posix.h" />
-    <ClInclude Include="grpc\generated\grpc\grpc_security.h" />
-    <ClInclude Include="grpc\generated\grpc\grpc_security_constants.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\atm.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\atm_gcc_atomic.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\atm_gcc_sync.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\atm_windows.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\byte_buffer.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\byte_buffer_reader.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\compression_types.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\connectivity_state.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\fork.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\gpr_slice.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\gpr_types.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\grpc_types.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\log.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\port_platform.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\propagation_bits.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\slice.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\status.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\sync.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\sync_custom.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\sync_generic.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\sync_posix.h" />
-    <ClInclude Include="grpc\generated\grpc\impl\codegen\sync_windows.h" />
-    <ClInclude Include="grpc\generated\grpc\load_reporting.h" />
-    <ClInclude Include="grpc\generated\grpc\slice.h" />
-    <ClInclude Include="grpc\generated\grpc\slice_buffer.h" />
-    <ClInclude Include="grpc\generated\grpc\status.h" />
-    <ClInclude Include="grpc\generated\grpc\support\alloc.h" />
-    <ClInclude Include="grpc\generated\grpc\support\atm.h" />
-    <ClInclude Include="grpc\generated\grpc\support\atm_gcc_atomic.h" />
-    <ClInclude Include="grpc\generated\grpc\support\atm_gcc_sync.h" />
-    <ClInclude Include="grpc\generated\grpc\support\atm_windows.h" />
-    <ClInclude Include="grpc\generated\grpc\support\cpu.h" />
-    <ClInclude Include="grpc\generated\grpc\support\log.h" />
-    <ClInclude Include="grpc\generated\grpc\support\log_windows.h" />
-    <ClInclude Include="grpc\generated\grpc\support\port_platform.h" />
-    <ClInclude Include="grpc\generated\grpc\support\string_util.h" />
-    <ClInclude Include="grpc\generated\grpc\support\sync.h" />
-    <ClInclude Include="grpc\generated\grpc\support\sync_custom.h" />
-    <ClInclude Include="grpc\generated\grpc\support\sync_generic.h" />
-    <ClInclude Include="grpc\generated\grpc\support\sync_posix.h" />
-    <ClInclude Include="grpc\generated\grpc\support\sync_windows.h" />
-    <ClInclude Include="grpc\generated\grpc\support\thd_id.h" />
-    <ClInclude Include="grpc\generated\grpc\support\time.h" />
-    <ClInclude Include="grpc\generated\grpc\support\workaround_list.h" />
-    <ClInclude Include="grpc\generated\ReactionData.grpc.pb.h" />
-    <ClInclude Include="grpc\generated\ReactionData.pb.h" />
-    <ClInclude Include="grpc\generated\ServerServices.grpc.pb.h" />
-    <ClInclude Include="grpc\generated\ServerServices.pb.h" />
     <ClInclude Include="headers\util\processes\ProcessChecker.h" />
     <ClInclude Include="headers\util\processes\ProcessUtils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="grpc\generated\ReactionData.grpc.pb.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="grpc\generated\ReactionData.pb.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="grpc\generated\ServerServices.grpc.pb.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="grpc\generated\ServerServices.pb.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="external\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="src\hunt\Hunt.cpp" />
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1004.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1015.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1037.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1050.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1055.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1060.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1099.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1100.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1101.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1103.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1131.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1136.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1138.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
-    <ClCompile Include="src\hunt\reaction\HuntTrigger.cpp" />
     <ClCompile Include="src\hunt\reaction\RemoveValue.cpp" />
     <ClCompile Include="src\hunt\reaction\SuspendProcess.cpp" />
     <ClCompile Include="src\hunt\RegistryHunt.cpp" />
@@ -445,13 +167,21 @@
     <ClCompile Include="src\mitigation\Mitigation.cpp" />
     <ClCompile Include="src\mitigation\MitigationRegister.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1025.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1035-RDP.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-LLMNR.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-NBT.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateM1042-WSH.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1047.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1054-RDP.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV1153.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV3340.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV3344.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV3379.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63597.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV63687.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV63753.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63817.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63825.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63829.cpp" />
@@ -463,21 +193,27 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\monitor\Event.cpp" />
+    <ClCompile Include="src\monitor\EventManager.cpp" />
     <ClCompile Include="src\user\banners.cpp" />
     <ClCompile Include="src\user\BLUESPAWN.cpp" />
     <ClCompile Include="src\user\CLI.cpp" />
     <ClCompile Include="src\util\configurations\CollectInfo.cpp" />
+    <ClCompile Include="src\util\eventlogs\EventLogItem.cpp" />
     <ClCompile Include="src\util\eventlogs\EventLogs.cpp" />
     <ClCompile Include="src\util\configurations\RegistryKey.cpp" />
     <ClCompile Include="src\util\configurations\RegistryValue.cpp" />
     <ClCompile Include="src\util\eventlogs\EventSubscription.cpp" />
+    <ClCompile Include="src\util\eventlogs\XpathQuery.cpp" />
     <ClCompile Include="src\util\filesystem\FileSystem.cpp" />
+    <ClCompile Include="src\util\filesystem\YaraScanner.cpp" />
     <ClCompile Include="src\util\log\CLISink.cpp" />
     <ClCompile Include="src\util\log\DebugSink.cpp" />
     <ClCompile Include="src\util\log\HuntLogMessage.cpp" />
     <ClCompile Include="src\util\log\Log.cpp" />
     <ClCompile Include="src\util\log\LogLevel.cpp" />
     <ClCompile Include="src\util\log\ServerSink.cpp" />
+    <ClCompile Include="src\util\log\XMLSink.cpp" />
     <ClCompile Include="src\util\pe\Export_Section.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -519,21 +255,32 @@
     <ClCompile Include="src\hunt\reaction\ReactLog.cpp" />
     <ClCompile Include="src\hunt\reaction\Reaction.cpp" />
     <ClCompile Include="src\util\processes\ProcessUtils.cpp" />
+    <ClInclude Include="resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BLUESPAWN-common\CommonLib.vcxproj">
       <Project>{25ae1d80-3e17-4e1d-bfb4-8afb375ebaf1}</Project>
     </ProjectReference>
+    <ProjectReference Include="libyara.vcxproj">
+      <Project>{e236ce39-d8f3-4db6-985c-f2794ff17746}</Project>
+    </ProjectReference>
     <ProjectReference Include="pe-sieve.vcxproj">
       <Project>{bec01f8e-5892-3f6f-a741-5bbd1d0f4ef9}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\BLUESPAWN-client.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\indicators" />
+    <None Include="resources\severe" />
   </ItemGroup>
   <ItemDefinitionGroup>
     <BuildLog>
       <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-client\external\krabsetw\krabs;$(SolutionDir)BLUESPAWN-client\external\cxxopts\include;$(SolutionDir)BLUESPAWN-client\external\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\yara\libyara\include;$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-client\external\krabsetw\krabs;$(SolutionDir)BLUESPAWN-client\external\cxxopts\include;$(SolutionDir)BLUESPAWN-client\external\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>

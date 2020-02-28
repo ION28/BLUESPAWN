@@ -9,9 +9,8 @@ using namespace Registry;
 
 namespace Mitigations{
 
-	MitigateV1153::MitigateV1153(MitigationRegister& record) :
+	MitigateV1153::MitigateV1153() :
 		Mitigation(
-			record,
 			L"V-1153 - The LanMan authentication level must be set to send NTLMv2 response only, and to refuse LM and NTLM",
 			L"The Kerberos v5 authentication protocol is the default for authentication of users who are logging on to domain "
 			L"accounts. NTLM which is less secure, is retained in later Windows versions for compatibility with clients and servers "
