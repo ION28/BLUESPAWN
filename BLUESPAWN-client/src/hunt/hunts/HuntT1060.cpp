@@ -58,11 +58,11 @@ namespace Hunts {
 		auto HKLMShellWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders" };
 
 		ShellKeys = {
-			HKLMUShell, HKLMShell,  HKLMShellWow64, HKLMUShellWow64,
+			HKCUShell, HKLMShell,  HKCUShellWow64, HKLMShellWow64,
 		};
 
 		UserShellKeys = {
-			HKCUShell, HKCUUShell, HKCUShellWow64, HKCUUShellWow64,
+			HKCUUShell, HKLMUShell, HKCUUShellWow64, HKLMUShellWow64,
 		};
 	}
 
@@ -90,7 +90,7 @@ namespace Hunts {
 
 		for (auto key : ShellKeys) {
 			keys.emplace(key, CheckValues(key, {
-				{ L"Common Startup", RegistryType::REG_EXPAND_SZ_T, L"%ProgramData%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", false, CheckSzEqual }
+				{ L"Common Startup", RegistryType::REG_SZ_T, L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", false, CheckSzEqual }
 			}));
 		}
 

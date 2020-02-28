@@ -21,7 +21,7 @@ public:
 		WrappedObject{ object }, 
 		BadValue{ BadValue },
 		ReferenceCounter{ nullptr, [object, BadValue, freeFunction](LPVOID memory){ 
-		    if(object != BadValue){ freeFunction(object); } 
+		    if(object != BadValue && object){ freeFunction(object); } 
 	    }}{}
 
 	operator T() const { return WrappedObject; }
