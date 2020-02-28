@@ -5,6 +5,23 @@
 #include <string>
 #include <codecvt>
 #include <algorithm>
+#include <map>
+#include <cmath>
+
+double GetShannonEntropy(const std::wstring& str) {
+	// Code from https://rosettacode.org/wiki/Entropy#C.2B.2B
+	std::map<char, int> frequencies;
+	for (char c : str)
+		frequencies[c] ++;
+	int numlen = str.length();
+	double infocontent = 0;
+	for (std::pair<char, int> p : frequencies) {
+		double freq = static_cast<double>(p.second) / numlen;
+		infocontent -= freq * (log(freq) / log(2));
+	}
+
+	return infocontent;
+}
 
 std::wstring StringToWidestring(const std::string& str){
 	std::wstring s = { str.begin(), str.end() };

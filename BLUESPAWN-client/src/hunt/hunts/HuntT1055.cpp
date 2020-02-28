@@ -18,11 +18,10 @@ extern "C" {
 namespace Hunts{
 
 	HuntT1055::HuntT1055() : Hunt(L"T1055 - Process Injection") {
-		// TODO: update these categories
 		dwSupportedScans = (DWORD) Aggressiveness::Normal;
-		dwCategoriesAffected = (DWORD) Category::Configurations;
-		dwSourcesInvolved = (DWORD) DataSource::Registry;
-		dwTacticsUsed = (DWORD) Tactic::Persistence;
+		dwCategoriesAffected = (DWORD) Category::Processes;
+		dwSourcesInvolved = (DWORD) DataSource::Processes;
+		dwTacticsUsed = (DWORD) Tactic::PrivilegeEscalation | (DWORD) Tactic::DefenseEvasion;
 	}
 
 	bool ScanProcess(DWORD pid, Reaction& reaction){
@@ -84,7 +83,7 @@ namespace Hunts{
 	}
 
 	int HuntT1055::ScanNormal(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for T1055 - Process Injection at level Normal");
+		LOG_INFO(L"Hunting for T1055 " << name << L" at level Normal");
 		reaction.BeginHunt(GET_INFO());
 
 		int identified = 0;

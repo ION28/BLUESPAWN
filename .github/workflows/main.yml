@@ -39,7 +39,11 @@ jobs:
     - name: Set PowerShell Execution Policy
       run: powershell set-executionpolicy Unrestricted
       shell: powershell
-      
+
+    - name: Run Atomic Red Team Prep Script
+      run: testing\run-atomic-prep.ps1
+      shell: powershell
+
     - name: Run Atomic Red Team Tests
       run: testing\run-atomic-tests.ps1
       shell: powershell

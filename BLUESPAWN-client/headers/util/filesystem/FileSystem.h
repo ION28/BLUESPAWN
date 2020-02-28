@@ -32,7 +32,7 @@ namespace FileSystem {
 		std::wstring FilePath;
 
 		//Handle for the file
-		FindWrapper hFile;
+		HandleWrapper hFile;
 
 		//Attributes of the file
 		FileAttribs Attribs;

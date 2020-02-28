@@ -15,7 +15,7 @@ namespace Hunts {
 	}
 
 	int HuntT1138::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for T1138 - Application Shimming at level Cursory");
+		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
 		std::map<RegistryKey, std::vector<RegistryValue>> keys;
@@ -23,13 +23,13 @@ namespace Hunts {
 		auto SDB = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB" };
 		keys.emplace(SDB, CheckKeyValues(SDB));
 
-		auto Custom = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Customs" };
+		auto Custom = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom" };
 		keys.emplace(Custom, CheckKeyValues(Custom));
 
 		auto SDBWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB" };
 		keys.emplace(SDBWow64, CheckKeyValues(SDBWow64));
 
-		auto CustomWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Customs" };
+		auto CustomWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom" };
 		keys.emplace(CustomWow64, CheckKeyValues(CustomWow64));
 
 		int detections = 0;
@@ -42,5 +42,14 @@ namespace Hunts {
 
 		reaction.EndHunt();
 		return detections;
+	}
+
+	std::vector<std::shared_ptr<Event>> HuntT1138::GetMonitoringEvents() {
+		std::vector<std::shared_ptr<Event>> events;
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom" }));
+		return events;
 	}
 }

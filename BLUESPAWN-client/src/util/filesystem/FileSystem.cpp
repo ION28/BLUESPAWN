@@ -353,7 +353,8 @@ namespace FileSystem{
 		std::wstring searchName = FolderPath;
 		searchName += L"\\*";
 		bFolderExists = true;
-		hCurFile = FindFirstFileW(searchName.c_str(), &ffd);
+		auto f = FindFirstFileW(searchName.c_str(), &ffd);
+		hCurFile = { f };
 		if(hCurFile == INVALID_HANDLE_VALUE) {
 			LOG_ERROR("Couldn't open folder " << path);
 			bFolderExists = false;

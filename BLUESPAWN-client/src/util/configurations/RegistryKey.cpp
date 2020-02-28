@@ -162,7 +162,6 @@ namespace Registry {
 	RegistryKey::~RegistryKey(){
 		if(_ReferenceCounts.find(hkBackingKey) != _ReferenceCounts.end()){
 			if(!--_ReferenceCounts[hkBackingKey]){
-				_ReferenceCounts.erase(hkBackingKey);
 				CloseHandle(hkBackingKey);
 			}
 		}
