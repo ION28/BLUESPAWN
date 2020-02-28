@@ -52,6 +52,9 @@ bool EventLogEvent::operator==(const Event& e) const {
 	} else return false;
 }
 
+/************************
+***   RegistryEvent   ***
+*************************/
 void RegistryEvent::DispatchRegistryThread(){
 	std::optional<RegistryEvent>* RegistryEvents = new std::optional<RegistryEvent>[MAXIMUM_WAIT_OBJECTS - 1]{};
 	RegistryEvent::hListener = CreateEventW(nullptr, false, false, nullptr);

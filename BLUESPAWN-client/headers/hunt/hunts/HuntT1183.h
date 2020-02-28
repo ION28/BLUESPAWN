@@ -20,5 +20,6 @@ namespace Hunts{
 		HuntT1183();
 
 		virtual int ScanCursory(const Scope& scope, Reaction reaction);
+		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

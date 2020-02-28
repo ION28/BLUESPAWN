@@ -14,7 +14,7 @@ namespace Hunts {
 	}
 
 	int HuntT1103::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for T1103 - AppInit DLLs at level Cursory");
+		LOG_INFO(L"Hunting for " << name << L"at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
 		std::map<RegistryKey, std::vector<RegistryValue>> keys;
@@ -23,12 +23,14 @@ namespace Hunts {
 		keys.emplace(WinKey, CheckValues(WinKey, {
 			{ L"AppInit_Dlls", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
 			{ L"LoadAppInit_Dlls", RegistryType::REG_DWORD_T, 0, false, CheckDwordEqual },
+			{ L"RequireSignedAppInit_DLLs", RegistryType::REG_DWORD_T, 1, false, CheckDwordEqual },
 		}));
 
 		auto WinKeyWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows" };
 		keys.emplace(WinKeyWow64, CheckValues(WinKeyWow64, {
 			{ L"AppInit_Dlls", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
 			{ L"LoadAppInit_Dlls", RegistryType::REG_DWORD_T, 0, false, CheckDwordEqual },
+			{ L"RequireSignedAppInit_DLLs", RegistryType::REG_DWORD_T, 1, false, CheckDwordEqual },
 		}));
 
 		int detections = 0;
@@ -43,4 +45,10 @@ namespace Hunts {
 		return detections;
 	}
 
+	std::vector<std::shared_ptr<Event>> HuntT1103::GetMonitoringEvents() {
+		std::vector<std::shared_ptr<Event>> events;
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows" }));
+		return events;
+	}
 }

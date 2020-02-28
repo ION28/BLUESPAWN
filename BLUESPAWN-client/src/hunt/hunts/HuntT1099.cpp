@@ -10,13 +10,13 @@ namespace Hunts {
 
 	HuntT1099::HuntT1099() : Hunt(L"T1099 - Timestomp") {
 		dwSupportedScans = (DWORD) Aggressiveness::Normal;
-		dwCategoriesAffected = (DWORD) Category::Files | (DWORD)Category::Processes;
+		dwCategoriesAffected = (DWORD) Category::Files | (DWORD) Category::Processes;
 		dwSourcesInvolved = (DWORD) DataSource::EventLogs;
 		dwTacticsUsed = (DWORD) Tactic::DefenseEvasion;
 	}
 
 	int HuntT1099::ScanNormal(const Scope& scope, Reaction reaction) {
-		LOG_INFO("Hunting for " << name << " at level Normal");
+		LOG_INFO(L"Hunting for " << name << L" at level Normal");
 		reaction.BeginHunt(GET_INFO());
 
 		// Create existance queries so interesting data is output
@@ -60,7 +60,7 @@ namespace Hunts {
 	}
 
 	int HuntT1099::ScanIntensive(const Scope& scope, Reaction reaction) {
-		LOG_INFO("Hunting for " << name << " at level Intensive");
+		LOG_INFO(L"Hunting for " << name << L" at level Intensive");
 		reaction.BeginHunt(GET_INFO());
 
 		// Create existance queries so interesting data is output

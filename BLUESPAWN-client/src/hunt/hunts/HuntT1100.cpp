@@ -97,7 +97,7 @@ namespace Hunts {
 	}
 
 	int HuntT1100::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for T1100 - Web Shells at level Cursory");
+		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 		SetRegexAggressivenessLevel(Aggressiveness::Cursory);
 
@@ -111,7 +111,7 @@ namespace Hunts {
 	}
 
 	int HuntT1100::ScanNormal(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for T1100 - Web Shells at level Normal");
+		LOG_INFO(L"Hunting for " << name << L" at level Normal");
 		reaction.BeginHunt(GET_INFO());
 		SetRegexAggressivenessLevel(Aggressiveness::Normal);
 
