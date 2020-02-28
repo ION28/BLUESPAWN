@@ -24,6 +24,7 @@ EventLogEvent::EventLogEvent(const std::wstring& channel, int eventID, const std
 	eventLogTrigger{ [this](EventLogs::EventLogItem){ this->RunCallbacks(); } } {}
 
 bool EventLogEvent::Subscribe(){
+	LOG_VERBOSE(1, L"Subscribing to EventLog " << channel << L" for Event ID " << eventID);
 	DWORD status{};
 	auto subscription = EventLogs::SubscribeToEvent(GetChannel(), GetEventID(), eventLogTrigger, queries);
 	if(subscription){
@@ -153,6 +154,7 @@ RegistryEvent::RegistryEvent(const Registry::RegistryKey& key, bool WatchSubkeys
 	hEvent{ CreateEventW(nullptr, false, false, nullptr) }{}
 
 bool RegistryEvent::Subscribe(){
+	LOG_VERBOSE(1, L"Subscribing to Registry Key " << key.ToString());
 	auto status = RegNotifyChangeKeyValue(key, WatchSubkeys, REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_THREAD_AGNOSTIC, hEvent, true);
 	if(status == ERROR_SUCCESS){
 		status = WaitForSingleObject(RegistryEvent::hMutex, INFINITE);
