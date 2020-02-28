@@ -41,6 +41,8 @@
 #include "mitigation/mitigations/MitigateV3344.h"
 #include "mitigation/mitigations/MitigateV3379.h"
 #include "mitigation/mitigations/MitigateV63597.h"
+#include "mitigation/mitigations/MitigateV63687.h"
+#include "mitigation/mitigations/MitigateV63753.h"
 #include "mitigation/mitigations/MitigateV63817.h"
 #include "mitigation/mitigations/MitigateV63825.h"
 #include "mitigation/mitigations/MitigateV63829.h"
@@ -94,6 +96,8 @@ Bluespawn::Bluespawn(){
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3344>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3379>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63597>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63687>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63753>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63817>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63825>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
