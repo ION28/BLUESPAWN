@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include <functional>
 #include <string>
+#include <variant>
 
 namespace Registry {
 
@@ -22,23 +23,22 @@ namespace Registry {
 		REG_BINARY_T
 	};
 
+	typedef std::variant<std::wstring, DWORD, AllocationWrapper, std::vector<std::wstring>> RegistryData;
+
 	/**
 	 * A container class for registry values and associated data.
 	 */
 	struct RegistryValue : public Loggable {
+		RegistryKey key;
 		std::wstring wValueName;
 		RegistryType type;
 
-		// Only one of these will be valid data; which one will be indicated by `type`
-		std::wstring wData = {};
-		DWORD dwData = {};
-		AllocationWrapper lpData = { nullptr, 0 };
-		std::vector<std::wstring> vData = {};
+		RegistryData data{};
 
-		RegistryValue(std::wstring wValueName, RegistryType type, std::wstring wData);
-		RegistryValue(std::wstring wValueName, RegistryType type, DWORD dwData);
-		RegistryValue(std::wstring wValueName, RegistryType type, AllocationWrapper lpData);
-		RegistryValue(std::wstring wValueName, RegistryType type, std::vector<std::wstring> wData);
+		RegistryValue(const RegistryKey& key, const std::wstring& wValueName, std::wstring&& wData);
+		RegistryValue(const RegistryKey& key, const std::wstring& wValueName, DWORD&& dwData);
+		RegistryValue(const RegistryKey& key, const std::wstring& wValueName, AllocationWrapper&& lpData);
+		RegistryValue(const RegistryKey& key, const std::wstring& wValueName, std::vector<std::wstring>&& wData);
 
 		RegistryType GetType() const;
 
