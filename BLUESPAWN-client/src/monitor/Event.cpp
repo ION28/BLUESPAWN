@@ -185,3 +185,31 @@ bool RegistryEvent::operator==(const Event& e) const {
 const HandleWrapper& RegistryEvent::GetEvent() const {
 	return hEvent;
 }
+
+namespace Registry {
+	std::vector<std::shared_ptr<Event>> GetRegistryEvents(HKEY hkHive, const std::wstring& path, bool WatchWow64, bool WatchUsers, bool WatchSubkeys){
+		std::unordered_set<std::shared_ptr<Event>> vKeys{{ std::static_pointer_cast<Event>(std::make_shared<RegistryEvent>(hkHive, path)) }};
+		if(WatchWow64){
+			std::shared_ptr<RegistryEvent> Wow64Key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hkHive), path, true }) };
+			if(Wow64Key->key.Exists()){
+				vKeys.emplace(std::static_pointer_cast<Event>(Wow64Key));
+			}
+		}
+		if(WatchUsers){
+			std::vector<RegistryKey> hkUserHives{ RegistryKey{HKEY_USERS}.EnumerateSubkeys() };
+			for(auto& hive : hkUserHives){
+				std::shared_ptr<RegistryEvent> key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hive), path, false }) };
+				if(key->key.Exists()){
+					vKeys.emplace(std::static_pointer_cast<Event>(key));
+				}
+				if(WatchWow64){
+					std::shared_ptr<RegistryEvent> Wow64Key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hive), path, true }) };
+					if(Wow64Key->key.Exists()){
+						vKeys.emplace(std::static_pointer_cast<Event>(Wow64Key));
+					}
+				}
+			}
+		}
+		return { vKeys.begin(), vKeys.end() };
+	}
+}

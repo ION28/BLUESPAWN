@@ -11,9 +11,20 @@
 #include "common/wrappers.hpp"
 
 #include "util/log/Loggable.h"
-#include "util/configurations/RegistryValue.h"
 
 DEFINE_FUNCTION(DWORD, NtQueryKey, NTAPI, HANDLE KeyHandle, int KeyInformationClass, PVOID KeyInformation, ULONG Length, PULONG ResultLength);
+
+/**
+ * This enum represents the datatypes stored in the registry.
+ * While other types do exist, for now, support only exists for the below types.
+ */
+enum class RegistryType {
+	REG_SZ_T,
+	REG_EXPAND_SZ_T,
+	REG_MULTI_SZ_T,
+	REG_DWORD_T,
+	REG_BINARY_T
+};
 
 namespace Registry {
 	extern std::map<std::wstring, HKEY> vHiveNames;

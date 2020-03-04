@@ -37,7 +37,7 @@ namespace Registry {
 
 	extern REG_MULTI_SZ_CHECK CheckMultiSzSubset;
 	extern REG_MULTI_SZ_CHECK CheckMultiSzExclusion;
-	extern REG_MULTI_SZ_CHECK CheckMultiSzEmpty;
+	extern REG_MULTI_SZ_CHECK CheckMultiSzEmpty; 
 
 	/**
 	 * A container class for registry values and associated data.

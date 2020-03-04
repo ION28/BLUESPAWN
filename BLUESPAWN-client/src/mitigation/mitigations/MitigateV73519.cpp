@@ -24,18 +24,13 @@ namespace Mitigations{
 
 	bool CheckSMBv1(bool enforce){
 		auto lanmankey = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters" };
-		auto lanmanchecks = std::vector<RegistryCheck>{
-			{ L"SMB1", RegistryType::REG_DWORD_T, 0, true, CheckDwordEqual }
-		};
-		for(auto check : lanmanchecks){
-			if(CheckValues(lanmankey, { check }).size() != 0){
-				LOG_VERBOSE(1, L"SMBv1 has been detected.");
-				if(enforce){
-					LOG_VERBOSE(1, L"Disabling SMBv1... Restart required");
-					return lanmankey.SetValue<DWORD>(L"SMB1", 0);
-				}
-				return false;
+		if(!lanmankey.ValueExists(L"SMB1") || lanmankey.GetValue<DWORD>(L"SMB1") != 0){
+			LOG_VERBOSE(1, L"SMBv1 has been detected.");
+			if(enforce){
+				LOG_VERBOSE(1, L"Disabling SMBv1... Restart required");
+				return lanmankey.SetValue<DWORD>(L"SMB1", 0);
 			}
+			return false;
 		}
 		LOG_VERBOSE(1, "SMBv1 not detected");
 		return true;

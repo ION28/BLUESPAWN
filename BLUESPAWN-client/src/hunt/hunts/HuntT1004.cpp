@@ -5,6 +5,7 @@
 #include "util/log/Log.h"
 #include "util/log/HuntLogMessage.h"
 #include "util/eventlogs/EventLogs.h"
+#include <algorithm>
 
 using namespace Registry;
 
@@ -21,38 +22,30 @@ namespace Hunts {
 		LOG_INFO("Hunting for " << name << " at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
-		auto winlogons = CheckValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", {
+		std::vector<RegistryValue> winlogons{ CheckValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", {
 			{ L"Shell", L"explorer\\.exe,?", true, CheckSzRegexMatch },
 			{ L"UserInit", L"(C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\)?(U|u)(SERINIT|serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch }
-		}, true, true);
+		}, true, true) };
+		std::for_each(winlogons.begin(), winlogons.end(), [&reaction](const RegistryValue& v){ reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(v)); });
 
-		auto notifies = CheckKeyValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify", true, true);
+		std::vector<RegistryValue> notifies{ CheckKeyValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify", true, true) };
 		for(auto& notify : CheckSubkeys(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify", true, true)){
 			notifies.emplace_back(RegistryValue{ notify, L"DllName", *notify.GetValue<std::wstring>(L"DllName") });
 		}
-
-		int detections = 0;
-		for(const auto& key : std::vector<RegistryValue>{ winlogons, notifies }){
-			for(const auto& value : key.second){
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
-				detections++;
-			}
-		}
+		std::for_each(notifies.begin(), notifies.end(), [&reaction](const RegistryValue& v){ reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(v)); });
 
 		reaction.EndHunt();
-		return detections;
+		return notifies.size() + winlogons.size();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1004::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" }));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" }));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" }));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_CURRENT_USER, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" }));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" }));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" }));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" }));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_CURRENT_USER, L"Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify" }));
+
+		std::vector<std::shared_ptr<Event>> winlogon{ Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon") };
+		std::vector<std::shared_ptr<Event>> notify{ Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Notify", true, true, true) };
+
+		std::merge(winlogon.begin(), winlogon.end(), notify.begin(), notify.end(), std::back_inserter(events));
+
 		return events;
 	}
 }
