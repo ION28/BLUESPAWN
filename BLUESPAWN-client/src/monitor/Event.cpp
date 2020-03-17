@@ -188,7 +188,7 @@ const HandleWrapper& RegistryEvent::GetEvent() const {
 
 namespace Registry {
 	std::vector<std::shared_ptr<Event>> GetRegistryEvents(HKEY hkHive, const std::wstring& path, bool WatchWow64, bool WatchUsers, bool WatchSubkeys){
-		std::unordered_set<std::shared_ptr<Event>> vKeys{{ std::static_pointer_cast<Event>(std::make_shared<RegistryEvent>(hkHive, path)) }};
+		std::unordered_set<std::shared_ptr<Event>> vKeys{ { std::static_pointer_cast<Event>(std::make_shared<RegistryEvent>(RegistryKey{ hkHive, path })) } };
 		if(WatchWow64){
 			std::shared_ptr<RegistryEvent> Wow64Key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hkHive), path, true }) };
 			if(Wow64Key->key.Exists()){

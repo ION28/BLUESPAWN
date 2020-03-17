@@ -176,7 +176,7 @@ namespace Registry {
 
 	RegistryKey::~RegistryKey(){
 		if(_ReferenceCounts.find(hkBackingKey) != _ReferenceCounts.end()){
-			if(!--_ReferenceCounts[hkBackingKey]){
+			if(!--_ReferenceCounts[hkBackingKey] && !(ULONG_PTR(hkBackingKey) & 0xFFFFFFFF00000000)){
 				CloseHandle(hkBackingKey);
 			}
 		}
@@ -492,6 +492,9 @@ namespace Registry {
 		return GetName();
 	}
 
+	bool RegistryKey::operator==(const RegistryKey& key) const {
+		return hkBackingKey == key.hkBackingKey;
+	}
 
 	bool RegistryKey::operator<(const RegistryKey& key) const {
 		return hkBackingKey < key.hkBackingKey;

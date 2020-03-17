@@ -5,7 +5,7 @@
 #include "util/log/Log.h"
 
 #include <regex>
-#include <unordered_set>
+#include <set>
 
 namespace Registry {
 	REG_SZ_CHECK CheckSzEqual = [](const std::wstring& s1, const std::wstring& s2){ return s1 == s2; };
@@ -79,26 +79,38 @@ namespace Registry {
 		return type;
 	}
 
+	bool RegistryCheck::operator()(const RegistryData& data) const {
+		if(type == RegistryType::REG_DWORD_T){
+			return (std::get<REG_DWORD_CHECK>(check))(std::get<DWORD>(data), std::get<DWORD>(value));
+		} else if(type == RegistryType::REG_SZ_T){
+			return (std::get<REG_SZ_CHECK>(check))(std::get<std::wstring>(data), std::get<std::wstring>(value));
+		} else if(type == RegistryType::REG_MULTI_SZ_T){
+			return (std::get<REG_MULTI_SZ_CHECK>(check))(std::get<std::vector<std::wstring>>(data), std::get<std::vector<std::wstring>>(value));
+		} else {
+			return (std::get<REG_BINARY_CHECK>(check))(std::get<AllocationWrapper>(data), std::get<AllocationWrapper>(value));
+		}
+	}
+
 	std::vector<RegistryValue> CheckValues(const HKEY& hkHive, const std::wstring& path, const std::vector<RegistryCheck>& checks, bool CheckWow64, bool CheckUsers){
 		std::vector<RegistryValue> vIdentifiedValues{};
-		std::unordered_set<RegistryKey> vKeys{ {hkHive, path} };
+		std::vector<RegistryKey> vKeys{ RegistryKey{hkHive, path} };
 		if(CheckWow64){
 			RegistryKey Wow64Key{ hkHive, path, true };
-			if(Wow64Key.Exists()){
-				vKeys.emplace(Wow64Key);
+			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key)){
+				vKeys.emplace_back(Wow64Key);
 			}
 		}
 		if(CheckUsers){
 			std::vector<RegistryKey> hkUserHives{ RegistryKey{HKEY_USERS}.EnumerateSubkeys() };
 			for(auto& hive : hkUserHives){
 				RegistryKey key{ HKEY(hive), path, false };
-				if(key.Exists()){
-					vKeys.emplace(key);
+				if(key.Exists() && std::count(vKeys.begin(), vKeys.end(), key) == 0){
+					vKeys.emplace_back(key);
 				}
 				if(CheckWow64){
 					RegistryKey Wow64Key{ HKEY(hive), path, true };
-					if(Wow64Key.Exists()){
-						vKeys.emplace(Wow64Key);
+					if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key) == 0){
+						vKeys.emplace_back(Wow64Key);
 					}
 				}
 			}
@@ -164,24 +176,24 @@ namespace Registry {
 
 	std::vector<RegistryValue> CheckKeyValues(const HKEY& hkHive, const std::wstring& path, bool CheckWow64, bool CheckUsers){
 		std::vector<RegistryValue> vIdentifiedValues{};
-		std::unordered_set<RegistryKey> vKeys{ {hkHive, path} };
+		std::vector<RegistryKey> vKeys{ RegistryKey{hkHive, path} };
 		if(CheckWow64){
 			RegistryKey Wow64Key{ hkHive, path, true };
-			if(Wow64Key.Exists()){
-				vKeys.emplace(Wow64Key);
+			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key)){
+				vKeys.emplace_back(Wow64Key);
 			}
 		}
 		if(CheckUsers){
 			std::vector<RegistryKey> hkUserHives{ RegistryKey{HKEY_USERS}.EnumerateSubkeys() };
 			for(auto& hive : hkUserHives){
 				RegistryKey key{ HKEY(hive), path, false };
-				if(key.Exists()){
-					vKeys.emplace(key);
+				if(key.Exists() && std::count(vKeys.begin(), vKeys.end(), key) == 0){
+					vKeys.emplace_back(key);
 				}
 				if(CheckWow64){
 					RegistryKey Wow64Key{ HKEY(hive), path, true };
-					if(Wow64Key.Exists()){
-						vKeys.emplace(Wow64Key);
+					if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key) == 0){
+						vKeys.emplace_back(Wow64Key);
 					}
 				}
 			}
@@ -230,24 +242,24 @@ namespace Registry {
 
 	std::vector<RegistryKey> CheckSubkeys(const HKEY& hkHive, const std::wstring& path, bool CheckWow64, bool CheckUsers){
 		std::vector<RegistryValue> vIdentifiedValues{};
-		std::unordered_set<RegistryKey> vKeys{ {hkHive, path} };
+		std::vector<RegistryKey> vKeys{ RegistryKey{hkHive, path} };
 		if(CheckWow64){
 			RegistryKey Wow64Key{ hkHive, path, true };
-			if(Wow64Key.Exists()){
-				vKeys.emplace(Wow64Key);
+			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key)){
+				vKeys.emplace_back(Wow64Key);
 			}
 		}
 		if(CheckUsers){
 			std::vector<RegistryKey> hkUserHives{ RegistryKey{HKEY_USERS}.EnumerateSubkeys() };
 			for(auto& hive : hkUserHives){
 				RegistryKey key{ HKEY(hive), path, false };
-				if(key.Exists()){
-					vKeys.emplace(key);
+				if(key.Exists() && std::count(vKeys.begin(), vKeys.end(), key) == 0){
+					vKeys.emplace_back(key);
 				}
 				if(CheckWow64){
 					RegistryKey Wow64Key{ HKEY(hive), path, true };
-					if(Wow64Key.Exists()){
-						vKeys.emplace(Wow64Key);
+					if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key) == 0){
+						vKeys.emplace_back(Wow64Key);
 					}
 				}
 			}
@@ -256,7 +268,9 @@ namespace Registry {
 		std::vector<RegistryKey> subkeys{};
 		for(auto& key : vKeys){
 			auto& subs = key.EnumerateSubkeys();
-			subkeys.emplace_back(subs.begin(), subs.end());
+			for(auto& sub : subs){
+				subkeys.emplace_back(sub);
+			}
 		}
 		return subkeys;
 	}

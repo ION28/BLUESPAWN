@@ -3,35 +3,35 @@
 
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
-#include <util\filesystem\YaraScanner.h>
+#include "util/filesystem/YaraScanner.h"
 
 using namespace Registry;
 
-namespace Hunts {
+namespace Hunts{
 	HuntT1037::HuntT1037() : Hunt(L"T1037 - Logon Scripts") {
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory | (DWORD)Aggressiveness::Normal | (DWORD)Aggressiveness::Intensive;
-		dwCategoriesAffected = (DWORD)Category::Configurations | (DWORD)Category::Files;
-		dwSourcesInvolved = (DWORD) DataSource::Registry | (DWORD)DataSource::FileSystem;
+		dwSupportedScans = (DWORD) Aggressiveness::Cursory | (DWORD) Aggressiveness::Normal | (DWORD) Aggressiveness::Intensive;
+		dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Files;
+		dwSourcesInvolved = (DWORD) DataSource::Registry | (DWORD) DataSource::FileSystem;
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::LateralMovement;
 	}
 
-	int HuntT1037::EvaluateStartupFile(FileSystem::File file, Reaction & reaction, Aggressiveness level) {
+	int HuntT1037::EvaluateStartupFile(FileSystem::File file, Reaction& reaction, Aggressiveness level) {
 		//Scan with YARA at all levels
 		LOG_VERBOSE(1, L"Examining " << file.GetFilePath());
 		auto& yara = YaraScanner::GetInstance();
 		YaraScanResult result = yara.ScanFile(file);
 
-		if (level == Aggressiveness::Cursory) {
-			if (!result && result.vKnownBadRules.size() > 0) {
+		if(level == Aggressiveness::Cursory) {
+			if(!result && result.vKnownBadRules.size() > 0) {
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 				return 1;
 			}
-		} else if (level == Aggressiveness::Normal) {
-			if ((!result && result.vKnownBadRules.size() > 0) || (std::find(sus_exts.begin(), sus_exts.end(), file.GetFileAttribs().extension) != sus_exts.end())) {
+		} else if(level == Aggressiveness::Normal) {
+			if((!result && result.vKnownBadRules.size() > 0) || (std::find(sus_exts.begin(), sus_exts.end(), file.GetFileAttribs().extension) != sus_exts.end())) {
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 				return 1;
 			}
-		} else if (level == Aggressiveness::Intensive) {
+		} else if(level == Aggressiveness::Intensive) {
 			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 			return 1;
 		}
@@ -42,21 +42,16 @@ namespace Hunts {
 	int Hunts::HuntT1037::AnalyzeRegistryStartupKey(Reaction reaction, Aggressiveness level) {
 		std::map<RegistryKey, std::vector<RegistryValue>> keys;
 
-		auto HKCUEnvironment = RegistryKey{ HKEY_CURRENT_USER, L"Environment", };
-		keys.emplace(HKCUEnvironment, CheckValues(HKCUEnvironment, {
-			{ L"UserInitMprLogonScript", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty }
-			}));
-
 		int detections = 0;
-		for (const auto& key : keys) {
-			for (const auto& value : key.second) {
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
-				detections++;
+		for(auto& detection : CheckValues(HKEY_CURRENT_USER, L"Environment", {
+			    { L"UserInitMprLogonScript", L"", false, CheckSzEmpty }
+			}, true, true)){
+			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			detections++;
 
-				FileSystem::File file = FileSystem::File(value.ToString());
-				detections += EvaluateStartupFile(file, reaction, level);
-			}
-		}
+			FileSystem::File file = FileSystem::File(detection.ToString());
+			detections += EvaluateStartupFile(file, reaction, level);
+        }
 
 		return detections;
 	}
@@ -116,10 +111,6 @@ namespace Hunts {
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1037::GetMonitoringEvents() {
-		std::vector<std::shared_ptr<Event>> events;
-
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_CURRENT_USER, L"Environment" }, false));
-		
-		return events;
+		return Registry::GetRegistryEvents(HKEY_CURRENT_USER, L"Environment", true, true, false);
 	}
 }

@@ -217,6 +217,15 @@ namespace Registry {
 		bool operator<(const RegistryKey& key) const;
 
 		/**
+		 * Override the == operator for comparisons.
+		 *
+		 * @param key The key to compare
+		 *
+		 * @return true or false
+		 */
+		bool operator==(const RegistryKey& key) const;
+
+		/**
 		 * Removes a value from the referenced registry key.
 		 *
 		 * @param wsValueName The name of the value to be removed

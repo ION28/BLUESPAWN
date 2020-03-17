@@ -14,10 +14,7 @@ namespace Hunts {
 	 */
 	class HuntT1060 : public Hunt {
 	private:
-		std::vector<Registry::RegistryKey> RunKeys;
-		std::vector<Registry::RegistryKey> CMDKeys;
-		std::vector<Registry::RegistryKey> ShellKeys;
-		std::vector<Registry::RegistryKey> UserShellKeys;
+		std::vector<std::wstring> RunKeys;
 	public:
 		HuntT1060();
 

@@ -20,8 +20,8 @@ namespace Hunts {
 		std::wstring wsIFEO = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
 		std::wstring wsIFEOWow64 = L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\";
 
-		int HuntT1015::EvaluateRegistry(Reaction reaction);
-		int HuntT1015::EvaluateFiles(Reaction reaction);
+		int HuntT1015::EvaluateRegistry(Reaction& reaction);
+		int HuntT1015::EvaluateFiles(Reaction& reaction);
 	public:
 		HuntT1015();
 
