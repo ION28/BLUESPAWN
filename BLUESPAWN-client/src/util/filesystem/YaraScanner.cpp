@@ -76,8 +76,15 @@ YaraScanner::YaraScanner() :
 }
 
 YaraScanner::~YaraScanner(){
-	yr_rules_destroy(KnownBad);
-	yr_rules_destroy(Indicators);
+	if(KnownBad){
+		yr_rules_destroy(KnownBad);
+		KnownBad = nullptr;
+	}
+
+	if(Indicators){
+		yr_rules_destroy(Indicators);
+		Indicators = nullptr;
+	}
 	yr_finalize();
 }
 

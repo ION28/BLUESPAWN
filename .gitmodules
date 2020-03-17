@@ -16,3 +16,6 @@
 [submodule "BLUESPAWN-client/external/tinyxml2"]
 	path = BLUESPAWN-client/external/tinyxml2
 	url = https://github.com/leethomason/tinyxml2
+[submodule "vcpkg"]
+	path = vcpkg
+	url = https://github.com/Microsoft/vcpkg.git
