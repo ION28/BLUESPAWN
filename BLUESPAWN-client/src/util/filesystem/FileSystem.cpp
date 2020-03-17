@@ -39,12 +39,37 @@ namespace FileSystem{
 		LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
 		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
 			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
-		if(!hFile){
-			LOG_VERBOSE(2, "Couldn't open file " << path << ".");
+		if(!hFile && GetLastError() == ERROR_FILE_NOT_FOUND){
+			LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
 			bFileExists = false;
-		} else {
+			bWriteAccess = false;
+			bReadAccess = false;
+		}
+		else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
+			bWriteAccess = false;
+			hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+				FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
+			if (!hFile && GetLastError() == ERROR_FILE_NOT_FOUND) {
+				LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
+				bFileExists = false;
+				bReadAccess = false;
+			}
+			else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
+				LOG_VERBOSE(2, "Couldn't open file, Access Denied" << path << ".");
+				bFileExists = true;
+				bReadAccess = false;
+			}
+			else {
+				LOG_VERBOSE(2, "File " << path << " opened.");
+				bFileExists = true;
+				bReadAccess = true;
+			}
+		}
+		else {
 			LOG_VERBOSE(2, "File " << path << " opened.");
 			bFileExists = true;
+			bWriteAccess = true;
+			bReadAccess = true;
 		}
 		Attribs.extension = PathFindExtension(path.c_str());
 	}
@@ -55,6 +80,13 @@ namespace FileSystem{
 
 		if(!bFileExists) {
 			LOG_ERROR("Can't write to file " << FilePath << ". File doesn't exist");
+			SetLastError(ERROR_FILE_NOT_FOUND);
+			return false;
+		}
+
+		if (!bWriteAccess) {
+			LOG_ERROR("Can't write to file " << FilePath << ". Insufficient permissions.");
+			SetLastError(ERROR_ACCESS_DENIED);
 			return false;
 		}
 
@@ -107,8 +139,14 @@ namespace FileSystem{
 		SCOPE_LOCK(SetFilePointer(0), ResetFilePointer);
 		LOG_VERBOSE(2, "Attempting to read " << amount << " bytes from " << FilePath << " at offset " << offset);
 		if(!bFileExists) {
-			LOG_ERROR("Can't write to " << FilePath << ". File doesn't exist.");
+			LOG_ERROR("Can't read from " << FilePath << ". File doesn't exist.");
 			SetLastError(ERROR_FILE_NOT_FOUND);
+			return false;
+		}
+
+		if (!bReadAccess) {
+			LOG_ERROR("Can't read from " << FilePath << ". Insufficient permissions.");
+			SetLastError(ERROR_ACCESS_DENIED);
 			return false;
 		}
 
@@ -180,6 +218,12 @@ namespace FileSystem{
 		LOG_VERBOSE(3, "Attempting to get MD5 hash of " << FilePath);
 		if(!bFileExists) {
 			LOG_ERROR("Can't get MD5 hash of " << FilePath << ". File doesn't exist");
+			SetLastError(ERROR_FILE_NOT_FOUND);
+			return std::nullopt;
+		}
+		if (!bReadAccess) {
+			LOG_ERROR("Can't get MD5 hash of " << FilePath << ". Insufficient permissions.");
+			SetLastError(ERROR_ACCESS_DENIED);
 			return std::nullopt;
 		}
 		//Function from Microsoft
@@ -286,6 +330,8 @@ namespace FileSystem{
 		}
 		LOG_VERBOSE(1, FilePath << " successfully created.");
 		bFileExists = true;
+		bReadAccess = true;
+		bWriteAccess = true;
 		return true;
 	}
 
