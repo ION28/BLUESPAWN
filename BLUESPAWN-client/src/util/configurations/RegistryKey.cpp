@@ -176,7 +176,7 @@ namespace Registry {
 
 	RegistryKey::~RegistryKey(){
 		if(_ReferenceCounts.find(hkBackingKey) != _ReferenceCounts.end()){
-			if(!--_ReferenceCounts[hkBackingKey] && !(ULONG_PTR(hkBackingKey) & 0xFFFFFFFF00000000)){
+			if(!--_ReferenceCounts[hkBackingKey] && !(ULONG_PTR(hkBackingKey) & 0xFFFFFFFF80000000)){
 				CloseHandle(hkBackingKey);
 			}
 		}
