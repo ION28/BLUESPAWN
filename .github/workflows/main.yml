@@ -22,13 +22,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Cache vcpkg's artifacts
-      uses: actions/cache@v1
-      with:
-        path: ${{ github.workspace }}/vcpkg/
-        # The key will be different each time a different version of vcpkg is used, or different ports are installed.
-        key: ${{ hashFiles( env.vcpkgResponseFile ) }}-${{ hashFiles('.git/modules/vcpkg/HEAD') }}-${{ runner.os }}
-
     - name: Setup NuGet.exe
       uses: warrenbuckley/Setup-Nuget@v1
 
