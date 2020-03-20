@@ -34,9 +34,9 @@ jobs:
         cd vcpkg
         .\bootstrap-vcpkg.bat
         dir
-        .\vckpg.exe install yara:x64-windows-static
-        .\vckpg.exe install yara:x86-windows-static
-        .\vkpkg.exe integrate install
+        .\vcpkg.exe install yara:x64-windows-static
+        .\vcpkg.exe install yara:x86-windows-static
+        .\vcpkg.exe integrate install
         cd ..
 
     - name: Download NuGet packages
