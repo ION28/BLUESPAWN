@@ -26,16 +26,17 @@ jobs:
       uses: warrenbuckley/Setup-Nuget@v1
 
     - name: Update submodules
-      run: git submodule update --init --recursive --remote
+      run: git submodule update --init --recursive
 
     - name: Install vcpkg
       shell: powershell
       run: |
         cd vcpkg
         .\bootstrap-vcpkg.bat
-        vckpg install yara:x64-windows-static
-        vckpg install yara:x86-windows-static
-        vkpkg integrate install
+        dir
+        .\vckpg.exe install yara:x64-windows-static
+        .\vckpg.exe install yara:x86-windows-static
+        .\vkpkg.exe integrate install
         cd ..
 
     - name: Download NuGet packages
