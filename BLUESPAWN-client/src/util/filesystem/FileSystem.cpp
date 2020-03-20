@@ -78,6 +78,8 @@ namespace FileSystem{
 		SCOPE_LOCK(SetFilePointer(0), ResetFilePointer);
 		LOG_VERBOSE(2, "Writing to file " << FilePath << " at " << offset << ". Insert = " << insert);
 
+		DWORD dwBytesIO{};
+
 		if(!bFileExists) {
 			LOG_ERROR("Can't write to file " << FilePath << ". File doesn't exist");
 			SetLastError(ERROR_FILE_NOT_FOUND);
@@ -100,7 +102,7 @@ namespace FileSystem{
 					LOG_ERROR("Can't set file pointer to " << offset << " in file " << FilePath << ".");
 					return false;
 				}
-				if(!ReadFile(hFile, buffer, dwCopySize, nullptr, nullptr)){
+				if(!ReadFile(hFile, buffer, dwCopySize, &dwBytesIO, nullptr)){
 					LOG_ERROR("Unable to read " << FilePath << " at offset " << dwFileSize - dwCopyOffset - dwCopySize << " (Error " << GetLastError() << ")");
 					return false;
 				}
@@ -108,7 +110,7 @@ namespace FileSystem{
 					LOG_ERROR("Can't set file pointer to " << offset << " in file " << FilePath << ".");
 					return false;
 				}
-				if(!WriteFile(hFile, buffer, dwCopySize, nullptr, nullptr)){
+				if(!WriteFile(hFile, buffer, dwCopySize, &dwBytesIO, nullptr)){
 					LOG_ERROR("Unable to write to " << FilePath << " at offset " << dwFileSize - dwCopyOffset << " (Error " << GetLastError() << ")");
 					return false;
 				}
@@ -120,7 +122,7 @@ namespace FileSystem{
 			return false;
 		}
 
-		if(!WriteFile(hFile, value, length, nullptr, nullptr)) {
+		if(!WriteFile(hFile, value, length, &dwBytesIO, nullptr)) {
 			LOG_ERROR("Failed to write to " << FilePath << " at offset " << offset << " with error " << GetLastError());
 			return false;
 		}
@@ -154,6 +156,12 @@ namespace FileSystem{
 			LOG_ERROR("Can't set file pointer to " << offset << " in file " << FilePath << ".");
 			return false;
 		}
+
+		DWORD dwBytesRead{};
+		if(!amountRead){
+			amountRead = &dwBytesRead;
+		}
+
 		if(!ReadFile(hFile, buffer, amount, amountRead, NULL)) {
 			LOG_ERROR("Failed to read from " << FilePath << " at offset " << offset << " with error " << GetLastError());
 			return false;
