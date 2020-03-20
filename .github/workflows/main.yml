@@ -22,6 +22,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Cache vcpkg's artifacts
+      uses: actions/cache@v1
+      with:
+        path: ${{ github.workspace }}/vcpkg/
+        # The key will be different each time a different version of vcpkg is used, or different ports are installed.
+        key: ${{ hashFiles( env.vcpkgResponseFile ) }}-${{ hashFiles('.git/modules/vcpkg/HEAD') }}-${{ runner.os }}
+
     - name: Setup NuGet.exe
       uses: warrenbuckley/Setup-Nuget@v1
 
@@ -33,9 +40,7 @@ jobs:
       run: |
         cd vcpkg
         .\bootstrap-vcpkg.bat
-        dir
-        .\vcpkg.exe install yara:x64-windows-static
-        .\vcpkg.exe install yara:x86-windows-static
+        .\vcpkg.exe install yara:${{ matrix.buildarch }}-windows-static
         .\vcpkg.exe integrate install
         cd ..
 
