@@ -37,35 +37,70 @@ namespace Registry {
 
 	extern REG_MULTI_SZ_CHECK CheckMultiSzSubset;
 	extern REG_MULTI_SZ_CHECK CheckMultiSzExclusion;
-	extern REG_MULTI_SZ_CHECK CheckMultiSzEmpty;
+	extern REG_MULTI_SZ_CHECK CheckMultiSzEmpty; 
 
 	/**
 	 * A container class for registry values and associated data.
 	 */
 	struct RegistryCheck {
-		RegistryValue value;
-		bool MissingBad;
-
-		REG_SZ_CHECK wCheck;
-		REG_DWORD_CHECK dwCheck;
-		REG_BINARY_CHECK lpCheck;
-		REG_MULTI_SZ_CHECK vCheck;
+		std::wstring name;
 		
-		RegistryCheck(const std::wstring& wValueName, RegistryType type, const std::wstring& wData, bool MissingBad = false,
-			const REG_SZ_CHECK& check = CheckSzEqual);
-		RegistryCheck(const std::wstring& wValueName, RegistryType type, const DWORD dwData, bool MissingBad = false,
-			const REG_DWORD_CHECK& check = CheckDwordEqual);
-		RegistryCheck(const std::wstring& wValueName, RegistryType type, const AllocationWrapper& lpData, bool MissingBad = false,
-			const REG_BINARY_CHECK& check = CheckBinaryEqual);
-		RegistryCheck(const std::wstring& wValueName, RegistryType type, const std::vector<std::wstring>& wData, bool MissingBad = false,
+		RegistryType type;
+		RegistryData value;
+		std::variant<REG_SZ_CHECK, REG_DWORD_CHECK, REG_BINARY_CHECK, REG_MULTI_SZ_CHECK> check;
+
+		bool MissingBad;
+		
+		RegistryCheck(std::wstring&& wValueName, std::wstring&& wData, bool MissingBad = false, const REG_SZ_CHECK& check = CheckSzEqual);
+		RegistryCheck(std::wstring&& wValueName, DWORD&& dwData, bool MissingBad = false, const REG_DWORD_CHECK& check = CheckDwordEqual);
+		RegistryCheck(std::wstring&& wValueName, AllocationWrapper&& lpData, bool MissingBad = false, const REG_BINARY_CHECK& check = CheckBinaryEqual);
+		RegistryCheck(std::wstring&& wValueName, std::vector<std::wstring>&& wData, bool MissingBad = false,
 			const REG_MULTI_SZ_CHECK& check = CheckMultiSzSubset);
 
 		RegistryType GetType() const;
+
+		bool operator()(const RegistryData& data) const;
 	};
 
-	std::vector<RegistryValue> CheckValues(const RegistryKey& key, const std::vector<RegistryCheck>& values);
+	/**
+	 * Checks the values under a certain key using the RegistryCheck class. if CheckWow64 is true, this will attempt to automatically redirect to the WoW64 version
+	 * of the key in addition to the 64-bit one. If CheckUsers is true, this will attempt to automatically check the same key under each user in addition to under
+	 * HKLM. 
+	 *
+	 * @param hkHive The registry hive under which the path lies. 
+	 * @param path The path to the specified key under the given hive. If CheckUsers is true, this will will also check the path under each user's account.
+	 * @param CheckWow64 If true, this will also check the wow64 version of the key, if one exists
+	 * @param CheckUsers If true, this will check for the path under all users' hives in addition to the given one
+	 *
+	 * @return A vector containing a RegistryValue object for each RegistryCheck that didn't match its valid conditions
+	 */
+	std::vector<RegistryValue> CheckValues(const HKEY& hkHive, const std::wstring& path, const std::vector<RegistryCheck>& values, bool CheckWow64 = true, bool CheckUsers = true);
 
-	std::vector<RegistryValue> CheckKeyValues(const RegistryKey& key);
+	/**
+	 * Checks for any values under a certain key. if CheckWow64 is true, this will attempt to automatically redirect to the WoW64 version of the key
+	 * in addition to the 64-bit one. If CheckUsers is true, this will attempt to automatically check the same key under each user in addition to under
+	 * HKLM.
+	 *
+	 * @param hkHive The registry hive under which the path lies.
+	 * @param path The path to the specified key under the given hive. If CheckUsers is true, this will will also check the path under each user's account.
+	 * @param CheckWow64 If true, this will also check the wow64 version of the key, if one exists
+	 * @param CheckUsers If true, this will check for the path under all users' hives in addition to the given one
+	 *
+	 * @return A vector containing a RegistryValue object for each RegistryCheck that didn't match its valid conditions
+	 */
+	std::vector<RegistryValue> CheckKeyValues(const HKEY& hkHive, const std::wstring& path, bool CheckWow64 = true, bool CheckUsers = true);
 
-	std::vector<RegistryKey> CheckSubkeys(const RegistryKey& key);
+	/**
+	 * Checks for any values under a certain key. if CheckWow64 is true, this will attempt to automatically redirect to the WoW64 version of the key
+	 * in addition to the 64-bit one. If CheckUsers is true, this will attempt to automatically check the same key under each user in addition to under
+	 * HKLM.
+	 *
+	 * @param hkHive The registry hive under which the path lies.
+	 * @param path The path to the specified key under the given hive. If CheckUsers is true, this will will also check the path under each user's account.
+	 * @param CheckWow64 If true, this will also check the wow64 version of the key, if one exists
+	 * @param CheckUsers If true, this will check for the path under all users' hives in addition to the given one
+	 *
+	 * @return A vector containing a RegistryValue object for each RegistryCheck that didn't match its valid conditions
+	 */
+	std::vector<RegistryKey> CheckSubkeys(const HKEY& hkHive, const std::wstring& path, bool CheckWow64 = true, bool CheckUsers = true);
 }

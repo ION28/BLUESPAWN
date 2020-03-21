@@ -261,9 +261,6 @@
     <ProjectReference Include="..\BLUESPAWN-common\CommonLib.vcxproj">
       <Project>{25ae1d80-3e17-4e1d-bfb4-8afb375ebaf1}</Project>
     </ProjectReference>
-    <ProjectReference Include="libyara.vcxproj">
-      <Project>{e236ce39-d8f3-4db6-985c-f2794ff17746}</Project>
-    </ProjectReference>
     <ProjectReference Include="pe-sieve.vcxproj">
       <Project>{bec01f8e-5892-3f6f-a741-5bbd1d0f4ef9}</Project>
     </ProjectReference>
@@ -280,16 +277,22 @@
       <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\yara\libyara\include;$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-client\external\krabsetw\krabs;$(SolutionDir)BLUESPAWN-client\external\cxxopts\include;$(SolutionDir)BLUESPAWN-client\external\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-client\external\cxxopts\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{159B2E72-9553-4E17-9BEC-CB92FCA8D0B0}</ProjectGuid>
     <RootNamespace>CommonLib</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
+    <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">

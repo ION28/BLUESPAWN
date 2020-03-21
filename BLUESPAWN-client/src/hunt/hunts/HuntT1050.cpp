@@ -1,8 +1,11 @@
 #include "hunt/hunts/HuntT1050.h"
+
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
 #include "util/log/HuntLogMessage.h"
-#include <util\filesystem\YaraScanner.h>
+#include "util/filesystem/YaraScanner.h"
+
+#include "common/Utils.h"
 
 #include <iostream>
 
@@ -115,8 +118,9 @@ namespace Hunts {
 
 	std::vector<std::shared_ptr<Event>> HuntT1050::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
+
 		events.push_back(std::make_shared<EventLogEvent>(L"System", 7045));
-		events.push_back(std::make_shared<RegistryEvent>(Registry::RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services" }));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services", false, false));
 
 		return events;
 	}

@@ -20,13 +20,22 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Setup NuGet.exe
       uses: warrenbuckley/Setup-Nuget@v1
 
     - name: Update submodules
-      run: git submodule update --init --recursive --remote
+      run: git submodule update --init --recursive
+
+    - name: Install vcpkg
+      shell: powershell
+      run: |
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+        .\vcpkg.exe install yara:${{ matrix.buildarch }}-windows-static
+        .\vcpkg.exe integrate install
+        cd ..
 
     - name: Download NuGet packages
       run: nuget restore BLUESPAWN.sln
@@ -40,14 +49,6 @@ jobs:
       run: powershell set-executionpolicy Unrestricted
       shell: powershell
 
-    - name: Run Atomic Red Team Prep Script
-      run: testing\run-atomic-prep.ps1
-      shell: powershell
-
-    - name: Run Atomic Red Team Tests
-      run: testing\run-atomic-tests.ps1
-      shell: powershell
-
     - name: Run BLUESPAWN Hunt
       run: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe --hunt -l Normal --log=xml --reaction=log
       shell: cmd
@@ -56,19 +57,10 @@ jobs:
       run: Get-ChildItem "bluespawn*.xml" | Rename-Item -NewName BLUESPAWNHuntResults.xml
       shell: powershell
 
-    - name: TESTS - Check BLUESPAWN Hunt Results against Atomic Red Team Results
-      run: testing\run-hunt-results-comparison.ps1
-      shell: powershell
-
     - uses: actions/upload-artifact@master
       with:
         name: BLUESPAWN-client-${{ matrix.buildarch }}-${{ matrix.buildtype }}
         path: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe
-
-    - uses: actions/upload-artifact@master
-      with:
-        name: AtomicTestsResults-${{ matrix.buildarch }}-${{ matrix.buildtype }}.csv
-        path: AtomicTestsResults.csv
 
     - uses: actions/upload-artifact@master
       with:

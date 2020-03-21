@@ -4,6 +4,8 @@
 #include "util/log/Log.h"
 #include "util/configurations/Registry.h"
 
+#include "common/Utils.h"
+
 using namespace Registry;
 
 namespace Hunts {
@@ -18,38 +20,25 @@ namespace Hunts {
 		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
-		std::map<RegistryKey, std::vector<RegistryValue>> keys;
+		auto& detections = CheckKeyValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB", true, false);
+		ADD_ALL_VECTOR(detections, CheckKeyValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom", true, false));
 
-		auto SDB = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB" };
-		keys.emplace(SDB, CheckKeyValues(SDB));
-
-		auto Custom = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom" };
-		keys.emplace(Custom, CheckKeyValues(Custom));
-
-		auto SDBWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB" };
-		keys.emplace(SDBWow64, CheckKeyValues(SDBWow64));
-
-		auto CustomWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom" };
-		keys.emplace(CustomWow64, CheckKeyValues(CustomWow64));
-
-		int detections = 0;
-		for(const auto& key : keys){
-			for(const auto& value : key.second){
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
-				detections++;
-			}
+		int detectionCount = 0;
+		for(const auto& detection : detections){
+			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			detectionCount++;
 		}
 
 		reaction.EndHunt();
-		return detections;
+		return detectionCount;
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1138::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB" }));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom" }));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB" }));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom" }));
+
+		ADD_ALL_VECTOR(events, GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB"));
+		ADD_ALL_VECTOR(events, GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom"));
+
 		return events;
 	}
 }

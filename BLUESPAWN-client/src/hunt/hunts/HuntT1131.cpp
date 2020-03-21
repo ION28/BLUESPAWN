@@ -18,20 +18,16 @@ namespace Hunts {
 		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
-		std::map<RegistryKey, std::vector<RegistryValue>> keys;
-
-		auto LSA = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
-		keys.emplace(LSA, CheckValues(LSA, {
-			{ L"Authentication Packages", RegistryType::REG_MULTI_SZ_T, okAuthPackages, false, CheckMultiSzSubset },
-			{ L"Notification Packages", RegistryType::REG_MULTI_SZ_T, okNotifPackages, false, CheckMultiSzSubset },
-		}));
-
 		int detections = 0;
-		for(const auto& key : keys){
-			for(const auto& value : key.second){
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
-				detections++;
-			}
+
+		auto safeAuthPackages = okAuthPackages;
+		auto safeNotifPackages = okNotifPackages;
+		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", {
+			{ L"Authentication Packages", std::move(safeAuthPackages), false, CheckMultiSzSubset },
+			{ L"Notification Packages", std::move(safeNotifPackages), false, CheckMultiSzSubset },
+		})){
+			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			detections++;
 		}
 
 		reaction.EndHunt();
@@ -40,7 +36,9 @@ namespace Hunts {
 
 	std::vector<std::shared_ptr<Event>> HuntT1131::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
+
 		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" }));
+
 		return events;
 	}
 }

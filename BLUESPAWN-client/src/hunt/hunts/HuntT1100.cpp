@@ -1,8 +1,9 @@
 #include "hunt/hunts/HuntT1100.h"
 
 #include "util/filesystem/FileSystem.h"
-#include <util\filesystem\YaraScanner.h>
+#include "util/filesystem/YaraScanner.h"
 #include "util/log/Log.h"
+
 #include "common/StringUtils.h"
 
 namespace Hunts {

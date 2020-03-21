@@ -25,8 +25,8 @@ namespace Log {
 						OutputDebugStringW((sLogHeader + L"\tPotentially malicious service detected - " + lpServiceDetection->wsServiceName + L" (PID is " + std::to_wstring(lpServiceDetection->ServicePID) + L")").c_str());
 					} else if(detection->Type == DetectionType::Registry){
 						auto lpRegistryDetection = std::static_pointer_cast<REGISTRY_DETECTION>(detection);
-						OutputDebugStringW((sLogHeader + L"\tPotentially malicious registry key detected - " + lpRegistryDetection->wsRegistryKeyPath + L": " + lpRegistryDetection->contents.wValueName + L" with value " + 
-							lpRegistryDetection->contents.ToString()).c_str());
+						OutputDebugStringW((sLogHeader + L"\tPotentially malicious registry key detected - " + lpRegistryDetection->value.key.ToString() + L": " + lpRegistryDetection->value.wValueName + L" with value " +
+							lpRegistryDetection->value.ToString()).c_str());
 					} else {
 						OutputDebugStringW((sLogHeader + L"\tUnknown detection type!").c_str());
 					}
