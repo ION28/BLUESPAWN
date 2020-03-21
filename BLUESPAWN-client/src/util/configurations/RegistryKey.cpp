@@ -36,9 +36,10 @@ namespace Registry {
 
 	std::map<HKEY, int> RegistryKey::_ReferenceCounts = {};
 	
-	RegistryKey::RegistryKey(const RegistryKey& key) noexcept {
-		this->bKeyExists = key.bKeyExists;
-		this->hkBackingKey = key.hkBackingKey;
+	RegistryKey::RegistryKey(const RegistryKey& key) noexcept :
+		bKeyExists{ key.bKeyExists },
+		bWow64{ key.bWow64 },
+		hkBackingKey{ key.hkBackingKey }{
 
 		if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
 			_ReferenceCounts[hkBackingKey] = 1;
@@ -49,6 +50,7 @@ namespace Registry {
 
 	RegistryKey& RegistryKey::operator=(const RegistryKey& key) noexcept {
 		this->bKeyExists = key.bKeyExists;
+		this->bWow64 = key.bWow64;
 		this->hkBackingKey = key.hkBackingKey;
 
 		if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
@@ -60,11 +62,13 @@ namespace Registry {
 		return *this;
 	}
 
-	RegistryKey::RegistryKey(RegistryKey&& key) noexcept {
-		this->bKeyExists = key.bKeyExists;
-		this->hkBackingKey = key.hkBackingKey;
+	RegistryKey::RegistryKey(RegistryKey&& key) noexcept :
+		bKeyExists{ key.bKeyExists },
+		bWow64{ key.bWow64 },
+		hkBackingKey{ key.hkBackingKey }{
 
 		key.bKeyExists = false;
+		key.bWow64 = false;
 		key.path = {};
 		key.hkHive = nullptr;
 		key.hkBackingKey = nullptr;
@@ -72,9 +76,11 @@ namespace Registry {
 
 	RegistryKey& RegistryKey::operator=(RegistryKey&& key) noexcept {
 		this->bKeyExists = key.bKeyExists;
+		this->bWow64 = key.bWow64;
 		this->hkBackingKey = key.hkBackingKey;
 
 		key.bKeyExists = false;
+		key.bWow64 = false;
 		key.path = {};
 		key.hkHive = nullptr;
 		key.hkBackingKey = nullptr;
@@ -82,10 +88,12 @@ namespace Registry {
 		return *this;
 	}
 
-	RegistryKey::RegistryKey(HKEY key){
-		this->hkBackingKey = key;
+	/// TODO - Add smart WoW64 checking
+	RegistryKey::RegistryKey(HKEY key) :
+		bKeyExists{ true },
+		bWow64{ false },
+		hkBackingKey{ key }{
 
-		this->bKeyExists = true;
 
 		if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
 			_ReferenceCounts[hkBackingKey] = 1;
@@ -95,9 +103,12 @@ namespace Registry {
 	}
 
 	RegistryKey::RegistryKey(HKEY hive, std::wstring path, bool WoW64){
-		LSTATUS status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_ALL_ACCESS, &hkBackingKey);
+		auto wLowerPath = ToLowerCase(path);
+
+		bWow64 = WoW64 || wLowerPath.find(L"wow6432node") != std::wstring::npos;
+		LSTATUS status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_ALL_ACCESS | (bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
 		if(status == ERROR_ACCESS_DENIED){
-			status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_READ | KEY_NOTIFY, &hkBackingKey);
+			status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_READ | KEY_NOTIFY | (bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
 		}
 
 		if(status != ERROR_SUCCESS){
@@ -125,6 +136,7 @@ namespace Registry {
 
 		if(vHiveNames.find(HiveName) == vHiveNames.end()){
 			this->bKeyExists = false;
+			this->bWow64 = false;
 			this->hkBackingKey = nullptr;
 		}
 
@@ -133,15 +145,18 @@ namespace Registry {
 
 			if(slash == name.length()){
 				this->bKeyExists = true;
+				this->bWow64 = false;
 				this->hkBackingKey = hkHive;
 			}
 
 			else {
 				path = name.substr(slash + 1, name.length());
+				auto wLowerPath = ToLowerCase(path);
 
-				LSTATUS status = RegOpenKeyEx(hkHive, path.c_str(), 0, KEY_ALL_ACCESS, &hkBackingKey);
+				bWow64 = WoW64 || wLowerPath.find(L"wow6432node") != std::wstring::npos;
+				LSTATUS status = RegOpenKeyEx(hkHive, path.c_str(), 0, KEY_ALL_ACCESS | (WoW64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
 				if(status == ERROR_ACCESS_DENIED){
-					status = RegOpenKeyEx(hkHive, path.c_str(), 0, KEY_READ | KEY_NOTIFY, &hkBackingKey);
+					status = RegOpenKeyEx(hkHive, path.c_str(), 0, KEY_READ | KEY_NOTIFY | (WoW64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
 				}
 
 				if(status == ERROR_SUCCESS){
@@ -161,7 +176,7 @@ namespace Registry {
 
 	RegistryKey::~RegistryKey(){
 		if(_ReferenceCounts.find(hkBackingKey) != _ReferenceCounts.end()){
-			if(!--_ReferenceCounts[hkBackingKey]){
+			if(!--_ReferenceCounts[hkBackingKey] && !(ULONG_PTR(hkBackingKey) & 0xFFFFFFFF80000000)){
 				CloseHandle(hkBackingKey);
 			}
 		}
@@ -313,7 +328,7 @@ namespace Registry {
 
 	template<>
 	bool RegistryKey::SetValue(const std::wstring& name, LPCWSTR value, DWORD size, DWORD type) const {
-		return RegistryKey::SetRawValue(name, { PBYTE(value), wcslen(value), AllocationWrapper::STACK_ALLOC }, type);
+		return RegistryKey::SetRawValue(name, { PBYTE(value), wcslen(value) * 2 + 2, AllocationWrapper::STACK_ALLOC }, type);
 	}
 	template bool RegistryKey::SetValue<LPCWSTR>(const std::wstring& name, LPCWSTR value, DWORD size, DWORD type) const;
 
@@ -477,6 +492,9 @@ namespace Registry {
 		return GetName();
 	}
 
+	bool RegistryKey::operator==(const RegistryKey& key) const {
+		return hkBackingKey == key.hkBackingKey;
+	}
 
 	bool RegistryKey::operator<(const RegistryKey& key) const {
 		return hkBackingKey < key.hkBackingKey;

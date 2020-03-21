@@ -40,12 +40,10 @@ typedef std::function<void(std::shared_ptr<FILE_DETECTION>)> DetectFile;
 
 /// A struct containing information about a registry key value identified in a hunt
 struct REGISTRY_DETECTION : public DETECTION {
-	std::wstring wsRegistryKeyPath;
-	Registry::RegistryValue contents;
-	REGISTRY_DETECTION(const std::wstring& wsRegistryKeyPath, const Registry::RegistryValue& contents) :
+	Registry::RegistryValue value;
+	REGISTRY_DETECTION(const Registry::RegistryValue& value) :
 		DETECTION{ DetectionType::Registry },
-		wsRegistryKeyPath{ wsRegistryKeyPath },
-		contents{ contents }{}
+		value{ value }{}
 };
 typedef std::function<void(std::shared_ptr<REGISTRY_DETECTION>)> DetectRegistry;
 

@@ -3,7 +3,9 @@
 
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
-#include <util\filesystem\YaraScanner.h>
+#include "util/filesystem/YaraScanner.h"
+
+#include "common/Utils.h"
 
 using namespace Registry;
 
@@ -15,37 +17,24 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	int HuntT1015::EvaluateRegistry(Reaction reaction) {
+	int HuntT1015::EvaluateRegistry(Reaction& reaction) {
 		int detections = 0;
 
-		// Check Registry Debuggers
-		std::map<RegistryKey, std::vector<RegistryValue>> keys;
-
-		for (auto key : vAccessibilityBinaries) {
-			auto subkey = RegistryKey{ HKEY_LOCAL_MACHINE, wsIFEO + key };
-			auto subkey2 = RegistryKey{ HKEY_LOCAL_MACHINE, wsIFEOWow64 + key };
-
-			keys.emplace(subkey, CheckValues(subkey, {
-				{ L"Debugger", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
-				}));
-
-			keys.emplace(subkey2, CheckValues(subkey2, {
-				{ L"Debugger", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
-				}));
-		}
-
-		for (const auto& key : keys) {
-			for (const auto& value : key.second) {
+		for (auto& key : vAccessibilityBinaries) {
+			std::vector<RegistryValue> debugger{ CheckValues(HKEY_LOCAL_MACHINE, wsIFEO + key, {
+				{ L"Debugger", L"", false, CheckSzEmpty },
+            }, true, false) };
+			for(auto& detection : debugger){
 				detections++;
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
-				LOG_INFO(key.first.GetName() << L" is configured with a Debugger value of " << value);
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+				LOG_INFO(detection.key.GetName() << L" is configured with a Debugger value of " << detection);
 
 				auto& yara = YaraScanner::GetInstance();
 
-				FileSystem::File file = FileSystem::File(value.ToString());
+				FileSystem::File file = FileSystem::File(detection.ToString());
 				YaraScanResult result = yara.ScanFile(file);
 
-				if (!result && result.vKnownBadRules.size() > 0) {
+				if(!result && result.vKnownBadRules.size() > 0) {
 					detections++;
 					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 				}
@@ -55,7 +44,7 @@ namespace Hunts {
 		return detections;
 	}
 
-	int HuntT1015::EvaluateFiles(Reaction reaction) {
+	int HuntT1015::EvaluateFiles(Reaction& reaction) {
 		int detections = 0;
 
 		auto& yara = YaraScanner::GetInstance();
@@ -99,8 +88,7 @@ namespace Hunts {
 		std::vector<std::shared_ptr<Event>> events;
 
 		for (auto key : vAccessibilityBinaries) {
-			events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, wsIFEO + key }, false));
-			events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, wsIFEOWow64 + key }, false));
+			ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, wsIFEO + key, true, false, false));
 		}
 
 		return events;

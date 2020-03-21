@@ -21,7 +21,7 @@ public:
 
 	void AddCallback(const std::function<void()>& callback);
 
-	void RunCallbacks() const;
+	virtual void RunCallbacks() const;
 
 	virtual bool Subscribe() = 0;
 
@@ -61,7 +61,6 @@ struct RegistryEventThreadArgs;
 
 class RegistryEvent : public Event {
 	HandleWrapper hEvent;
-	Registry::RegistryKey key;
 	bool WatchSubkeys;
 
 	static HandleWrapper hMutex;
@@ -72,6 +71,8 @@ class RegistryEvent : public Event {
 	static void DispatchRegistryThread();
 
 public:
+	Registry::RegistryKey key;
+
 	RegistryEvent(const Registry::RegistryKey& key, bool WatchSubkeys = false);
 
 	const HandleWrapper& GetEvent() const;
@@ -85,3 +86,7 @@ struct RegistryEventThreadArgs {
 	HandleWrapper Notify;
 	std::optional<RegistryEvent>* Events;
 };
+
+namespace Registry {
+	std::vector<std::shared_ptr<Event>> GetRegistryEvents(HKEY hkHive, const std::wstring& path, bool WatchWow64 = true, bool WatchUsers = true, bool WatchSubkeys = false);
+}

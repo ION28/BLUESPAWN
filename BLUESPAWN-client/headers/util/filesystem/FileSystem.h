@@ -28,6 +28,12 @@ namespace FileSystem {
 		//Whether or not this current file actually exists on the filesystem
 		bool bFileExists; 
 
+		//Whether or not the program has write access to the file
+		bool bWriteAccess;
+
+		//Whether or not the program has read access to the file
+		bool bReadAccess;
+
 		//Path to the file
 		std::wstring FilePath;
 
@@ -79,6 +85,24 @@ namespace FileSystem {
 		*/
 		bool GetFileExists() const {
 			return bFileExists;
+		}
+
+		/**
+		* Function to check if program has write access to the file
+		* 
+		* return true if program has write access, false otherwise
+		*/
+		bool GetWriteAccess() const {
+			return bWriteAccess;
+		}
+
+		/**
+		* Function to check if program has read access to the file
+		*
+		* return true if program has read access, false otherwise
+		*/
+		bool GetReadAccess() const {
+			return bReadAccess;
 		}
 
 		/**

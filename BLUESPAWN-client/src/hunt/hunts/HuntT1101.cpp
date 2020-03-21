@@ -18,24 +18,22 @@ namespace Hunts {
 		LOG_INFO(L"Hunting for " << name << " at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
-		std::map<RegistryKey, std::vector<RegistryValue>> keys;
-
-		auto Lsa = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
-		keys.emplace(Lsa, CheckValues(Lsa, {
-			{L"Security Packages", RegistryType::REG_MULTI_SZ_T, okSecPackages, false, CheckMultiSzSubset },
-		}));
-
-		auto OSConfig = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig" };
-		keys.emplace(OSConfig, CheckValues(OSConfig, {
-			{L"Security Packages", RegistryType::REG_MULTI_SZ_T, okSecPackages, false, CheckMultiSzSubset },
-		}));
-
 		int detections = 0;
-		for(const auto& key : keys){
-			for(const auto& value : key.second){
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
-				detections++;
-			}
+
+		auto safeSecPackages = okSecPackages;
+		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", {
+			{L"Security Packages", std::move(safeSecPackages), false, CheckMultiSzSubset },
+		})){
+			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			detections++;
+		}
+
+		safeSecPackages = okSecPackages;
+		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", {
+			{L"Security Packages", std::move(safeSecPackages), false, CheckMultiSzSubset },
+		})){
+			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			detections++;
 		}
 
 		reaction.EndHunt();
@@ -44,8 +42,10 @@ namespace Hunts {
 
 	std::vector<std::shared_ptr<Event>> HuntT1101::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
+
 		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" }));
 		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig" }));
+
 		return events;
 	}
 }

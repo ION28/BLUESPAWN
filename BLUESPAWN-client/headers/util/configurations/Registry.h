@@ -11,9 +11,20 @@
 #include "common/wrappers.hpp"
 
 #include "util/log/Loggable.h"
-#include "util/configurations/RegistryValue.h"
 
 DEFINE_FUNCTION(DWORD, NtQueryKey, NTAPI, HANDLE KeyHandle, int KeyInformationClass, PVOID KeyInformation, ULONG Length, PULONG ResultLength);
+
+/**
+ * This enum represents the datatypes stored in the registry.
+ * While other types do exist, for now, support only exists for the below types.
+ */
+enum class RegistryType {
+	REG_SZ_T,
+	REG_EXPAND_SZ_T,
+	REG_MULTI_SZ_T,
+	REG_DWORD_T,
+	REG_BINARY_T
+};
 
 namespace Registry {
 	extern std::map<std::wstring, HKEY> vHiveNames;
@@ -50,6 +61,8 @@ namespace Registry {
 		 *
 		 * @param base The base key.
 		 * @param path The path relative to the base key.
+		 * @param WoW64 Indicate whether this instance should refer to the WoW64 version of a key. For keys without 
+		 *        WoW64 versions, this has no effect. If Wow6432node is part of the provided path, this value is ignored.
 		 */
 		RegistryKey(HKEY base, std::wstring path, bool WoW64 = false);
 
@@ -72,6 +85,7 @@ namespace Registry {
 		HKEY hkBackingKey;
 
 		bool bKeyExists;
+		bool bWow64;
 
 		HKEY hkHive{};
 		std::wstring path{};
@@ -107,7 +121,7 @@ namespace Registry {
 		 * Reads the raw bytes present in a given value. 
 		 *
 		 * @return A AllocationWrapper object pointing to the bytes read if the value is present, or
-		 *	       an empty memory wrapper if the value is not present. The memory must be freed.
+		 *	       an empty memory wrapper if the value is not present.
 		 */
 		AllocationWrapper GetRawValue(const std::wstring& wsValueName) const;
 
@@ -201,6 +215,15 @@ namespace Registry {
 		 * @return true or false
 		 */
 		bool operator<(const RegistryKey& key) const;
+
+		/**
+		 * Override the == operator for comparisons.
+		 *
+		 * @param key The key to compare
+		 *
+		 * @return true or false
+		 */
+		bool operator==(const RegistryKey& key) const;
 
 		/**
 		 * Removes a value from the referenced registry key.

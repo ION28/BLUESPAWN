@@ -10,11 +10,10 @@
 namespace Reactions{
 
 	void RemoveValueReaction::RemoveRegistryIdentified(std::shared_ptr<REGISTRY_DETECTION> detection){
-		if(io.GetUserConfirm(L"Registry key " + detection->wsRegistryKeyPath + L" contains potentially malicious value "
-			+ detection->contents.wValueName + L" with data " + detection->contents.ToString() + L". Remove value?") == 1){
-			auto key = Registry::RegistryKey{ detection->wsRegistryKeyPath };
-			if(!key.RemoveValue(detection->contents.wValueName)){
-				LOG_ERROR("Unable to remove registry value " << detection->wsRegistryKeyPath << ": " << detection->contents.wValueName << " (Error " << GetLastError() << ")");
+		if(io.GetUserConfirm(L"Registry key " + detection->value.key.ToString() + L" contains potentially malicious value "
+			+ detection->value.wValueName + L" with data " + detection->value.ToString() + L". Remove value?") == 1){
+			if(!detection->value.key.RemoveValue(detection->value.wValueName)){
+				LOG_ERROR("Unable to remove registry value " << detection->value.key.ToString() << ": " << detection->value.wValueName << " (Error " << GetLastError() << ")");
 			}
 		}
 	}

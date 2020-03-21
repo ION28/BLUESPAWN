@@ -2,6 +2,7 @@
 build/
 artifacts/
 packages/
+vcpkg/
 BLUESPAWN-client/external/
 BLUESPAWN-client/resources/severe
 BLUESPAWN-client/resources/indicators

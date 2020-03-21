@@ -19,18 +19,11 @@ namespace Mitigations {
 		) {}
 
 	bool MitigateV1093::MitigationIsEnforced(SecurityLevel level) {
-		std::map<RegistryKey, std::vector<RegistryValue>> keys;
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Lsa" };
-
-		keys.emplace(key, CheckValues(key, {
-			{ L"RestrictAnonymous", RegistryType::REG_DWORD_T, 1, true, CheckDwordEqual },
-		}));
-
-		for (const auto& key : keys) {
-			for (const auto& value : key.second) {
-				LOG_INFO(L"[" + name + L"] RestrictAnonymous value is not set to 1");
-				return false;
-			}
+		auto data = key.GetValue<DWORD>(L"RestrictAnonymous");
+		if(!data || !*data){
+			LOG_INFO(L"[" + name + L"] RestrictAnonymous value is not set to 1");
+			return false;
 		}
 
 		return true;

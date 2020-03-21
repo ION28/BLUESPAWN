@@ -4,6 +4,8 @@
 #include "util/log/Log.h"
 #include "util/configurations/Registry.h"
 
+#include "common/Utils.h"
+
 using namespace Registry;
 
 namespace Hunts{
@@ -18,50 +20,29 @@ namespace Hunts{
 		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
-		std::map<RegistryKey, std::vector<RegistryValue>> keys;
+		std::vector<RegistryValue> values;
 
 		auto IFEO = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options" };
 		for(auto subkey : IFEO.EnumerateSubkeys()){
-			keys.emplace(subkey, CheckValues(subkey, {
-				{ L"Debugger", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
-				{ L"GlobalFlag", RegistryType::REG_DWORD_T, 0, false, [](DWORD d1, DWORD d2){ return !(d1 & 0x200); } },
+			ADD_ALL_VECTOR(values, CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options", {
+				{ L"Debugger", L"", false, CheckSzEmpty },
+				{ L"GlobalFlag", 0, false, [](DWORD d1, DWORD d2){ return !(d1 & 0x200); } },
 			}));
 			auto GFlags = subkey.GetValue<DWORD>(L"GlobalFlag");
 			if(GFlags && *GFlags & 0x200){
 				auto name = subkey.GetName();
 				name = name.substr(name.find_last_of(L"\\") + 1);
-				auto SilentProcessExit = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit\\" + name };
-				keys.emplace(SilentProcessExit, CheckValues(SilentProcessExit, {
-					{ L"ReportingMode", RegistryType::REG_DWORD_T, 0, false, CheckDwordEqual },
-					{ L"MonitorProcess", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
-				}));
-			}
-		}
-
-		auto IFEOWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options" };
-		for(auto subkey : IFEOWow64.EnumerateSubkeys()){
-			keys.emplace(subkey, CheckValues(subkey, {
-				{ L"Debugger", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
-				{ L"GlobalFlag", RegistryType::REG_DWORD_T, 0, false, [](DWORD d1, DWORD d2){ return !(d1 & 0x200); } },
-				}));
-			auto GFlags = subkey.GetValue<DWORD>(L"GlobalFlag");
-			if(GFlags && *GFlags & 0x200){
-				auto name = subkey.GetName();
-				name = name.substr(name.find_last_of(L"\\") + 1);
-				auto SilentProcessExit = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit\\" + name };
-				keys.emplace(SilentProcessExit, CheckValues(SilentProcessExit, {
-					{ L"ReportingMode", RegistryType::REG_DWORD_T, 0, false, CheckDwordEqual },
-					{ L"MonitorProcess", RegistryType::REG_SZ_T, L"", false, CheckSzEmpty },
+				ADD_ALL_VECTOR(values, CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit\\" + name, {
+					{ L"ReportingMode", 0, false, CheckDwordEqual },
+					{ L"MonitorProcess", L"", false, CheckSzEmpty },
 				}));
 			}
 		}
 
 		int detections = 0;
-		for(const auto& key : keys){
-			for(const auto& value : key.second){
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(key.first.GetName(), value));
-				detections++;
-			}
+		for(const auto& value : values){
+			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(value));
+			detections++;
 		}
 
 		reaction.EndHunt();
@@ -70,10 +51,10 @@ namespace Hunts{
 
 	std::vector<std::shared_ptr<Event>> HuntT1183::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options" }, true));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options" }, true));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit" }, true));
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit" }, true));
+
+		ADD_ALL_VECTOR(events, GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options", true, false, true));
+		ADD_ALL_VECTOR(events, GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options", true, false, true));
+		
 		return events;
 	}
 }
