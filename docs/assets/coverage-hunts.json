@@ -13,6 +13,11 @@
     "domain": "mitre-enterprise",
     "techniques": [
         {
+            "color": "#FCF26B",
+			"comment": "Covered by checking EventLogs for Security/4698, Task-Scheduler/106 events and monitoring for these events",
+            "techniqueID": "T1053"
+        },
+        {
             "color": "#5AADFF",
 			"comment": "Covered by checking EventLogs for Security/4720 events and monitoring for these events",
             "techniqueID": "T1136"
