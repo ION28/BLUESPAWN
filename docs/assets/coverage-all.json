@@ -99,7 +99,7 @@
         },
         {
             "color": "#5AADFF",
-			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025)",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025). DLL Safe Search mode is enabled (V-3479)",
             "techniqueID": "T1177"
         },
         {
@@ -136,7 +136,12 @@
 			"color": "#5AADFF",
 			"comment": "Covered by checking Sysmon Logs for EID 2 events, YARA scanning those files, and monitoring for these events",
 			"techniqueID": "T1099"
-		}
+		},
+        {
+            "color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+            "techniqueID": "T1038"
+        }
     ],
     "legendItems": [
         {
