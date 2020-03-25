@@ -72,7 +72,7 @@ If you have any questions, comments, or suggestions, please feel free to send us
 ## Licensing & Compliance
 The core BLUESPAWN code is licensed under [GNU General Public License (GPL) v3.0](https://github.com/ION28/BLUESPAWN/blob/master/LICENSE).
 
-Note that the project integrates several other libraries to provide additional features/detections. One of these is Florian Roth's [signature-base](https://github.com/Neo23x0/signature-base) which is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/). YARA rules from this project are integrated into the standard build without any changes. In order to use BLUESPAWN for any commercial purposes, you must remove everything under the "Non-Commercial Only" line in [this file](https://github.com/ION28/BLUESPAWN/blob/master/BLUESPAWN-client/resources/severe.yar) and recompile the project.
+Note that the project integrates several other libraries to provide additional features/detections. One of these is Florian Roth's [signature-base](https://github.com/Neo23x0/signature-base) which is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/). YARA rules from this project are integrated into the standard build without any changes. In order to use BLUESPAWN for any commercial purposes, you must remove everything under the "Non-Commercial Only" line in [this file](https://github.com/ION28/BLUESPAWN/blob/master/BLUESPAWN-client/resources/severe2.yar) and recompile the project.
 
 ## Project Authors
 Made with :heart: by the UVA Cyber Defense Team Windows Group
