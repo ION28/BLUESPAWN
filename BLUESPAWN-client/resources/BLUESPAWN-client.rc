@@ -51,6 +51,7 @@ END
 //
 
 YaraSevere              yararule                "resources\\severe"
+YaraSevere2             yararule                "resources\\severe2"
 
 YaraIndicators          yararule                "resources\\indicators"
 

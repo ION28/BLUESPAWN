@@ -83,7 +83,7 @@ namespace Hunts{
 	}
 
 	int HuntT1055::ScanNormal(const Scope& scope, Reaction reaction){
-		LOG_INFO(L"Hunting for T1055 " << name << L" at level Normal");
+		LOG_INFO(L"Hunting for " << name << L" at level Normal");
 		reaction.BeginHunt(GET_INFO());
 
 		int identified = 0;

@@ -62,6 +62,17 @@ YaraScanner::YaraScanner() :
 		status = YaraStatus::RulesMissing;
 		return;
 	}
+	
+	auto hSevereYara2 = GetResourceRule(YaraSevere2);
+	if(!hSevereYara2){
+		status = YaraStatus::RulesMissing;
+		return;
+	} 
+	KnownBad2 = LoadRules(hSevereYara2);
+	if(!KnownBad2){
+		status = YaraStatus::RulesMissing;
+		return;
+	}
 
 	auto hIndicatorsYara = GetResourceRule(YaraIndicators);
 	if(!hIndicatorsYara){
@@ -79,6 +90,11 @@ YaraScanner::~YaraScanner(){
 	if(KnownBad){
 		yr_rules_destroy(KnownBad);
 		KnownBad = nullptr;
+	}
+	
+	if(KnownBad2){
+		yr_rules_destroy(KnownBad2);
+		KnownBad2 = nullptr;
 	}
 
 	if(Indicators){
@@ -129,6 +145,12 @@ YaraScanResult YaraScanner::ScanFile(const FileSystem::File& file) const {
 
 	arg.type = arg.Severe;
 	auto status = yr_rules_scan_mem(KnownBad, reinterpret_cast<const uint8_t*>((LPVOID) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
+	if(status != ERROR_SUCCESS){
+		arg.result.status = YaraStatus::Failure;
+	}
+	
+	arg.type = arg.Severe;
+	status = yr_rules_scan_mem(KnownBad2, reinterpret_cast<const uint8_t*>((LPVOID) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
 	if(status != ERROR_SUCCESS){
 		arg.result.status = YaraStatus::Failure;
 	}

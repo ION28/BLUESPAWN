@@ -19,3 +19,6 @@
 [submodule "vcpkg"]
 	path = vcpkg
 	url = https://github.com/Microsoft/vcpkg.git
+[submodule "BLUESPAWN-client/external/signature-base"]
+	path = BLUESPAWN-client/external/signature-base
+	url = https://github.com/Neo23x0/signature-base
