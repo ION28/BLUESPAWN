@@ -8,8 +8,10 @@
 namespace Reactions {
 
 	void CarveProcessReaction::CarveProcessIdentified(std::shared_ptr<PROCESS_DETECTION> detection){
-		auto remover = PERemover{ static_cast<DWORD>(detection->PID), detection->lpAllocationBase, detection->dwAllocationSize };
-		remover.RemoveImage();
+		if(io.GetUserConfirm(detection->wsCmdline + L" appears to be infected. Suspend process?") == 1){
+			auto remover = PERemover{ static_cast<DWORD>(detection->PID), detection->lpAllocationBase, detection->dwAllocationSize };
+			remover.RemoveImage();
+		}
 	}
 
 	CarveProcessReaction::CarveProcessReaction(const IOBase& io) : io{ io }{
