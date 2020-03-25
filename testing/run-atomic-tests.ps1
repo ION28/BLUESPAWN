@@ -9,6 +9,7 @@ Invoke-AtomicTest T1004 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsR
 Invoke-AtomicTest T1015 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1037 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1050 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
+Invoke-AtomicTest T1053 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1055 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1060 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1099 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
