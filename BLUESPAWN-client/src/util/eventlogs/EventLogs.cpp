@@ -1,6 +1,6 @@
 #include "util/eventlogs/EventLogs.h"
 #include "common/StringUtils.h"
-#include "hunt/reaction/Detections.h"
+#include "reaction/Detections.h"
 #include "util/log/Log.h"
 
 const int SIZE_DATA = 4096;

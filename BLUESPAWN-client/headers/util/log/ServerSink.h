@@ -9,7 +9,7 @@
 #include "LogSink.h"
 #include "LogLevel.h"
 #include "ReactionData.pb.h"
-#include "hunt/reaction/Detections.h"
+#include "reaction/Detections.h"
 
 namespace Log {
 

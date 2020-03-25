@@ -1,5 +1,5 @@
 #include "hunt/RegistryHunt.h"
-#include "hunt/reaction/Reaction.h"
+#include "reaction/Reaction.h"
 
 #include "util/log/HuntLogMessage.h"
 #include "util/log/Log.h"

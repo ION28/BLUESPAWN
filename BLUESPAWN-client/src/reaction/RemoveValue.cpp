@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 
-#include "hunt/reaction/RemoveValue.h"
+#include "reaction/RemoveValue.h"
 #include "util/configurations/Registry.h"
 #include "common/wrappers.hpp"
 

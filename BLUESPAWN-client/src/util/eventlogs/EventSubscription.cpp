@@ -1,5 +1,5 @@
 #include "util/eventlogs/EventSubscription.h"
-#include "hunt/reaction/Detections.h"
+#include "reaction/Detections.h"
 #include "util/log/Log.h"
 #include "util/eventlogs/EventLogs.h"
 

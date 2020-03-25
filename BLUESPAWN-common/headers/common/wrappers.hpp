@@ -25,7 +25,8 @@ public:
 	    }}{}
 
 	operator T() const { return WrappedObject; }
-	T* operator *(){ return *WrappedObject; }
+	T* operator *(){ return WrappedObject; }
+	T operator ->(){ return WrappedObject; }
 	T& operator &(){ return &WrappedObject; }
 	bool operator ==(T object){ return WrappedObject == object; }
 	bool operator !(){ return !WrappedObject || WrappedObject == BadValue; }

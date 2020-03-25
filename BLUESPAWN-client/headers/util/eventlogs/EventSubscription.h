@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <winevt.h>
 #include <functional>
-#include "hunt/reaction/Detections.h"
+#include "reaction/Detections.h"
 #include "util/eventlogs/EventLogItem.h"
 
 #pragma comment(lib, "wevtapi.lib")

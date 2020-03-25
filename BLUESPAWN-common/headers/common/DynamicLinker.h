@@ -14,8 +14,3 @@
     namespace Linker {                                                                                  \
         name##_type name## = reinterpret_cast<name##_type>(GetProcAddress(LoadLibraryW(L#dll), #name)); \
     }
-
-namespace Linker {
-	extern std::vector<std::function<bool()>> LoadCalls;
-	bool LinkFunctions();
-}

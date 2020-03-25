@@ -2,7 +2,7 @@
 
 #include "util/log/Log.h"
 #include "util/configurations/Registry.h"
-#include "hunt/reaction/Log.h"
+#include "reaction/Log.h"
 #include "util/eventlogs/EventLogs.h"
 
 namespace Mitigations {
