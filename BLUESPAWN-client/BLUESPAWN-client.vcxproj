@@ -275,6 +275,7 @@
   <ItemGroup>
     <None Include="resources\indicators" />
     <None Include="resources\severe" />
+    <None Include="resources\severe2" />
   </ItemGroup>
   <ItemDefinitionGroup>
     <BuildLog>

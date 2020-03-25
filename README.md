@@ -69,6 +69,11 @@ BLUESPAWN consists of 3 major modes as listed below. Several of these modules ha
 ## Contact Us
 If you have any questions, comments, or suggestions, please feel free to send us an email at <bluespawn@virginia.edu>
 
+## Licensing & Compliance
+The core BLUESPAWN code is licensed under [GNU General Public License (GPL) v3.0](https://github.com/ION28/BLUESPAWN/blob/master/LICENSE).
+
+Note that the project integrates several other libraries to provide additional features/detections. One of these is Florian Roth's [signature-base](https://github.com/Neo23x0/signature-base) which is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/). YARA rules from this project are integrated into the standard build without any changes. In order to use BLUESPAWN for any commercial purposes, you must remove everything under the "Non-Commercial Only" line in [this file](https://github.com/ION28/BLUESPAWN/blob/master/BLUESPAWN-client/resources/severe.yar) and recompile the project.
+
 ## Project Authors
 Made with :heart: by the UVA Cyber Defense Team Windows Group
 
@@ -94,6 +99,7 @@ We would like to provide a special thank you to the following projects that have
 * [@hasherezade](https://github.com/hasherezade)'s [PE Sieve](https://github.com/hasherezade/pe-sieve), which currently manages our process analytics
 * VirusTotal's [YARA](https://github.com/VirusTotal/yara) Project which we use to scan data for malicious identifiers
 * The [Yara Rules Project](https://twitter.com/yararules)'s [Rules](https://github.com/Yara-Rules/rules) repository which contains a large collection of open-source YARA rules
+* [@Neo23x0](https://github.com/Neo23x0)'s open-source [signature-base](https://github.com/Neo23x0/signature-base) project which contains a large collection of YARA rules
 * The [MITRE's ATT&CK Project](https://attack.mitre.org/) which has put together an amazing framework for which to consider, document, and categorize attacker tradercraft
 * Red Canary's [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) and [Invoke-AtomicRedTeam](https://github.com/redcanaryco/invoke-atomicredteam) Projects which have been incredibly useful in helping to test the detections we are building
 * Amazon's [Open Source at AWS Initiative](https://aws.amazon.com/opensource/) who has provided our team some AWS promotional credits to help us reserach and test BLUESPAWN better

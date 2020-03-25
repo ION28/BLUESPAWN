@@ -106,6 +106,7 @@
     <PostBuildEvent>
       <Command>cmd /c "
 $(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe.yar $(ProjectDir)resources\severe &amp; 
+$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe2.yar $(ProjectDir)resources\severe2 &amp; 
 $(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\indicators.yar $(ProjectDir)resources\indicators &amp; 
 exit 0
 "</Command>
@@ -131,6 +132,7 @@ exit 0
     <PostBuildEvent>
       <Command>cmd /c "
 $(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe.yar $(ProjectDir)resources\severe &amp; 
+$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe2.yar $(ProjectDir)resources\severe2 &amp; 
 $(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\indicators.yar $(ProjectDir)resources\indicators &amp; 
 exit 0
 "</Command>
@@ -158,6 +160,7 @@ exit 0
     <PostBuildEvent>
       <Command>cmd /c "
 $(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe.yar $(ProjectDir)resources\severe &amp; 
+$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe2.yar $(ProjectDir)resources\severe2 &amp; 
 $(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\indicators.yar $(ProjectDir)resources\indicators &amp; 
 exit 0
 "</Command>
@@ -185,6 +188,7 @@ exit 0
     <PostBuildEvent>
       <Command>cmd /c "
 $(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe.yar $(ProjectDir)resources\severe &amp; 
+$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe2.yar $(ProjectDir)resources\severe2 &amp; 
 $(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\indicators.yar $(ProjectDir)resources\indicators &amp; 
 exit 0
 "</Command>
