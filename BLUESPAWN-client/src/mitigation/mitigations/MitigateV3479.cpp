@@ -11,7 +11,7 @@ namespace Mitigations {
 	MitigateV3479::MitigateV3479() :
 		Mitigation(
 			L"V-3479 - The system will be configured to use Safe DLL Search Mode",
-			L"he default search behavior, when an application calls a function in a Dynamic Link Library (DLL), "
+			L"The default search behavior, when an application calls a function in a Dynamic Link Library (DLL), "
 			"is to search the current directory followed by the directories contained in the systems path environment "
 			"variable. An unauthorized DLL inserted into an applications working directory could allow malicious code "
 			"to be run on the system. Creating the following registry key and setting the appropriate value forces the "
