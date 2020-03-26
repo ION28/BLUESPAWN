@@ -5,6 +5,7 @@
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
 #include "util/log/HuntLogMessage.h"
+#include "util/processes/ProcessUtils.h"
 #include "common/wrappers.hpp"
 
 #include "pe_sieve.h"
@@ -68,7 +69,7 @@ namespace Hunts{
 
 			for(auto module : report->scan_report->module_reports){
 				if(module->status & SCAN_SUSPICIOUS){
-					reaction.ProcessIdentified(std::make_shared<PROCESS_DETECTION>(path, path, pid, module->module, module->moduleSize, identifiers));
+					reaction.ProcessIdentified(std::make_shared<PROCESS_DETECTION>(path, GetProcessCommandline(pid), pid, module->module, module->moduleSize, identifiers));
 				}
 			}
 
