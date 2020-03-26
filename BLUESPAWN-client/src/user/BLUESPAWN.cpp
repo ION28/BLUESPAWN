@@ -14,6 +14,7 @@
 #include "hunt/hunts/HuntT1015.h"
 #include "hunt/hunts/HuntT1037.h"
 #include "hunt/hunts/HuntT1050.h"
+#include "hunt/hunts/HuntT1053.h"
 #include "hunt/hunts/HuntT1055.h"
 #include "hunt/hunts/HuntT1060.h"
 #include "hunt/hunts/HuntT1099.h"
@@ -41,6 +42,7 @@
 #include "mitigation/mitigations/MitigateV3340.h"
 #include "mitigation/mitigations/MitigateV3344.h"
 #include "mitigation/mitigations/MitigateV3379.h"
+#include "mitigation/mitigations/MitigateV3479.h"
 #include "mitigation/mitigations/MitigateV63597.h"
 #include "mitigation/mitigations/MitigateV63687.h"
 #include "mitigation/mitigations/MitigateV63753.h"
@@ -49,6 +51,7 @@
 #include "mitigation/mitigations/MitigateV63829.h"
 #include "mitigation/mitigations/MitigateV72753.h"
 #include "mitigation/mitigations/MitigateV73519.h"
+#include "mitigation/mitigations/MitigateV73585.h"
 
 #pragma warning(push)
 
@@ -71,6 +74,7 @@ Bluespawn::Bluespawn(){
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1015>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1037>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1050>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1053>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1055>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1060>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1099>());
@@ -96,6 +100,7 @@ Bluespawn::Bluespawn(){
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3340>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3344>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3379>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3479>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63597>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63687>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63753>());
@@ -104,6 +109,7 @@ Bluespawn::Bluespawn(){
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
 }
 
 void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {

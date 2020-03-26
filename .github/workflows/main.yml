@@ -20,13 +20,22 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Setup NuGet.exe
       uses: warrenbuckley/Setup-Nuget@v1
 
     - name: Update submodules
-      run: git submodule update --init --recursive --remote
+      run: git submodule update --init --recursive
+
+    - name: Install vcpkg
+      shell: powershell
+      run: |
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+        .\vcpkg.exe install yara:${{ matrix.buildarch }}-windows-static
+        .\vcpkg.exe integrate install
+        cd ..
 
     - name: Download NuGet packages
       run: nuget restore BLUESPAWN.sln

@@ -28,6 +28,7 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1015.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1037.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1050.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1053.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1055.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1060.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1099.h" />
@@ -59,6 +60,7 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3340.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3344.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3379.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV3479.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63597.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63687.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63753.h" />
@@ -67,6 +69,7 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63829.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV72753.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV73519.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV73585.h" />
     <ClInclude Include="headers\monitor\ETW_Wrapper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -151,6 +154,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1015.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1037.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1050.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1053.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1055.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1060.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1099.cpp" />
@@ -182,6 +186,7 @@
     <ClCompile Include="src\mitigation\mitigations\MitigateV3340.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3344.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3379.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV3479.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63597.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63687.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63753.cpp" />
@@ -190,6 +195,7 @@
     <ClCompile Include="src\mitigation\mitigations\MitigateV63829.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV72753.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV73519.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV73585.cpp" />
     <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -275,6 +281,7 @@
   <ItemGroup>
     <None Include="resources\indicators" />
     <None Include="resources\severe" />
+    <None Include="resources\severe2" />
   </ItemGroup>
   <ItemDefinitionGroup>
     <BuildLog>

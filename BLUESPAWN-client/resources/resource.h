@@ -3,6 +3,7 @@
 // Used by BLUESPAWN-client.rc
 //
 #define YaraSevere                      6
+#define YaraSevere2                     7
 #define YaraIndicators                  8
 #define IDR_YARARULE2                   101
 
