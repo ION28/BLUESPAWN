@@ -14,7 +14,7 @@
 
 #include "hunt/Hunt.h"
 #include "hunt/HuntRegister.h"
-#include "hunt/reaction/Reaction.h"
+#include "reaction/Reaction.h"
 
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"

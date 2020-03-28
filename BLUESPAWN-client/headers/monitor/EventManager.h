@@ -2,7 +2,7 @@
 
 #include <functional>
 #include <string>
-#include "hunt/reaction/Reaction.h"
+#include "reaction/Reaction.h"
 #include "hunt/Scope.h"
 #include "Event.h"
 #include "util/eventlogs/EventSubscription.h"

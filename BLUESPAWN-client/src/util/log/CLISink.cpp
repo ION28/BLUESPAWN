@@ -30,7 +30,7 @@ namespace Log {
 						std::wcout << L"\tPotentially malicious file detected - " << lpFileDetection->wsFilePath << L" (hash is " << StringToWidestring(lpFileDetection->hash) << L")" << std::endl;
 					} else if(detection->Type == DetectionType::Process){
 						auto lpProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);
-						std::wcout << L"\tPotentially malicious process detected - " << lpProcessDetection->wsImageName << L" (PID is " << lpProcessDetection->PID << L")" << std::endl;
+						std::wcout << L"\tPotentially malicious process detected - " << lpProcessDetection->wsImagePath << L" (PID is " << lpProcessDetection->PID << L")" << std::endl;
 					} else if(detection->Type == DetectionType::Service){
 						auto lpServiceDetection = std::static_pointer_cast<SERVICE_DETECTION>(detection);
 						std::wcout << L"\tPotentially malicious service detected - " << lpServiceDetection->wsServiceName << L" (PID is " << lpServiceDetection->ServicePID << L")" << std::endl;

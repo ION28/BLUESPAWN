@@ -19,7 +19,7 @@ namespace Log {
 						OutputDebugStringW((sLogHeader + L"\tPotentially malicious file detected - " + lpFileDetection->wsFilePath).c_str());
 					} else if(detection->Type == DetectionType::Process){
 						auto lpProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);
-						OutputDebugStringW((sLogHeader + L"\tPotentially malicious process detected - " + lpProcessDetection->wsImageName + L" (PID is " + std::to_wstring(lpProcessDetection->PID) + L")").c_str());
+						OutputDebugStringW((sLogHeader + L"\tPotentially malicious process detected - " + lpProcessDetection->wsCmdline + L" (PID is " + std::to_wstring(lpProcessDetection->PID) + L")").c_str());
 					} else if(detection->Type == DetectionType::Service){
 						auto lpServiceDetection = std::static_pointer_cast<SERVICE_DETECTION>(detection);
 						OutputDebugStringW((sLogHeader + L"\tPotentially malicious service detected - " + lpServiceDetection->wsServiceName + L" (PID is " + std::to_wstring(lpServiceDetection->ServicePID) + L")").c_str());

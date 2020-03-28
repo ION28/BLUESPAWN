@@ -72,26 +72,26 @@ enum class ProcessDetectionMethod {
 	Other          = 32
 };
 
-/// A struct containing information about a process identified in a hunt
-/// Note that the AllocationStart must be filled in manually
 struct PROCESS_DETECTION : public DETECTION {
-	std::wstring wsImageName;
 	std::wstring wsImagePath;
 	std::wstring wsCmdline;
 	int PID;
-	int TID;
 	DWORD method;
+	LPVOID lpAllocationBase;
+	DWORD dwAllocationSize;
 	BYTE AllocationStart[512];      // This member is intended to be used for signaturing purposes
-	PROCESS_DETECTION(const std::wstring& wsImageName, const std::wstring& wsImagePath, const std::wstring& wsCmdLine,
-		const int& PID, const int& TID, DWORD method) :
+	PROCESS_DETECTION(const std::wstring& wsImagePath, const std::wstring& wsCmdLine, const int& PID,
+		const LPVOID& lpAllocationBase, const DWORD& dwAllocationSize, const DWORD& method) :
 		DETECTION{ DetectionType::Process },
-		wsImageName{ wsImageName },
-		wsImagePath{ wsCmdLine },
+		wsImagePath{ wsImagePath },
+		wsCmdline{ wsCmdLine },
 		PID{ PID },
-		TID{ TID },
 		method{ method },
+		lpAllocationBase{ lpAllocationBase },
+		dwAllocationSize{ dwAllocationSize },
 		AllocationStart{}{}
 };
+
 typedef std::function<void(std::shared_ptr<PROCESS_DETECTION>)> DetectProcess;
 
 enum class ServiceType {

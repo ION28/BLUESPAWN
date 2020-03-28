@@ -6,8 +6,9 @@
 #include "common/DynamicLinker.h"
 #include "common/StringUtils.h"
 #include "util/eventlogs/EventLogs.h"
-#include "hunt/reaction/SuspendProcess.h"
-#include "hunt/reaction/RemoveValue.h"
+#include "reaction/SuspendProcess.h"
+#include "reaction/RemoveValue.h"
+#include "reaction/CarveMemory.h"
 
 #include "hunt/hunts/HuntT1004.h"
 #include "hunt/hunts/HuntT1015.h"
@@ -170,9 +171,7 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 
 int main(int argc, char* argv[]){
 
-	Linker::LinkFunctions();
-
-	Bluespawn bluespawn;
+	Bluespawn bluespawn{};
 
 	print_banner();
 
@@ -202,13 +201,13 @@ int main(int argc, char* argv[]){
 		auto result = options.parse(argc, argv);
 
 		if (result.count("verbose")) {
-			if (result["verbose"].as<int>() >= 1) {
+			if(result["verbose"].as<int>() >= 1) {
 				Log::LogLevel::LogVerbose1.Enable();
 			}
-			if (result["verbose"].as<int>() >= 2) {
+			if(result["verbose"].as<int>() >= 2) {
 				Log::LogLevel::LogVerbose2.Enable();
 			}
-			if (result["verbose"].as<int>() >= 3) {
+			if(result["verbose"].as<int>() >= 3) {
 				Log::LogLevel::LogVerbose3.Enable();
 			}
 		}
@@ -248,6 +247,7 @@ int main(int argc, char* argv[]){
 				{"log", Reactions::LogReaction{}},
 				{"remove-value", Reactions::RemoveValueReaction{ bluespawn.io }},
 				{"suspend", Reactions::SuspendProcessReaction{ bluespawn.io }},
+				{"carve-memory", Reactions::CarveProcessReaction{ bluespawn.io }},
 			};
 
 			auto UserReactions = result["reaction"].as<std::string>();
