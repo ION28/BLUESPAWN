@@ -29,7 +29,7 @@ AllocationWrapper GetResourceRule(DWORD identifier){
 				if(-1 != zip_stat(zip, "data", ZIP_STAT_SIZE, &stats)){
 
 					if(-1 != stats.size){
-						AllocationWrapper data{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, stats.size), stats.size, AllocationWrapper::HEAP_ALLOC };
+						AllocationWrapper data{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, static_cast<SIZE_T>(stats.size)), static_cast<SIZE_T>(stats.size), AllocationWrapper::HEAP_ALLOC };
 						if(-1 != zip_fread(fdRules, data, stats.size)){
 							zip_fclose(fdRules);
 							zip_close(zip);
