@@ -34,6 +34,7 @@ jobs:
         cd vcpkg
         .\bootstrap-vcpkg.bat
         .\vcpkg.exe install yara:${{ matrix.buildarch }}-windows-static
+        .\vcpkg.exe install libzip:${{ matrix.buildarch }}-windows-static
         .\vcpkg.exe integrate install
         cd ..
 

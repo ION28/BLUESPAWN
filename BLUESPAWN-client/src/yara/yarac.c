@@ -49,6 +49,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "args.h"
 #include "common.h"
 
+/// BEGIN MODIFICATIONS
+#include <zip.h>
+#include <string>
+/// END MODITIFICATIONS
 
 #ifndef MAX_PATH
 #define MAX_PATH 256
@@ -298,7 +302,33 @@ int main(
   {
     fprintf(stderr, "error: %d\n", result);
     exit_with_code(EXIT_FAILURE);
+  } 
+  /// BEGIN MODIFICATIONS
+  else {
+      std::string name = std::string{ argv[argc - 1] } +".z";
+      int err{};
+      auto zip = zip_open(name.c_str(), ZIP_CREATE, &err);
+      if(zip){
+          auto source = zip_source_file(zip, argv[argc - 1], 0, 0);
+          if(source){
+              if(-1 == zip_file_add(zip, "data", source, ZIP_FL_OVERWRITE)){
+                  zip_close(zip);
+                  zip_source_close(source);
+                  goto _exit;
+              }
+              zip_source_close(source);
+              zip_close(zip);
+              MoveFileExA(name.c_str(), argv[argc - 1], MOVEFILE_REPLACE_EXISTING);
+          }
+          if(!source){
+              zip_close(zip);
+              goto _exit;
+          }
+      } else {
+          goto _exit;
+      }
   }
+  /// END MODIFICATIONS
 
   result = EXIT_SUCCESS;
 
