@@ -51,11 +51,17 @@ namespace Hunts {
 
 		for (auto key : vAccessibilityBinaries) {
 			FileSystem::File file = FileSystem::File(L"C:\\Windows\\System32\\" + key);
+
 			YaraScanResult result = yara.ScanFile(file);
 
 			if (!result && result.vKnownBadRules.size() > 0) {
 				detections++;
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+			}
+			else if (!file.GetFileSigned()) {
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+				LOG_INFO(file.GetFilePath() << L" is not signed!");
+				detections++;
 			}
 		}
 
