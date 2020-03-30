@@ -48,7 +48,6 @@ namespace Hunts {
 
 		auto& yara = YaraScanner::GetInstance();
 		int detections = 0;
-
 		
 		for (auto result : queryResults) {
 			auto imageName = result.GetProperty(L"Event/EventData/Data[@Name='ServiceName']");
