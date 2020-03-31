@@ -8,36 +8,29 @@ using namespace Registry;
 
 namespace Hunts {
 	HuntT1101::HuntT1101() : Hunt(L"T1101 - Security Support Provider") {
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1101::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO(L"Hunting for " << name << " at level Cursory");
-		reaction.BeginHunt(GET_INFO());
-
-		int detections = 0;
+	std::vector<std::shared_ptr<DETECTION>> HuntT1101::RunHunt(const Scope& scope){
+		HUNT_INIT();
 
 		auto safeSecPackages = okSecPackages;
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", {
 			{L"Security Packages", std::move(safeSecPackages), false, CheckMultiSzSubset },
 		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detections++;
+			REGISTRY_DETECTION(detection);
 		}
 
 		safeSecPackages = okSecPackages;
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", {
 			{L"Security Packages", std::move(safeSecPackages), false, CheckMultiSzSubset },
 		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detections++;
+			REGISTRY_DETECTION(detection);
 		}
 
-		reaction.EndHunt();
-		return detections;
+		HUNT_END();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1101::GetMonitoringEvents() {

@@ -10,15 +10,13 @@ using namespace Registry;
 
 namespace Hunts{
 	HuntT1183::HuntT1183() : Hunt(L"T1183 - Image File Execution Options") {
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	int HuntT1183::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
-		reaction.BeginHunt(GET_INFO());
+	std::vector<std::shared_ptr<DETECTION>> HuntT1183::RunHunt(const Scope& scope){
+		HUNT_INIT();
 
 		std::vector<RegistryValue> values;
 
@@ -39,14 +37,11 @@ namespace Hunts{
 			}
 		}
 
-		int detections = 0;
 		for(const auto& value : values){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(value));
-			detections++;
+			REGISTRY_DETECTION(value);
 		}
 
-		reaction.EndHunt();
-		return detections;
+		HUNT_END();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1183::GetMonitoringEvents() {

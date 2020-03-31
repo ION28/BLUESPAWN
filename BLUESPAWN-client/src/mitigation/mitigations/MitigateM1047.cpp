@@ -43,7 +43,7 @@ namespace Mitigations {
 			LOG_VERBOSE(1, L"Sysmon is not installed.");
 			enforced = false;
 		}
-		if (sysmon.Exists() && sysmon.GetValue<DWORD>(L"Start") >= 3 || sysmon64.Exists() && sysmon64.GetValue<DWORD>(L"Start") >= 3) {
+		if (sysmon.Exists() && *sysmon.GetValue<DWORD>(L"Start") >= 3 || sysmon64.Exists() && *sysmon64.GetValue<DWORD>(L"Start") >= 3) {
 			LOG_VERBOSE(1, L"Sysmon is set to manual or disabled.");
 			enforced = false;
 		}
@@ -54,7 +54,7 @@ namespace Mitigations {
 			LOG_VERBOSE(1, L"Windows Event Log Service is not installed.");
 			enforced = false;
 		}
-		else if (eventLogService.GetValue<DWORD>(L"Start") >= 3) {
+		else if (eventLogService.GetValue<DWORD>(L"Start") >= 3u) {
 			LOG_VERBOSE(1, L"Windows Event Log Service is set to manual or disabled.");
 			enforced = false;
 		}

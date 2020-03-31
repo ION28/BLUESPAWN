@@ -13,17 +13,42 @@
 class HuntRegister;
 
 #define GET_INFO() \
-    HuntInfo{ this->name, __func__ == std::string{"ScanCursory"}  ? Aggressiveness::Cursory  :                             \
-                          __func__ == std::string{"ScanNormal"} ? Aggressiveness::Normal : Aggressiveness::Intensive, \
-              this->dwTacticsUsed, this->dwCategoriesAffected, this->dwSourcesInvolved,                                    \
+    HuntInfo{ this->name, this->dwTacticsUsed, this->dwCategoriesAffected, this->dwSourcesInvolved,                                    \
               (long) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() }
+
+#define HUNT_INIT() \
+	LOG_INFO("Hunting for " << name << " at level Cursory"); \
+    LOG_HUNT_BEGIN();                          \
+    std::vector<std::shared_ptr<DETECTION>> detections{};
+
+#define REGISTRY_DETECTION(value) \
+    detections.emplace_back(std::static_pointer_cast<DETECTION>(std::make_shared<REGISTRY_DETECTION>(value)));
+
+#define FILE_DETECTION(value) \
+    detections.emplace_back(std::static_pointer_cast<DETECTION>(std::make_shared<FILE_DETECTION>(value)));
+
+#define SERVICE_DETECTION(name, path) \
+    detections.emplace_back(std::static_pointer_cast<DETECTION>(std::make_shared<SERVICE_DETECTION>(name, path)));
+
+#define EVENT_DETECTION(log) \
+    detections.emplace_back(std::static_pointer_cast<DETECTION>(EventLogs::EventLogItemToDetection(log)));
+
+#define PROCESS_DETECTION(path, cmdline, pid, module, dwModuleSize, identifiers) \
+    detections.emplace_back(std::static_pointer_cast<DETECTION>(std::make_shared<PROCESS_DETECTION>(path, cmdline, pid, module, dwModuleSize, identifiers)));
+
+#define HUNT_END()                            \
+    for(const auto& detection : detections) { \
+        LOG_HUNT_DETECTION(detection);        \
+    }                                         \
+    LOG_HUNT_END();                           \
+	return detections;
+    
 
 class Hunt {
 protected:
 	DWORD dwTacticsUsed;
 	DWORD dwSourcesInvolved;
 	DWORD dwCategoriesAffected;
-	DWORD dwSupportedScans;
 
 	std::wstring name;
 
@@ -35,11 +60,8 @@ public:
 	bool UsesTactics(DWORD tactics);
 	bool UsesSources(DWORD sources);
 	bool AffectsCategory(DWORD category);
-	bool SupportsScan(Aggressiveness scan);
 
-	virtual int ScanCursory(const Scope& scope, Reaction reaction);
-	virtual int ScanNormal(const Scope& scope, Reaction reaction);
-	virtual int ScanIntensive(const Scope& scope, Reaction reaction);
+	virtual std::vector<std::shared_ptr<DETECTION>> RunHunt(const Scope& scope);
 
 	virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents();
 };

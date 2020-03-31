@@ -9,9 +9,7 @@ namespace Log {
 		const std::vector<std::shared_ptr<DETECTION>>& detections){
 		if(level.Enabled()){
 			if(level.severity == Severity::LogHunt){
-				std::wstring aggressiveness = info->HuntAggressiveness == Aggressiveness::Intensive ? L"Intensive" :
-					info->HuntAggressiveness == Aggressiveness::Normal ? L"Normal" : L"Cursory";
-				std::wstring sLogHeader = L"[" + info->HuntName + L": " + aggressiveness + L"] - ";
+				std::wstring sLogHeader = L"[" + info->HuntName + L"] - ";
 				OutputDebugStringW((sLogHeader + std::to_wstring(detections.size()) + L" detection" + (detections.size() == 1 ? L"!" : L"s!")).c_str());
 				for(auto detection : detections){
 					if(detection->Type == DetectionType::File){
@@ -22,7 +20,7 @@ namespace Log {
 						OutputDebugStringW((sLogHeader + L"\tPotentially malicious process detected - " + lpProcessDetection->wsCmdline + L" (PID is " + std::to_wstring(lpProcessDetection->PID) + L")").c_str());
 					} else if(detection->Type == DetectionType::Service){
 						auto lpServiceDetection = std::static_pointer_cast<SERVICE_DETECTION>(detection);
-						OutputDebugStringW((sLogHeader + L"\tPotentially malicious service detected - " + lpServiceDetection->wsServiceName + L" (PID is " + std::to_wstring(lpServiceDetection->ServicePID) + L")").c_str());
+						OutputDebugStringW((sLogHeader + L"\tPotentially malicious service detected - " + lpServiceDetection->wsServiceName + L" (Path is " + lpServiceDetection->wsServiceExecutablePath + L")").c_str());
 					} else if(detection->Type == DetectionType::Registry){
 						auto lpRegistryDetection = std::static_pointer_cast<REGISTRY_DETECTION>(detection);
 						OutputDebugStringW((sLogHeader + L"\tPotentially malicious registry key detected - " + lpRegistryDetection->value.key.ToString() + L": " + lpRegistryDetection->value.wValueName + L" with value " +

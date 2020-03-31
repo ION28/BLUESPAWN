@@ -8,17 +8,13 @@ using namespace Registry;
 
 namespace Hunts {
 	HuntT1131::HuntT1131() : Hunt(L"T1131 - Authentication Package") {
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1131::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
-		reaction.BeginHunt(GET_INFO());
-
-		int detections = 0;
+	std::vector<std::shared_ptr<DETECTION>> HuntT1131::RunHunt(const Scope& scope){
+		HUNT_INIT();
 
 		auto safeAuthPackages = okAuthPackages;
 		auto safeNotifPackages = okNotifPackages;
@@ -26,12 +22,10 @@ namespace Hunts {
 			{ L"Authentication Packages", std::move(safeAuthPackages), false, CheckMultiSzSubset },
 			{ L"Notification Packages", std::move(safeNotifPackages), false, CheckMultiSzSubset },
 		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detections++;
+			REGISTRY_DETECTION(detection);
 		}
 
-		reaction.EndHunt();
-		return detections;
+		HUNT_END();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1131::GetMonitoringEvents() {

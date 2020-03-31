@@ -19,17 +19,29 @@
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
 
+#include <map>
+
+enum class BluespawnMode {
+	HUNT, SCAN, MONITOR, MITIGATE
+};
+
 class Bluespawn {
+
 	Reaction reaction;
+	
+	std::map<BluespawnMode, int> modes;
+
+	void RunMitigations(bool enforce, bool force);
+	void RunHunts();
+	void RunMonitor();
 
 	public:
 		Bluespawn();
 
-		void SetReaction(const Reaction& reaction);
+		void AddReaction(const std::shared_ptr<Reaction>& reaction);
+		void EnableMode(BluespawnMode mode, int argument = 0);
 
-		void dispatch_hunt(Aggressiveness aHuntLevel);
-		void dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce);
-		void monitor_system(Aggressiveness aHuntLevel);
+		void Run();
 
 		static HuntRegister huntRecord;
 		static MitigationRegister mitigationRecord;

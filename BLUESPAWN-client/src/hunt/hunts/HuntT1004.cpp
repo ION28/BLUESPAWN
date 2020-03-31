@@ -15,25 +15,20 @@ using namespace Registry;
 namespace Hunts {
 
 	HuntT1004::HuntT1004() : Hunt(L"T1004 - Winlogon Helper DLL") {
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1004::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for " << name << " at level Cursory");
-		reaction.BeginHunt(GET_INFO());
-
-		int detections = 0;
+	std::vector<std::shared_ptr<DETECTION>> HuntT1004::RunHunt(const Scope& scope){
+		HUNT_INIT();
 
 		std::vector<RegistryValue> winlogons{ CheckValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", {
 			{ L"Shell", L"explorer\\.exe,?", false, CheckSzRegexMatch },
 			{ L"UserInit", L"(C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\)?(U|u)(SERINIT|serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch }
 		}, true, true) };
 		for(auto& detection : winlogons){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detections++;
+			REGISTRY_DETECTION(detection);
 		}
 
 		std::vector<RegistryValue> notifies{ CheckKeyValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify", true, true) };
@@ -43,16 +38,14 @@ namespace Hunts {
 			}
 		}
 		for(auto& detection : notifies){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detections++;
+			REGISTRY_DETECTION(detection);
 		}
 
-		reaction.EndHunt();
-		return detections;
+		HUNT_END();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1004::GetMonitoringEvents() {
-		std::vector<std::shared_ptr<Event>> events;
+		std::vector<std::shared_ptr<Event>> events{};
 
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon"));
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Notify", true, true, true));

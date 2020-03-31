@@ -63,10 +63,18 @@
 #pragma warning(pop)
 
 #include <iostream>
+#include <memory>
 
 const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{ io };
 MitigationRegister Bluespawn::mitigationRecord{ io };
+
+std::map<std::string, std::shared_ptr<Reaction>> reactions = {
+	{"log", std::make_shared<Reactions::LogReaction>()},
+	{"remove-value", std::make_shared<Reactions::RemoveValueReaction>( Bluespawn::io )},
+	{"suspend", std::make_shared<Reactions::SuspendProcessReaction>( Bluespawn::io )},
+	{"carve-memory", std::make_shared<Reactions::CarveProcessReaction>( Bluespawn::io )},
+};
 
 Bluespawn::Bluespawn(){
 
@@ -112,20 +120,20 @@ Bluespawn::Bluespawn(){
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
 }
 
-void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
+void Bluespawn::RunHunts() {
 	Bluespawn::io.InformUser(L"Starting a Hunt");
 	DWORD tactics = UINT_MAX;
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
 
-	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope);
 }
 
-void Bluespawn::dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce) {
-	if (mode == MitigationMode::Enforce) {
+void Bluespawn::RunMitigations(bool enforce, bool force) {
+	if (enforce) {
 		Bluespawn::io.InformUser(L"Enforcing Mitigations");
-		mitigationRecord.EnforceMitigations(SecurityLevel::High, bForceEnforce);
+		mitigationRecord.EnforceMitigations(SecurityLevel::High, force);
 	}
 	else {
 		Bluespawn::io.InformUser(L"Auditing Mitigations");
@@ -133,14 +141,14 @@ void Bluespawn::dispatch_mitigations_analysis(MitigationMode mode, bool bForceEn
 	}
 }
 
-void Bluespawn::monitor_system(Aggressiveness aHuntLevel) {
+void Bluespawn::RunMonitor() {
 	DWORD tactics = UINT_MAX;
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
 
 	Bluespawn::io.InformUser(L"Monitoring the system");
-	huntRecord.SetupMonitoring(aHuntLevel, reaction);
+	huntRecord.SetupMonitoring();
 
 	HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, L"Local\\FlushLogs") };
 	while (true) {
@@ -149,25 +157,89 @@ void Bluespawn::monitor_system(Aggressiveness aHuntLevel) {
 	}
 }
 
-void Bluespawn::SetReaction(const Reaction& reaction){
-	this->reaction = reaction;
+void Bluespawn::AddReaction(const std::shared_ptr<Reaction>& reaction){
+	this->reaction.Combine(*reaction);
+}
+
+void Bluespawn::EnableMode(BluespawnMode mode, int option){
+	modes.emplace(mode, option);
+}
+
+void Bluespawn::Run(){
+	if(modes.find(BluespawnMode::MITIGATE) != modes.end()){
+		RunMitigations(modes[BluespawnMode::MITIGATE] & 0x01, modes[BluespawnMode::MITIGATE] & 0x02);
+	}
+	if(modes.find(BluespawnMode::HUNT) != modes.end()){
+		RunHunts();
+	}
+	if(modes.find(BluespawnMode::MONITOR) != modes.end()){
+		RunMonitor();
+	}
 }
 
 void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 	std::string help_category = result["help"].as < std::string >();
 
-	std::transform(help_category.begin(), help_category.end(),
-		help_category.begin(), [](unsigned char c) { return std::tolower(c); });
-
-	if(help_category.compare("hunt") == 0) {
-		std::cout << (options.help({ "hunt" })) << std::endl;
-	} else if(help_category.compare("general") == 0) {
-		std::cout << (options.help()) << std::endl;
+	if(CompareIgnoreCase(help_category, std::string{ "hunt" })) {
+		Bluespawn::io.InformUser(StringToWidestring(options.help({ "hunt" })));
+	} else if(CompareIgnoreCase(help_category, std::string{ "scan" })) {
+		Bluespawn::io.InformUser(StringToWidestring(options.help({ "scan" })));
+	} else if(CompareIgnoreCase(help_category, std::string{ "monitor" })) {
+		Bluespawn::io.InformUser(StringToWidestring(options.help({ "monitor" })));
+	} else if(CompareIgnoreCase(help_category, std::string{ "mitigate" })) {
+		Bluespawn::io.InformUser(StringToWidestring(options.help({ "mitigate" })));
 	} else {
-		std::cerr << ("Unknown help category") << std::endl;
+		Bluespawn::io.InformUser(StringToWidestring(options.help()));
 	}
 }
 
+void ParseLogSinks(const std::string& sinks, bool debug){
+	std::set<std::string> sink_set;
+	for(unsigned startIdx = 0; startIdx < sinks.size();){
+		auto endIdx = min(sinks.find(',', startIdx), sinks.size());
+		auto sink = sinks.substr(startIdx, endIdx - startIdx);
+		sink_set.emplace(sink);
+		startIdx = endIdx + 1;
+	}
+	for(auto sink : sink_set){
+		if(sink == "console"){
+			auto Console = std::make_shared<Log::CLISink>();
+			Log::AddHuntSink(Console);
+			if(debug) Log::AddSink(Console);
+		} else if(sink == "xml"){
+			auto XMLSink = std::make_shared<Log::XMLSink>();
+			Log::AddHuntSink(XMLSink);
+			if(debug) Log::AddSink(XMLSink);
+		} else if(sink == "debug"){
+			auto DbgSink = std::make_shared<Log::DebugSink>();
+			Log::AddHuntSink(DbgSink);
+			if(debug) Log::AddSink(DbgSink);
+		} else {
+			Bluespawn::io.AlertUser(L"Unknown log sink \"" + StringToWidestring(sink) + L"\"", INFINITY, ImportanceLevel::MEDIUM);
+		}
+	}
+}
+
+Aggressiveness GetAggressiveness(const cxxopts::OptionValue& value){
+	Aggressiveness aHuntLevel{};
+	auto level{ value.as<std::string>() };
+
+	if(CompareIgnoreCase<std::string>(level, "Cursory")) {
+		aHuntLevel = Aggressiveness::Cursory;
+	} else if(CompareIgnoreCase<std::string>(level, "Normal")) {
+		aHuntLevel = Aggressiveness::Normal;
+	} else if(CompareIgnoreCase<std::string>(level, "Intensive")) {
+		aHuntLevel = Aggressiveness::Intensive;
+	} else {
+		LOG_ERROR("Error " << level << " - Unknown level. Please specify either Cursory, Normal, or Intensive");
+		LOG_ERROR("Will default to Normal for this run.");
+		Bluespawn::io.InformUser(L"Error " + StringToWidestring(level) + L" - Unknown level. Please specify either Cursory, Normal, or Intensive");
+		Bluespawn::io.InformUser(L"Will default to Normal.");
+		aHuntLevel = Aggressiveness::Normal;
+	}
+
+	return aHuntLevel;
+}
 
 int main(int argc, char* argv[]){
 
@@ -181,24 +253,24 @@ int main(int argc, char* argv[]){
 		("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
 		("n,monitor", "Monitor the System for Malicious Activity. Available options are Cursory, Normal, or Intensive.", cxxopts::value<std::string>()->implicit_value("Normal"))
 		("m,mitigate", "Mitigates vulnerabilities by applying security settings. Available options are audit and enforce.", cxxopts::value<std::string>()->implicit_value("audit"))
+		("s,scan", "Mitigates vulnerabilities by applying security settings. Available options are audit and enforce.", cxxopts::value<std::string>()->implicit_value("audit"))
 		("help", "Help Information. You can also specify a category for help on a specific module such as hunt.", cxxopts::value<std::string>()->implicit_value("general"))
 		("log", "Specify how Bluespawn should log events. Options are console (default), xml, and debug.", cxxopts::value<std::string>()->default_value("console"))
-		("reaction", "Specifies how bluespawn should react to potential threats dicovered during hunts.", cxxopts::value<std::string>()->default_value("log"))
+		("r,react", "Specifies how bluespawn should react to potential threats dicovered during hunts.", cxxopts::value<std::string>()->default_value("log"))
 		("v,verbose", "Verbosity", cxxopts::value<int>()->default_value("0"))
-		("debug", "Enable Debug Output", cxxopts::value<bool>())
-		;
+		("debug", "Enable Debug Output", cxxopts::value<bool>());
 
-	options.add_options("hunt")
-		("l,level", "Aggressiveness of Hunt. Either Cursory, Normal, or Intensive", cxxopts::value<std::string>())
-		;
-
-	options.add_options("mitigate")
-		("force", "Use this option to forcibly apply mitigations with no prompt", cxxopts::value<bool>())
-		;
+	options.add_options("scan")("l,level", "Aggressiveness of scan. Either Cursory, Normal, or Intensive", cxxopts::value<std::string>()->default_value("Normal"));
+	options.add_options("mitigate")("force", "Use this option to forcibly apply mitigations with no prompt", cxxopts::value<bool>());
 
 	options.parse_positional({ "level" });
 	try {
 		auto result = options.parse(argc, argv);
+
+		if(result.count("help")) {
+			print_help(result, options);
+			return 0;
+		}
 
 		if (result.count("verbose")) {
 			if(result["verbose"].as<int>() >= 1) {
@@ -212,100 +284,30 @@ int main(int argc, char* argv[]){
 			}
 		}
 
-		auto sinks = result["log"].as<std::string>();
-		std::set<std::string> sink_set;
-		for(unsigned startIdx = 0; startIdx < sinks.size();){
-			auto endIdx = min(sinks.find(',', startIdx), sinks.size());
-			auto sink = sinks.substr(startIdx, endIdx - startIdx);
-			sink_set.emplace(sink);
+		ParseLogSinks(result["log"].as<std::string>(), result.count("debug"));
+
+		auto UserReactions = result["react"].as<std::string>();
+		std::set<std::string> reaction_set;
+		for(unsigned startIdx = 0; startIdx < UserReactions.size();){
+			auto endIdx = min(UserReactions.find(',', startIdx), UserReactions.size());
+			auto sink = UserReactions.substr(startIdx, endIdx - startIdx);
+			reaction_set.emplace(sink);
 			startIdx = endIdx + 1;
 		}
-		for(auto sink : sink_set){
-			if(sink == "console"){
-				auto Console = std::make_shared<Log::CLISink>();
-				Log::AddHuntSink(Console);
-				if(result.count("debug")) Log::AddSink(Console);
-			} else if(sink == "xml"){
-				auto XMLSink = std::make_shared<Log::XMLSink>();
-				Log::AddHuntSink(XMLSink);
-				if(result.count("debug")) Log::AddSink(XMLSink);
-			} else if(sink == "debug"){
-				auto DbgSink = std::make_shared<Log::DebugSink>();
-				Log::AddHuntSink(DbgSink);
-				if(result.count("debug")) Log::AddSink(DbgSink);
+
+		Reaction combined = {};
+		for(auto reaction : reaction_set){
+			if(reactions.find(reaction) != reactions.end()){
+				bluespawn.AddReaction(reactions[reaction]);
 			} else {
-				bluespawn.io.AlertUser(L"Unknown log sink \"" + StringToWidestring(sink) + L"\"", INFINITY, ImportanceLevel::MEDIUM);
+				bluespawn.io.AlertUser(L"Unknown reaction \"" + StringToWidestring(reaction) + L"\"", INFINITY, ImportanceLevel::MEDIUM);
 			}
 		}
 
-		if (result.count("help")) {
-			print_help(result, options);
+		if (result.count("scan")) {
+			bluespawn.EnableMode(BluespawnMode::SCAN, static_cast<DWORD>(GetAggressiveness(result["level"])));
 		}
-
-		else if (result.count("hunt") || result.count("monitor")) {
-			std::map<std::string, Reaction> reactions = {
-				{"log", Reactions::LogReaction{}},
-				{"remove-value", Reactions::RemoveValueReaction{ bluespawn.io }},
-				{"suspend", Reactions::SuspendProcessReaction{ bluespawn.io }},
-				{"carve-memory", Reactions::CarveProcessReaction{ bluespawn.io }},
-			};
-
-			auto UserReactions = result["reaction"].as<std::string>();
-			std::set<std::string> reaction_set;
-			for(unsigned startIdx = 0; startIdx < UserReactions.size();){
-				auto endIdx = min(UserReactions.find(',', startIdx), UserReactions.size());
-				auto sink = UserReactions.substr(startIdx, endIdx - startIdx);
-				reaction_set.emplace(sink);
-				startIdx = endIdx + 1;
-			}
-
-			Reaction combined = {};
-			for(auto reaction : reaction_set){
-				if(reactions.find(reaction) != reactions.end()){
-					combined.Combine(reactions[reaction]);
-				} else {
-					bluespawn.io.AlertUser(L"Unknown reaction \"" + StringToWidestring(reaction) + L"\"", INFINITY, ImportanceLevel::MEDIUM);
-				}
-			}
-
-			bluespawn.SetReaction(combined);
-
-			std::string flag("level");
-			if (result.count("monitor"))
-				flag = "monitor";
-
-			// Parse the hunt level
-			std::string sHuntLevelFlag = "Normal";
-			Aggressiveness aHuntLevel;
-			try {
-				sHuntLevelFlag = result[flag].as < std::string >();
-			}
-			catch (int e) {}
-
-			if (CompareIgnoreCase<std::string>(sHuntLevelFlag, "Cursory")) {
-				aHuntLevel = Aggressiveness::Cursory;
-			}
-			else if (CompareIgnoreCase<std::string>(sHuntLevelFlag, "Normal")) {
-				aHuntLevel = Aggressiveness::Normal;
-			}
-			else if (CompareIgnoreCase<std::string>(sHuntLevelFlag, "Intensive")) {
-				aHuntLevel = Aggressiveness::Intensive;
-			}
-			else {
-				LOG_ERROR("Error " << sHuntLevelFlag << " - Unknown level. Please specify either Cursory, Normal, or Intensive");
-				LOG_ERROR("Will default to Cursory for this run.");
-				Bluespawn::io.InformUser(L"Error " + StringToWidestring(sHuntLevelFlag) + L" - Unknown level. Please specify either Cursory, Normal, or Intensive");
-				Bluespawn::io.InformUser(L"Will default to Cursory.");
-				aHuntLevel = Aggressiveness::Cursory;
-			}
-			
-			if (result.count("hunt"))
-				bluespawn.dispatch_hunt(aHuntLevel);
-			else if (result.count("monitor"))
-				bluespawn.monitor_system(aHuntLevel);
-
-		}
-		else if (result.count("mitigate")) {
+		if (result.count("mitigate")) {
 			bool bForceEnforce = false;
 			if (result.count("force"))
 				bForceEnforce = true;
@@ -314,13 +316,19 @@ int main(int argc, char* argv[]){
 			if (result["mitigate"].as<std::string>() == "e" || result["mitigate"].as<std::string>() == "enforce")
 				mode = MitigationMode::Enforce;
 
-			bluespawn.dispatch_mitigations_analysis(mode, bForceEnforce);
+			bluespawn.EnableMode(BluespawnMode::MITIGATE, (static_cast<DWORD>(bForceEnforce) << 1) | (static_cast<DWORD>(mode) << 0));
 		}
-		else {
-			LOG_ERROR("Nothing to do. Use the -h or --hunt flags to launch a hunt");
+		if(result.count("hunt")){
+			bluespawn.EnableMode(BluespawnMode::HUNT);
 		}
+		if(result.count("monitor")){
+			bluespawn.EnableMode(BluespawnMode::MONITOR);
+		}
+
+		bluespawn.Run();
 	}
 	catch (cxxopts::OptionParseException e1) {
+		Bluespawn::io.InformUser(StringToWidestring(options.help()));
 		LOG_ERROR(e1.what());
 	}
 	return 0;

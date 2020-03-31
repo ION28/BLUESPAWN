@@ -11,10 +11,6 @@ namespace Hunts {
 
 	/**
 	 * HuntT1101 examines Security Support Providers (SSPs) on the system
-	 * 
-	 * @scans Cursory checks the names of the SSPs on the system.
-	 * @scans Normal Scan not supported.
-	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1101 : public Hunt {
 	private:
@@ -23,7 +19,7 @@ namespace Hunts {
 	public:
 		HuntT1101();
 
-		virtual int ScanCursory(const Scope& scope, Reaction reaction);
+		virtual std::vector<std::shared_ptr<DETECTION>> RunHunt(const Scope& scope);
 		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

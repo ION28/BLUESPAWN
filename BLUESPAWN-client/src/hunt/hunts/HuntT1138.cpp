@@ -10,27 +10,22 @@ using namespace Registry;
 
 namespace Hunts {
 	HuntT1138::HuntT1138() : Hunt(L"T1138 - Application Shimming") {
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	int HuntT1138::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
-		reaction.BeginHunt(GET_INFO());
+	std::vector<std::shared_ptr<DETECTION>> HuntT1138::RunHunt(const Scope& scope){
+		HUNT_INIT();
 
-		auto& detections = CheckKeyValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB", true, false);
-		ADD_ALL_VECTOR(detections, CheckKeyValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom", true, false));
+		auto& values = CheckKeyValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB", true, false);
+		ADD_ALL_VECTOR(values, CheckKeyValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom", true, false));
 
-		int detectionCount = 0;
-		for(const auto& detection : detections){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detectionCount++;
+		for(const auto& detection : values){
+			REGISTRY_DETECTION(detection);
 		}
 
-		reaction.EndHunt();
-		return detectionCount;
+		HUNT_END();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1138::GetMonitoringEvents() {

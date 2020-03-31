@@ -10,7 +10,6 @@
 namespace Hunts {
 
 	HuntT1053::HuntT1053() : Hunt(L"T1053 - Scheduled Task") {
-		dwSupportedScans = (DWORD) Aggressiveness::Intensive;
 		dwCategoriesAffected = (DWORD) Category::Files | (DWORD) Category::Processes;
 		dwSourcesInvolved = (DWORD) DataSource::EventLogs;
 		dwTacticsUsed = (DWORD) Tactic::Execution | (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
@@ -52,23 +51,21 @@ namespace Hunts {
 		return queryResults;
 	}
 
-	int HuntT1053::ScanIntensive(const Scope& scope, Reaction reaction){
-		LOG_INFO(L"Hunting for " << name << L" at level Intensive");
-		reaction.BeginHunt(GET_INFO());
+	std::vector<std::shared_ptr<DETECTION>> HuntT1053::RunHunt(const Scope& scope){
+		HUNT_INIT();
 
 		auto queryResults = Get4698Events();
 		auto queryResults2 = Get106Events();
 
 		for (auto result : queryResults) {
-			reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+			EVENT_DETECTION(result);
 		}
 
 		for (auto result : queryResults2) {
-			reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+			EVENT_DETECTION(result);
 		}
 
-		reaction.EndHunt();
-		return queryResults.size();
+		HUNT_END();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1053::GetMonitoringEvents() {

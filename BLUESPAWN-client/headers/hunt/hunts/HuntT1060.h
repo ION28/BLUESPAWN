@@ -7,10 +7,6 @@ namespace Hunts {
 
 	/**
 	 * HuntT1060 examines associated Registry Run Keys
-	 * 
-	 * @scans Cursory checks the values of the associated Registry Run Keys
-	 * @scans Normal Scan not supported.
-	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1060 : public Hunt {
 	private:
@@ -18,7 +14,7 @@ namespace Hunts {
 	public:
 		HuntT1060();
 
-		virtual int ScanCursory(const Scope& scope, Reaction reaction);
+		virtual std::vector<std::shared_ptr<DETECTION>> RunHunt(const Scope& scope);
 		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

@@ -68,14 +68,7 @@ namespace Reactions{
 	}
 
 	void SuspendProcessReaction::SuspendServiceIdentified(std::shared_ptr<SERVICE_DETECTION> detection){
-		HandleWrapper process = OpenProcess(PROCESS_SUSPEND_RESUME, false, detection->ServicePID);
-		if(process){
-			if(io.GetUserConfirm(L"Service " + detection->wsServiceName + L" appears to be infected. Suspend process?") == 1){
-				Linker::NtSuspendProcess(process);
-			}
-		} else {
-			LOG_ERROR("Unable to open potentially infected process " << detection->ServicePID);
-		}
+		SuspendFileIdentified(std::make_shared<FILE_DETECTION>(detection->wsServiceExecutablePath));
 	}
 
 	SuspendProcessReaction::SuspendProcessReaction(const IOBase& io) : io{ io }{

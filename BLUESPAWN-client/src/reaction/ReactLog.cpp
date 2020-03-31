@@ -7,7 +7,7 @@
 
 namespace Reactions {
 	void LogReaction::LogBeginHunt(const HuntInfo& info){
-		_HuntLogMessage = std::optional{ Log::HuntLogMessage{ info, Log::_LogHuntSinks } };
+		_HuntLogMessage = { Log::HuntLogMessage{ info, Log::_LogHuntSinks } };
 		HuntBegun = true;
 	}
 	void LogReaction::LogEndHunt(){

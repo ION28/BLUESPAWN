@@ -8,27 +8,21 @@ using namespace Registry;
 
 namespace Hunts {
 	HuntT1182::HuntT1182() : Hunt(L"T1182 - AppCert DLLs") {
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	int HuntT1182::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
-		reaction.BeginHunt(GET_INFO());
-
-		int detections = 0;
+	std::vector<std::shared_ptr<DETECTION>> HuntT1182::RunHunt(const Scope& scope){
+		HUNT_INIT();
 
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager", {
 			{ L"AppCertDLLs", std::vector<std::wstring>{}, false, CheckMultiSzEmpty },
 		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detections++;
+			REGISTRY_DETECTION(detection);
 		}
 
-		reaction.EndHunt();
-		return detections;
+		HUNT_END();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1182::GetMonitoringEvents() {

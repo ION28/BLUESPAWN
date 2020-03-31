@@ -10,7 +10,6 @@ using namespace Registry;
 
 namespace Hunts {
 	HuntT1060::HuntT1060() : Hunt(L"T1060 - Registry Run Keys / Startup Folder") {
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
@@ -29,42 +28,34 @@ namespace Hunts {
 		};
 	}
 
-	int HuntT1060::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
-		reaction.BeginHunt(GET_INFO());
-
-		int detections = 0;
+	std::vector<std::shared_ptr<DETECTION>> HuntT1060::RunHunt(const Scope& scope){
+		HUNT_INIT();
 		
 		for(auto& key : RunKeys){
 			for(auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, key)){
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-				detections++;
+				REGISTRY_DETECTION(detection);
 			}
 		}
 
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Command Processor", {
 			{ L"AutoRun", L"", false, CheckSzEmpty }
 		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detections++;
+			REGISTRY_DETECTION(detection);
 		}
 
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", {
 			{ L"Startup", L"%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", false, CheckSzEqual }
 		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detections++;
+			REGISTRY_DETECTION(detection);
 		}
 
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", {
 			{ L"Common Startup", L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", false, CheckSzEqual }
 		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detections++;
+			REGISTRY_DETECTION(detection);
 		}
 
-		reaction.EndHunt();
-		return detections;
+		HUNT_END();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1060::GetMonitoringEvents() {

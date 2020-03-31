@@ -6,15 +6,13 @@
 namespace Hunts {
 
 	HuntT1136::HuntT1136() : Hunt(L"T1136 - Account Created") {
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::EventLogs;
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1136::ScanCursory(const Scope& scope, Reaction reaction) {
-		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
-		reaction.BeginHunt(GET_INFO());
+	std::vector<std::shared_ptr<DETECTION>> HuntT1136::RunHunt(const Scope& scope) {
+		HUNT_INIT();
 
 		// Create existance queries so interesting data is output
 		std::vector<EventLogs::XpathQuery> queries;
@@ -27,10 +25,9 @@ namespace Hunts {
 
 		auto results = EventLogs::QueryEvents(L"Security", 4720, queries);
 		for (auto result : results)
-			reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+			EVENT_DETECTION(result);
 
-		reaction.EndHunt();
-		return results.size();
+		HUNT_END();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1136::GetMonitoringEvents() {

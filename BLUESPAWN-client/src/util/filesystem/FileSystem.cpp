@@ -228,7 +228,7 @@ namespace FileSystem{
 		if(amount == -1){
 			amount = GetFileSize();
 		}
-		AllocationWrapper memory = { HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, amount + 1), amount + 1, AllocationWrapper::HEAP_ALLOC };
+		AllocationWrapper memory = { HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, static_cast<SIZE_T>(amount + 1)), static_cast<SIZE_T>(amount + 1), AllocationWrapper::HEAP_ALLOC };
 		bool success = Read(memory, amount, offset, amountRead);
 		return success ? memory : AllocationWrapper{ nullptr, 0 };
 	}

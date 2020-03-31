@@ -19,9 +19,7 @@ namespace Log {
 			SetConsoleColor(CLISink::PrependColors[static_cast<WORD>(level.severity)]);
 
 			if(level.severity == Severity::LogHunt){
-				std::wstring aggressiveness = info->HuntAggressiveness == Aggressiveness::Intensive ? L"Intensive" :
-					info->HuntAggressiveness == Aggressiveness::Normal ? L"Normal" : L"Cursory";
-				std::wcout << L"[" << info->HuntName << L": " << aggressiveness << L"] ";
+				std::wcout << L"[" << info->HuntName << L"] ";
 				SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
 				std::wcout << L" - " << detections.size() << " detection" << (detections.size() == 1 ? L"" : L"s") << L"!" << std::endl;
 				for(auto detection : detections){
@@ -33,7 +31,7 @@ namespace Log {
 						std::wcout << L"\tPotentially malicious process detected - " << lpProcessDetection->wsImagePath << L" (PID is " << lpProcessDetection->PID << L")" << std::endl;
 					} else if(detection->Type == DetectionType::Service){
 						auto lpServiceDetection = std::static_pointer_cast<SERVICE_DETECTION>(detection);
-						std::wcout << L"\tPotentially malicious service detected - " << lpServiceDetection->wsServiceName << L" (PID is " << lpServiceDetection->ServicePID << L")" << std::endl;
+						std::wcout << L"\tPotentially malicious service detected - " << lpServiceDetection->wsServiceName << L" (Path is " << lpServiceDetection->wsServiceExecutablePath << L")" << std::endl;
 					} else if(detection->Type == DetectionType::Registry){
 						auto lpRegistryDetection = std::static_pointer_cast<REGISTRY_DETECTION>(detection);
 						std::wcout << L"\tPotentially malicious registry key detected - " << lpRegistryDetection->value.key.ToString() << L": " << lpRegistryDetection->value.wValueName

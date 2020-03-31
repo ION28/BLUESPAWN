@@ -51,15 +51,10 @@ typedef std::function<void(std::shared_ptr<REGISTRY_DETECTION>)> DetectRegistry;
 struct SERVICE_DETECTION : public DETECTION {
 	std::wstring wsServiceName;
 	std::wstring wsServiceExecutablePath;
-	std::wstring wsServiceDll;
-	int ServicePID;
-	SERVICE_DETECTION(const std::wstring& wsServiceName, const std::wstring& wsServiceExecutablePath, 
-		const std::wstring& wsServiceDll, const int& ServicePID) :
+	SERVICE_DETECTION(const std::wstring& wsServiceName, const std::wstring& wsServiceExecutablePath) :
 		DETECTION{ DetectionType::Service },
 		wsServiceName{ wsServiceName },
-		wsServiceExecutablePath{ wsServiceExecutablePath },
-		wsServiceDll{ wsServiceDll },
-		ServicePID{ ServicePID }{}
+		wsServiceExecutablePath{ wsServiceExecutablePath }{}
 };
 typedef std::function<void(std::shared_ptr<SERVICE_DETECTION>)> DetectService;
 

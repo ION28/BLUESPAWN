@@ -47,10 +47,9 @@ enum class Aggressiveness {
 // This struct is a POD type for storing information about a hunt to be logged.
 struct HuntInfo {
 	std::wstring HuntName;
-	Aggressiveness HuntAggressiveness;
 	DWORD HuntTactics;
 	DWORD HuntCategories;
 	DWORD HuntDatasources;
 	long HuntStartTime;
-	HuntInfo(const std::wstring& HuntName, Aggressiveness HuntAggressiveness, DWORD HuntTactics, DWORD HuntCategories, DWORD HuntDatasources, long HuntStartTime);
+	HuntInfo(const std::wstring& HuntName, DWORD HuntTactics, DWORD HuntCategories, DWORD HuntDatasources, long HuntStartTime);
 };

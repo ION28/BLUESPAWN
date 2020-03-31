@@ -11,7 +11,7 @@
 #include <memory>
 
 // Creates a Hunt log message named _HuntLogMessage. This macro is only to be called inside
-// ScanCursory, ScanNormal, or ScanIntensive.
+// RunHunt, ScanNormal, or ScanIntensive.
 #define LOG_HUNT_BEGIN() \
     auto _HuntLogMessage = Log::HuntLogMessage(GET_INFO(), Log::_LogHuntSinks)
 

@@ -90,16 +90,10 @@ namespace Log{
 			auto ServiceDetection = std::static_pointer_cast<SERVICE_DETECTION>(detection);
 			auto Name = XMLDoc.NewElement("name");
 			auto Path = XMLDoc.NewElement("path");
-			auto Dll = XMLDoc.NewElement("dll");
-			auto Pid = XMLDoc.NewElement("pid");
 			Name->SetText(WidestringToString(ServiceDetection->wsServiceName).c_str());
 			Path->SetText(WidestringToString(ServiceDetection->wsServiceExecutablePath).c_str());
-			Dll->SetText(WidestringToString(ServiceDetection->wsServiceDll).c_str());
-			Pid->SetText(std::to_string(ServiceDetection->ServicePID).c_str());
 			detect->InsertEndChild(Name);
 			detect->InsertEndChild(Path);
-			detect->InsertEndChild(Dll);
-			detect->InsertEndChild(Pid);
 		} else if(detection->Type == DetectionType::Event){
 			detect->SetAttribute("type", "Event");
 			auto EventDetection = std::static_pointer_cast<EVENT_DETECTION>(detection);
@@ -133,8 +127,6 @@ namespace Log{
 		auto mutex = AcquireMutex(hMutex);
 		if(level.Enabled() && level.severity == Severity::LogHunt && info){
 			auto hunt = XMLDoc.NewElement("hunt");
-			hunt->SetAttribute("agressiveness", info->HuntAggressiveness == Aggressiveness::Intensive ? "Intensive" :
-				info->HuntAggressiveness == Aggressiveness::Normal ? "Normal" : "Cursory");
 			hunt->SetAttribute("categories", static_cast<int64_t>(info->HuntCategories));
 			hunt->SetAttribute("datasources", static_cast<int64_t>(info->HuntDatasources));
 			hunt->SetAttribute("tactics", static_cast<int64_t>(info->HuntTactics));

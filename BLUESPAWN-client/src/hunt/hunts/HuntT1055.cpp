@@ -21,13 +21,12 @@ extern "C" {
 namespace Hunts{
 
 	HuntT1055::HuntT1055() : Hunt(L"T1055 - Process Injection") {
-		dwSupportedScans = (DWORD) Aggressiveness::Normal;
 		dwCategoriesAffected = (DWORD) Category::Processes;
 		dwSourcesInvolved = (DWORD) DataSource::Processes;
 		dwTacticsUsed = (DWORD) Tactic::PrivilegeEscalation | (DWORD) Tactic::DefenseEvasion;
 	}
 
-	bool ScanProcess(DWORD pid, Reaction& reaction){
+	bool ScanProcess(DWORD pid, std::vector<std::shared_ptr<DETECTION>>& detections){
 		pesieve::t_params params = {
 			pid,
 			3,
@@ -69,7 +68,7 @@ namespace Hunts{
 
 			for(auto module : report->scan_report->module_reports){
 				if(module->status & SCAN_SUSPICIOUS){
-					reaction.ProcessIdentified(std::make_shared<PROCESS_DETECTION>(path, GetProcessCommandline(pid), pid, module->module, module->moduleSize, identifiers));
+					PROCESS_DETECTION(path, GetProcessCommandline(pid), pid, module->module, static_cast<DWORD>(module->moduleSize), identifiers);
 				}
 			}
 
@@ -79,9 +78,8 @@ namespace Hunts{
 		return false;
 	}
 
-	int HuntT1055::ScanNormal(const Scope& scope, Reaction reaction){
-		LOG_INFO(L"Hunting for " << name << L" at level Normal");
-		reaction.BeginHunt(GET_INFO());
+	std::vector<std::shared_ptr<DETECTION>> HuntT1055::RunHunt(const Scope& scope){
+		HUNT_INIT();
 
 		int identified = 0;
 
@@ -93,7 +91,7 @@ namespace Hunts{
 			ProcessCount /= sizeof(DWORD);
 			for(int i = 0; i < ProcessCount; i++){
 				if(scope.ProcessIsInScope(processes[i])){
-					if(ScanProcess(processes[i], reaction)){
+					if(ScanProcess(processes[i], detections)){
 						identified++;
 					}
 				}
@@ -102,8 +100,7 @@ namespace Hunts{
 			LOG_ERROR("Unable to enumerate processes - Process related hunts will not run.");
 		}
 
-		reaction.EndHunt();
-		return identified;
+		HUNT_END();
 	}
 
 }
