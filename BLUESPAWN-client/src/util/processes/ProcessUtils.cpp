@@ -1,6 +1,7 @@
 #include "util/processes/ProcessUtils.h"
 
 #include "util/log/Log.h"
+#include "util/filesystem/FileSystem.h"
 
 typedef struct _CURDIR {
     UNICODE_STRING DosPath;
@@ -101,5 +102,27 @@ std::wstring GetProcessCommandline(DWORD dwPID){
     } else {
         LOG_ERROR("Unable to open process with PID " << dwPID << " to find its command line (error " << GetLastError() << ")");
         return {};
+    }
+}
+
+std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
+    WCHAR path[MAX_PATH]{};
+    auto start = wsCmd.find_first_not_of(L" \t\n\r", 0);
+    if(wsCmd.at(start) == '"' || wsCmd.at(start) == '\''){
+        return wsCmd.substr(start, wsCmd.find_first_of(L"'\"", start) - start);
+    } else {
+        auto idx = start;
+        while(idx != std::wstring::npos){
+            auto spacepos = wsCmd.find(L" ", idx);
+            if(spacepos == std::wstring::npos){
+                return wsCmd.substr(start);
+            } else if(reinterpret_cast<ULONG_PTR>(FindExecutableW(wsCmd.substr(start, spacepos - start).c_str(), nullptr, path)) > 32){
+                return path;
+            } else {
+                idx = spacepos + 1;
+            }
+        }
+
+        return wsCmd.substr(start, wsCmd.find_first_of(L" \t\n\r", start) - start);
     }
 }
