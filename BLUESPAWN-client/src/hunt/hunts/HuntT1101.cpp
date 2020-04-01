@@ -3,6 +3,8 @@
 
 #include "util/log/Log.h"
 #include "util/configurations/Registry.h"
+#include "util/filesystem/FileSystem.h"
+#include "util/filesystem/YaraScanner.h"
 
 using namespace Registry;
 
@@ -14,27 +16,45 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
+	int HuntT1101::EvaluatePackages(Registry::RegistryKey key, std::vector<std::wstring> vSecPackages, Reaction reaction) {
+		int detections = 0;
+
+		for (auto secPackage : vSecPackages) {
+			FileSystem::File file = nullptr;
+			if (FileSystem::File(secPackage).GetFileExists()) {
+				file = FileSystem::File(secPackage);
+			}
+			else {
+				file = FileSystem::File(ExpandEnvStringsW(L"%SYSTEMROOT%\\System32\\") + secPackage + L".dll");
+				if (!file.GetFileExists()) { continue; }
+			}
+
+			auto& yara = YaraScanner::GetInstance();
+			YaraScanResult result = yara.ScanFile(file);
+
+			if (!file.GetFileSigned()) {
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ key, L"Security Packages", std::move(std::wstring{}) }));
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+				detections += 2;
+			}
+		}
+
+		return detections;
+	}
+
 	int HuntT1101::ScanCursory(const Scope& scope, Reaction reaction){
 		LOG_INFO(L"Hunting for " << name << " at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
 		int detections = 0;
 
-		auto safeSecPackages = okSecPackages;
-		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", {
-			{L"Security Packages", std::move(safeSecPackages), false, CheckMultiSzSubset },
-		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detections++;
-		}
+		auto lsa = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
+		auto vSecPackages = *lsa.GetValue<std::vector<std::wstring>>(L"Security Packages");
+		detections += EvaluatePackages(lsa, vSecPackages, reaction);
 
-		safeSecPackages = okSecPackages;
-		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", {
-			{L"Security Packages", std::move(safeSecPackages), false, CheckMultiSzSubset },
-		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			detections++;
-		}
+		auto lsa2 = RegistryKey(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig");
+		auto vSecPackages2 = *lsa2.GetValue<std::vector<std::wstring>>(L"Security Packages");
+		detections += EvaluatePackages(lsa2, vSecPackages2, reaction);
 
 		reaction.EndHunt();
 		return detections;

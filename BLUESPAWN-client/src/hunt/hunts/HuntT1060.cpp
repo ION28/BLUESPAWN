@@ -3,6 +3,9 @@
 
 #include "util/log/Log.h"
 #include "util/configurations/Registry.h"
+#include "util/filesystem/FileSystem.h"
+#include "util/filesystem/YaraScanner.h"
+#include "util/processes/ProcessUtils.h"
 
 #include "common/Utils.h"
 
@@ -29,6 +32,25 @@ namespace Hunts {
 		};
 	}
 
+	int HuntT1060::EvaluateFile(std::wstring wLaunchString, Reaction reaction) {
+		/*
+		auto filepath = GetImagePathFromCommand(wLaunchString);
+
+		FileSystem::File file = FileSystem::File(filepath);
+
+		auto& yara = YaraScanner::GetInstance();
+		YaraScanResult result = yara.ScanFile(file);
+		bool bFileSigned = file.GetFileSigned();
+
+		if (!bFileSigned || (!result && result.vKnownBadRules.size() > 0)) {
+			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+			return 1;
+		}
+		*/
+
+		return 0;
+	}
+
 	int HuntT1060::ScanCursory(const Scope& scope, Reaction reaction){
 		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
 		reaction.BeginHunt(GET_INFO());
@@ -38,6 +60,7 @@ namespace Hunts {
 		for(auto& key : RunKeys){
 			for(auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, key)){
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+				EvaluateFile(detection.ToString(), reaction);
 				detections++;
 			}
 		}
@@ -46,6 +69,7 @@ namespace Hunts {
 			{ L"AutoRun", L"", false, CheckSzEmpty }
 		})){
 			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			EvaluateFile(detection.ToString(), reaction);
 			detections++;
 		}
 
@@ -53,6 +77,7 @@ namespace Hunts {
 			{ L"Startup", L"%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", false, CheckSzEqual }
 		})){
 			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			EvaluateFile(detection.ToString(), reaction);
 			detections++;
 		}
 
@@ -60,6 +85,7 @@ namespace Hunts {
 			{ L"Common Startup", L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", false, CheckSzEqual }
 		})){
 			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			EvaluateFile(detection.ToString(), reaction);
 			detections++;
 		}
 
