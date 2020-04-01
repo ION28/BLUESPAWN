@@ -17,7 +17,7 @@ class HuntRegister;
               (long) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() }
 
 #define HUNT_INIT() \
-	LOG_INFO("Hunting for " << name << " at level Cursory"); \
+	LOG_INFO("Hunting for " << name);          \
     LOG_HUNT_BEGIN();                          \
     std::vector<std::shared_ptr<DETECTION>> detections{};
 

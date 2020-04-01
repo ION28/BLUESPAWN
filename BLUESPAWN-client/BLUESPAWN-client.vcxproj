@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -78,6 +78,11 @@
     </ClInclude>
     <ClInclude Include="headers\monitor\Event.h" />
     <ClInclude Include="headers\monitor\EventManager.h" />
+    <ClInclude Include="headers\scan\CollectDetections.h" />
+    <ClInclude Include="headers\scan\FileScanner.h" />
+    <ClInclude Include="headers\scan\ProcessScanner.h" />
+    <ClInclude Include="headers\scan\RegistryScanner.h" />
+    <ClInclude Include="headers\scan\Scanner.h" />
     <ClInclude Include="headers\user\banners.h" />
     <ClInclude Include="headers\user\bluespawn.h" />
     <ClInclude Include="headers\user\CLI.h" />
@@ -91,7 +96,7 @@
     <ClInclude Include="headers\util\eventlogs\EventSubscription.h" />
     <ClInclude Include="headers\util\eventlogs\XpathQuery.h" />
     <ClInclude Include="headers\util\filesystem\FileSystem.h" />
-    <ClInclude Include="headers\util\filesystem\YaraScanner.h" />
+    <ClInclude Include="headers\scan\YaraScanner.h" />
     <ClInclude Include="headers\util\log\CLISink.h" />
     <ClInclude Include="headers\util\log\DebugSink.h" />
     <ClInclude Include="headers\util\log\HuntLogMessage.h" />
@@ -215,7 +220,7 @@
     <ClCompile Include="src\util\eventlogs\EventSubscription.cpp" />
     <ClCompile Include="src\util\eventlogs\XpathQuery.cpp" />
     <ClCompile Include="src\util\filesystem\FileSystem.cpp" />
-    <ClCompile Include="src\util\filesystem\YaraScanner.cpp" />
+    <ClCompile Include="src\scan\YaraScanner.cpp" />
     <ClCompile Include="src\util\log\CLISink.cpp" />
     <ClCompile Include="src\util\log\DebugSink.cpp" />
     <ClCompile Include="src\util\log\HuntLogMessage.cpp" />

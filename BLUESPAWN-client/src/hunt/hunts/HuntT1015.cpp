@@ -3,7 +3,7 @@
 
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
-#include "util/filesystem/YaraScanner.h"
+#include "scan/YaraScanner.h"
 
 #include "common/Utils.h"
 

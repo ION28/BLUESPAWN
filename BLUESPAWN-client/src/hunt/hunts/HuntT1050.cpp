@@ -3,7 +3,7 @@
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
 #include "util/log/HuntLogMessage.h"
-#include "util/filesystem/YaraScanner.h"
+#include "scan/YaraScanner.h"
 
 #include "common/Utils.h"
 #include "common/StringUtils.h"

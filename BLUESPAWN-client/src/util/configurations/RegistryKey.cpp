@@ -282,6 +282,9 @@ namespace Registry {
 	template<>
 	std::optional<std::wstring> RegistryKey::GetValue(const std::wstring& wsValueName) const {
 		if(ValueExists(wsValueName)){
+			if(GetValueType(wsValueName) == RegistryType::REG_EXPAND_SZ_T){
+				return ExpandEnvStringsW(*GetRawValue(wsValueName).ReadWString());
+			}
 			return GetRawValue(wsValueName).ReadWString();
 		}
 		return std::nullopt;

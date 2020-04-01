@@ -1,4 +1,4 @@
-#include "util/filesystem/YaraScanner.h"
+#include "scan/YaraScanner.h"
 #include "../resources/resource.h"
 #include "common/wrappers.hpp"
 #include "util/log/Log.h"

@@ -10,8 +10,7 @@
 #include <string>
 #include <memory>
 
-// Creates a Hunt log message named _HuntLogMessage. This macro is only to be called inside
-// RunHunt, ScanNormal, or ScanIntensive.
+// Creates a Hunt log message named _HuntLogMessage. This macro is generally only used in the HUNT_INIT macro.
 #define LOG_HUNT_BEGIN() \
     auto _HuntLogMessage = Log::HuntLogMessage(GET_INFO(), Log::_LogHuntSinks)
 
