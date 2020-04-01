@@ -29,22 +29,23 @@ void HuntRegister::RegisterHunt(std::shared_ptr<Hunt> hunt) {
 }
 
 bool HuntRegister::HuntShouldRun(Hunt& hunt, vector<string> vExcludedHunts, vector<string> vIncludedHunts) {
-	if (vExcludedHunts.size() == 0 && vIncludedHunts.size() == 0) {
-		return true;
-	}
 	if (vExcludedHunts.size() != 0) {
 		for (auto name : vExcludedHunts) {
-			if (WidestringToString(hunt.GetName()).find(name) != string::npos)
+			if (hunt.GetName().find(StringToWidestring(name)) != wstring::npos) {
 				return false;
+			}
 		}
+		return true;
 	}
 	if(vIncludedHunts.size() != 0) {
 		for (auto name : vIncludedHunts) {
-			if (WidestringToString(hunt.GetName()).find(name) != string::npos)
+			if (hunt.GetName().find(StringToWidestring(name)) != wstring::npos) {
 				return true;
+			}
 		}
+		return false;
 	}
-	return false;
+	return true;
 }
 
 void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction, vector<string> vExcludedHunts, vector<string>vIncludedHunts){
