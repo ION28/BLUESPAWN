@@ -168,7 +168,6 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 	}
 }
 
-
 int main(int argc, char* argv[]){
 
 	Bluespawn bluespawn{};
