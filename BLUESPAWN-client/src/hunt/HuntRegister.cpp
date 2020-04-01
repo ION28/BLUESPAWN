@@ -3,6 +3,7 @@
 #include <functional>
 #include "monitor/EventManager.h"
 #include "util/log/Log.h"
+#include "common/StringUtils.h"
 
 HuntRegister::HuntRegister(const IOBase& io) : io(io) {}
 
@@ -27,28 +28,49 @@ void HuntRegister::RegisterHunt(std::shared_ptr<Hunt> hunt) {
 	}*/
 }
 
-void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction){
+bool HuntRegister::HuntShouldRun(Hunt& hunt, vector<string> vExcludedHunts, vector<string> vIncludedHunts) {
+	if (vExcludedHunts.size() == 0 && vIncludedHunts.size() == 0) {
+		return true;
+	}
+	if (vExcludedHunts.size() != 0) {
+		for (auto name : vExcludedHunts) {
+			if (WidestringToString(hunt.GetName()).find(name) != string::npos)
+				return false;
+		}
+	}
+	if(vIncludedHunts.size() != 0) {
+		for (auto name : vIncludedHunts) {
+			if (WidestringToString(hunt.GetName()).find(name) != string::npos)
+				return true;
+		}
+	}
+	return false;
+}
+
+void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction, vector<string> vExcludedHunts, vector<string>vIncludedHunts){
 	io.InformUser(L"Starting a hunt for " + std::to_wstring(vRegisteredHunts.size()) + L" techniques.");
 	int huntsRan = 0;
 
   for (auto name : vRegisteredHunts) {
-		int huntRunStatus = 0;
-		auto level = getLevelForHunt(*name, aggressiveness);
-		switch (level) {
-			case Aggressiveness::Intensive:
-				huntRunStatus = name->ScanIntensive(scope, reaction);
-				break;
-			case Aggressiveness::Normal:
-				huntRunStatus = name->ScanNormal(scope, reaction);
-				break;
-			case Aggressiveness::Cursory:
-				huntRunStatus = name->ScanCursory(scope, reaction);
-				break;
-		}
-		
-		if (huntRunStatus != -1) {
-			++huntsRan;
-		}
+	  if (HuntShouldRun(*name, vExcludedHunts, vIncludedHunts)) {
+		  int huntRunStatus = 0;
+		  auto level = getLevelForHunt(*name, aggressiveness);
+		  switch (level) {
+		  case Aggressiveness::Intensive:
+			  huntRunStatus = name->ScanIntensive(scope, reaction);
+			  break;
+		  case Aggressiveness::Normal:
+			  huntRunStatus = name->ScanNormal(scope, reaction);
+			  break;
+		  case Aggressiveness::Cursory:
+			  huntRunStatus = name->ScanCursory(scope, reaction);
+			  break;
+		  }
+
+		  if (huntRunStatus != -1) {
+			  ++huntsRan;
+		  }
+	  }
 	}
 	if (huntsRan != vRegisteredHunts.size()) {
 		io.InformUser(L"Successfully ran " + std::to_wstring(huntsRan) + L" hunts. There were no scans available for " + std::to_wstring(vRegisteredHunts.size() - huntsRan) + L" of the techniques.");

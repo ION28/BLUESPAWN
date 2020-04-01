@@ -112,14 +112,14 @@ Bluespawn::Bluespawn(){
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
 }
 
-void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
+void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel, vector<string> vExcludedHunts, vector<string> vIncludedHunts) {
 	Bluespawn::io.InformUser(L"Starting a Hunt");
 	DWORD tactics = UINT_MAX;
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
 
-	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction, vExcludedHunts, vIncludedHunts);
 }
 
 void Bluespawn::dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce) {
@@ -190,6 +190,8 @@ int main(int argc, char* argv[]){
 
 	options.add_options("hunt")
 		("l,level", "Aggressiveness of Hunt. Either Cursory, Normal, or Intensive", cxxopts::value<std::string>())
+		("hunts", "List of hunts to run by Mitre ATT&CK name. Will only run these hunts.", cxxopts::value<std::string>())
+		("exclude-hunts", "List of hunts to avoid running by Mitre ATT&CK name. Will run all hunts but these.", cxxopts::value<std::string>())
 		;
 
 	options.add_options("mitigate")
@@ -298,9 +300,32 @@ int main(int argc, char* argv[]){
 				Bluespawn::io.InformUser(L"Will default to Cursory.");
 				aHuntLevel = Aggressiveness::Cursory;
 			}
-			
+
+			//Parse included and excluded hunts
+			std::vector<std::string> vIncludedHunts;
+			std::vector<std::string> vExcludedHunts;
+			flag = "hunts";
+			try {
+				auto UserIncludedHunts = result[flag].as<std::string>();
+				for (unsigned startIdx = 0; startIdx < UserIncludedHunts.size();) {
+					auto endIdx = min(UserIncludedHunts.find(',', startIdx), UserIncludedHunts.size());
+					auto hunt = UserIncludedHunts.substr(startIdx, endIdx - startIdx);
+					vIncludedHunts.push_back(hunt);
+					startIdx = endIdx + 1;
+				}
+			} catch(const std::domain_error& e){}
+			try {
+				auto UserExcludedHunts = result["exclude-hunts"].as<std::string>();
+				for (unsigned startIdx = 0; startIdx < UserExcludedHunts.size();) {
+					auto endIdx = min(UserExcludedHunts.find(',', startIdx), UserExcludedHunts.size());
+					auto hunt = UserExcludedHunts.substr(startIdx, endIdx - startIdx);
+					vExcludedHunts.push_back(hunt);
+					startIdx = endIdx + 1;
+				}
+			}catch (const std::domain_error & e) {}
+
 			if (result.count("hunt"))
-				bluespawn.dispatch_hunt(aHuntLevel);
+				bluespawn.dispatch_hunt(aHuntLevel, vExcludedHunts, vIncludedHunts);
 			else if (result.count("monitor"))
 				bluespawn.monitor_system(aHuntLevel);
 
