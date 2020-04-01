@@ -281,18 +281,18 @@ namespace FileSystem{
 		WinTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
 		WinVerifyTrust(NULL, &verification, &WinTrustData);
 		if(result == ERROR_SUCCESS){
-			LOG_VERBOSE(3, FilePath << " signed.");
+			LOG_VERBOSE(1, FilePath << " signed.");
 			return true;
 		}
 		else {
 			//Verify signature in system catalog
 			bool bInCatalog = File::GetFileInSystemCatalogs();
 			if (bInCatalog) {
-				LOG_VERBOSE(3, FilePath << " signed in system catalogs.");
+				LOG_VERBOSE(1, FilePath << " signed in system catalogs.");
 				return true;
 			}
 		}
-		LOG_VERBOSE(3, FilePath << " not signed or located in system catalogs.");
+		LOG_VERBOSE(1, FilePath << " not signed or located in system catalogs.");
 		return false;
 	}
 

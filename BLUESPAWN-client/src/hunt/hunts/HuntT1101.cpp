@@ -19,22 +19,26 @@ namespace Hunts {
 	int HuntT1101::EvaluatePackages(Registry::RegistryKey key, std::vector<std::wstring> vSecPackages, Reaction reaction) {
 		int detections = 0;
 
+		FileSystem::File* file;
+
 		for (auto secPackage : vSecPackages) {
-			FileSystem::File file = nullptr;
+			if (secPackage == L"\"\"") {
+				continue;
+			}
 			if (FileSystem::File(secPackage).GetFileExists()) {
-				file = FileSystem::File(secPackage);
+				file = new FileSystem::File(secPackage);
 			}
 			else {
-				file = FileSystem::File(ExpandEnvStringsW(L"%SYSTEMROOT%\\System32\\") + secPackage + L".dll");
-				if (!file.GetFileExists()) { continue; }
+				file = new FileSystem::File(ExpandEnvStringsW(L"%SYSTEMROOT%\\System32\\") + secPackage + L".dll");
+				if (!file->GetFileExists()) { continue; }
 			}
 
 			auto& yara = YaraScanner::GetInstance();
-			YaraScanResult result = yara.ScanFile(file);
+			YaraScanResult result = yara.ScanFile(*file);
 
-			if (!file.GetFileSigned()) {
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ key, L"Security Packages", std::move(std::wstring{}) }));
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+			if (!file->GetFileSigned()) {
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ key, L"Security Packages", *key.GetValue<std::vector<std::wstring>>(L"Security Packages")}));
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file->GetFilePath()));
 				detections += 2;
 			}
 		}
