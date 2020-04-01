@@ -106,6 +106,7 @@ std::wstring GetProcessCommandline(DWORD dwPID){
 }
 
 std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
+    WCHAR path[MAX_PATH]{};
     auto start = wsCmd.find_first_not_of(L" \t\n\r", 0);
     if(wsCmd.at(start) == '"' || wsCmd.at(start) == '\''){
         return wsCmd.substr(start, wsCmd.find_first_of(L"'\"", start) - start);
@@ -115,13 +116,13 @@ std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
             auto spacepos = wsCmd.find(L" ", idx);
             if(spacepos == std::wstring::npos){
                 return wsCmd.substr(start);
-            } else if(FileSystem::CheckFileExists(wsCmd.substr(start, spacepos - start))){
-                return wsCmd.substr(start, spacepos - start);
+            } else if(reinterpret_cast<ULONG_PTR>(FindExecutableW(wsCmd.substr(start, spacepos - start).c_str(), nullptr, path)) > 32){
+                return path;
             } else {
                 idx = spacepos + 1;
             }
         }
 
-        return {};
+        return wsCmd.substr(start, wsCmd.find_first_of(L" \t\n\r", start) - start);
     }
 }
