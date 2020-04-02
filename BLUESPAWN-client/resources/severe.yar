@@ -1,3 +1,5 @@
+include "bluespawn-original/kernel32_kernelbase_ror13.yar"
+
 include "../external/yara-rules/antidebug_antivm/antidebug_antivm.yar"
 include "../external/yara-rules/cve_rules/CVE-2010-0805.yar"
 include "../external/yara-rules/cve_rules/CVE-2010-0887.yar"
