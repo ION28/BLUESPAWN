@@ -37,7 +37,7 @@ namespace Hunts {
 			YaraScanResult result = yara.ScanFile(*file);
 
 			if (!file->GetFileSigned()) {
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ key, L"Security Packages", *key.GetValue<std::vector<std::wstring>>(L"Security Packages")}));
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ key, L"Security Packages", key.GetValue<std::vector<std::wstring>>(L"Security Packages").value() }));
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file->GetFilePath()));
 				detections += 2;
 			}

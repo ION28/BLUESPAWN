@@ -25,4 +25,4 @@ std::vector<LPVOID> GetHooks(DWORD pid);
 std::wstring GetProcessCommandline(DWORD dwPID);
 std::wstring GetProcessCommandline(const HandleWrapper& hProcess);
 
-std::wstring GetImagePathFromCommand(const std::wstring& wsCmd);
+std::wstring GetImagePathFromCommand(std::wstring wsCmd);
