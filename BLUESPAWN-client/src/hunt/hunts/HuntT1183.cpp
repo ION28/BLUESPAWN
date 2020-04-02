@@ -24,14 +24,15 @@ namespace Hunts{
 
 		auto IFEO = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options" };
 		for(auto subkey : IFEO.EnumerateSubkeys()){
-			ADD_ALL_VECTOR(values, CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options", {
+			auto name = subkey.GetName();
+			name = name.substr(name.find_last_of(L"\\") + 1);
+			ADD_ALL_VECTOR(values, CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\" + name, {
 				{ L"Debugger", L"", false, CheckSzEmpty },
 				{ L"GlobalFlag", 0, false, [](DWORD d1, DWORD d2){ return !(d1 & 0x200); } },
 			}));
+
 			auto GFlags = subkey.GetValue<DWORD>(L"GlobalFlag");
 			if(GFlags && *GFlags & 0x200){
-				auto name = subkey.GetName();
-				name = name.substr(name.find_last_of(L"\\") + 1);
 				ADD_ALL_VECTOR(values, CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SilentProcessExit\\" + name, {
 					{ L"ReportingMode", 0, false, CheckDwordEqual },
 					{ L"MonitorProcess", L"", false, CheckSzEmpty },

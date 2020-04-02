@@ -17,8 +17,7 @@ namespace Hunts {
 	 */
 	class HuntT1131 : public Hunt {
 	private:
-		std::vector<std::wstring> okAuthPackages = { L"msv1_0", L"SshdPinAuthLsa" };
-		std::vector<std::wstring> okNotifPackages = { L"scecli" };
+		int EvaluatePackages(Registry::RegistryKey key, std::vector<std::wstring> vSecPackages, std::wstring name, Reaction reaction);
 	public:
 		HuntT1131();
 

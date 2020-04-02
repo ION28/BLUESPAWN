@@ -33,7 +33,6 @@ namespace Hunts {
 	}
 
 	int HuntT1060::EvaluateFile(std::wstring wLaunchString, Reaction reaction) {
-		/*
 		auto filepath = GetImagePathFromCommand(wLaunchString);
 
 		FileSystem::File file = FileSystem::File(filepath);
@@ -46,7 +45,6 @@ namespace Hunts {
 			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 			return 1;
 		}
-		*/
 
 		return 0;
 	}
