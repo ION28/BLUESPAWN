@@ -122,8 +122,7 @@ namespace Hunts {
 		std::vector<std::shared_ptr<Event>> events;
 
 		events.push_back(std::make_shared<EventLogEvent>(L"System", 7045));
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services", false, false));
-
+		
 		return events;
 	}
 
