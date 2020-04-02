@@ -7,9 +7,9 @@ BLUESPAWN-client/external/
 BLUESPAWN-client/resources/severe
 BLUESPAWN-client/resources/severe2
 BLUESPAWN-client/resources/indicators
-BLUESPAWN-client/resources/BLUESPAWN-client.aps
 *.user
 *.filters
 *.cache
 *.bak
 *.lib
+*.aps

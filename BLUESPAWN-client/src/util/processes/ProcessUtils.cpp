@@ -109,14 +109,16 @@ std::wstring GetProcessCommandline(DWORD dwPID){
 }
 
 std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
-    auto start = wsCmd.find_first_not_of(L" \f\v\t\n\r", 0);
-    if(wsCmd.substr(start, 4) == L"\\??\\"){
+    const std::wstring wsCmdExpanded = ExpandEnvStringsW(wsCmd);
+
+    auto start = wsCmdExpanded.find_first_not_of(L" \f\v\t\n\r", 0);
+    if(wsCmdExpanded.substr(start, 4) == L"\\??\\"){
         start += 4;
     }
     if(start == std::wstring::npos){
         return L"";
-    } else if(wsCmd.at(start) == '"' || wsCmd.at(start) == '\''){
-        auto name = wsCmd.substr(start + 1, wsCmd.find_first_of(L"'\"", start + 1) - start - 1);
+    } else if(wsCmdExpanded.at(start) == '"' || wsCmdExpanded.at(start) == '\''){
+        auto name = wsCmdExpanded.substr(start + 1, wsCmdExpanded.find_first_of(L"'\"", start + 1) - start - 1);
         auto path = FileSystem::SearchPathExecutable(name);
         if(path){
             return *path;
@@ -142,6 +144,6 @@ std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
             idx = spacepos + 1;
         }
 
-        return wsCmd.substr(start, wsCmd.find_first_of(L" \t\n\r", start) - start);
+        return wsCmdExpanded.substr(start, wsCmdExpanded.find_first_of(L" \t\n\r", start) - start);
     }
 }

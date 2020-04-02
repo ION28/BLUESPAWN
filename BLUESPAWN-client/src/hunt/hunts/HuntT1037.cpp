@@ -20,14 +20,21 @@ namespace Hunts{
 		LOG_VERBOSE(1, L"Examining " << file.GetFilePath());
 		auto& yara = YaraScanner::GetInstance();
 		YaraScanResult result = yara.ScanFile(file);
+		bool bFileSigned = file.GetFileSigned();
 
-		if(level == Aggressiveness::Cursory) {
+		if(level == Aggressiveness::Cursory || level == Aggressiveness::Normal) {
+			if (file.GetFileAttribs().extension == L".exe" && !bFileSigned) {
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+				return 1;
+			}
 			if(!result && result.vKnownBadRules.size() > 0) {
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 				return 1;
 			}
-		} else if(level == Aggressiveness::Normal) {
-			if((!result && result.vKnownBadRules.size() > 0) || (std::find(sus_exts.begin(), sus_exts.end(), file.GetFileAttribs().extension) != sus_exts.end())) {
+		}
+		if(level == Aggressiveness::Normal) {
+			if((std::find(sus_exts.begin(), sus_exts.end(), file.GetFileAttribs().extension) != sus_exts.end())) {
+				LOG_INFO(L"Startup with suspicious extension identified.");
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 				return 1;
 			}

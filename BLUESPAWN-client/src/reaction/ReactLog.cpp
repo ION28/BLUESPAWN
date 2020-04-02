@@ -34,7 +34,7 @@ namespace Reactions {
 		if(HuntBegun){
 			_HuntLogMessage->AddDetection(std::static_pointer_cast<DETECTION>(detection));
 		} else {
-			LOG_ERROR("Potentially malicious process " << detection->wsCmdline << " (PID " << detection->PID 
+			LOG_ERROR("Potentially malicious process " << detection->wsImagePath << " (PID " << detection->PID 
 				<< ") detected outside of a hunt!");
 		}
 	}

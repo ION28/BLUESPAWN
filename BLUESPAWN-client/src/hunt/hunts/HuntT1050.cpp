@@ -48,17 +48,17 @@ namespace Hunts {
 
 		auto& yara = YaraScanner::GetInstance();
 		int detections = 0;
-
 		
 		for (auto result : queryResults) {
 			auto imageName = result.GetProperty(L"Event/EventData/Data[@Name='ServiceName']");
 			auto imagePath = result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']");
 
-			// Find detections with YARA rules
+			// Look for unsigned service binaries or binaries with YARA rule hits
 			FileSystem::File file = FileSystem::File(imagePath);
 			YaraScanResult ScanResult = yara.ScanFile(file);
+			bool bFileSigned = file.GetFileSigned();
 
-			if (!ScanResult && ScanResult.vKnownBadRules.size() > 0) {
+			if (!bFileSigned || (!ScanResult && ScanResult.vKnownBadRules.size() > 0)) {
 				detections++;
 				reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
@@ -82,6 +82,7 @@ namespace Hunts {
 			// the ones MSF generates https://www.offensive-security.com/metasploit-unleashed/psexec-pass-hash/
 			if (GetShannonEntropy(imageName) < 3.00 || GetShannonEntropy(imageName) > 5.00) {
 				reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 				detections++;
 			}
 		}
@@ -106,8 +107,9 @@ namespace Hunts {
 
 			FileSystem::File file = FileSystem::File(imagePath);
 			YaraScanResult ScanResult = yara.ScanFile(file);
+			bool bFileSigned = file.GetFileSigned();
 
-			if (!ScanResult && ScanResult.vKnownBadRules.size() > 0) {
+			if (!bFileSigned || (!ScanResult && ScanResult.vKnownBadRules.size() > 0)) {
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 			}
 		}
