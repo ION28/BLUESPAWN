@@ -20,9 +20,7 @@ namespace Hunts {
 
 		int detections = 0;
 
-		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager", {
-			{ L"AppCertDLLs", std::vector<std::wstring>{}, false, CheckMultiSzEmpty },
-		})){
+		for(auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls")){
 			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
 			detections++;
 		}
