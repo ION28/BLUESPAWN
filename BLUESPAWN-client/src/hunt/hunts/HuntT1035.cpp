@@ -62,7 +62,7 @@ namespace Hunts {
 			}
 
 			if (!servicedll.GetFileSigned()) {
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ subkey, L"ServiceDll", key.GetValue<std::wstring>(L"ServiceDll").value() }));
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ subkey, L"ServiceDll", subkey.GetValue<std::wstring>(L"ServiceDll").value() }));
 
 				auto& yara = YaraScanner::GetInstance();
 				YaraScanResult result = yara.ScanFile(servicedll);

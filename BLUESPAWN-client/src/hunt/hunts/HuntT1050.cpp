@@ -4,6 +4,7 @@
 #include "util/log/Log.h"
 #include "util/log/HuntLogMessage.h"
 #include "util/filesystem/YaraScanner.h"
+#include "util/processes/ProcessUtils.h"
 
 #include "common/Utils.h"
 
@@ -51,39 +52,43 @@ namespace Hunts {
 		
 		for (auto result : queryResults) {
 			auto imageName = result.GetProperty(L"Event/EventData/Data[@Name='ServiceName']");
-			auto imagePath = result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']");
+			auto imagePath = GetImagePathFromCommand(result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']"));
 
-			// Look for unsigned service binaries or binaries with YARA rule hits
-			FileSystem::File file = FileSystem::File(imagePath);
-			YaraScanResult ScanResult = yara.ScanFile(file);
-			bool bFileSigned = file.GetFileSigned();
+			if(FileSystem::CheckFileExists(imagePath)){
+				// Look for unsigned service binaries or binaries with YARA rule hits
+				FileSystem::File file = FileSystem::File(imagePath);
+				bool bFileSigned = file.GetFileSigned();
 
-			if (!bFileSigned || (!ScanResult && ScanResult.vKnownBadRules.size() > 0)) {
-				detections++;
-				reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
-			}
+				if(!bFileSigned){
+					YaraScanResult ScanResult = yara.ScanFile(file);
+					if(!bFileSigned || (!ScanResult && ScanResult.vKnownBadRules.size() > 0)) {
+						detections++;
+						reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+					}
+				}
 
-			// Look for PSExec services
-			if (imageName.find(L"PSEXESVC") != std::wstring::npos) {
-				reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
-				detections++;
-			}
-			
-			// Look for Mimikatz Driver loading
-			if (imageName.find(L"mimikatz") != std::wstring::npos || imageName.find(L"mimidrv") != std::wstring::npos 
-				|| imagePath.find(L"mimidrv.sys") != std::wstring::npos) {
-				reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
-				detections++;
-			}
+				// Look for PSExec services
+				if(imageName.find(L"PSEXESVC") != std::wstring::npos) {
+					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+					detections++;
+				}
 
-			// Calculate entropy of service names to look for suspicious services like 
-			// the ones MSF generates https://www.offensive-security.com/metasploit-unleashed/psexec-pass-hash/
-			if (GetShannonEntropy(imageName) < 3.00 || GetShannonEntropy(imageName) > 5.00) {
-				reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
-				detections++;
+				// Look for Mimikatz Driver loading
+				if(imageName.find(L"mimikatz") != std::wstring::npos || imageName.find(L"mimidrv") != std::wstring::npos
+					|| imagePath.find(L"mimidrv.sys") != std::wstring::npos) {
+					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+					detections++;
+				}
+
+				// Calculate entropy of service names to look for suspicious services like 
+				// the ones MSF generates https://www.offensive-security.com/metasploit-unleashed/psexec-pass-hash/
+				if(GetShannonEntropy(imageName) < 3.00 || GetShannonEntropy(imageName) > 5.00) {
+					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+					detections++;
+				}
 			}
 		}
 
@@ -103,14 +108,18 @@ namespace Hunts {
 		for (auto result : queryResults) {
 			reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
 
-			auto imagePath = result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']");
+			auto imagePath = GetImagePathFromCommand(result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']"));
 
-			FileSystem::File file = FileSystem::File(imagePath);
-			YaraScanResult ScanResult = yara.ScanFile(file);
-			bool bFileSigned = file.GetFileSigned();
+			if(FileSystem::CheckFileExists(imagePath)){
+				FileSystem::File file = FileSystem::File(imagePath);
+				bool bFileSigned = file.GetFileSigned();
+				if(!bFileSigned){
+					YaraScanResult ScanResult = yara.ScanFile(file);
 
-			if (!bFileSigned || (!ScanResult && ScanResult.vKnownBadRules.size() > 0)) {
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+					if(!bFileSigned || (!ScanResult && ScanResult.vKnownBadRules.size() > 0)) {
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+					}
+				}
 			}
 		}
 

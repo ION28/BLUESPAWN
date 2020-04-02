@@ -108,8 +108,12 @@ std::wstring GetProcessCommandline(DWORD dwPID){
     }
 }
 
-std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
-    const std::wstring wsCmdExpanded = ExpandEnvStringsW(wsCmd);
+std::wstring GetImagePathFromCommand(std::wstring wsCmd){
+    if(wsCmd.substr(0, 11) == L"\\SystemRoot"){
+        wsCmd = L"%SYSTEMROOT%" + wsCmd.substr(11);
+    }
+
+    std::wstring wsCmdExpanded = ExpandEnvStringsW(wsCmd);
 
     auto start = wsCmdExpanded.find_first_not_of(L" \f\v\t\n\r", 0);
     if(wsCmdExpanded.substr(start, 4) == L"\\??\\"){
