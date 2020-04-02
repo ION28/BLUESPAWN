@@ -99,7 +99,7 @@ namespace Hunts {
 	std::vector<std::shared_ptr<Event>> HuntT1035::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
 
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services", true, false, true));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services", false, false));
 
 		return events;
 	}
