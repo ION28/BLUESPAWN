@@ -30,11 +30,11 @@ namespace Hunts {
 			}
 		}
 
-		FileSystem::File image = FileSystem::File(filepath);
-
-		if (!image.GetFileExists() || !image.GetReadAccess()) {
+		if (!FileSystem::CheckFileExists(filepath)) {
 			return 0;
 		}
+
+		FileSystem::File image = FileSystem::File(filepath);
 
 		if (!image.GetFileSigned()) {
 			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ key, L"ImagePath", key.GetValue<std::wstring>(L"ImagePath").value() }));
@@ -55,11 +55,11 @@ namespace Hunts {
 		if (subkey.Exists() && subkey.ValueExists(L"ServiceDll")) {
 			auto filepath2 = GetImagePathFromCommand(subkey.GetValue<std::wstring>(L"ServiceDll").value());
 
-			FileSystem::File servicedll = FileSystem::File(filepath2);
-
-			if (!servicedll.GetFileExists() || !servicedll.GetReadAccess()) {
+			if (!FileSystem::CheckFileExists(filepath2)) {
 				return detections;
 			}
+
+			FileSystem::File servicedll = FileSystem::File(filepath2);
 
 			if (!servicedll.GetFileSigned()) {
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ subkey, L"ServiceDll", subkey.GetValue<std::wstring>(L"ServiceDll").value() }));
