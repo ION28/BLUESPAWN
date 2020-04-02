@@ -92,6 +92,8 @@ bool PERemover::CheckThreads(){
             return false;
         }
     } while(Thread32Next(hThreadSnapshot, &ThreadEntry));
+
+    return 1;
 }
 
 /// TODO: Actually walk the thread back instead of terminating it
