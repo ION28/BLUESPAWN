@@ -125,10 +125,6 @@ std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
         auto idx = start;
         while(idx != std::wstring::npos){
             auto spacepos = wsCmd.find(L" ", idx);
-            if(spacepos == std::wstring::npos){
-                return wsCmd.substr(start);
-            }
-
             auto name = wsCmd.substr(start, spacepos - start);
             auto path = FileSystem::SearchPathExecutable(name);
             if(path && FileSystem::CheckFileExists(*path)){
@@ -136,6 +132,10 @@ std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
             }
 
             if(name.length() > 4 && CompareIgnoreCaseW(name.substr(name.length() - 4), L".exe")){
+                return name;
+            }
+
+            if(spacepos == std::wstring::npos){
                 return name;
             }
             
