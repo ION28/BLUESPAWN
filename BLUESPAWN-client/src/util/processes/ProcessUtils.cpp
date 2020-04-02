@@ -112,17 +112,15 @@ std::wstring GetImagePathFromCommand(std::wstring wsCmd){
     if(wsCmd.substr(0, 11) == L"\\SystemRoot"){
         wsCmd = L"%SYSTEMROOT%" + wsCmd.substr(11);
     }
-
-    std::wstring wsCmdExpanded = ExpandEnvStringsW(wsCmd);
-
-    auto start = wsCmdExpanded.find_first_not_of(L" \f\v\t\n\r", 0);
-    if(wsCmdExpanded.substr(start, 4) == L"\\??\\"){
+    
+    auto start = wsCmd.find_first_not_of(L" \f\v\t\n\r", 0);
+    if(wsCmd.substr(start, 4) == L"\\??\\"){
         start += 4;
     }
     if(start == std::wstring::npos){
         return L"";
-    } else if(wsCmdExpanded.at(start) == '"' || wsCmdExpanded.at(start) == '\''){
-        auto name = wsCmdExpanded.substr(start + 1, wsCmdExpanded.find_first_of(L"'\"", start + 1) - start - 1);
+    } else if(wsCmd.at(start) == '"' || wsCmd.at(start) == '\''){
+        auto name = wsCmd.substr(start + 1, wsCmd.find_first_of(L"'\"", start + 1) - start - 1);
         auto path = FileSystem::SearchPathExecutable(name);
         if(path){
             return *path;
@@ -130,12 +128,8 @@ std::wstring GetImagePathFromCommand(std::wstring wsCmd){
     } else {
         auto idx = start;
         while(idx != std::wstring::npos){
-            auto spacepos = wsCmdExpanded.find(L" ", idx);
-            if(spacepos == std::wstring::npos){
-                return wsCmdExpanded.substr(start);
-            }
-
-            auto name = wsCmdExpanded.substr(start, spacepos - start);
+            auto spacepos = wsCmd.find(L" ", idx);
+            auto name = wsCmd.substr(start, spacepos - start);
             auto path = FileSystem::SearchPathExecutable(name);
             if(path && FileSystem::CheckFileExists(*path)){
                 return *path;
@@ -144,10 +138,14 @@ std::wstring GetImagePathFromCommand(std::wstring wsCmd){
             if(name.length() > 4 && CompareIgnoreCaseW(name.substr(name.length() - 4), L".exe")){
                 return name;
             }
+
+            if(spacepos == std::wstring::npos){
+                return name;
+            }
             
             idx = spacepos + 1;
         }
 
-        return wsCmdExpanded.substr(start, wsCmdExpanded.find_first_of(L" \t\n\r", start) - start);
+        return wsCmd.substr(start, wsCmd.find_first_of(L" \t\n\r", start) - start);
     }
 }

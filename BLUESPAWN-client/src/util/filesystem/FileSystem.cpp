@@ -33,27 +33,18 @@ namespace FileSystem{
 	}
 
 	std::optional<std::wstring> SearchPathExecutable(const std::wstring& name){
-		WCHAR* ext = L".exe";
-		if(name.size() >= 4 && (name.substr(name.size() - 4) == L".exe" || name.substr(name.size() - 4) == L".dll")){
-			ext = nullptr;
-		}
-
-		auto size = SearchPathW(nullptr, name.c_str(), ext, 0, nullptr, nullptr);
+		auto size = SearchPathW(nullptr, name.c_str(), L".exe", 0, nullptr, nullptr);
 		if(!size){
 			return std::nullopt;
 		}
 
-		WCHAR* buffer = new WCHAR[static_cast<size_t>(size) + 1]{};
+		std::vector<WCHAR> buffer(static_cast<size_t>(size) + 1);
 		WCHAR* filename{};
-		if(!SearchPathW(nullptr, name.c_str(), ext, size + 1, buffer, &filename)){
-			delete[] buffer;
+		if(!SearchPathW(nullptr, name.c_str(), L".exe", size + 1, buffer.data(), &filename)){
 			return std::nullopt;
 		}
 
-		std::wstring path = buffer;
-		delete[] buffer;
-
-		return path;
+		return buffer.data();
 	}
 
 	DWORD File::SetFilePointer(DWORD64 val) const {
