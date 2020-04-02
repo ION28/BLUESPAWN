@@ -1,4 +1,8 @@
 #pragma once
+#include <Windows.h>
+
+#include <vector>
+
 #include "../Hunt.h"
 #include "reaction/Reaction.h"
 #include "reaction/Log.h"
@@ -6,22 +10,21 @@
 namespace Hunts {
 
 	/**
-	 * HuntT1060 examines associated Registry Run Keys
+	 * HuntT1035 examines the system for malicious services
 	 * 
-	 * @scans Cursory checks the values of the associated Registry Run Keys
+	 * @scans Cursory scans the services that are installed and their binaries
 	 * @scans Normal Scan not supported.
 	 * @scans Intensive Scan not supported.
 	 */
-	class HuntT1060 : public Hunt {
+	class HuntT1035 : public Hunt {
 	private:
-		std::vector<std::wstring> RunKeys;
 		std::vector<std::wstring> vSuspicious = { L"cmd.exe", L"powershell.exe", L"cscript.exe", L"wscript.exe", L"net.exe", L"net1.exe" };
-		int EvaluateFile(std::wstring wLaunchString, Reaction reaction);
+		int EvaluateService(Registry::RegistryKey key, Reaction reaction);
 
 	public:
-		HuntT1060();
+		HuntT1035();
 
-		virtual int ScanCursory(const Scope& scope, Reaction reaction);
+		virtual int ScanNormal(const Scope& scope, Reaction reaction);
 		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

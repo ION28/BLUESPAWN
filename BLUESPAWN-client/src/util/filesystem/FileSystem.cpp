@@ -311,7 +311,7 @@ namespace FileSystem{
 		WinTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
 		WinVerifyTrust(NULL, &verification, &WinTrustData);
 		if(result == ERROR_SUCCESS){
-			LOG_VERBOSE(1, FilePath << " signed.");
+			LOG_VERBOSE(1, FilePath << " is signed.");
 			return true;
 		}
 		else {
