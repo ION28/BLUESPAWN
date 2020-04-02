@@ -3,6 +3,8 @@
 #include "util/log/Log.h"
 #include "util/filesystem/FileSystem.h"
 
+#include "shlwapi.h"
+
 typedef struct _CURDIR {
     UNICODE_STRING DosPath;
     PVOID Handle;
@@ -64,20 +66,21 @@ std::wstring GetProcessCommandline(const HandleWrapper& process){
 		NTSTATUS status = Linker::NtQueryInformationProcess(process, ProcessBasicInformation, &information, sizeof(information), nullptr);
 		if(NT_SUCCESS(status)){
 			auto peb = information.PebBaseAddress;
+
+            ULONG_PTR pointer{};
+            if(!ReadProcessMemory(process, &peb->ProcessParameters, &pointer, sizeof(pointer), nullptr)){
+                LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its command line (error " << GetLastError() << ")");
+                return {};
+            }
             RTL_USER_PROCESS_PARAMETERS_ params{};
-            if(!ReadProcessMemory(process, &peb->ProcessParameters, &params, sizeof(params), nullptr)){
+            if(!ReadProcessMemory(process, LPVOID(pointer), &params, sizeof(params), nullptr)){
                 LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its command line (error " << GetLastError() << ")");
                 return {};
             }
 
             DWORD dwLength = params.CommandLine.Length;
             auto cmdline = AllocationWrapper{ new WCHAR[dwLength / 2 + 1], dwLength + 2, AllocationWrapper::CPP_ARRAY_ALLOC };
-            if(!ReadProcessMemory(process, &peb->ProcessParameters, &params, sizeof(params), nullptr)){
-                LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its command line (error " << GetLastError() << ")");
-                return {};
-            }
-
-            if(!ReadProcessMemory(process, &params.CommandLine.Buffer, cmdline, dwLength, nullptr)){
+            if(!ReadProcessMemory(process, params.CommandLine.Buffer, cmdline, dwLength, nullptr)){
                 LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its command line (error " << GetLastError() << ")");
                 return {};
             }
@@ -106,21 +109,37 @@ std::wstring GetProcessCommandline(DWORD dwPID){
 }
 
 std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
-    WCHAR path[MAX_PATH]{};
-    auto start = wsCmd.find_first_not_of(L" \t\n\r", 0);
-    if(wsCmd.at(start) == '"' || wsCmd.at(start) == '\''){
-        return wsCmd.substr(start, wsCmd.find_first_of(L"'\"", start) - start);
+    auto start = wsCmd.find_first_not_of(L" \f\v\t\n\r", 0);
+    if(wsCmd.substr(start, 4) == L"\\??\\"){
+        start += 4;
+    }
+    if(start == std::wstring::npos){
+        return L"";
+    } else if(wsCmd.at(start) == '"' || wsCmd.at(start) == '\''){
+        auto name = wsCmd.substr(start + 1, wsCmd.find_first_of(L"'\"", start + 1) - start - 1);
+        auto path = FileSystem::SearchPathExecutable(name);
+        if(path){
+            return *path;
+        } else return name;
     } else {
         auto idx = start;
         while(idx != std::wstring::npos){
             auto spacepos = wsCmd.find(L" ", idx);
             if(spacepos == std::wstring::npos){
                 return wsCmd.substr(start);
-            } else if(reinterpret_cast<ULONG_PTR>(FindExecutableW(wsCmd.substr(start, spacepos - start).c_str(), nullptr, path)) > 32){
-                return path;
-            } else {
-                idx = spacepos + 1;
             }
+
+            auto name = wsCmd.substr(start, spacepos - start);
+            auto path = FileSystem::SearchPathExecutable(name);
+            if(path && FileSystem::CheckFileExists(*path)){
+                return *path;
+            }
+
+            if(name.length() > 4 && CompareIgnoreCaseW(name.substr(name.length() - 4), L".exe")){
+                return name;
+            }
+            
+            idx = spacepos + 1;
         }
 
         return wsCmd.substr(start, wsCmd.find_first_of(L" \t\n\r", start) - start);
