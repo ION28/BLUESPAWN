@@ -11,7 +11,7 @@ using namespace Registry;
 
 namespace Hunts {
 	HuntT1015::HuntT1015() : Hunt(L"T1015 - Accessibility Features") {
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory | (DWORD)Aggressiveness::Normal;
+		dwSupportedScans = (DWORD) Aggressiveness::Cursory | (DWORD) Aggressiveness::Normal;
 		dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Files;
 		dwSourcesInvolved = (DWORD) DataSource::Registry | (DWORD) DataSource::FileSystem;
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
@@ -20,7 +20,9 @@ namespace Hunts {
 	int HuntT1015::EvaluateRegistry(Reaction& reaction) {
 		int detections = 0;
 
-		for (auto& key : vAccessibilityBinaries) {
+		auto& yara = YaraScanner::GetInstance();
+
+		for (auto key : vAccessibilityBinaries) {
 			std::vector<RegistryValue> debugger{ CheckValues(HKEY_LOCAL_MACHINE, wsIFEO + key, {
 				{ L"Debugger", L"", false, CheckSzEmpty },
             }, true, false) };
@@ -29,12 +31,11 @@ namespace Hunts {
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
 				LOG_INFO(detection.key.GetName() << L" is configured with a Debugger value of " << detection);
 
-				auto& yara = YaraScanner::GetInstance();
-
 				FileSystem::File file = FileSystem::File(detection.ToString());
 				YaraScanResult result = yara.ScanFile(file);
+				bool bFileSigned = file.GetFileSigned();
 
-				if(!result && result.vKnownBadRules.size() > 0) {
+				if(!bFileSigned || (!result && result.vKnownBadRules.size() > 0)) {
 					detections++;
 					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 				}
@@ -44,23 +45,20 @@ namespace Hunts {
 		return detections;
 	}
 
-	int HuntT1015::EvaluateFiles(Reaction& reaction) {
+	int HuntT1015::EvaluateFiles(Reaction& reaction, bool bScanYara) {
 		int detections = 0;
-
-		auto& yara = YaraScanner::GetInstance();
 
 		for (auto key : vAccessibilityBinaries) {
 			FileSystem::File file = FileSystem::File(L"C:\\Windows\\System32\\" + key);
 
-			YaraScanResult result = yara.ScanFile(file);
+			if (!file.GetFileSigned()) {
+				if (bScanYara) { 
+					auto& yara = YaraScanner::GetInstance();
+					YaraScanResult result = yara.ScanFile(file);
+				}
 
-			if (!result && result.vKnownBadRules.size() > 0) {
-				detections++;
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
-			}
-			else if (!file.GetFileSigned()) {
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 				LOG_INFO(file.GetFilePath() << L" is not signed!");
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
 				detections++;
 			}
 		}
@@ -73,18 +71,19 @@ namespace Hunts {
 		reaction.BeginHunt(GET_INFO());
 
 		int results = EvaluateRegistry(reaction);
+		results += EvaluateFiles(reaction, false);
 
 		reaction.EndHunt();
 		return results;
 	}
 
 	int HuntT1015::ScanNormal(const Scope& scope, Reaction reaction) {
-		LOG_INFO(L"Hunting for " << name << L"at level Normal");
+		LOG_INFO(L"Hunting for " << name << L" at level Normal");
 		reaction.BeginHunt(GET_INFO());
 
 
 		int results = EvaluateRegistry(reaction);
-		results += EvaluateFiles(reaction);
+		results += EvaluateFiles(reaction, true);
 		
 		reaction.EndHunt();
 		return results;

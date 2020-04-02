@@ -18,12 +18,42 @@
 
 namespace FileSystem{
 	bool CheckFileExists(std::wstring filename) {
-		if(INVALID_FILE_ATTRIBUTES == GetFileAttributes(filename.c_str()) && GetLastError() == ERROR_FILE_NOT_FOUND){
+		auto attribs = GetFileAttributesW(filename.c_str());
+		if(INVALID_FILE_ATTRIBUTES == attribs && GetLastError() == ERROR_FILE_NOT_FOUND){
 			LOG_VERBOSE(3, "File " << filename << " does not exist.");
+			return false;
+		}
+
+		if(attribs & FILE_ATTRIBUTE_DIRECTORY){
+			LOG_VERBOSE(3, "File " << filename << " is a directory.");
 			return false;
 		}
 		LOG_VERBOSE(3, "File " << filename << " exists");
 		return true;
+	}
+
+	std::optional<std::wstring> SearchPathExecutable(const std::wstring& name){
+		WCHAR* ext = L".exe";
+		if(name.size() >= 4 && (name.substr(name.size() - 4) == L".exe" || name.substr(name.size() - 4) == L".dll")){
+			ext = nullptr;
+		}
+
+		auto size = SearchPathW(nullptr, name.c_str(), ext, 0, nullptr, nullptr);
+		if(!size){
+			return std::nullopt;
+		}
+
+		WCHAR* buffer = new WCHAR[static_cast<size_t>(size) + 1]{};
+		WCHAR* filename{};
+		if(!SearchPathW(nullptr, name.c_str(), ext, size + 1, buffer, &filename)){
+			delete[] buffer;
+			return std::nullopt;
+		}
+
+		std::wstring path = buffer;
+		delete[] buffer;
+
+		return path;
 	}
 
 	DWORD File::SetFilePointer(DWORD64 val) const {
@@ -281,18 +311,18 @@ namespace FileSystem{
 		WinTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
 		WinVerifyTrust(NULL, &verification, &WinTrustData);
 		if(result == ERROR_SUCCESS){
-			LOG_VERBOSE(3, FilePath << " signed.");
+			LOG_VERBOSE(1, FilePath << " signed.");
 			return true;
 		}
 		else {
 			//Verify signature in system catalog
 			bool bInCatalog = File::GetFileInSystemCatalogs();
 			if (bInCatalog) {
-				LOG_VERBOSE(3, FilePath << " signed in system catalogs.");
+				LOG_VERBOSE(1, FilePath << " signed in system catalogs.");
 				return true;
 			}
 		}
-		LOG_VERBOSE(3, FilePath << " not signed or located in system catalogs.");
+		LOG_VERBOSE(1, FilePath << " not signed or located in system catalogs.");
 		return false;
 	}
 

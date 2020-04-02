@@ -3,6 +3,9 @@
 
 #include "util/log/Log.h"
 #include "util/configurations/Registry.h"
+#include "util/filesystem/FileSystem.h"
+#include "util/filesystem/YaraScanner.h"
+#include "util/processes/ProcessUtils.h"
 
 #include "common/Utils.h"
 
@@ -29,6 +32,30 @@ namespace Hunts {
 		};
 	}
 
+	int HuntT1060::EvaluateFile(std::wstring wLaunchString, Reaction reaction) {
+		auto filepath = GetImagePathFromCommand(wLaunchString);
+
+		FileSystem::File file = FileSystem::File(filepath);
+
+		bool bFileSigned = file.GetFileSigned();
+
+		for (std::wstring val : vSuspicious) {
+			if (filepath.find(val) != std::wstring::npos) {
+				return 1;
+			}
+		}
+
+		if (!bFileSigned) {
+			auto& yara = YaraScanner::GetInstance();
+			YaraScanResult result = yara.ScanFile(file);
+
+			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+			return 1;
+		}
+
+		return 0;
+	}
+
 	int HuntT1060::ScanCursory(const Scope& scope, Reaction reaction){
 		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
 		reaction.BeginHunt(GET_INFO());
@@ -37,7 +64,9 @@ namespace Hunts {
 		
 		for(auto& key : RunKeys){
 			for(auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, key)){
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+				if (EvaluateFile(detection.ToString(), reaction)) {
+					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+				}
 				detections++;
 			}
 		}
@@ -45,21 +74,27 @@ namespace Hunts {
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Command Processor", {
 			{ L"AutoRun", L"", false, CheckSzEmpty }
 		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			if (EvaluateFile(detection.ToString(), reaction)) {
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			}
 			detections++;
 		}
 
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", {
 			{ L"Startup", L"%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", false, CheckSzEqual }
 		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			if (EvaluateFile(detection.ToString(), reaction)) {
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			}
 			detections++;
 		}
 
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", {
 			{ L"Common Startup", L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", false, CheckSzEqual }
 		})){
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			if (EvaluateFile(detection.ToString(), reaction)) {
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			}
 			detections++;
 		}
 

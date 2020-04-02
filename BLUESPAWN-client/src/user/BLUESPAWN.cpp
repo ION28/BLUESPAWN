@@ -49,6 +49,7 @@
 #include "mitigation/mitigations/MitigateV63817.h"
 #include "mitigation/mitigations/MitigateV63825.h"
 #include "mitigation/mitigations/MitigateV63829.h"
+#include "mitigation/mitigations/MitigateV71769.h"
 #include "mitigation/mitigations/MitigateV72753.h"
 #include "mitigation/mitigations/MitigateV73519.h"
 #include "mitigation/mitigations/MitigateV73585.h"
@@ -107,6 +108,7 @@ Bluespawn::Bluespawn(){
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63817>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63825>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV71769>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
@@ -167,7 +169,6 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 		std::cerr << ("Unknown help category") << std::endl;
 	}
 }
-
 
 int main(int argc, char* argv[]){
 

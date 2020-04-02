@@ -8,9 +8,9 @@ namespace Hunts {
 	/**
 	 * HuntT1050 examines Windows events for new services created
 	 *
-	 * @scans Cursory checks System logs for event id 7045 for new events
-	 * @scans Normal Scan not supported.
-	 * @scans Intensive Scan not supported.
+	 * @scans Cursory Scan not supported.
+	 * @scans Normal checks System logs for event id 7045 for new events
+	 * @scans Intensive checks System logs for event id 7045 for new events
 	 * @monitor Triggers a hunt whenever System log event ID 7045 is generated
 	 */
 	class HuntT1050 : public Hunt {
