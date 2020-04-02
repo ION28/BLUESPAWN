@@ -131,7 +131,7 @@ std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
 
             auto name = wsCmd.substr(start, spacepos - start);
             auto path = FileSystem::SearchPathExecutable(name);
-            if(path){
+            if(path && FileSystem::CheckFileExists(*path)){
                 return *path;
             }
 

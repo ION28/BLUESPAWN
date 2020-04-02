@@ -17,8 +17,14 @@
 
 namespace FileSystem{
 	bool CheckFileExists(std::wstring filename) {
-		if(INVALID_FILE_ATTRIBUTES == GetFileAttributes(filename.c_str()) && GetLastError() == ERROR_FILE_NOT_FOUND){
+		auto attribs = GetFileAttributesW(filename.c_str());
+		if(INVALID_FILE_ATTRIBUTES == attribs && GetLastError() == ERROR_FILE_NOT_FOUND){
 			LOG_VERBOSE(3, "File " << filename << " does not exist.");
+			return false;
+		}
+
+		if(attribs & FILE_ATTRIBUTE_DIRECTORY){
+			LOG_VERBOSE(3, "File " << filename << " is a directory.");
 			return false;
 		}
 		LOG_VERBOSE(3, "File " << filename << " exists");
