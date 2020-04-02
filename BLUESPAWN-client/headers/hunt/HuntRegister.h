@@ -26,9 +26,10 @@ private:
 public:
 	HuntRegister(const IOBase& oIo);
 
-	void RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
+	void RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction, vector<string> vExcludedHunts, vector<string> vIncludedHunts);
 	void RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction);
 
+	bool HuntRegister::HuntShouldRun(Hunt& hunt, vector<string> vExcludedHunts, vector<string> vIncludedHunts);
 	void SetupMonitoring(Aggressiveness aggressiveness, const Reaction& reaction);
 	void RegisterHunt(std::shared_ptr<Hunt> hunt);
 };

@@ -47,8 +47,9 @@ namespace Hunts {
 			//TODO: Also scan ProcessId with PE-Sieve to see if malicious
 			FileSystem::File file = FileSystem::File(query.GetProperty(L"Event/EventData/Data[@Name='TargetFilename']"));
 			YaraScanResult result = yara.ScanFile(file);
+			bool bFileSigned = file.GetFileSigned();
 
-			if (!result && result.vKnownBadRules.size() > 0) {
+			if (bFileSigned || (!result && result.vKnownBadRules.size() > 0)) {
 				detections++;
 				reaction.EventIdentified(EventLogs::EventLogItemToDetection(query));
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
@@ -81,13 +82,17 @@ namespace Hunts {
 		queries.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param4));
 		queries.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param5));
 
-		auto results = EventLogs::QueryEvents(L"Microsoft-Windows-Sysmon/Operational", 2, queries);
+		auto queryResults = EventLogs::QueryEvents(L"Microsoft-Windows-Sysmon/Operational", 2, queries);
 
-		for (auto result : results)
-			reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+		for (auto query : queryResults) {
+			reaction.EventIdentified(EventLogs::EventLogItemToDetection(query));
+
+			FileSystem::File file = FileSystem::File(query.GetProperty(L"Event/EventData/Data[@Name='TargetFilename']"));
+			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+		}
 
 		reaction.EndHunt();
-		return results.size();
+		return queryResults.size();
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1099::GetMonitoringEvents() {

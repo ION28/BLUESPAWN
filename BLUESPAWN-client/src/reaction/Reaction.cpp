@@ -1,4 +1,4 @@
-#include "hunt/reaction/Reaction.h"
+#include "reaction/Reaction.h"
 
 void Reaction::BeginHunt(const HuntInfo& info){
 	for(auto BeginProc : vStartHuntProcs){

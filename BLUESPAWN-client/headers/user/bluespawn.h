@@ -14,7 +14,7 @@
 
 #include "hunt/Hunt.h"
 #include "hunt/HuntRegister.h"
-#include "hunt/reaction/Reaction.h"
+#include "reaction/Reaction.h"
 
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
@@ -27,7 +27,7 @@ class Bluespawn {
 
 		void SetReaction(const Reaction& reaction);
 
-		void dispatch_hunt(Aggressiveness aHuntLevel);
+		void dispatch_hunt(Aggressiveness aHuntLevel, vector<string> vExcludedHunts, vector<string> vIncludedHunts);
 		void dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce);
 		void monitor_system(Aggressiveness aHuntLevel);
 

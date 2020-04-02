@@ -34,6 +34,7 @@ private:
 	YaraScanner();
 	
 	YR_RULES* KnownBad = nullptr;
+	YR_RULES* KnownBad2 = nullptr;
 	YR_RULES* Indicators = nullptr;
 
 	YaraStatus status;

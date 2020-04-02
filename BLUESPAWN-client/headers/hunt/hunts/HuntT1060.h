@@ -1,7 +1,7 @@
 #pragma once
 #include "../Hunt.h"
-#include "hunt/reaction/Reaction.h"
-#include "hunt/reaction/Log.h"
+#include "reaction/Reaction.h"
+#include "reaction/Log.h"
 
 namespace Hunts {
 
@@ -15,6 +15,9 @@ namespace Hunts {
 	class HuntT1060 : public Hunt {
 	private:
 		std::vector<std::wstring> RunKeys;
+		std::vector<std::wstring> vSuspicious = { L"cmd.exe", L"powershell.exe", L"cscript.exe", L"wscript.exe", L"net.exe", L"net1.exe" };
+		int EvaluateFile(std::wstring wLaunchString, Reaction reaction);
+
 	public:
 		HuntT1060();
 

@@ -12,6 +12,16 @@
     "name": "BLUESPAWN Overall",
     "domain": "mitre-enterprise",
     "techniques": [
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by checking Services key/subkeys and analyzing each of the binaries",
+            "techniqueID": "T1035"
+        },
+        {
+            "color": "#FCF26B",
+			"comment": "Covered by checking EventLogs for Security/4698, Task-Scheduler/106 events and monitoring for these events",
+            "techniqueID": "T1053"
+        },
 		{
             "color": "#5AADFF",
 			"comment": "Covered by checking EventLogs for Security/4720 events and monitoring for these events",
@@ -94,7 +104,7 @@
         },
         {
             "color": "#5AADFF",
-			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025)",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025). DLL Safe Search mode is enabled (V-3479)",
             "techniqueID": "T1177"
         },
         {
@@ -131,7 +141,12 @@
 			"color": "#5AADFF",
 			"comment": "Covered by checking Sysmon Logs for EID 2 events, YARA scanning those files, and monitoring for these events",
 			"techniqueID": "T1099"
-		}
+		},
+        {
+            "color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+            "techniqueID": "T1038"
+        }
     ],
     "legendItems": [
         {

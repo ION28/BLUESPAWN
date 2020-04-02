@@ -13,16 +13,38 @@
 #include <vector>
 #include <Shlwapi.h>
 #include <SoftPub.h>
+#include <mscat.h>
 #include "common/wrappers.hpp"
 
 namespace FileSystem{
 	bool CheckFileExists(std::wstring filename) {
-		if(INVALID_FILE_ATTRIBUTES == GetFileAttributes(filename.c_str()) && GetLastError() == ERROR_FILE_NOT_FOUND){
+		auto attribs = GetFileAttributesW(filename.c_str());
+		if(INVALID_FILE_ATTRIBUTES == attribs && GetLastError() == ERROR_FILE_NOT_FOUND){
 			LOG_VERBOSE(3, "File " << filename << " does not exist.");
+			return false;
+		}
+
+		if(attribs & FILE_ATTRIBUTE_DIRECTORY){
+			LOG_VERBOSE(3, "File " << filename << " is a directory.");
 			return false;
 		}
 		LOG_VERBOSE(3, "File " << filename << " exists");
 		return true;
+	}
+
+	std::optional<std::wstring> SearchPathExecutable(const std::wstring& name){
+		auto size = SearchPathW(nullptr, name.c_str(), L".exe", 0, nullptr, nullptr);
+		if(!size){
+			return std::nullopt;
+		}
+
+		std::vector<WCHAR> buffer(static_cast<size_t>(size) + 1);
+		WCHAR* filename{};
+		if(!SearchPathW(nullptr, name.c_str(), L".exe", size + 1, buffer.data(), &filename)){
+			return std::nullopt;
+		}
+
+		return buffer.data();
 	}
 
 	DWORD File::SetFilePointer(DWORD64 val) const {
@@ -32,6 +54,59 @@ namespace FileSystem{
 		auto lowerVal = static_cast<DWORD>(val & lowerMask);
 		auto upperVal = static_cast<DWORD>((val & upperMask) >> 32);
 		return ::SetFilePointer(hFile, lowerVal, reinterpret_cast<PLONG>(&upperVal), 0);
+	}
+
+	bool File::GetFileInSystemCatalogs() const {
+		bool bFileFound = false; //Whether the file was found in system catalogs
+		HCATADMIN hCatAdmin = NULL; //Context for enumerating system catalogs
+		HCATINFO hCatInfo = NULL;
+		GUID gAction = DRIVER_ACTION_VERIFY;
+		//Hash info
+		DWORD dwHashLength = 0; //Length of the hash
+		PBYTE pbHash = NULL; //Hash of the file
+		if (!CryptCATAdminAcquireContext(&hCatAdmin, &gAction, 0)) {
+			LOG_ERROR("Error acquiring catalog admin context " << GetLastError());
+			goto end;
+		}
+
+		//Get hash length
+		if (!CryptCATAdminCalcHashFromFileHandle(hFile, &dwHashLength, NULL, 0)) {
+			LOG_ERROR("Error getting hash size " << GetLastError());
+			goto end;
+		}
+		
+		//Get the hash of the file
+		pbHash = (PBYTE) HeapAlloc(GetProcessHeap(), 0, dwHashLength);
+		if (pbHash == NULL) {
+			LOG_ERROR("Error allocating " << dwHashLength << " bytes, out of memory.");
+			goto end;
+		}
+		if (!CryptCATAdminCalcHashFromFileHandle(hFile, &dwHashLength, pbHash, 0)) {
+			LOG_ERROR("Error getting file hash " << GetLastError());
+			goto end;
+		}
+
+		//Search catalogs for hash
+		hCatInfo = CryptCATAdminEnumCatalogFromHash(hCatAdmin, pbHash, dwHashLength, 0, &hCatInfo);
+		while (hCatInfo != NULL) {
+			bFileFound = true;
+			CATALOG_INFO ciCatalogInfo = {};
+			ciCatalogInfo.cbStruct = sizeof(ciCatalogInfo);
+
+			if (!CryptCATCatalogInfoFromContext(hCatInfo, &ciCatalogInfo, 0))	{
+				LOG_ERROR("Couldn't get catalog info for catalog containing hash of file " << FilePath);
+				break;
+			}
+
+			LOG_VERBOSE(3, "Hash for file " << FilePath << " found in catalog " << ciCatalogInfo.wszCatalogFile);
+
+			hCatInfo = CryptCATAdminEnumCatalogFromHash(hCatAdmin, pbHash, dwHashLength, 0, &hCatInfo);
+		}
+	end:
+		if (hCatInfo != NULL) CryptCATAdminReleaseCatalogContext(&hCatAdmin, &hCatInfo, 0);
+		if (hCatAdmin != NULL) CryptCATAdminReleaseContext(&hCatAdmin, 0);
+		if (pbHash != NULL) HeapFree(GetProcessHeap(), 0, pbHash);
+		return bFileFound;
 	}
 
 	File::File(IN const std::wstring& path) : hFile{ nullptr }{
@@ -191,7 +266,16 @@ namespace FileSystem{
 	}
 
 	bool File::GetFileSigned() const {
-
+		if (!bFileExists) {
+			LOG_ERROR("Can't check file signature for " << FilePath << ". File doesn't exist.");
+			SetLastError(ERROR_FILE_NOT_FOUND);
+			return false;
+		}
+		if (!bReadAccess) {
+			LOG_ERROR("Can't check file signature for " << FilePath << ". Insufficient permissions.");
+			SetLastError(ERROR_ACCESS_DENIED);
+			return false;
+		}
 		WINTRUST_FILE_INFO FileData{};
 		FileData.cbStruct = sizeof(WINTRUST_FILE_INFO);
 		FileData.pcwszFilePath = FilePath.c_str();
@@ -215,11 +299,22 @@ namespace FileSystem{
 		WinTrustData.pFile = &FileData;
 
 		LONG result = WinVerifyTrust((HWND) INVALID_HANDLE_VALUE, &verification, &WinTrustData);
-		if(result){
-			return false;
+		WinTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
+		WinVerifyTrust(NULL, &verification, &WinTrustData);
+		if(result == ERROR_SUCCESS){
+			LOG_VERBOSE(1, FilePath << " is signed.");
+			return true;
 		}
-
-		return true;
+		else {
+			//Verify signature in system catalog
+			bool bInCatalog = File::GetFileInSystemCatalogs();
+			if (bInCatalog) {
+				LOG_VERBOSE(1, FilePath << " signed in system catalogs.");
+				return true;
+			}
+		}
+		LOG_VERBOSE(1, FilePath << " not signed or located in system catalogs.");
+		return false;
 	}
 
 	std::optional<std::string> File::GetMD5Hash() const {

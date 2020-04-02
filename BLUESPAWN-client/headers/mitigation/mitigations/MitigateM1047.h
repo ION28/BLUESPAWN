@@ -2,7 +2,7 @@
 
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
-#include "hunt/reaction/Reaction.h"
+#include "reaction/Reaction.h"
 
 namespace Mitigations {
 

@@ -5,7 +5,7 @@
 #include <sddl.h>
 #include <stdio.h>
 #include <winevt.h>
-#include "hunt/reaction/Reaction.h"
+#include "reaction/Reaction.h"
 #include <vector>
 #include "util/eventlogs/EventSubscription.h"
 #include "util/eventlogs/EventLogItem.h"

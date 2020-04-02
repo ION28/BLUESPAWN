@@ -26,8 +26,10 @@
     <ClInclude Include="headers\hunt\HuntRegister.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1004.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1015.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1035.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1037.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1050.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1053.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1055.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1060.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1099.h" />
@@ -39,8 +41,10 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1138.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h" />
-    <ClInclude Include="headers\hunt\reaction\RemoveValue.h" />
-    <ClInclude Include="headers\hunt\reaction\SuspendProcess.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV71769.h" />
+    <ClInclude Include="headers\reaction\CarveMemory.h" />
+    <ClInclude Include="headers\reaction\RemoveValue.h" />
+    <ClInclude Include="headers\reaction\SuspendProcess.h" />
     <ClInclude Include="headers\hunt\RegistryHunt.h" />
     <ClInclude Include="headers\hunt\Scope.h" />
     <ClInclude Include="headers\mitigation\Mitigation.h" />
@@ -58,6 +62,7 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3340.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3344.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV3379.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV3479.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63597.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63687.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63753.h" />
@@ -66,6 +71,7 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateV63829.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV72753.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV73519.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV73585.h" />
     <ClInclude Include="headers\monitor\ETW_Wrapper.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -135,9 +141,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="headers\util\processes\Analyzer.h" />
-    <ClInclude Include="headers\hunt\reaction\Detections.h" />
-    <ClInclude Include="headers\hunt\reaction\Log.h" />
-    <ClInclude Include="headers\hunt\reaction\Reaction.h" />
+    <ClInclude Include="headers\reaction\Detections.h" />
+    <ClInclude Include="headers\reaction\Log.h" />
+    <ClInclude Include="headers\reaction\Reaction.h" />
+    <ClInclude Include="headers\util\processes\PERemover.h" />
     <ClInclude Include="headers\util\processes\ProcessChecker.h" />
     <ClInclude Include="headers\util\processes\ProcessUtils.h" />
   </ItemGroup>
@@ -147,8 +154,10 @@
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1004.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1015.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1035.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1037.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1050.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1053.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1055.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1060.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1099.cpp" />
@@ -160,8 +169,10 @@
     <ClCompile Include="src\hunt\hunts\HuntT1138.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
-    <ClCompile Include="src\hunt\reaction\RemoveValue.cpp" />
-    <ClCompile Include="src\hunt\reaction\SuspendProcess.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV71769.cpp" />
+    <ClCompile Include="src\reaction\CarveMemory.cpp" />
+    <ClCompile Include="src\reaction\RemoveValue.cpp" />
+    <ClCompile Include="src\reaction\SuspendProcess.cpp" />
     <ClCompile Include="src\hunt\RegistryHunt.cpp" />
     <ClCompile Include="src\hunt\Scope.cpp" />
     <ClCompile Include="src\mitigation\Mitigation.cpp" />
@@ -179,6 +190,7 @@
     <ClCompile Include="src\mitigation\mitigations\MitigateV3340.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3344.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV3379.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV3479.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63597.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63687.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV63753.cpp" />
@@ -187,6 +199,7 @@
     <ClCompile Include="src\mitigation\mitigations\MitigateV63829.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV72753.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV73519.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV73585.cpp" />
     <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -252,8 +265,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\util\processes\Analyzer.cpp" />
-    <ClCompile Include="src\hunt\reaction\ReactLog.cpp" />
-    <ClCompile Include="src\hunt\reaction\Reaction.cpp" />
+    <ClCompile Include="src\reaction\ReactLog.cpp" />
+    <ClCompile Include="src\reaction\Reaction.cpp" />
+    <ClCompile Include="src\util\processes\PERemover.cpp" />
     <ClCompile Include="src\util\processes\ProcessUtils.cpp" />
     <ClInclude Include="resources\resource.h" />
   </ItemGroup>
@@ -271,13 +285,14 @@
   <ItemGroup>
     <None Include="resources\indicators" />
     <None Include="resources\severe" />
+    <None Include="resources\severe2" />
   </ItemGroup>
   <ItemDefinitionGroup>
     <BuildLog>
       <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-client\external\cxxopts\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;$(SolutionDir)BLUESPAWN-client\external\pe-sieve\;$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-client\external\cxxopts\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreaded</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreaded</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MultiThreadedDebug</RuntimeLibrary>

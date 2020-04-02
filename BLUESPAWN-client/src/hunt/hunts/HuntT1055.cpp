@@ -5,7 +5,10 @@
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
 #include "util/log/HuntLogMessage.h"
+#include "util/processes/ProcessUtils.h"
+#include "common/wrappers.hpp"
 
+#include "pe_sieve.h"
 #include "pe_sieve_types.h"
 
 extern "C" {
@@ -40,11 +43,14 @@ namespace Hunts{
 			0
 		};
 
-		auto summary = PESieve_scan(params);
-		if(summary.errors){
+		WRAP(pesieve::ReportEx*, report, scan_and_dump(params), delete data);
+
+		if(!report){
 			LOG_WARNING("Unable to scan process " << pid << " due to an error in PE-Sieve.dll");
+			return false;
 		}
-		
+
+		auto summary = report->scan_report->generateSummary();
 		if(summary.skipped){
 			LOG_WARNING("Skipped scanning " << summary.skipped << " modules in process " << pid << ". This is likely due to use of .NET");
 		}
@@ -59,23 +65,14 @@ namespace Hunts{
 			if(summary.implanted + summary.hooked + summary.detached + summary.hdr_mod + summary.replaced != summary.suspicious)
 				identifiers |= static_cast<DWORD>(ProcessDetectionMethod::Other);
 
-			HandleWrapper handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
-			std::wstring name = {};
-			std::wstring path = {};
-			if(handle){
-				DWORD buffSize = 1024;
-				wchar_t buffer[1024];
-				if(QueryFullProcessImageNameW(handle, 0, buffer, &buffSize))
-					name = buffer;
+			std::wstring path = StringToWidestring(report->scan_report->mainImagePath);
 
-				buffSize = 1024;
-				if(GetProcessImageFileNameW(handle, buffer, buffSize))
-					path = buffer;
+			for(auto module : report->scan_report->module_reports){
+				if(module->status & SCAN_SUSPICIOUS){
+					reaction.ProcessIdentified(std::make_shared<PROCESS_DETECTION>(path, GetProcessCommandline(pid), pid, module->module, module->moduleSize, identifiers));
+				}
 			}
 
-
-
-			reaction.ProcessIdentified(std::make_shared<PROCESS_DETECTION>(name, path, std::wstring{}, pid, 0, identifiers));
 			return true;
 		}
 
@@ -83,7 +80,7 @@ namespace Hunts{
 	}
 
 	int HuntT1055::ScanNormal(const Scope& scope, Reaction reaction){
-		LOG_INFO(L"Hunting for T1055 " << name << L" at level Normal");
+		LOG_INFO(L"Hunting for " << name << L" at level Normal");
 		reaction.BeginHunt(GET_INFO());
 
 		int identified = 0;

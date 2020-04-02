@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 
-#include "hunt/reaction/SuspendProcess.h"
+#include "reaction/SuspendProcess.h"
 #include "common/wrappers.hpp"
 #include "util/log/Log.h"
 
@@ -59,7 +59,7 @@ namespace Reactions{
 	void SuspendProcessReaction::SuspendProcessIdentified(std::shared_ptr<PROCESS_DETECTION> detection){
 		HandleWrapper process = OpenProcess(PROCESS_SUSPEND_RESUME, false, detection->PID);
 		if(process){
-			if(io.GetUserConfirm(detection->wsImageName + L" appears to be infected. Suspend process?") == 1){
+			if(io.GetUserConfirm(detection->wsCmdline + L" appears to be infected. Suspend process?") == 1){
 				Linker::NtSuspendProcess(process);
 			}
 		} else {

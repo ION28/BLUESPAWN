@@ -30,6 +30,24 @@ std::string WidestringToString(const std::wstring& in);
 std::wstring StringToWidestring(const std::string& in);
 
 /**
+ * Expands all enviroment strings present in the input
+ * 
+ * @param in The string to expand all environment strings for
+ *
+ * @return The string with all environment strings expanded.
+ */
+std::wstring ExpandEnvStringsW(const std::wstring& in);
+
+/**
+ * Expands all enviroment strings present in the input
+ *
+ * @param in The string to expand all environment strings for
+ *
+ * @return The string with all environment strings expanded.
+ */
+std::string ExpandEnvStringsA(const std::string& in);
+
+/**
  * Convert a string or wstring to uppercase. Note that the only
  * allowable template classes are std::string and std::wstring.
  *

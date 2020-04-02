@@ -1,6 +1,6 @@
 #include "hunt/Hunt.h"
 #include "hunt/HuntRegister.h"
-#include "hunt/reaction/Reaction.h"
+#include "reaction/Reaction.h"
 
 HuntInfo::HuntInfo(const std::wstring& HuntName, Aggressiveness HuntAggressiveness, DWORD HuntTactics, DWORD HuntCategories, DWORD HuntDatasources, long HuntStartTime) :
 	HuntName{ HuntName },

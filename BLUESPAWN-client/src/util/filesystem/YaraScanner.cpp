@@ -3,6 +3,8 @@
 #include "common/wrappers.hpp"
 #include "util/log/Log.h"
 
+#include <zip.h>
+
 const YaraScanner YaraScanner::instance{};
 
 AllocationWrapper GetResourceRule(DWORD identifier){
@@ -16,7 +18,36 @@ AllocationWrapper GetResourceRule(DWORD identifier){
 		return { nullptr, 0 };
 	}
 
-	return { LockResource(hRsrc), SizeofResource(nullptr, hRsrcInfo) };
+	zip_error_t err{};
+	auto lpZipSource = zip_source_buffer_create(LockResource(hRsrc), SizeofResource(nullptr, hRsrcInfo), 0, &err);
+	if(lpZipSource){
+		auto zip = zip_open_from_source(lpZipSource, 0, &err);
+		if(zip){
+			auto fdRules = zip_fopen(zip, "data", 0);
+			if(fdRules){
+				zip_stat_t stats{};
+				if(-1 != zip_stat(zip, "data", ZIP_STAT_SIZE, &stats)){
+
+					if(-1 != stats.size){
+						AllocationWrapper data{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, static_cast<SIZE_T>(stats.size)), static_cast<SIZE_T>(stats.size), AllocationWrapper::HEAP_ALLOC };
+						if(-1 != zip_fread(fdRules, data, stats.size)){
+							zip_fclose(fdRules);
+							zip_close(zip);
+							zip_source_close(lpZipSource);
+
+							return data;
+						}
+					}
+				}
+
+				zip_fclose(fdRules);
+			}
+			zip_close(zip);
+		}
+		zip_source_close(lpZipSource);
+	}
+
+	return { nullptr, 0 };
 }
 
 struct AllocationWrapperStream {
@@ -62,6 +93,17 @@ YaraScanner::YaraScanner() :
 		status = YaraStatus::RulesMissing;
 		return;
 	}
+	
+	auto hSevereYara2 = GetResourceRule(YaraSevere2);
+	if(!hSevereYara2){
+		status = YaraStatus::RulesMissing;
+		return;
+	} 
+	KnownBad2 = LoadRules(hSevereYara2);
+	if(!KnownBad2){
+		status = YaraStatus::RulesMissing;
+		return;
+	}
 
 	auto hIndicatorsYara = GetResourceRule(YaraIndicators);
 	if(!hIndicatorsYara){
@@ -79,6 +121,11 @@ YaraScanner::~YaraScanner(){
 	if(KnownBad){
 		yr_rules_destroy(KnownBad);
 		KnownBad = nullptr;
+	}
+	
+	if(KnownBad2){
+		yr_rules_destroy(KnownBad2);
+		KnownBad2 = nullptr;
 	}
 
 	if(Indicators){
@@ -129,6 +176,12 @@ YaraScanResult YaraScanner::ScanFile(const FileSystem::File& file) const {
 
 	arg.type = arg.Severe;
 	auto status = yr_rules_scan_mem(KnownBad, reinterpret_cast<const uint8_t*>((LPVOID) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
+	if(status != ERROR_SUCCESS){
+		arg.result.status = YaraStatus::Failure;
+	}
+	
+	arg.type = arg.Severe;
+	status = yr_rules_scan_mem(KnownBad2, reinterpret_cast<const uint8_t*>((LPVOID) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
 	if(status != ERROR_SUCCESS){
 		arg.result.status = YaraStatus::Failure;
 	}

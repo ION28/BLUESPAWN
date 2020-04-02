@@ -6,13 +6,16 @@
 #include "common/DynamicLinker.h"
 #include "common/StringUtils.h"
 #include "util/eventlogs/EventLogs.h"
-#include "hunt/reaction/SuspendProcess.h"
-#include "hunt/reaction/RemoveValue.h"
+#include "reaction/SuspendProcess.h"
+#include "reaction/RemoveValue.h"
+#include "reaction/CarveMemory.h"
 
 #include "hunt/hunts/HuntT1004.h"
 #include "hunt/hunts/HuntT1015.h"
+#include "hunt/hunts/HuntT1035.h"
 #include "hunt/hunts/HuntT1037.h"
 #include "hunt/hunts/HuntT1050.h"
+#include "hunt/hunts/HuntT1053.h"
 #include "hunt/hunts/HuntT1055.h"
 #include "hunt/hunts/HuntT1060.h"
 #include "hunt/hunts/HuntT1099.h"
@@ -40,14 +43,17 @@
 #include "mitigation/mitigations/MitigateV3340.h"
 #include "mitigation/mitigations/MitigateV3344.h"
 #include "mitigation/mitigations/MitigateV3379.h"
+#include "mitigation/mitigations/MitigateV3479.h"
 #include "mitigation/mitigations/MitigateV63597.h"
 #include "mitigation/mitigations/MitigateV63687.h"
 #include "mitigation/mitigations/MitigateV63753.h"
 #include "mitigation/mitigations/MitigateV63817.h"
 #include "mitigation/mitigations/MitigateV63825.h"
 #include "mitigation/mitigations/MitigateV63829.h"
+#include "mitigation/mitigations/MitigateV71769.h"
 #include "mitigation/mitigations/MitigateV72753.h"
 #include "mitigation/mitigations/MitigateV73519.h"
+#include "mitigation/mitigations/MitigateV73585.h"
 
 #pragma warning(push)
 
@@ -68,8 +74,10 @@ Bluespawn::Bluespawn(){
 
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1004>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1015>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1035>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1037>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1050>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1053>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1055>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1060>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1099>());
@@ -95,24 +103,27 @@ Bluespawn::Bluespawn(){
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3340>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3344>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3379>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3479>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63597>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63687>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63753>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63817>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63825>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV71769>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
 }
 
-void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel) {
+void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel, vector<string> vExcludedHunts, vector<string> vIncludedHunts) {
 	Bluespawn::io.InformUser(L"Starting a Hunt");
 	DWORD tactics = UINT_MAX;
 	DWORD dataSources = UINT_MAX;
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
 
-	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction);
+	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope, aHuntLevel, reaction, vExcludedHunts, vIncludedHunts);
 }
 
 void Bluespawn::dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce) {
@@ -161,12 +172,9 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 	}
 }
 
-
 int main(int argc, char* argv[]){
 
-	Linker::LinkFunctions();
-
-	Bluespawn bluespawn;
+	Bluespawn bluespawn{};
 
 	print_banner();
 
@@ -185,6 +193,8 @@ int main(int argc, char* argv[]){
 
 	options.add_options("hunt")
 		("l,level", "Aggressiveness of Hunt. Either Cursory, Normal, or Intensive", cxxopts::value<std::string>())
+		("hunts", "List of hunts to run by Mitre ATT&CK name. Will only run these hunts.", cxxopts::value<std::vector<std::string>>())
+		("exclude-hunts", "List of hunts to avoid running by Mitre ATT&CK name. Will run all hunts but these.", cxxopts::value<std::vector<std::string>>())
 		;
 
 	options.add_options("mitigate")
@@ -196,13 +206,13 @@ int main(int argc, char* argv[]){
 		auto result = options.parse(argc, argv);
 
 		if (result.count("verbose")) {
-			if (result["verbose"].as<int>() >= 1) {
+			if(result["verbose"].as<int>() >= 1) {
 				Log::LogLevel::LogVerbose1.Enable();
 			}
-			if (result["verbose"].as<int>() >= 2) {
+			if(result["verbose"].as<int>() >= 2) {
 				Log::LogLevel::LogVerbose2.Enable();
 			}
-			if (result["verbose"].as<int>() >= 3) {
+			if(result["verbose"].as<int>() >= 3) {
 				Log::LogLevel::LogVerbose3.Enable();
 			}
 		}
@@ -242,6 +252,7 @@ int main(int argc, char* argv[]){
 				{"log", Reactions::LogReaction{}},
 				{"remove-value", Reactions::RemoveValueReaction{ bluespawn.io }},
 				{"suspend", Reactions::SuspendProcessReaction{ bluespawn.io }},
+				{"carve-memory", Reactions::CarveProcessReaction{ bluespawn.io }},
 			};
 
 			auto UserReactions = result["reaction"].as<std::string>();
@@ -264,15 +275,11 @@ int main(int argc, char* argv[]){
 
 			bluespawn.SetReaction(combined);
 
-			std::string flag("level");
-			if (result.count("monitor"))
-				flag = "monitor";
-
 			// Parse the hunt level
 			std::string sHuntLevelFlag = "Normal";
 			Aggressiveness aHuntLevel;
 			try {
-				sHuntLevelFlag = result[flag].as < std::string >();
+				sHuntLevelFlag = result["level"].as < std::string >();
 			}
 			catch (int e) {}
 
@@ -292,9 +299,20 @@ int main(int argc, char* argv[]){
 				Bluespawn::io.InformUser(L"Will default to Cursory.");
 				aHuntLevel = Aggressiveness::Cursory;
 			}
-			
+
+			//Parse included and excluded hunts
+			std::vector<std::string> vIncludedHunts;
+			std::vector<std::string> vExcludedHunts;
+
+			if (result.count("hunts")) {
+				vIncludedHunts = result["hunts"].as<std::vector<std::string>>();
+			}
+			else if (result.count("exclude-hunts")) {
+				vExcludedHunts = result["exclude-hunts"].as<std::vector<std::string>>();
+			}
+
 			if (result.count("hunt"))
-				bluespawn.dispatch_hunt(aHuntLevel);
+				bluespawn.dispatch_hunt(aHuntLevel, vExcludedHunts, vIncludedHunts);
 			else if (result.count("monitor"))
 				bluespawn.monitor_system(aHuntLevel);
 

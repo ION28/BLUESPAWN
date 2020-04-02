@@ -65,7 +65,7 @@ std::wstring Loaded_Image::GetName(){
 Image_Loader::Image_Loader(const HandleWrapper& process) : 
 	process{ process }, LoadedImages{}{
 	if(process){
-		PROCESS_BASIC_INFORMATION information = {};
+		PROCESS_BASIC_INFORMATION information{};
 		NTSTATUS status = Linker::NtQueryInformationProcess(process, ProcessBasicInformation, &information, sizeof(information), nullptr);
 		if(!NT_SUCCESS(status)){
 			LOG_ERROR("Error " << status << " occured when finding the PEB of process " << process.Get());

@@ -14,6 +14,7 @@
 
 namespace FileSystem {
 	bool CheckFileExists(std::wstring);
+	std::optional<std::wstring> SearchPathExecutable(const std::wstring& name);
 	
 	struct FileAttribs {
 		std::wstring extension;
@@ -52,6 +53,12 @@ namespace FileSystem {
 		* @param upper - variable to store pointer to upper value
 		*/
 		DWORD SetFilePointer(DWORD64 dwFilePointer) const;
+		/**
+		* Function to check if a file is signed in the system catalogs
+		*
+		* return true if the file is signed in the system catalogs, false if it isn't or on error
+		*/
+		bool GetFileInSystemCatalogs() const;
 	public:
 
 		/**

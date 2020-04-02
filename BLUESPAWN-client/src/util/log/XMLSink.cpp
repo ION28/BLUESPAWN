@@ -76,21 +76,15 @@ namespace Log{
 		} else if(detection->Type == DetectionType::Process){
 			detect->SetAttribute("type", "Process");
 			auto ProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);
-			auto Name = XMLDoc.NewElement("name");
 			auto Path = XMLDoc.NewElement("path");
 			auto Cmd = XMLDoc.NewElement("hash");
 			auto Pid = XMLDoc.NewElement("pid");
-			auto Tid = XMLDoc.NewElement("tid");
-			Name->SetText(WidestringToString(ProcessDetection->wsImageName).c_str());
 			Path->SetText(WidestringToString(ProcessDetection->wsImagePath).c_str());
 			Cmd->SetText(WidestringToString(ProcessDetection->wsCmdline).c_str());
 			Pid->SetText(std::to_string(ProcessDetection->PID).c_str());
-			Tid->SetText(std::to_string(ProcessDetection->TID).c_str());
-			detect->InsertEndChild(Name);
 			detect->InsertEndChild(Path);
 			detect->InsertEndChild(Cmd);
 			detect->InsertEndChild(Pid);
-			detect->InsertEndChild(Tid);
 		} else if(detection->Type == DetectionType::Service){
 			detect->SetAttribute("type", "Service");
 			auto ServiceDetection = std::static_pointer_cast<SERVICE_DETECTION>(detection);
