@@ -14,6 +14,7 @@
 
 namespace FileSystem {
 	bool CheckFileExists(std::wstring);
+	std::optional<std::wstring> SearchPathExecutable(const std::wstring& name);
 	
 	struct FileAttribs {
 		std::wstring extension;

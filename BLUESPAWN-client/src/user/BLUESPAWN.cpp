@@ -168,7 +168,27 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 	}
 }
 
+#include <Psapi.h>
+#include "util/processes/ProcessUtils.h"
 int main(int argc, char* argv[]){
+	DWORD processes[1024];
+	DWORD ProcessCount = 0;
+	ZeroMemory(processes, sizeof(processes));
+	auto success = EnumProcesses(processes, sizeof(processes), &ProcessCount);
+	if(success){
+		ProcessCount /= sizeof(DWORD);
+		for(int i = 0; i < ProcessCount; i++){
+			auto cmd = GetProcessCommandline(processes[i]);
+			if(cmd.length()){
+				auto exe = GetImagePathFromCommand(cmd);
+				std::wcout << cmd << std::endl << exe << std::endl << std::endl;
+			}
+		}
+	} else {
+		LOG_ERROR("Unable to enumerate processes - Process related hunts will not run.");
+	}
+
+	return 0;
 
 	Bluespawn bluespawn{};
 

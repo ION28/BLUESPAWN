@@ -116,7 +116,11 @@ std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
     if(start == std::wstring::npos){
         return L"";
     } else if(wsCmd.at(start) == '"' || wsCmd.at(start) == '\''){
-        return wsCmd.substr(start + 1, wsCmd.find_first_of(L"'\"", start + 1) - start - 1);
+        auto name = wsCmd.substr(start + 1, wsCmd.find_first_of(L"'\"", start + 1) - start - 1);
+        auto path = FileSystem::SearchPathExecutable(name);
+        if(path){
+            return *path;
+        } else return name;
     } else {
         auto idx = start;
         while(idx != std::wstring::npos){
@@ -125,9 +129,14 @@ std::wstring GetImagePathFromCommand(const std::wstring& wsCmd){
                 return wsCmd.substr(start);
             }
 
-            auto str = wsCmd.substr(start, spacepos - start);
-            if(FileSystem::CheckFileExists(str)){
-                return str;
+            auto name = wsCmd.substr(start, spacepos - start);
+            auto path = FileSystem::SearchPathExecutable(name);
+            if(path){
+                return *path;
+            }
+
+            if(name.length() > 4 && CompareIgnoreCaseW(name.substr(name.length() - 4), L".exe")){
+                return name;
             }
             
             idx = spacepos + 1;
