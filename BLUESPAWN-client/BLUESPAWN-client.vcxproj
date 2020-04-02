@@ -40,6 +40,7 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1138.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV71769.h" />
     <ClInclude Include="headers\reaction\CarveMemory.h" />
     <ClInclude Include="headers\reaction\RemoveValue.h" />
     <ClInclude Include="headers\reaction\SuspendProcess.h" />
@@ -166,6 +167,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1138.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV71769.cpp" />
     <ClCompile Include="src\reaction\CarveMemory.cpp" />
     <ClCompile Include="src\reaction\RemoveValue.cpp" />
     <ClCompile Include="src\reaction\SuspendProcess.cpp" />
