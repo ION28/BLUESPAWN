@@ -38,11 +38,28 @@ struct FILE_DETECTION : public DETECTION {
 };
 typedef std::function<void(std::shared_ptr<FILE_DETECTION>)> DetectFile;
 
+enum class RegistryDetectionType {
+	FileReference,    // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a file
+	FilesReference,   // The associated value is a REG_MULTI_SZ that references some number of files
+	FolderReference,  // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a folder
+	FoldersReference, // The associated value is a REG_MULTI_SZ that references some number of folders
+	PipeReference,    // The associated value is either a REG_SZ that references a named pipe
+	PipesReference,   // The associated value is a REG_MULTI_SZ that references some number of named pipe
+	ShareReference,   // The associated value is either a REG_SZ that references a share
+	SharesReference,  // The associated value is a REG_MULTI_SZ that references some number of shares
+	UserReference,    // The associated value is either a REG_SZ that references a user
+	UsersReference,   // The associated value is a REG_MULTI_SZ that references some number of users
+	Configuration,    // The associated value references a configuration for the operating system
+	Association       // The associated value is assumed malicious due to association with other malicious detections
+};
+
 /// A struct containing information about a registry key value identified in a hunt
 struct REGISTRY_DETECTION : public DETECTION {
 	Registry::RegistryValue value;
-	REGISTRY_DETECTION(const Registry::RegistryValue& value) :
+	RegistryDetectionType type;
+	REGISTRY_DETECTION(const Registry::RegistryValue& value, RegistryDetectionType type = RegistryDetectionType::Configuration) :
 		DETECTION{ DetectionType::Registry },
+		type{ type },
 		value{ value }{}
 };
 typedef std::function<void(std::shared_ptr<REGISTRY_DETECTION>)> DetectRegistry;
@@ -64,7 +81,8 @@ enum class ProcessDetectionMethod {
 	Detached       = 4,
 	Hooked         = 8,
 	Implanted      = 16,
-	Other          = 32
+	File           = 32,
+	Other          = 64
 };
 
 struct PROCESS_DETECTION : public DETECTION {

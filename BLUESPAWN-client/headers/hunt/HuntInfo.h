@@ -41,7 +41,7 @@ enum class Category {
 enum class Aggressiveness {
 	Cursory = 0x1, // Most obvious indicators (least false positives)
 	Normal = 0x2, // Examine more things
-	Intensive = 0x4 //  Check everything imaginable (most false positives)
+	Intensive = 0x3 //  Check everything imaginable (most false positives)
 };
 
 // This struct is a POD type for storing information about a hunt to be logged.

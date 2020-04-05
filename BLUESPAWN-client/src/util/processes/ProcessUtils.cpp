@@ -1,5 +1,7 @@
 #include "util/processes/ProcessUtils.h"
 
+#include <Psapi.h>
+
 #include "util/log/Log.h"
 
 typedef struct _CURDIR {
@@ -102,4 +104,140 @@ std::wstring GetProcessCommandline(DWORD dwPID){
         LOG_ERROR("Unable to open process with PID " << dwPID << " to find its command line (error " << GetLastError() << ")");
         return {};
     }
+}
+
+std::wstring GetProcessImage(const HandleWrapper& process){
+    if(process){
+        PROCESS_BASIC_INFORMATION information{};
+        NTSTATUS status = Linker::NtQueryInformationProcess(process, ProcessBasicInformation, &information, sizeof(information), nullptr);
+        if(NT_SUCCESS(status)){
+            auto peb = information.PebBaseAddress;
+            RTL_USER_PROCESS_PARAMETERS_ params{};
+            if(!ReadProcessMemory(process, &peb->ProcessParameters, &params, sizeof(params), nullptr)){
+                LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its image path (error " << GetLastError() << ")");
+                return {};
+            }
+
+            DWORD dwLength = params.DllPath.Length;
+            auto path = AllocationWrapper{ new WCHAR[dwLength / 2 + 1], dwLength + 2, AllocationWrapper::CPP_ARRAY_ALLOC };
+            if(!ReadProcessMemory(process, &peb->ProcessParameters, &params, sizeof(params), nullptr)){
+                LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its image path (error " << GetLastError() << ")");
+                return {};
+            }
+
+            if(!ReadProcessMemory(process, &params.DllPath.Buffer, path, dwLength, nullptr)){
+                LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its image path (error " << GetLastError() << ")");
+                return {};
+            }
+            path.SetByte(dwLength, 0);
+            path.SetByte(dwLength + 1, 0);
+
+            return std::wstring{ reinterpret_cast<PWCHAR>(LPVOID(path)) };
+        } else {
+            LOG_ERROR("Unable to query information from process with PID " << GetProcessId(process) << " to find its image path (error " << status << ")");
+            return {};
+        }
+    } else {
+        LOG_ERROR("Unable to get command line of invalid process");
+        return {};
+    }
+}
+
+std::wstring GetProcessImage(DWORD dwPID){
+    HandleWrapper process{ OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, false, dwPID) };
+    if(process){
+        return GetProcessImage(process);
+    } else {
+        LOG_ERROR("Unable to open process with PID " << dwPID << " to find its command line (error " << GetLastError() << ")");
+        return {};
+    }
+}
+
+std::vector<std::wstring> EnumModules(DWORD dwPID){
+    HandleWrapper hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, dwPID);
+    if(hProcess){
+        return EnumModules(hProcess);
+    } else {
+        LOG_ERROR("Unable to open process with PID " << dwPID << " to enumerate its modules (error " << GetLastError() << ")");
+        return {};
+    }
+
+}
+
+std::vector<std::wstring> EnumModules(const HandleWrapper& hProcess){
+    std::vector<HMODULE> modules(1024);
+    DWORD dwBytesNeeded{};
+    auto status{ EnumProcessModules(hProcess, modules.data(), 1024 * sizeof(HMODULE), &dwBytesNeeded) };
+    if(dwBytesNeeded > 1024 * sizeof(HMODULE)){
+        modules.resize(dwBytesNeeded / sizeof(HMODULE));
+        status = EnumProcessModules(hProcess, modules.data(), dwBytesNeeded, &dwBytesNeeded);
+    }
+
+    std::vector<std::wstring> vModules{};
+
+    if(status){
+        for(auto mod : modules){
+            WCHAR path[MAX_PATH];
+            if(GetModuleFileNameExW(hProcess, mod, path, MAX_PATH)){
+                vModules.emplace_back(path);
+            } else {
+                LOG_ERROR("Unable to get name of module at " << mod << " in process with PID " << GetProcessId(hProcess));
+            }
+        }
+    } else {
+        LOG_ERROR("Unable to enumerate modules in process with PID " << GetProcessId(hProcess) << " (Error " << GetLastError() << ")");
+    }
+
+    return vModules;
+}
+
+LPVOID GetModuleAddress(DWORD dwPID, const std::wstring& wsModuleName){
+    HandleWrapper hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, dwPID);
+    if(hProcess){
+        return GetModuleAddress(hProcess, wsModuleName);
+    } else {
+        LOG_ERROR("Unable to open process with PID " << dwPID << " to enumerate its modules (error " << GetLastError() << ")");
+        return {};
+    }
+
+}
+
+LPVOID GetModuleAddress(const HandleWrapper& hProcess, const std::wstring& wsModuleName){
+    std::vector<HMODULE> modules(1024);
+    DWORD dwBytesNeeded{};
+    auto status{ EnumProcessModules(hProcess, modules.data(), 1024 * sizeof(HMODULE), &dwBytesNeeded) };
+    if(dwBytesNeeded > 1024 * sizeof(HMODULE)){
+        modules.resize(dwBytesNeeded / sizeof(HMODULE));
+        status = EnumProcessModules(hProcess, modules.data(), dwBytesNeeded, &dwBytesNeeded);
+    }
+
+    std::vector<std::wstring> vModules{};
+
+    std::vector<HMODULE> modules(1024);
+    DWORD dwBytesNeeded{};
+    auto status{ EnumProcessModules(hProcess, modules.data(), 1024 * sizeof(HMODULE), &dwBytesNeeded) };
+    if(dwBytesNeeded > 1024 * sizeof(HMODULE)){
+        modules.resize(dwBytesNeeded / sizeof(HMODULE));
+        status = EnumProcessModules(hProcess, modules.data(), dwBytesNeeded, &dwBytesNeeded);
+    }
+
+    std::vector<std::wstring> vModules{};
+
+    if(status){
+        for(auto mod : modules){
+            WCHAR path[MAX_PATH];
+            if(GetModuleFileNameExW(hProcess, mod, path, MAX_PATH)){
+                if(path == wsModuleName){
+                    return mod;
+                }
+            } else {
+                LOG_ERROR("Unable to get name of module at " << mod << " in process with PID " << GetProcessId(hProcess));
+            }
+        }
+    } else {
+        LOG_ERROR("Unable to enumerate modules in process with PID " << GetProcessId(hProcess) << " (Error " << GetLastError() << ")");
+    }
+
+    LOG_ERROR("Unable to find address of module " << wsModuleName << " in process with PID " << GetProcessId(hProcess));
+    return nullptr;
 }

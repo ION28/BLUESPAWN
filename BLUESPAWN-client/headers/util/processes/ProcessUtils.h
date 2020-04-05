@@ -22,5 +22,11 @@ std::vector<LPVOID> GetUnregisteredImages(DWORD pid);
 std::vector<LPVOID> GetModifiedImages(DWORD pid);
 std::vector<LPVOID> GetHooks(DWORD pid);
 
+std::wstring GetProcessImage(DWORD dwPID);
+std::wstring GetProcessImage(const HandleWrapper& hProcess);
 std::wstring GetProcessCommandline(DWORD dwPID);
 std::wstring GetProcessCommandline(const HandleWrapper& hProcess);
+std::vector<std::wstring> EnumModules(DWORD dwPID);
+std::vector<std::wstring> EnumModules(const HandleWrapper& hProcess);
+LPVOID GetModuleAddress(DWORD dwPID, const std::wstring& wsModuleName);
+LPVOID GetModuleAddress(const HandleWrapper&, const std::wstring& wsModuleName);
