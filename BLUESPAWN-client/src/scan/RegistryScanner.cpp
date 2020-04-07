@@ -7,20 +7,23 @@
 
 #include <regex>
 
-std::vector<std::wstring> ExtractRegistryKeys(const std::vector<std::wstring>& strings){
-	std::vector<std::wstring> filepaths{};
-	std::wregex regex{ L"[a-zA-Z]:([/\\\\][a-zA-Z0-9\\. @_-]+)+" };
+std::vector<std::wstring> RegistryScanner::ExtractRegistryKeys(const std::vector<std::wstring>& strings){
+	std::vector<std::wstring> keys{};
+	std::wregex regex{ L"(system|software)([/\\\\][a-zA-Z0-9\\. @_-]+)+" };
 	for(auto& string : strings){
 		std::wsmatch match{};
-		if(std::regex_search(string, match, regex)){
-			for(auto& filename : match){
-				if(FileSystem::CheckFileExists(filename)){
-					filepaths.emplace_back(filename);
+		auto lower = ToLowerCaseW(string);
+		if(std::regex_search(lower, match, regex)){
+			for(auto& keyname : match){
+				for(auto hive : Registry::vHives){
+					if(Registry::RegistryKey::CheckKeyExists(hive.first, keyname.str())){
+						keys.emplace_back(hive.second + L"\\" + keyname.str());
+					}
 				}
 			}
 		}
 	}
-	return filepaths;
+	return keys;
 }
 
 std::vector<std::shared_ptr<DETECTION>> RegistryScanner::GetAssociatedDetections(std::shared_ptr<DETECTION> base, Aggressiveness level){
@@ -32,6 +35,7 @@ std::vector<std::shared_ptr<DETECTION>> RegistryScanner::GetAssociatedDetections
 	auto detection = *std::static_pointer_cast<REGISTRY_DETECTION>(base);
 
 	if(detection.type == RegistryDetectionType::FilesReference){
+		
 	}
 
 	return detections;

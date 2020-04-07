@@ -40,6 +40,18 @@ namespace Registry {
 	class RegistryKey : 
 		public Loggable {
 	public:
+
+		/**
+		 * Checks if a given registry key exists.
+		 *
+		 * @param hive The registry hive to search for `name`
+		 * @param name The path to the registry key under `hive`
+		 * @param WoW64 True if the key should be reflected/redirected for WoW64; false otherwise.
+		 *
+		 * @return true if the key exists; false otherwise
+		 */
+		static bool CheckKeyExists(HKEY hive, const std::wstring& name, bool WoW64 = false);
+
 		/* Copy constructor for a RegistryKey */
 		RegistryKey(const RegistryKey& key) noexcept;
 

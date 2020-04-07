@@ -83,6 +83,7 @@
     <ClInclude Include="headers\scan\ProcessScanner.h" />
     <ClInclude Include="headers\scan\RegistryScanner.h" />
     <ClInclude Include="headers\scan\Scanner.h" />
+    <ClInclude Include="headers\scan\ScanNode.h" />
     <ClInclude Include="headers\user\banners.h" />
     <ClInclude Include="headers\user\bluespawn.h" />
     <ClInclude Include="headers\user\CLI.h" />
@@ -209,6 +210,9 @@
     </ClCompile>
     <ClCompile Include="src\monitor\Event.cpp" />
     <ClCompile Include="src\monitor\EventManager.cpp" />
+    <ClCompile Include="src\scan\FileScanner.cpp" />
+    <ClCompile Include="src\scan\ProcessScanner.cpp" />
+    <ClCompile Include="src\scan\RegistryScanner.cpp" />
     <ClCompile Include="src\user\banners.cpp" />
     <ClCompile Include="src\user\BLUESPAWN.cpp" />
     <ClCompile Include="src\user\CLI.cpp" />

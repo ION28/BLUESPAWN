@@ -241,3 +241,62 @@ LPVOID GetModuleAddress(const HandleWrapper& hProcess, const std::wstring& wsMod
     LOG_ERROR("Unable to find address of module " << wsModuleName << " in process with PID " << GetProcessId(hProcess));
     return nullptr;
 }
+
+DWORD GetRegionSize(const HandleWrapper& hProcess, LPVOID lpBaseAddress){
+    DWORD dwImageSize = 0;
+    ULONG_PTR address = reinterpret_cast<ULONG_PTR>(lpBaseAddress);
+
+    while(true){
+        MEMORY_BASIC_INFORMATION memory{};
+        if(VirtualQueryEx(hProcess, reinterpret_cast<LPVOID>(address), &memory, sizeof(memory))){
+            if(memory.AllocationBase == lpBaseAddress){
+                dwImageSize += memory.RegionSize;
+                address += memory.RegionSize;
+            } else break;
+        } else break;
+    }
+
+    LOG_VERBOSE(2, "Determined the size of the region to remove is " << dwImageSize);
+    return dwImageSize;
+}
+
+DWORD GetRegionSize(DWORD dwPID, LPVOID lpBaseAddress){
+    HandleWrapper hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, dwPID);
+    if(hProcess){
+        return GetRegionSize(hProcess, lpBaseAddress);
+    } else {
+        LOG_ERROR("Unable to open process with PID " << dwPID << " to determine size of region at " << lpBaseAddress << " (error " << GetLastError() << ")");
+        return {};
+    }
+
+}
+
+namespace Utils::Process{
+    AllocationWrapper ReadProcessMemory(const HandleWrapper& hProcess, LPVOID lpBaseAddress, DWORD dwSize){
+        if(hProcess){
+            if(dwSize == -1){
+                dwSize = GetRegionSize(hProcess, lpBaseAddress);
+            }
+
+            AllocationWrapper wrapper{ VirtualAlloc(nullptr, dwSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE), dwSize };
+            
+            if(::ReadProcessMemory(hProcess, lpBaseAddress, wrapper, dwSize, nullptr)){
+                return wrapper;
+            } else {
+                LOG_ERROR("Unable to read memory at " << lpBaseAddress << " in process with PID " << GetProcessId(hProcess) << " (error " << GetLastError() << ")");
+            }
+        } else {
+            LOG_ERROR("Unable to read memory from invalid process!");
+        }
+    }
+
+    AllocationWrapper ReadProcessMemory(DWORD dwPID, LPVOID lpBaseAddress, DWORD dwSize){
+        HandleWrapper hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, dwPID);
+        if(hProcess){
+            return ReadProcessMemory(hProcess, lpBaseAddress, dwSize);
+        } else {
+            LOG_ERROR("Unable to open process with PID " << dwPID << " to read memory at " << lpBaseAddress << " (error " << GetLastError() << ")");
+            return { nullptr, 0 };
+        }
+    }
+}

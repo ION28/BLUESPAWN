@@ -6,6 +6,7 @@
 #include "util/filesystem/FileSystem.h"
 #include "util/processes/ProcessUtils.h"
 #include "hunt/Hunt.h"
+#include "scan/RegistryScanner.h"
 
 #include <regex>
 
@@ -13,7 +14,7 @@ bool GetFilesSimilar(const AllocationWrapper& lpFile1, const AllocationWrapper& 
 	return lpFile1.GetSize() == lpFile2.GetSize() && lpFile1.GetSize() == RtlCompareMemory(lpFile1, lpFile2, lpFile1.GetSize());
 }
 
-std::vector<std::wstring> ExtractFileStrings(const AllocationWrapper& data, DWORD dwMinLength = 5){
+std::vector<std::wstring> FileScanner::ExtractStrings(const AllocationWrapper& data, DWORD dwMinLength){
 	std::vector<std::wstring> strings{};
 
 	DWORD dwStringStart{};
@@ -57,15 +58,15 @@ std::vector<std::wstring> ExtractFileStrings(const AllocationWrapper& data, DWOR
 	return strings;
 }
 
-std::vector<std::wstring> ExtractFilePaths(const std::vector<std::wstring>& strings){
+std::vector<std::wstring> FileScanner::ExtractFilePaths(const std::vector<std::wstring>& strings){
 	std::vector<std::wstring> filepaths{};
 	std::wregex regex{ L"[a-zA-Z]:([/\\\\][a-zA-Z0-9\\. @_-]+)+" };
 	for(auto& string : strings){
 		std::wsmatch match{};
 		if(std::regex_search(string, match, regex)){
 			for(auto& filename : match){
-				if(FileSystem::CheckFileExists(filename)){
-					filepaths.emplace_back(filename);
+				if(FileSystem::CheckFileExists(filename.str())){
+					filepaths.emplace_back(filename.str());
 				}
 			}
 		}
@@ -119,10 +120,16 @@ std::vector<std::shared_ptr<DETECTION>> FileScanner::GetAssociatedDetections(std
 		}
 	}
 
-	auto strings = ExtractFileStrings(contents, 4);
+	auto strings = ExtractStrings(contents, 8);
 	auto filenames = ExtractFilePaths(strings);
 	for(auto& filename : filenames){
 		FILE_DETECTION(filename);
+	}
+
+	auto keynames = RegistryScanner::ExtractRegistryKeys(strings);
+	for(auto keyname : keynames){
+		Registry::RegistryValue value{ Registry::RegistryKey{ keyname }, L"Unknown", std::move(std::wstring{ L"Unknown" }) };
+		REGISTRY_DETECTION(value);
 	}
 
 	return detections;

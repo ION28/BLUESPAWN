@@ -29,4 +29,11 @@ std::wstring GetProcessCommandline(const HandleWrapper& hProcess);
 std::vector<std::wstring> EnumModules(DWORD dwPID);
 std::vector<std::wstring> EnumModules(const HandleWrapper& hProcess);
 LPVOID GetModuleAddress(DWORD dwPID, const std::wstring& wsModuleName);
-LPVOID GetModuleAddress(const HandleWrapper&, const std::wstring& wsModuleName);
+LPVOID GetModuleAddress(const HandleWrapper& hProcess, const std::wstring& wsModuleName);
+DWORD GetRegionSize(DWORD dwPID, LPVOID lpRegionAddress);
+DWORD GetRegionSize(const HandleWrapper& hProcess, LPVOID lpRegionAddress);
+
+namespace Utils::Process {
+	AllocationWrapper ReadProcessMemory(const HandleWrapper& hProcess, LPVOID lpBaseAddress, DWORD dwSize);
+	AllocationWrapper ReadProcessMemory(DWORD dwPID, LPVOID lpBaseAddress, DWORD dwSize);
+}

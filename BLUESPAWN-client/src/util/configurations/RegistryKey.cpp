@@ -35,6 +35,23 @@ namespace Registry {
 	};
 
 	std::map<HKEY, int> RegistryKey::_ReferenceCounts = {};
+
+	bool RegistryKey::CheckKeyExists(HKEY hive, const std::wstring& name, bool WoW64){
+		auto wLowerPath = ToLowerCase(name);
+
+		HKEY key{};
+		WoW64 = WoW64 || wLowerPath.find(L"wow6432node") != std::wstring::npos;
+		LSTATUS status = RegOpenKeyExW(hive, name.c_str(), 0, KEY_READ | KEY_NOTIFY | (WoW64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &key);
+		if(status == ERROR_ACCESS_DENIED){
+			status = RegOpenKeyExW(hive, name.c_str(), 0, KEY_READ | KEY_NOTIFY | (WoW64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &key);
+		}
+
+		if(status == ERROR_SUCCESS){
+			if(_ReferenceCounts.find(key) == _ReferenceCounts.end()){
+				RegCloseKey(key);
+			}
+		}
+	}
 	
 	RegistryKey::RegistryKey(const RegistryKey& key) noexcept :
 		bKeyExists{ key.bKeyExists },
@@ -177,7 +194,7 @@ namespace Registry {
 	RegistryKey::~RegistryKey(){
 		if(_ReferenceCounts.find(hkBackingKey) != _ReferenceCounts.end()){
 			if(!--_ReferenceCounts[hkBackingKey] && !(ULONG_PTR(hkBackingKey) & 0xFFFFFFFF80000000)){
-				CloseHandle(hkBackingKey);
+				RegCloseKey(hkBackingKey);
 			}
 		}
 	}
