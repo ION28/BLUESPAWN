@@ -26,6 +26,7 @@ std::wstring GetProcessImage(DWORD dwPID);
 std::wstring GetProcessImage(const HandleWrapper& hProcess);
 std::wstring GetProcessCommandline(DWORD dwPID);
 std::wstring GetProcessCommandline(const HandleWrapper& hProcess);
+std::wstring GetImagePathFromCommand(std::wstring wsCmd);
 std::vector<std::wstring> EnumModules(DWORD dwPID);
 std::vector<std::wstring> EnumModules(const HandleWrapper& hProcess);
 LPVOID GetModuleAddress(DWORD dwPID, const std::wstring& wsModuleName);
