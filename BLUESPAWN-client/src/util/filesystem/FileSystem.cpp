@@ -18,12 +18,33 @@
 
 namespace FileSystem{
 	bool CheckFileExists(std::wstring filename) {
-		if(INVALID_FILE_ATTRIBUTES == GetFileAttributes(filename.c_str()) && GetLastError() == ERROR_FILE_NOT_FOUND){
+		auto attribs = GetFileAttributesW(filename.c_str());
+		if(INVALID_FILE_ATTRIBUTES == attribs && GetLastError() == ERROR_FILE_NOT_FOUND){
 			LOG_VERBOSE(3, "File " << filename << " does not exist.");
+			return false;
+		}
+
+		if(attribs & FILE_ATTRIBUTE_DIRECTORY){
+			LOG_VERBOSE(3, "File " << filename << " is a directory.");
 			return false;
 		}
 		LOG_VERBOSE(3, "File " << filename << " exists");
 		return true;
+	}
+	
+	std::optional<std::wstring> SearchPathExecutable(const std::wstring& name){
+		auto size = SearchPathW(nullptr, name.c_str(), L".exe", 0, nullptr, nullptr);
+		if(!size){
+			return std::nullopt;
+		}
+
+		std::vector<WCHAR> buffer(static_cast<size_t>(size) + 1);
+		WCHAR* filename{};
+		if(!SearchPathW(nullptr, name.c_str(), L".exe", size + 1, buffer.data(), &filename)){
+			return std::nullopt;
+		}
+
+		return buffer.data();
 	}
 
 	DWORD File::SetFilePointer(DWORD64 val) const {
@@ -281,18 +302,18 @@ namespace FileSystem{
 		WinTrustData.dwStateAction = WTD_STATEACTION_CLOSE;
 		WinVerifyTrust(NULL, &verification, &WinTrustData);
 		if(result == ERROR_SUCCESS){
-			LOG_VERBOSE(3, FilePath << " signed.");
+			LOG_VERBOSE(1, FilePath << " is signed.");
 			return true;
 		}
 		else {
 			//Verify signature in system catalog
 			bool bInCatalog = File::GetFileInSystemCatalogs();
 			if (bInCatalog) {
-				LOG_VERBOSE(3, FilePath << " signed in system catalogs.");
+				LOG_VERBOSE(1, FilePath << " signed in system catalogs.");
 				return true;
 			}
 		}
-		LOG_VERBOSE(3, FilePath << " not signed or located in system catalogs.");
+		LOG_VERBOSE(1, FilePath << " not signed or located in system catalogs.");
 		return false;
 	}
 
