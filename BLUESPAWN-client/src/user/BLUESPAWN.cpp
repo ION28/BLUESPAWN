@@ -9,6 +9,7 @@
 #include "reaction/SuspendProcess.h"
 #include "reaction/RemoveValue.h"
 #include "reaction/CarveMemory.h"
+#include "util/users/users.h"
 
 #include "hunt/hunts/HuntT1004.h"
 #include "hunt/hunts/HuntT1015.h"

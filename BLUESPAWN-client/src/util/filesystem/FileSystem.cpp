@@ -113,7 +113,7 @@ namespace FileSystem{
 	File::File(IN const std::wstring& path) : hFile{ nullptr }{
 		FilePath = path;
 		LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
-		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE | WRITE_OWNER, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
 			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
 		if(!hFile && GetLastError() == ERROR_FILE_NOT_FOUND){
 			LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
@@ -502,10 +502,19 @@ namespace FileSystem{
 		PSID psUserSID = NULL;
 		PSECURITY_DESCRIPTOR pDesc = NULL;
 		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psUserSID, NULL, NULL, NULL, &pDesc) != ERROR_SUCCESS) {
-			LOG_ERROR("Error getting file owner for file " << FilePath << ". Error = " << GetLastError());
+			LOG_ERROR("Error getting file owner for file " << FilePath << ". Error: " << GetLastError());
 			return std::nullopt;
 		}
-		return Users::User(psUserSID);
+		return Users::User(psUserSID, true);
+	}
+
+	bool File::SetFileOwner(Users::User user) {
+		if (SetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, user.getSID(), NULL, NULL, NULL) != ERROR_SUCCESS) {
+			LOG_ERROR("Error setting the file owner for file " << FilePath << " to " << user << ". Error: " << GetLastError());
+			return false;
+		}
+		LOG_VERBOSE(3, "Set the owner for file " << FilePath << " to " << user << ".");
+		return true;
 	}
 
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
