@@ -35,7 +35,7 @@ namespace Users {
 		*
 		* @param sid The SID of the user
 		*/
-		User(IN const PSID sid);
+		User(IN const PSID sid, bool useSID);
 
 		/**
 		* Function to get whether or not the user existed

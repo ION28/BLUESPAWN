@@ -2,6 +2,7 @@
 #include "util/log/Log.h"
 
 namespace Users {
+	//TODO: Fix Memory Leaks
 	User::User(IN const std::wstring uName) {
 		LPWSTR Domain;
 		DWORD sidLen = 0;
@@ -10,8 +11,9 @@ namespace Users {
 		bUserExists = true;
 		Username = uName;
 		LookupAccountName(NULL, uName.c_str(), NULL, &sidLen, NULL, &DomainLen, &SidType);
-		sUserSID = AllocationWrapper{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sidLen), sidLen, AllocationWrapper::HEAP_ALLOC };
-		Domain = (LPWSTR)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, DomainLen);
+		sUserSID = VirtualAlloc(NULL, sidLen, MEM_COMMIT, PAGE_READWRITE);
+		//AllocationWrapper{ VirtualAlloc(NULL, sidLen, MEM_COMMIT, PAGE_READWRITE), sidLen, AllocationWrapper::VIRTUAL_ALLOC };//AllocationWrapper{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sidLen), sidLen, AllocationWrapper::HEAP_ALLOC };
+		Domain = (LPWSTR) VirtualAlloc(NULL, DomainLen, MEM_COMMIT, PAGE_READWRITE);//(LPWSTR)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, DomainLen);
 		if (Domain == NULL) {
 			LOG_ERROR("Heap allocation failed. Error: " << GetLastError());
 		}
@@ -35,11 +37,11 @@ namespace Users {
 					LOG_VERBOSE(3, "User with name " << uName << " found.");
 				}
 			}
-			HeapFree(GetProcessHeap(), HEAP_ZERO_MEMORY, Domain);
+			VirtualFree(Domain, DomainLen, MEM_DECOMMIT);
 		}
 	}
 
-	User::User(IN const PSID sid) {
+	User::User(IN const PSID sid, bool useSID) {
 		LPWSTR Domain;
 		DWORD DomainLen = 0;
 		LPWSTR Name;
@@ -49,12 +51,14 @@ namespace Users {
 		SID_NAME_USE eUse = SidTypeUnknown;
 		LookupAccountSid(NULL, sid, NULL, &NameLen, NULL, &DomainLen, &eUse);
 
-		Domain = (LPWSTR)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, DomainLen);
+		Domain = (LPWSTR) VirtualAlloc(NULL, DomainLen, MEM_COMMIT, PAGE_READWRITE);
+		//(LPWSTR)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, DomainLen);
 		if (Domain == NULL) {
 			LOG_ERROR("Couldn't allocate memory. Error " << GetLastError());
 		}
 		else {
-			Name = (LPWSTR)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, NameLen);
+			Name = (LPWSTR)VirtualAlloc(NULL, NameLen, MEM_COMMIT, PAGE_READWRITE);
+			//(LPWSTR)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, NameLen);
 			if (Name == NULL) {
 				LOG_ERROR("Couldn't allocate memory. Error " << GetLastError());
 			}
@@ -79,9 +83,9 @@ namespace Users {
 						bUserExists = true;
 					}
 				}
-				HeapFree(GetProcessHeap(), HEAP_ZERO_MEMORY, Name);
+				VirtualFree(Name, NameLen, MEM_DECOMMIT);
 			}
-			HeapFree(GetProcessHeap(), HEAP_ZERO_MEMORY, Domain);
+			VirtualFree(Domain, DomainLen, MEM_DECOMMIT);
 		}
 	}
 	
