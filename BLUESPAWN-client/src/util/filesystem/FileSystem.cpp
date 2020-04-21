@@ -15,6 +15,7 @@
 #include <SoftPub.h>
 #include <mscat.h>
 #include "common/wrappers.hpp"
+#include "aclapi.h"
 
 namespace FileSystem{
 	bool CheckFileExists(std::wstring filename) {
@@ -495,6 +496,16 @@ namespace FileSystem{
 
 	std::wstring File::ToString() const {
 		return FilePath;
+	}
+
+	std::optional<Users::User> File::GetFileOwner() const {
+		PSID psUserSID = NULL;
+		PSECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psUserSID, NULL, NULL, NULL, &pDesc) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting file owner for file " << FilePath << ". Error = " << GetLastError());
+			return std::nullopt;
+		}
+		return Users::User(psUserSID);
 	}
 
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {

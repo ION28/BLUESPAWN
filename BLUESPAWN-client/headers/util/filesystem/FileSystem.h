@@ -8,6 +8,7 @@
 
 #include "util/log/Loggable.h"
 #include "common/wrappers.hpp"
+#include "util/users/Users.h"
 
 #define BUFSIZE 1024
 #define MD5LEN  16
@@ -210,6 +211,14 @@ namespace FileSystem {
 		 * @return The file path of the object
 		 */
 		virtual std::wstring ToString() const;
+
+
+		/**
+		* Function to get the file owner
+		*
+		* @return a User object representing the owner of the file
+		*/
+		std::optional<Users::User> GetFileOwner() const;
 	};
 
 	class Folder {
