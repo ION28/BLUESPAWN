@@ -2,18 +2,48 @@
 
 #include <Windows.h>
 #include <winnt.h>
+#include <AclAPI.h>
 
 #include <string>
 
 #include "util/log/Loggable.h"
+#include "common/wrappers.hpp"
 
-namespace Users {
+namespace Permissions {
+
+	class SecurityDescriptor : public GenericWrapper<PISECURITY_DESCRIPTOR> {
+		PSID lpUserSid;
+		PSID lpGroupSid;
+		PACL dacl;
+		PACL sacl;
+		
+	protected:
+		enum class SecurityDataType {
+			USER_SID, GROUP_SID, DACL, SACL
+		};
+
+		SecurityDescriptor(DWORD dwSize, SecurityDataType type);
+
+	public:
+		static SecurityDescriptor CreateUserSID(DWORD dwSize);
+		static SecurityDescriptor CreateGroupSID(DWORD dwSize);
+		static SecurityDescriptor CreateDACL(DWORD dwSize);
+		static SecurityDescriptor CreateSACL(DWORD dwSize);
+
+		SecurityDescriptor(PISECURITY_DESCRIPTOR lpSecurity = nullptr);
+		
+		PSID GetUserSID() const;
+		PSID GetGroupSID() const;
+		PACL GetDACL() const;
+		PACL GetSACL() const;
+	};
+
 	class User : public Loggable{
 		//Whether or not this user is on the system
 		bool bUserExists;
 
 		//The user's SID structure
-		PSID sUserSID;
+		SecurityDescriptor sUserSID;
 
 		//User's qualified name
 		std::wstring Username;
@@ -28,14 +58,14 @@ namespace Users {
 		*
 		* @param uName The qualified username of the user given as DOMAIN\USERNAME
 		*/
-		User(IN const std::wstring uName);
+		User(IN const std::wstring& uName);
 
 		/**
 		* Create a User object based off an SID
 		*
 		* @param sid The SID of the user
 		*/
-		User(IN const PSID sid, bool useSID);
+		User(IN const SecurityDescriptor& sid);
 
 		/**
 		* Function to get whether or not the user existed

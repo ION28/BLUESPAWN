@@ -218,7 +218,7 @@ namespace FileSystem {
 		*
 		* @return a User object representing the owner of the file
 		*/
-		std::optional<Users::User> GetFileOwner() const;
+		std::optional<Permissions::User> GetFileOwner() const;
 
 		/**
 		* Function to set a file owner
@@ -226,7 +226,7 @@ namespace FileSystem {
 		* param user A User object representing the new file owner
 		* @return true if the file is now owned by the new user, false otherwise
 		*/
-		bool SetFileOwner(Users::User user);
+		bool SetFileOwner(Permissions::User user);
 	};
 
 	class Folder {

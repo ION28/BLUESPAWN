@@ -1,94 +1,117 @@
 #include "util/users/users.h"
 #include "util/log/Log.h"
 
-namespace Users {
-	//TODO: Fix Memory Leaks
-	User::User(IN const std::wstring uName) {
-		LPWSTR Domain;
-		DWORD sidLen = 0;
-		DWORD DomainLen = 0;
-		SID_NAME_USE SidType;
-		bUserExists = true;
-		Username = uName;
-		LookupAccountName(NULL, uName.c_str(), NULL, &sidLen, NULL, &DomainLen, &SidType);
-		sUserSID = VirtualAlloc(NULL, sidLen, MEM_COMMIT, PAGE_READWRITE);
-		//AllocationWrapper{ VirtualAlloc(NULL, sidLen, MEM_COMMIT, PAGE_READWRITE), sidLen, AllocationWrapper::VIRTUAL_ALLOC };//AllocationWrapper{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sidLen), sidLen, AllocationWrapper::HEAP_ALLOC };
-		Domain = (LPWSTR) VirtualAlloc(NULL, DomainLen, MEM_COMMIT, PAGE_READWRITE);//(LPWSTR)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, DomainLen);
-		if (Domain == NULL) {
-			LOG_ERROR("Heap allocation failed. Error: " << GetLastError());
+namespace Permissions {
+	SecurityDescriptor::SecurityDescriptor(DWORD dwSize, SecurityDescriptor::SecurityDataType type) :
+		GenericWrapper<PISECURITY_DESCRIPTOR>(reinterpret_cast<PISECURITY_DESCRIPTOR>(HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwSize)),
+			[](LPVOID memory) { HeapFree(GetProcessHeap(), 0, memory); }, nullptr) {
+		switch (type) {
+		case SecurityDescriptor::SecurityDataType::USER_SID:
+			lpUserSid = reinterpret_cast<PSID>(WrappedObject);
+			break;
+		case SecurityDescriptor::SecurityDataType::GROUP_SID:
+			lpGroupSid = reinterpret_cast<PSID>(WrappedObject);
+			break;
+		case SecurityDescriptor::SecurityDataType::DACL:
+			dacl = reinterpret_cast<PACL>(WrappedObject);
+			break;
+		case SecurityDescriptor::SecurityDataType::SACL:
+			sacl = reinterpret_cast<PACL>(WrappedObject);
+			break;
+		}
+	}
+
+	SecurityDescriptor::SecurityDescriptor(PISECURITY_DESCRIPTOR lpSecurity) :
+		GenericWrapper<PISECURITY_DESCRIPTOR>(lpSecurity, LocalFree, nullptr) {
+		if (lpSecurity) {
+			lpUserSid = lpSecurity->Owner;
+			lpGroupSid = lpSecurity->Group;
+			dacl = lpSecurity->Dacl;
+			sacl = lpSecurity->Sacl;
+		}
+	}
+
+	SecurityDescriptor SecurityDescriptor::CreateUserSID(DWORD dwSize) {
+		return SecurityDescriptor(dwSize, SecurityDescriptor::SecurityDataType::USER_SID);
+	}
+
+	SecurityDescriptor SecurityDescriptor::CreateGroupSID(DWORD dwSize) {
+		return SecurityDescriptor(dwSize, SecurityDescriptor::SecurityDataType::GROUP_SID);
+	}
+
+	SecurityDescriptor SecurityDescriptor::CreateDACL(DWORD dwSize) {
+		return SecurityDescriptor(dwSize, SecurityDescriptor::SecurityDataType::DACL);
+	}
+
+	SecurityDescriptor SecurityDescriptor::CreateSACL(DWORD dwSize) {
+		return SecurityDescriptor(dwSize, SecurityDescriptor::SecurityDataType::SACL);
+	}
+
+	PACL SecurityDescriptor::GetDACL() const { return this->dacl; }
+	PACL SecurityDescriptor::GetSACL() const { return this->sacl; }
+	PSID SecurityDescriptor::GetUserSID() const { return this->lpUserSid; }
+	PSID SecurityDescriptor::GetGroupSID() const { return this->lpGroupSid; }
+
+	User::User(IN const std::wstring& uName) : Username{ uName }, bUserExists{ true } {
+
+		DWORD dwSIDLen{};
+		DWORD DomainLen{};
+		SID_NAME_USE SidType{};
+		LookupAccountNameW(nullptr, Username.c_str(), nullptr, &dwSIDLen, nullptr, &DomainLen, &SidType);
+
+		sUserSID = SecurityDescriptor::CreateUserSID(dwSIDLen);
+		std::vector<WCHAR> Domain(DomainLen);
+		if (!LookupAccountNameW(nullptr, Username.c_str(), sUserSID.GetUserSID(), &dwSIDLen, Domain.data(), &DomainLen, &SidType)) {
+			LOG_ERROR("Error getting user with name " << Username << " " << GetLastError());
+			bUserExists = false;
 		}
 		else {
-			if (!LookupAccountName(NULL, uName.c_str(), sUserSID, &sidLen, Domain, &DomainLen, &SidType)) {
-				LOG_ERROR("Error getting user with name " << uName << " " << GetLastError());
+			DomainName = std::wstring(Domain.data());
+			if (SidType == SidTypeDeletedAccount) {
+				LOG_VERBOSE(2, "User with name " << Username << " has been deleted.");
+				bUserExists = false;
+			}
+			else if (SidType != SidTypeUser) {
+				LOG_VERBOSE(2, "User with name " << Username << " does not exist.");
 				bUserExists = false;
 			}
 			else {
-				DomainName = std::wstring(Domain);
-				if (SidType == SidTypeDeletedAccount) {
-					LOG_VERBOSE(2, "User with name " << uName << " has been deleted.");
-					bUserExists = false;
-				}
-				else if (SidType != SidTypeUser) {
-					LOG_VERBOSE(2, "User with name " << uName << " does not exist.");
-					bUserExists = false;
-				}
-				else {
-					bUserExists = true;
-					LOG_VERBOSE(3, "User with name " << uName << " found.");
-				}
+				LOG_VERBOSE(3, "User with name " << Username << " found.");
 			}
-			VirtualFree(Domain, DomainLen, MEM_DECOMMIT);
 		}
+
 	}
 
-	User::User(IN const PSID sid, bool useSID) {
-		LPWSTR Domain;
+	User::User(IN const SecurityDescriptor& sid) : sUserSID{ sid }, bUserExists{ true } {
 		DWORD DomainLen = 0;
-		LPWSTR Name;
 		DWORD NameLen = 0;
-		sUserSID = sid;
-		bUserExists = true;
 		SID_NAME_USE eUse = SidTypeUnknown;
-		LookupAccountSid(NULL, sid, NULL, &NameLen, NULL, &DomainLen, &eUse);
+		LookupAccountSidW(nullptr, sUserSID.GetUserSID(), nullptr, &NameLen, nullptr, &DomainLen, &eUse);
 
-		Domain = (LPWSTR) VirtualAlloc(NULL, DomainLen, MEM_COMMIT, PAGE_READWRITE);
-		//(LPWSTR)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, DomainLen);
-		if (Domain == NULL) {
-			LOG_ERROR("Couldn't allocate memory. Error " << GetLastError());
+		std::vector<WCHAR> Domain(DomainLen);
+		std::vector<WCHAR> Name(NameLen);
+
+		if (!LookupAccountSid(nullptr, sUserSID.GetUserSID(), Name.data(), &NameLen, Domain.data(), &DomainLen, &eUse)) {
+			LOG_ERROR("Error getting user " << GetLastError());
+			bUserExists = false;
 		}
 		else {
-			Name = (LPWSTR)VirtualAlloc(NULL, NameLen, MEM_COMMIT, PAGE_READWRITE);
-			//(LPWSTR)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, NameLen);
-			if (Name == NULL) {
-				LOG_ERROR("Couldn't allocate memory. Error " << GetLastError());
+			DomainName = std::wstring(Domain.data());
+			Username = std::wstring(Name.data());
+			if (eUse == SidTypeDeletedAccount) {
+				LOG_VERBOSE(2, "User " << Username << " has been deleted.");
+				bUserExists = false;
+			}
+			else if (eUse != SidTypeUser) {
+				LOG_VERBOSE(2, "User doesn't exist.");
+				bUserExists = false;
 			}
 			else {
-				if (!LookupAccountSid(NULL, sid, Name, &NameLen, Domain, &DomainLen, &eUse)) {
-					LOG_ERROR("Error getting user " << GetLastError());
-					bUserExists = false;
-				}
-				else {
-					DomainName = std::wstring(Domain);
-					Username = std::wstring(Name);
-					if (eUse == SidTypeDeletedAccount) {
-						LOG_VERBOSE(2, "User " << Username << " has been deleted.");
-						bUserExists = false;
-					}
-					else if (eUse != SidTypeUser) {
-						LOG_VERBOSE(2, "User doesn't exist.");
-						bUserExists = false;
-					}
-					else {
-						LOG_VERBOSE(3, "User " << Username << " Exists.");
-						bUserExists = true;
-					}
-				}
-				VirtualFree(Name, NameLen, MEM_DECOMMIT);
+				LOG_VERBOSE(3, "User " << Username << " Exists.");
 			}
-			VirtualFree(Domain, DomainLen, MEM_DECOMMIT);
 		}
 	}
-	
+
 	std::wstring User::ToString() const {
 		return Username;
 	}
