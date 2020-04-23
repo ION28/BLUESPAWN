@@ -8,7 +8,7 @@
 
 #include "util/log/Loggable.h"
 #include "common/wrappers.hpp"
-#include "util/users/Users.h"
+#include "util/permissions/permissions.h"
 
 #define BUFSIZE 1024
 #define MD5LEN  16
@@ -218,7 +218,7 @@ namespace FileSystem {
 		*
 		* @return a User object representing the owner of the file
 		*/
-		std::optional<Permissions::User> GetFileOwner() const;
+		std::optional<Permissions::Owner> GetFileOwner() const;
 
 		/**
 		* Function to set a file owner
@@ -226,7 +226,7 @@ namespace FileSystem {
 		* param user A User object representing the new file owner
 		* @return true if the file is now owned by the new user, false otherwise
 		*/
-		bool SetFileOwner(Permissions::User user);
+		bool SetFileOwner(Permissions::Owner user);
 	};
 
 	class Folder {

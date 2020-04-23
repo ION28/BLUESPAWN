@@ -103,6 +103,7 @@
     <ClInclude Include="headers\util\log\LogSink.h" />
     <ClInclude Include="headers\util\log\ServerSink.h" />
     <ClInclude Include="headers\util\log\XMLSink.h" />
+    <ClInclude Include="headers\util\permissions\permissions.h" />
     <ClInclude Include="headers\util\pe\Export_Section.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -227,6 +228,7 @@
     <ClCompile Include="src\util\log\LogLevel.cpp" />
     <ClCompile Include="src\util\log\ServerSink.cpp" />
     <ClCompile Include="src\util\log\XMLSink.cpp" />
+    <ClCompile Include="src\util\permissions\permissions.cpp" />
     <ClCompile Include="src\util\pe\Export_Section.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

@@ -498,25 +498,26 @@ namespace FileSystem{
 		return FilePath;
 	}
 
-	std::optional<Permissions::User> File::GetFileOwner() const {
-		PSID psUserSID = NULL;
+	std::optional<Permissions::Owner> File::GetFileOwner() const {
+		PSID psOwnerSID = NULL;
 		PISECURITY_DESCRIPTOR pDesc = NULL;
-		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psUserSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR *>(&pDesc)) != ERROR_SUCCESS) {
+		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psOwnerSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR *>(&pDesc)) != ERROR_SUCCESS) {
 			LOG_ERROR("Error getting file owner for file " << FilePath << ". Error: " << GetLastError());
 			return std::nullopt;
 		}
-		pDesc->Owner = psUserSID;
+		//pDesc->Owner = psOwnerSID;
+		pDesc->Owner = psOwnerSID;
 
 		Permissions::SecurityDescriptor secDesc(pDesc);
-		return Permissions::User(secDesc);
+		return Permissions::Owner(secDesc);
 	}
 
-	bool File::SetFileOwner(Permissions::User user) {
-		if (SetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, user.getSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
-			LOG_ERROR("Error setting the file owner for file " << FilePath << " to " << user << ". Error: " << GetLastError());
+	bool File::SetFileOwner(Permissions::Owner owner) {
+		if (SetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.getSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
+			LOG_ERROR("Error setting the file owner for file " << FilePath << " to " << owner << ". Error: " << GetLastError());
 			return false;
 		}
-		LOG_VERBOSE(3, "Set the owner for file " << FilePath << " to " << user << ".");
+		LOG_VERBOSE(3, "Set the owner for file " << FilePath << " to " << owner << ".");
 		return true;
 	}
 
