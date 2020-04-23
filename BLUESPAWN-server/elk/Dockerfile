@@ -4,9 +4,15 @@ FROM sebp/elk:latest
 RUN echo "xpack.security.enabled: true" >> /etc/elasticsearch/elasticsearch.yml
 RUN	echo "xpack.security.transport.ssl.enabled: true" >> /etc/elasticsearch/elasticsearch.yml
 
-# Copy in additional startup scripts
-RUN sed -i '$ d' /usr/local/bin/start.sh
-COPY extraStart.sh /usr/local/bin/extraStart.sh
-RUN cat /usr/local/bin/extraStart.sh >> /usr/local/bin/start.sh
+# Configure passwords
+RUN cp /usr/local/bin/start.sh /usr/local/bin/runElk.sh
+RUN sed -i '$ d' /usr/local/bin/runElk.sh
+COPY configurePasswords.sh configurePasswords.sh
+RUN /usr/local/bin/runElk.sh; chmod +x configurePasswords.sh; ./configurePasswords.sh
+RUN rm configurePasswords.sh
+RUN rm /usr/local/bin/runElk.sh
+RUN service logstash stop
+RUN service kibana stop
+RUN service elasticsearch stop
 
 CMD ["/usr/local/bin/start.sh"]

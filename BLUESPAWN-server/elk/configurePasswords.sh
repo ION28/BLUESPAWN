@@ -42,10 +42,3 @@ curl --user elastic:"$elastic_pass" -X POST "localhost:9200/_security/user/elast
 echo 'elasticsearch.username: "kibana"' >> opt/kibana/config/kibana.yml
 echo 'elasticsearch.password: "Chiapet1"' >> opt/kibana/config/kibana.yml
 echo 'xpack.security.encryptionKey: "some_really_long_phrase_no_kne_can_guess_haha"' >> opt/kibana/config/kibana.yml
-
-# Restart kibana
-service kibana stop
-service kibana start
-
-# Wait endlessly so the container doesn't die
-wait
