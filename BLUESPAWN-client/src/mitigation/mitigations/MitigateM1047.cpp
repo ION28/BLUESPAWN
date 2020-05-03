@@ -43,7 +43,8 @@ namespace Mitigations {
 			LOG_VERBOSE(1, L"Sysmon is not installed.");
 			enforced = false;
 		}
-		if (sysmon.Exists() && sysmon.GetValue<DWORD>(L"Start") >= 3 || sysmon64.Exists() && sysmon64.GetValue<DWORD>(L"Start") >= 3) {
+		if (sysmon.Exists() && sysmon.GetValue<DWORD>(L"Start") >= static_cast<DWORD>(3) || 
+			sysmon64.Exists() && sysmon64.GetValue<DWORD>(L"Start") >= static_cast<DWORD>(3)) {
 			LOG_VERBOSE(1, L"Sysmon is set to manual or disabled.");
 			enforced = false;
 		}
@@ -54,7 +55,7 @@ namespace Mitigations {
 			LOG_VERBOSE(1, L"Windows Event Log Service is not installed.");
 			enforced = false;
 		}
-		else if (eventLogService.GetValue<DWORD>(L"Start") >= 3) {
+		else if (eventLogService.GetValue<DWORD>(L"Start") >= static_cast<DWORD>(3)) {
 			LOG_VERBOSE(1, L"Windows Event Log Service is set to manual or disabled.");
 			enforced = false;
 		}
@@ -80,11 +81,11 @@ namespace Mitigations {
 			LOG_VERBOSE(1, L"Sysmon is not installed.");
 			enforced = false;
 		}
-		if (sysmon.Exists() && sysmon.GetValue<DWORD>(L"Start") >= 3) {
+		if (sysmon.Exists() && sysmon.GetValue<DWORD>(L"Start") >= 3ul) {
 			LOG_VERBOSE(1, L"Attempting to set SYSTEM\\CurrentControlSet\\Services\\Sysmon\\Start to 2.");
 			enforced &= sysmon.SetValue<DWORD>(L"Start", 2);
 		}
-		if (sysmon64.Exists() && sysmon64.GetValue<DWORD>(L"Start") >= 3) {
+		if (sysmon64.Exists() && sysmon64.GetValue<DWORD>(L"Start") >= 3ul) {
 			LOG_VERBOSE(1, L"Attempting to set SYSTEM\\CurrentControlSet\\Services\\Sysmon64\\Start to 2.");
 			enforced &= sysmon64.SetValue<DWORD>(L"Start", 2);
 		}
@@ -95,7 +96,7 @@ namespace Mitigations {
 			LOG_VERBOSE(1, L"Windows Event Log Service is not installed.");
 			enforced = false;
 		}
-		else if (eventLogService.GetValue<DWORD>(L"Start") >= 3) {
+		else if (eventLogService.GetValue<DWORD>(L"Start") >= 3ul) {
 			LOG_VERBOSE(1, L"Attempting to set SYSTEM\\CurrentControlSet\\Services\\EventLog\\Start to 2.");
 			enforced &= eventLogService.SetValue<DWORD>(L"Start", 2);
 		}
