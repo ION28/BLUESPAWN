@@ -259,18 +259,6 @@ LPVOID GetModuleAddress(const HandleWrapper& hProcess, const std::wstring& wsMod
         status = EnumProcessModules(hProcess, modules.data(), dwBytesNeeded, &dwBytesNeeded);
     }
 
-    std::vector<std::wstring> vModules{};
-
-    std::vector<HMODULE> modules(1024);
-    DWORD dwBytesNeeded{};
-    auto status{ EnumProcessModules(hProcess, modules.data(), 1024 * sizeof(HMODULE), &dwBytesNeeded) };
-    if(dwBytesNeeded > 1024 * sizeof(HMODULE)){
-        modules.resize(dwBytesNeeded / sizeof(HMODULE));
-        status = EnumProcessModules(hProcess, modules.data(), dwBytesNeeded, &dwBytesNeeded);
-    }
-
-    std::vector<std::wstring> vModules{};
-
     if(status){
         for(auto mod : modules){
             WCHAR path[MAX_PATH];

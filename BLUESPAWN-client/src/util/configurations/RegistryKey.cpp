@@ -43,14 +43,17 @@ namespace Registry {
 		WoW64 = WoW64 || wLowerPath.find(L"wow6432node") != std::wstring::npos;
 		LSTATUS status = RegOpenKeyExW(hive, name.c_str(), 0, KEY_READ | KEY_NOTIFY | (WoW64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &key);
 		if(status == ERROR_ACCESS_DENIED){
-			status = RegOpenKeyExW(hive, name.c_str(), 0, KEY_READ | KEY_NOTIFY | (WoW64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &key);
+			return true;
 		}
 
 		if(status == ERROR_SUCCESS){
 			if(_ReferenceCounts.find(key) == _ReferenceCounts.end()){
 				RegCloseKey(key);
 			}
+			return true;
 		}
+
+		return false;
 	}
 	
 	RegistryKey::RegistryKey(const RegistryKey& key) noexcept :

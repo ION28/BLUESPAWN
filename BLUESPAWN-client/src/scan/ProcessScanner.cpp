@@ -23,7 +23,7 @@ std::vector<std::shared_ptr<DETECTION>> ProcessScanner::GetAssociatedDetections(
 		if(FileSystem::CheckFileExists(path)){
 			FileSystem::File file{ path };
 			if(!file.GetFileSigned()){
-				FILE_DETECTION(file);
+				FILE_DETECTION(path);
 			}
 		}
 	}

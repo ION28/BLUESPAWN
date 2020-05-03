@@ -34,8 +34,20 @@ std::vector<std::shared_ptr<DETECTION>> RegistryScanner::GetAssociatedDetections
 
 	auto detection = *std::static_pointer_cast<REGISTRY_DETECTION>(base);
 
-	if(detection.type == RegistryDetectionType::FilesReference){
-		
+	if(detection.type == RegistryDetectionType::FilesReference && detection.value.GetType() == RegistryType::REG_MULTI_SZ_T){
+		auto data{ std::get<std::vector<std::wstring>>(detection.value.data) };
+		for(auto& entry : data){
+			auto file = FileSystem::SearchPathExecutable(entry);
+			if(file){
+				FILE_DETECTION(*file);
+			}
+		}
+	} else if(detection.type == RegistryDetectionType::FilesReference && (detection.value.GetType() == RegistryType::REG_SZ_T
+		|| detection.value.GetType() == RegistryType::REG_EXPAND_SZ_T)){
+		auto file = FileSystem::SearchPathExecutable(std::get<std::wstring>(detection.value.data));
+		if(file){
+			FILE_DETECTION(*file);
+		}
 	}
 
 	return detections;

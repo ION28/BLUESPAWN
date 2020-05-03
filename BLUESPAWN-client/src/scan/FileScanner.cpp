@@ -19,9 +19,7 @@ std::vector<std::wstring> FileScanner::ExtractStrings(const AllocationWrapper& d
 
 	DWORD dwStringStart{};
 	for(DWORD idx = 0; idx < data.GetSize(); idx++){
-		if(data[idx] >= 0x20 && data[idx] < 0x7E){
-			
-		} else {
+		if(!(data[idx] >= 0x20 && data[idx] < 0x7E)){
 			DWORD dwStringLength = idx - dwStringStart;
 			if(dwStringLength >= dwMinLength){
 				strings.emplace_back(StringToWidestring(std::string{ PCHAR(LPVOID(data)) + dwStringStart, dwStringLength }));
@@ -38,10 +36,8 @@ std::vector<std::wstring> FileScanner::ExtractStrings(const AllocationWrapper& d
 
 	dwStringStart = 0;
 	for(DWORD idx = 0; 2 * idx < data.GetSize(); idx++){
-		if(data[idx * 2] >= 0x20 && data[idx * 2] < 0x7E){
-
-		} else {
-			DWORD dwStringLength = idx - dwStringStart;
+		if(!(data[idx * 2] >= 0x20 && data[idx * 2] < 0x7E)){
+			dwStringLength = idx - dwStringStart;
 			if(dwStringLength >= dwMinLength){
 				strings.emplace_back(std::wstring{ PWCHAR(LPVOID(data)) + dwStringStart, dwStringLength });
 			}
@@ -50,9 +46,9 @@ std::vector<std::wstring> FileScanner::ExtractStrings(const AllocationWrapper& d
 		}
 	}
 
-	DWORD dwStringLength = data.GetSize() - dwStringStart;
+	dwStringLength = data.GetSize() - dwStringStart;
 	if(dwStringLength >= dwMinLength){
-		strings.emplace_back(StringToWidestring(std::string{ PCHAR(LPVOID(data)) + dwStringStart, dwStringLength }));
+		strings.emplace_back(std::wstring{ PWCHAR(PCHAR(LPVOID(data))) + dwStringStart, dwStringLength });
 	}
 
 	return strings;
@@ -83,7 +79,7 @@ std::vector<std::shared_ptr<DETECTION>> FileScanner::GetAssociatedDetections(std
 	auto detection = *std::static_pointer_cast<FILE_DETECTION>(base);
 	auto ext = detection.wsFileName.substr(detection.wsFileName.size() - 4);
 	if(ext != L".exe" && ext != L".dll"){
-		return;
+		return detections;
 	}
 
 	auto file{ FileSystem::File(detection.wsFilePath) };
@@ -103,17 +99,29 @@ std::vector<std::shared_ptr<DETECTION>> FileScanner::GetAssociatedDetections(std
 			for(auto mod : modules){
 				if(level == Aggressiveness::Cursory){
 					if(mod == detection.wsFilePath){
-						PROCESS_DETECTION(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i], GetModuleAddress(processes[i], mod), -1, ProcessDetectionMethod::File);
+						auto alloc = GetModuleAddress(processes[i], mod);
+						if(alloc){
+							auto dwAllocSize = GetRegionSize(processes[i], alloc);
+							PROCESS_DETECTION(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i], alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File));
+						}
 					}
 				} else if(level == Aggressiveness::Normal && FileSystem::CheckFileExists(mod)){
 					auto ModuleContents = FileSystem::File(mod).Read();
 					if(contents.GetSize() == ModuleContents.GetSize() && contents.GetSize() == RtlCompareMemory(contents, ModuleContents, contents.GetSize())){
-						PROCESS_DETECTION(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i], GetModuleAddress(processes[i], mod), -1, ProcessDetectionMethod::File);
+						auto alloc = GetModuleAddress(processes[i], mod);
+						if(alloc){
+							auto dwAllocSize = GetRegionSize(processes[i], alloc);
+							PROCESS_DETECTION(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i], alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File));
+						}
 					}
 				} else if(level == Aggressiveness::Intensive && FileSystem::CheckFileExists(mod)){
 					auto ModuleContents = FileSystem::File(mod).Read();
 					if(GetFilesSimilar(contents, ModuleContents)){
-						PROCESS_DETECTION(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i], GetModuleAddress(processes[i], mod), -1, ProcessDetectionMethod::File);
+						auto alloc = GetModuleAddress(processes[i], mod);
+						if(alloc){
+							auto dwAllocSize = GetRegionSize(processes[i], alloc);
+							PROCESS_DETECTION(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i], alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File));
+						}
 					}
 				}
 			}

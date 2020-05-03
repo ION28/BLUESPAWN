@@ -82,6 +82,7 @@
     <ClInclude Include="headers\scan\FileScanner.h" />
     <ClInclude Include="headers\scan\ProcessScanner.h" />
     <ClInclude Include="headers\scan\RegistryScanner.h" />
+    <ClInclude Include="headers\scan\ScanAssociation.h" />
     <ClInclude Include="headers\scan\Scanner.h" />
     <ClInclude Include="headers\scan\ScanNode.h" />
     <ClInclude Include="headers\user\banners.h" />

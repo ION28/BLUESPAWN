@@ -5,6 +5,7 @@
 #include <Psapi.h>
 
 #include "util/processes/PERemover.h"
+#include "util/processes/ProcessUtils.h"
 #include "reaction/SuspendProcess.h"
 #include "util/log/Log.h"
 
