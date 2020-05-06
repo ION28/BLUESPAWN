@@ -7,8 +7,8 @@
 
 class ScanNode {
 	std::vector<std::shared_ptr<ScanNode>> associations;
-	std::shared_ptr<DETECTION> detection;
+	Detection detection;
 
 public:
-	ScanNode(std::shared_ptr<DETECTION> detection);
+	ScanNode(const Detection& detection);
 };

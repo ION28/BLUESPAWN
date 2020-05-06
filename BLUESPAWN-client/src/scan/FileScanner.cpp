@@ -70,11 +70,11 @@ std::vector<std::wstring> FileScanner::ExtractFilePaths(const std::vector<std::w
 	return filepaths;
 }
 
-std::vector<std::shared_ptr<DETECTION>> FileScanner::GetAssociatedDetections(std::shared_ptr<DETECTION> base, Aggressiveness level){
+std::vector<Detection> FileScanner::GetAssociatedDetections(std::shared_ptr<DETECTION> base, Aggressiveness level){
 	if(!base || base->Type != DetectionType::File){
 		return {};
 	}
-	std::vector<std::shared_ptr<DETECTION>> detections{};
+	std::vector<Detection> detections{};
 
 	auto detection = *std::static_pointer_cast<FILE_DETECTION>(base);
 	auto ext = detection.wsFileName.substr(detection.wsFileName.size() - 4);

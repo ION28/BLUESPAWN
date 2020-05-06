@@ -15,13 +15,15 @@ enum class DetectionType {
 	Registry,
 	Service,
 	Process,
-	Event
+	Event,
+	Other
 };
 
 struct DETECTION {
 	DetectionType Type;
 	DETECTION(DetectionType Type) : Type{ Type }{}
 };
+typedef std::shared_ptr<DETECTION> Detection;
 
 /// A struct containing information about a file identified in a hunt
 /// Note that the hash will have to be manually set.
@@ -36,19 +38,15 @@ struct FILE_DETECTION : public DETECTION {
 		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
 	}
 };
+typedef std::shared_ptr<FILE_DETECTION> FileDetection;
 typedef std::function<void(std::shared_ptr<FILE_DETECTION>)> DetectFile;
 
 enum class RegistryDetectionType {
 	FileReference,    // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a file
-	FilesReference,   // The associated value is a REG_MULTI_SZ that references some number of files
 	FolderReference,  // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a folder
-	FoldersReference, // The associated value is a REG_MULTI_SZ that references some number of folders
 	PipeReference,    // The associated value is either a REG_SZ that references a named pipe
-	PipesReference,   // The associated value is a REG_MULTI_SZ that references some number of named pipe
 	ShareReference,   // The associated value is either a REG_SZ that references a share
-	SharesReference,  // The associated value is a REG_MULTI_SZ that references some number of shares
 	UserReference,    // The associated value is either a REG_SZ that references a user
-	UsersReference,   // The associated value is a REG_MULTI_SZ that references some number of users
 	Configuration,    // The associated value references a configuration for the operating system
 	Association       // The associated value is assumed malicious due to association with other malicious detections
 };
@@ -57,11 +55,15 @@ enum class RegistryDetectionType {
 struct REGISTRY_DETECTION : public DETECTION {
 	Registry::RegistryValue value;
 	RegistryDetectionType type;
-	REGISTRY_DETECTION(const Registry::RegistryValue& value, RegistryDetectionType type = RegistryDetectionType::Configuration) :
+	bool multitype;
+	REGISTRY_DETECTION(const Registry::RegistryValue& value, RegistryDetectionType type = RegistryDetectionType::Configuration, 
+					   bool multitype = false) :
 		DETECTION{ DetectionType::Registry },
 		type{ type },
+		multitype{ multitype },
 		value{ value }{}
 };
+typedef std::shared_ptr<REGISTRY_DETECTION> RegistryDetection;
 typedef std::function<void(std::shared_ptr<REGISTRY_DETECTION>)> DetectRegistry;
 
 /// A struct containing information about a service identified in a hunt
@@ -73,6 +75,7 @@ struct SERVICE_DETECTION : public DETECTION {
 		wsServiceName{ wsServiceName },
 		wsServiceExecutablePath{ wsServiceExecutablePath }{}
 };
+typedef std::shared_ptr<SERVICE_DETECTION> ServiceDetection;
 typedef std::function<void(std::shared_ptr<SERVICE_DETECTION>)> DetectService;
 
 enum class ProcessDetectionMethod {
@@ -92,7 +95,6 @@ struct PROCESS_DETECTION : public DETECTION {
 	DWORD method;
 	LPVOID lpAllocationBase;
 	DWORD dwAllocationSize;
-	BYTE AllocationStart[512];      // This member is intended to be used for signaturing purposes
 	PROCESS_DETECTION(const std::wstring& wsImagePath, const std::wstring& wsCmdLine, const int& PID,
 		const LPVOID& lpAllocationBase, const DWORD& dwAllocationSize, const DWORD& method) :
 		DETECTION{ DetectionType::Process },
@@ -101,10 +103,9 @@ struct PROCESS_DETECTION : public DETECTION {
 		PID{ PID },
 		method{ method },
 		lpAllocationBase{ lpAllocationBase },
-		dwAllocationSize{ dwAllocationSize },
-		AllocationStart{}{}
+		dwAllocationSize{ dwAllocationSize }{}
 };
-
+typedef std::shared_ptr<PROCESS_DETECTION> ProcessDetection;
 typedef std::function<void(std::shared_ptr<PROCESS_DETECTION>)> DetectProcess;
 
 enum class ServiceType {
@@ -127,7 +128,8 @@ struct EVENT_DETECTION : public DETECTION {
 	std::wstring rawXML;
 	std::unordered_map<std::wstring, std::wstring> params;
 	
-	EVENT_DETECTION(unsigned int eventID, unsigned int eventRecordID, std::wstring timeCreated, std::wstring channel, std::wstring rawXML) :
+	EVENT_DETECTION(unsigned int eventID, unsigned int eventRecordID, const std::wstring& timeCreated, 
+					const std::wstring& channel, const std::wstring& rawXML) :
 		DETECTION{ DetectionType::Event },
 		eventID{ eventID },
 		eventRecordID{ eventRecordID },
@@ -135,7 +137,21 @@ struct EVENT_DETECTION : public DETECTION {
 		channel{ channel },
 		rawXML{ rawXML }{}
 };
+typedef std::shared_ptr<EVENT_DETECTION> EventDetection;
 typedef std::function<void(std::shared_ptr<EVENT_DETECTION>)> DetectEvent;
+
+struct OTHER_DETECTION : public DETECTION {
+	std::wstring type;
+	std::unordered_map<std::wstring, std::wstring> params;
+
+	OTHER_DETECTION(const std::wstring& type, const std::unordered_map<std::wstring, std::wstring>& params) : 
+		DETECTION{ DetectionType::Other },
+		type{ type },
+		params{ params }{}
+};
+typedef std::shared_ptr<OTHER_DETECTION> OtherDetection;
+typedef std::function<void(std::shared_ptr<OTHER_DETECTION>)> DetectOther;
+
 
 typedef std::function<void(const HuntInfo&)> HuntStart;
 typedef std::function<void()> HuntEnd;
