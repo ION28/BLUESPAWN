@@ -2,6 +2,7 @@
 #include "common/StringUtils.h"
 #include "reaction/Detections.h"
 #include "util/log/Log.h"
+#include "common/Utils.h"
 
 const int SIZE_DATA = 4096;
 const int ARRAY_SIZE = 10;
@@ -144,7 +145,7 @@ namespace EventLogs {
 
 		pItem.SetEventID(std::stoul(*eventIDStr));
 		pItem.SetEventRecordID(std::stoul(*eventRecordIDStr));
-		pItem.SetTimeCreated(*timeCreated);
+		pItem.SetTimeCreated(FormatWindowsTime(*timeCreated));
 		pItem.SetChannel(*channel);
 		pItem.SetXML(*rawXML);
 
