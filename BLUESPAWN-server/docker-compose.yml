@@ -1,19 +1,39 @@
 version: '3'
 services:
-    bluespawn-server:
-      build:
-        context: ./management
-      ports:
-        - "3000:3000"
-      volumes:
-        - "./bluespawn-server:/bluespawn-server"
-      stdin_open: true
-      tty: true
-    elk:
-      build:
-        context: ./elk
-      image: myelk
-      ports:
-        - "5601:5601"
-        - "9200:9200"
-        - "5044:5044"
+  elk_base:
+    image: elk_base:latest
+    build:
+      context: ./elk/base
+  elasticsearch:
+    depends_on:
+      - elk_base
+    build:
+      context: ./elk/elasticsearch
+    ports:
+      - "9200:9200"
+  kibana:
+    depends_on:
+      - elk_base
+    build:
+      context: ./elk/kibana
+    ports:
+      - "5601:5601"
+  bluespawn-server:
+    build:
+      context: ./management
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./bluespawn-server:/bluespawn-server"
+    stdin_open: true
+    tty: true
+  shell:
+    build:
+      context: ./elk/shell
+    stdin_open: true
+    tty: true
+
+networks:
+  default:
+    external:
+      name: elk-network
