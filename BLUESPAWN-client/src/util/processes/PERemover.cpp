@@ -23,9 +23,9 @@ PERemover::PERemover(const HandleWrapper& hProcess, LPVOID lpBaseAddress, DWORD 
 PERemover::PERemover(DWORD dwPID, LPVOID lpBaseAddress, DWORD dwImageSize) :
     PERemover(OpenProcess(PROCESS_ALL_ACCESS, false, dwPID), lpBaseAddress, dwImageSize){}
 PERemover::PERemover(const HandleWrapper& hProcess, const std::wstring& wsImageName) :
-    PERemover(hProcess, GetModuleHandleW(wsImageName.c_str()), -1){}
+    PERemover(hProcess, GetModuleAddress(hProcess, wsImageName.c_str()), -1){}
 PERemover::PERemover(DWORD dwPID, const std::wstring& wsImageName) :
-    PERemover(OpenProcess(PROCESS_ALL_ACCESS, false, dwPID), GetModuleHandleW(wsImageName.c_str()), -1){}
+    PERemover(OpenProcess(PROCESS_ALL_ACCESS, false, dwPID), GetModuleAddress(dwPID, wsImageName.c_str()), -1){}
 
 bool PERemover::RemoveImage(){
     Linker::NtSuspendProcess(hProcess);

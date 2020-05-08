@@ -5,8 +5,8 @@
 #include "common/wrappers.hpp"
 #include "util/filesystem/FileSystem.h"
 #include "util/processes/ProcessUtils.h"
-#include "hunt/Hunt.h"
 #include "scan/RegistryScanner.h"
+#include "scan/ScanNode.h"
 
 #include <regex>
 
@@ -70,11 +70,11 @@ std::vector<std::wstring> FileScanner::ExtractFilePaths(const std::vector<std::w
 	return filepaths;
 }
 
-std::vector<Detection> FileScanner::GetAssociatedDetections(std::shared_ptr<DETECTION> base, Aggressiveness level){
+std::map<std::shared_ptr<ScanNode>, Association> FileScanner::GetAssociatedDetections(Detection base, Aggressiveness level){
 	if(!base || base->Type != DetectionType::File){
 		return {};
 	}
-	std::vector<Detection> detections{};
+	std::map<std::shared_ptr<ScanNode>, Association> detections{};
 
 	auto detection = *std::static_pointer_cast<FILE_DETECTION>(base);
 	auto ext = detection.wsFileName.substr(detection.wsFileName.size() - 4);
@@ -97,22 +97,25 @@ std::vector<Detection> FileScanner::GetAssociatedDetections(std::shared_ptr<DETE
 		for(int i = 0; i < dwProcCount; i++){
 			auto modules{ EnumModules(processes[i]) };
 			for(auto mod : modules){
-				if(level == Aggressiveness::Cursory){
-					if(mod == detection.wsFilePath){
-						auto alloc = GetModuleAddress(processes[i], mod);
-						if(alloc){
-							auto dwAllocSize = GetRegionSize(processes[i], alloc);
-							PROCESS_DETECTION(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i], alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File));
-						}
+				if(level >= Aggressiveness::Cursory && mod == detection.wsFilePath){
+					auto alloc = GetModuleAddress(processes[i], mod);
+					if(alloc){
+						auto dwAllocSize = GetRegionSize(processes[i], alloc);
+						auto detection{ std::make_shared<PROCESS_DETECTION>(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i], 
+																			alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File)) };
+						detections.emplace(std::make_shared<ScanNode>(detection), Association::Certain);
 					}
-				} else if(level == Aggressiveness::Normal && FileSystem::CheckFileExists(mod)){
+				} else if(level >= Aggressiveness::Normal && FileSystem::CheckFileExists(mod)){
 					auto ModuleContents = FileSystem::File(mod).Read();
 					if(contents.GetSize() == ModuleContents.GetSize() && contents.GetSize() == RtlCompareMemory(contents, ModuleContents, contents.GetSize())){
 						auto alloc = GetModuleAddress(processes[i], mod);
 						if(alloc){
 							auto dwAllocSize = GetRegionSize(processes[i], alloc);
-							PROCESS_DETECTION(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i], alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File));
+							auto detection{ std::make_shared<PROCESS_DETECTION>(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i],
+																				alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File)) };
+							detections.emplace(std::make_shared<ScanNode>(detection), Association::Certain);
 						}
+						continue;
 					}
 				} else if(level == Aggressiveness::Intensive && FileSystem::CheckFileExists(mod)){
 					auto ModuleContents = FileSystem::File(mod).Read();
@@ -120,7 +123,9 @@ std::vector<Detection> FileScanner::GetAssociatedDetections(std::shared_ptr<DETE
 						auto alloc = GetModuleAddress(processes[i], mod);
 						if(alloc){
 							auto dwAllocSize = GetRegionSize(processes[i], alloc);
-							PROCESS_DETECTION(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i], alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File));
+							auto detection{ std::make_shared<PROCESS_DETECTION>(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i],
+																				alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File)) };
+							detections.emplace(std::make_shared<ScanNode>(detection), Association::Strong);
 						}
 					}
 				}
@@ -131,13 +136,13 @@ std::vector<Detection> FileScanner::GetAssociatedDetections(std::shared_ptr<DETE
 	auto strings = ExtractStrings(contents, 8);
 	auto filenames = ExtractFilePaths(strings);
 	for(auto& filename : filenames){
-		FILE_DETECTION(filename);
+		detections.emplace(std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(filename)), Association::Moderate);
 	}
 
 	auto keynames = RegistryScanner::ExtractRegistryKeys(strings);
 	for(auto keyname : keynames){
 		Registry::RegistryValue value{ Registry::RegistryKey{ keyname }, L"Unknown", std::move(std::wstring{ L"Unknown" }) };
-		REGISTRY_DETECTION(value);
+		detections.emplace(std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(value)), Association::Weak);
 	}
 
 	return detections;

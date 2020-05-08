@@ -1,9 +1,14 @@
 #pragma once
 
-#include "scan/Scanner.h"
+#include "scan/ScanNode.h"
 
-class RegistryScanner : public Scanner {
+#include <map>
+#include <vector>
+
+class RegistryScanner {
 public:
-	virtual std::vector<std::shared_ptr<DETECTION>> GetAssociatedDetections(std::shared_ptr<DETECTION> base, Aggressiveness level);
+	static std::map<std::shared_ptr<ScanNode>, Association> GetAssociatedDetections(Detection base, Aggressiveness level);
 	static std::vector<std::wstring> ExtractRegistryKeys(const std::vector<std::wstring>& strings);
+
+	static Certainty ScanItem(const Detection& base, Aggressiveness level);
 };

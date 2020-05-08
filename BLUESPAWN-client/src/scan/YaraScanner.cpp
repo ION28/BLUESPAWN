@@ -159,21 +159,34 @@ int YaraCallbackFunction(int message, LPVOID lpMessageData, YaraScanArg* arg){
 	return CALLBACK_CONTINUE;
 }
 
-YaraScanResult YaraScanner::ScanFile(const FileSystem::File& file) const {
+YaraScanResult YaraScanner::ScanFile(const FileSystem::File& file) const{
 	if(status != YaraStatus::Success){
 		YaraScanResult res = {};
 		res.status = status;
 		return res;
 	}
 
-	YaraScanArg arg = {};
-	arg.result.status = YaraStatus::Success;
 	auto memory = file.Read();
 	if(!memory){
-		arg.result.status = YaraStatus::Failure;
-		return arg.result;
+		YaraScanResult result{};
+		result.status = YaraStatus::Failure;
+		return result;
+	}
+	auto result{ ScanMemory(memory) };
+
+	for(auto identifier : result.vKnownBadRules){
+		LOG_INFO(file.GetFilePath() << L" matches known malicious identifier " << StringToWidestring(identifier));
+	}
+	for(auto identifier : result.vIndicatorRules){
+		LOG_INFO(file.GetFilePath() << L" matches known indicator identifier " << StringToWidestring(identifier));
 	}
 
+	return result;
+}
+
+YaraScanResult YaraScanner::ScanMemory(const AllocationWrapper& memory) const {
+	YaraScanArg arg{};
+	arg.result.status = YaraStatus::Success;
 	arg.type = arg.Severe;
 	auto status = yr_rules_scan_mem(KnownBad, reinterpret_cast<const uint8_t*>((LPVOID) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
 	if(status != ERROR_SUCCESS){
@@ -192,14 +205,15 @@ YaraScanResult YaraScanner::ScanFile(const FileSystem::File& file) const {
 		arg.result.status = YaraStatus::Failure;
 	}
 
-	for (auto identifier : arg.result.vKnownBadRules) {
-		LOG_INFO(file.GetFilePath() << L" matches known malicious identifier " << StringToWidestring(identifier));
-	}
-	for (auto identifier : arg.result.vIndicatorRules) {
-		LOG_INFO(file.GetFilePath() << L" matches known indicator identifier " << StringToWidestring(identifier));
-	}
-
 	return arg.result;
+}
+
+YaraScanResult YaraScanner::ScanMemory(LPVOID memory, DWORD dwSize) const{
+	return ScanMemory(AllocationWrapper{ memory, dwSize });
+}
+
+YaraScanResult YaraScanner::ScanMemory(const MemoryWrapper<>& memory) const {
+	return ScanMemory(memory.Read());
 }
 
 void YaraScanResult::AddBadRule(const char* identifier){

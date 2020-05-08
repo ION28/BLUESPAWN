@@ -289,6 +289,21 @@ public:
 		}
 	}
 
+	AllocationWrapper Read() const {
+		if(!process){
+			return AllocationWrapper{ address, MemorySize };
+		} else{
+			AllocationWrapper copy{ VirtualAlloc(nullptr, MemorySize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE), MemorySize, AllocationWrapper::VIRTUAL_ALLOC };
+			if(ReadProcessMemory(process, address, copy, MemorySize, nullptr)){
+				return copy;
+			} else{
+#ifdef LOG_ERROR
+				LOG_ERROR("Failed to read memory at " << address << " of process with PID " << GetProcessId(process) << " (Error " << GetLastError() << ")");
+#endif
+			}
+		}
+	}
+
 	operator bool() const { return address; }
 	bool operator !() const { return !address; }
 };

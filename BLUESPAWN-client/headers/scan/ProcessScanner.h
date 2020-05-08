@@ -1,8 +1,13 @@
 #pragma once
 
-#include "scan/Scanner.h"
+#include "scan/ScanNode.h"
 
-class ProcessScanner : public Scanner {
+#include <map>
+#include <vector>
+
+class ProcessScanner {
 public:
-	virtual std::vector<std::shared_ptr<DETECTION>> GetAssociatedDetections(std::shared_ptr<DETECTION> base, Aggressiveness level);
+	static std::map<std::shared_ptr<ScanNode>, Association> ProcessScanner::GetAssociatedDetections(Detection base, Aggressiveness level);
+
+	static Certainty ScanItem(const Detection& base, Aggressiveness level);
 };
