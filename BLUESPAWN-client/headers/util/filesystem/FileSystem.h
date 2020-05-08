@@ -216,17 +216,32 @@ namespace FileSystem {
 		/**
 		* Function to get the file owner
 		*
-		* @return a User object representing the owner of the file
+		* @return an Owner object representing the owner of the file
 		*/
 		std::optional<Permissions::Owner> GetFileOwner() const;
 
 		/**
 		* Function to set a file owner
 		*
-		* param user A User object representing the new file owner
+		* @param owner An Owner object representing the new file owner
 		* @return true if the file is now owned by the new user, false otherwise
 		*/
-		bool SetFileOwner(Permissions::Owner user);
+		bool SetFileOwner(const Permissions::Owner& owner);
+
+		/**
+		* Function to get the permissions a user or group has on a file
+		*
+		* @param owner An Owner object to check permissions for
+		* @return An ACCESS_MASK object 
+		*/
+		ACCESS_MASK GetAccessPermissions(const Permissions::Owner& owner);
+
+		/**
+		* Function to get permissions that the everyone group has
+		*
+		* @return the permissions granted to the everyone group
+		*/
+		ACCESS_MASK GetEveryonePermissions();
 	};
 
 	class Folder {

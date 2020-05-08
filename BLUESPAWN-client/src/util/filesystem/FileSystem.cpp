@@ -123,6 +123,7 @@ namespace FileSystem{
 		}
 		else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
 			bWriteAccess = false;
+			LOG_VERBOSE(3, "No write access available to file");
 			hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
 				FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
 			if (!hFile && GetLastError() == ERROR_FILE_NOT_FOUND) {
@@ -499,26 +500,51 @@ namespace FileSystem{
 	}
 
 	std::optional<Permissions::Owner> File::GetFileOwner() const {
+		if (!bFileExists) {
+			LOG_ERROR("Can't get owner of nonexistent file " << FilePath);
+			return std::nullopt;
+		}
 		PSID psOwnerSID = NULL;
 		PISECURITY_DESCRIPTOR pDesc = NULL;
 		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psOwnerSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR *>(&pDesc)) != ERROR_SUCCESS) {
 			LOG_ERROR("Error getting file owner for file " << FilePath << ". Error: " << GetLastError());
 			return std::nullopt;
 		}
-		//pDesc->Owner = psOwnerSID;
 		pDesc->Owner = psOwnerSID;
 
 		Permissions::SecurityDescriptor secDesc(pDesc);
 		return Permissions::Owner(secDesc);
 	}
 
-	bool File::SetFileOwner(Permissions::Owner owner) {
-		if (SetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.getSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
+	bool File::SetFileOwner(const Permissions::Owner& owner) {
+		if (SetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
 			LOG_ERROR("Error setting the file owner for file " << FilePath << " to " << owner << ". Error: " << GetLastError());
 			return false;
 		}
 		LOG_VERBOSE(3, "Set the owner for file " << FilePath << " to " << owner << ".");
 		return true;
+	}
+
+	ACCESS_MASK File::GetAccessPermissions(const Permissions::Owner& owner) {
+		if (!bFileExists) {
+			LOG_ERROR("Can't get permissions of nonexistent file " << FilePath);
+			return 0;
+		}
+		PACL paDACL = NULL;
+		PISECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting permissions on file " << FilePath << " for owner " << owner << ". Error: " << GetLastError());
+			return 0;
+		}
+		Permissions::SecurityDescriptor secDesc = Permissions::SecurityDescriptor::CreateDACL(paDACL->AclSize);
+		memcpy(secDesc.GetDACL(), paDACL, paDACL->AclSize);
+		LocalFree(pDesc);
+		return Permissions::GetOwnerRightsFromACL(owner, secDesc);
+	}
+
+	ACCESS_MASK File::GetEveryonePermissions() {
+		Permissions::Owner everyone(L"Everyone");
+		return this->GetAccessPermissions(everyone);
 	}
 
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {

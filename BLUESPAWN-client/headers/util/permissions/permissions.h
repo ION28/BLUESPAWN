@@ -3,13 +3,35 @@
 #include <Windows.h>
 #include <winnt.h>
 #include <AclAPI.h>
-
+#include <sddl.h>
 #include <string>
 
 #include "util/log/Loggable.h"
 #include "common/wrappers.hpp"
 
 namespace Permissions {
+	/**
+	* Functions to check if an access mask includes a permission
+	* 
+	* @param access - the access mask to check
+	* @return true if the access mask includes the permission or ALL, false otherwise
+	*/
+	bool AccessIncludesAll(const ACCESS_MASK& access);
+	bool AccessIncludesWrite(const ACCESS_MASK& access);
+	bool AccessIncludesRead(const ACCESS_MASK& access);
+	bool AccessIncludesExecute(const ACCESS_MASK& access);
+	bool AccessIncludesWriteOwner(const ACCESS_MASK& access);
+
+	/**
+	* Function to add an access to an access mask
+	*
+	* @param access - the access mask to be changed
+	*/
+	void AccessAddAll(ACCESS_MASK& access);
+	void AccessAddWrite(ACCESS_MASK& access);
+	void AccessAddRead(ACCESS_MASK& access);
+	void AccessAddExecute(ACCESS_MASK& access);
+	void AccessAddWriteOwner(ACCESS_MASK& access);
 
 	class SecurityDescriptor : public GenericWrapper<PISECURITY_DESCRIPTOR> {
 		PSID lpUserSid;
@@ -70,7 +92,7 @@ namespace Permissions {
 		*
 		* @return true if the owner exists, false otherwise
 		*/
-		bool getExists() const {
+		bool GetExists() const {
 			return bExists;
 		}
 
@@ -79,7 +101,7 @@ namespace Permissions {
 		*
 		* @return wstring containing the name of the owner in form
 		*/
-		std::wstring getUsername() const {
+		std::wstring GetName() const {
 			return wName;
 		}
 
@@ -89,7 +111,7 @@ namespace Permissions {
 		*
 		* @return wstring containing the domain name that the owner belongs to
 		*/
-		std::wstring getDomainName() const {
+		std::wstring GetDomainName() const {
 			return wDomainName;
 		}
 
@@ -98,8 +120,9 @@ namespace Permissions {
 		*
 		* @return SID structure with the owner's SID
 		*/
-		PSID getSID() const {
-			return sdSID;
+		PSID GetSID() const {
+			if(otType == OwnerType::USER) return sdSID.GetUserSID();
+			return sdSID.GetGroupSID();
 		}
 
 		/**
@@ -107,14 +130,14 @@ namespace Permissions {
 		* 
 		* @return OwnerType value of GROUP, USER, or NONE
 		*/
-		OwnerType getOwnerType() const {
+		OwnerType GetOwnerType() const {
 			return otType;
 		}
 
 		/**
 		 * Gets the owner's name
 		 *
-		 * @return The username of the user
+		 * @return The name of the owner
 		 */
 		virtual std::wstring ToString() const;
 	};
@@ -156,4 +179,6 @@ namespace Permissions {
 		*/
 		Group(IN const SecurityDescriptor& sid);
 	};
+
+	ACCESS_MASK GetOwnerRightsFromACL(const Owner& owner, const SecurityDescriptor& acl);
 }

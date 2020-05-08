@@ -2,6 +2,71 @@
 #include "util/log/Log.h"
 
 namespace Permissions {
+
+	bool AccessIncludesAll(const ACCESS_MASK& access) {
+		return ((access & GENERIC_ALL) == GENERIC_ALL) ||
+			((access & FILE_ALL_ACCESS) == FILE_ALL_ACCESS);
+	}
+
+	bool AccessIncludesWrite(const ACCESS_MASK& access) {
+		return AccessIncludesAll(access) || 
+			((access & GENERIC_WRITE) == GENERIC_WRITE) ||
+			((access & FILE_GENERIC_WRITE) == FILE_GENERIC_WRITE);
+	}
+	
+	bool AccessIncludesRead(const ACCESS_MASK& access) {
+		return AccessIncludesAll(access) || 
+			((access & GENERIC_READ) == GENERIC_READ) || 
+			((access & FILE_GENERIC_READ) == FILE_GENERIC_READ);
+	}
+	
+	bool AccessIncludesExecute(const ACCESS_MASK& access) {
+		return AccessIncludesAll(access) || 
+			((access & GENERIC_EXECUTE) == GENERIC_EXECUTE) ||
+			((access & FILE_GENERIC_EXECUTE) == FILE_GENERIC_EXECUTE);
+	}
+
+	bool AccessIncludesWriteOwner(const ACCESS_MASK& access) {
+		return AccessIncludesAll(access) || 
+			((access & WRITE_OWNER) == WRITE_OWNER);
+	}
+
+	void AccessAddAll(ACCESS_MASK& access) {
+		access |= GENERIC_ALL;
+	}
+
+	void AccessAddWrite(ACCESS_MASK& access) {
+		access |= GENERIC_WRITE;
+	}
+
+	void AccessAddRead(ACCESS_MASK& access) {
+		access |= GENERIC_READ;
+	}
+
+	void AccessAddExecute(ACCESS_MASK& access) {
+		access |= GENERIC_EXECUTE;
+	}
+
+	void AccessAddWriteOwner(ACCESS_MASK& access) {
+		access |= WRITE_OWNER;
+	}
+
+	ACCESS_MASK GetOwnerRightsFromACL(const Owner& owner, const SecurityDescriptor& acl) {
+		TRUSTEE_W tOwnerTrustee;
+		BuildTrusteeWithSidW(&tOwnerTrustee, owner.GetSID());
+		ACCESS_MASK amAccess{ 0 };
+		auto dacl = acl.GetDACL();
+		LPWSTR ac;
+		ConvertSecurityDescriptorToStringSecurityDescriptorW(acl, SDDL_REVISION_1, DACL_SECURITY_INFORMATION, &ac, nullptr);
+		auto x{ GetLastError() };
+		HRESULT hr = GetEffectiveRightsFromAclW(dacl, &tOwnerTrustee, &amAccess);
+		if (hr != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting rights from acl with owner " << owner << ". ERROR: " << hr );
+			return 0;
+		}
+		return amAccess;
+	}
+
 	SecurityDescriptor::SecurityDescriptor(DWORD dwSize, SecurityDescriptor::SecurityDataType type) :
 		GenericWrapper<PISECURITY_DESCRIPTOR>(reinterpret_cast<PISECURITY_DESCRIPTOR>(HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwSize)),
 			[](LPVOID memory) { HeapFree(GetProcessHeap(), 0, memory); }, nullptr) {
@@ -111,7 +176,7 @@ namespace Permissions {
 		}
 	}
 
-	Owner::Owner(IN const SecurityDescriptor& sid) : sdSID{ sid }, bExists{ true }{
+	Owner::Owner(IN const SecurityDescriptor& sid) : sdSID{ sid }, bExists{ true } {
 		DWORD dwDomainLen{};
 		DWORD dwNameLen{};
 		SID_NAME_USE SIDType{ SidTypeUnknown };
