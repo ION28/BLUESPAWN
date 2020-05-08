@@ -96,7 +96,7 @@ namespace Registry {
 		std::vector<RegistryKey> vKeys{ RegistryKey{hkHive, path} };
 		if(CheckWow64){
 			RegistryKey Wow64Key{ hkHive, path, true };
-			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key)){
+			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key) == 0){
 				vKeys.emplace_back(Wow64Key);
 			}
 		}
@@ -179,7 +179,7 @@ namespace Registry {
 		std::vector<RegistryKey> vKeys{ RegistryKey{hkHive, path} };
 		if(CheckWow64){
 			RegistryKey Wow64Key{ hkHive, path, true };
-			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key)){
+			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key) == 0){
 				vKeys.emplace_back(Wow64Key);
 			}
 		}
@@ -245,7 +245,7 @@ namespace Registry {
 		std::vector<RegistryKey> vKeys{ RegistryKey{hkHive, path} };
 		if(CheckWow64){
 			RegistryKey Wow64Key{ hkHive, path, true };
-			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key)){
+			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key) == 0){
 				vKeys.emplace_back(Wow64Key);
 			}
 		}

@@ -106,9 +106,9 @@ namespace Registry {
 		auto wLowerPath = ToLowerCase(path);
 
 		bWow64 = WoW64 || wLowerPath.find(L"wow6432node") != std::wstring::npos;
-		LSTATUS status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_ALL_ACCESS | (bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
+		LSTATUS status = RegOpenKeyExW(hive, path.c_str(), 0, KEY_ALL_ACCESS | (bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
 		if(status == ERROR_ACCESS_DENIED){
-			status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_READ | KEY_NOTIFY | (bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
+			status = RegOpenKeyExW(hive, path.c_str(), 0, KEY_READ | KEY_NOTIFY | (bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
 		}
 
 		if(status != ERROR_SUCCESS){
