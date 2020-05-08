@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Windows.h>
 #include <vector>
 #include <string>
 
@@ -11,4 +12,6 @@
 		}                       \
     }
 
+int64_t SystemTimeToInteger(const SYSTEMTIME st);
+std::wstring FormatWindowsTime(const SYSTEMTIME systemtime);
 std::wstring FormatWindowsTime(const std::wstring& windowsTime);
