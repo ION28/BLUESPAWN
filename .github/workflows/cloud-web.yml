@@ -1,0 +1,31 @@
+name: Deploy Project Website to bluespawn.cloud
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+    - develop
+
+jobs:
+  build:
+    name: Update Project site
+    runs-on: ubuntu-latest
+    steps:
+    - name: SSH into server and update
+      uses: appleboy/ssh-action@master
+      with:
+        host: bluespawn.cloud
+        username: ubuntu
+        key: ${{ secrets.PRIVATE_KEY }}
+        port: 22
+        script: |
+          cd ~/BLUESPAWN
+	  git pull
+          source ~/venv/bin/activate
+          cd docs
+          pip install -r requirements.txt
+          python manage.py makemigrations
+          python manage.py migrate
+          sudo /etc/init.d/nginx restart

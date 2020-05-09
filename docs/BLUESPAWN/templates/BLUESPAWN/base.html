@@ -1,0 +1,50 @@
+{% load static %} <html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" 
+href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		<script src="https://kit.fontawesome.com/47c0b1c943.js" crossorigin="anonymous"></script>
+		<link href="{% static 'BLUESPAWN/BLUESPAWN.css' %}" rel="stylesheet">
+	</head>
+	
+	<body>
+		<div class="cover-container d-flex h-100 mx-auto flex-column">
+			<nav class="navbar navbar-expand-lg px-5 navbar-dark" style="background: #0078d7;">
+				<!-- Logo -->
+				<a class="navbar-brand" href="/">
+					<img src="{% static 'BLUESPAWN/logo.png' %}" width="30" height="30" 
+alt="">
+				</a>
+				
+				<!-- RideOn home text -->
+				<a class="navbar-brand" href="/">BLUESPAWN</a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" 
+data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" 
+aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<!-- Elements that will turn into a drop-down on small screens -->
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item">
+							<a class="nav-link" href="/about"><i class="fas 
+fa-info-circle"></i>&nbsp; About</a>
+						</li>
+					</ul>
+				</div>
+				
+			</nav>
+		
+			<main role="main" class="pt-3">
+				{% block content %}
+				{% endblock %}
+			</main>
+		</div>
+		
+	</body>
+	
+</html>

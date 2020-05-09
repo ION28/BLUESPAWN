@@ -1,0 +1,4 @@
+gunicorn
+django
+django-bootstrap4
+django-crispy-forms

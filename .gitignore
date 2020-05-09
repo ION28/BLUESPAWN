@@ -13,3 +13,5 @@ BLUESPAWN-client/resources/indicators
 *.bak
 *.lib
 *.aps
+*.lock
+docs/db.sqlite3
