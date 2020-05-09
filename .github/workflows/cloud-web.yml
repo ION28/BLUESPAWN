@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - master
+    - develop
   pull_request:
     branches:
     - master
@@ -22,6 +23,8 @@ jobs:
         port: 22
         script: |
           cd ~/BLUESPAWN
+          git fetch
+          git checkout ${{ github.ref }}
           git pull
           source ~/venv/bin/activate
           cd docs
@@ -29,3 +32,24 @@ jobs:
           python3 manage.py makemigrations
           python3 manage.py migrate
           sudo /etc/init.d/nginx restart
+      if: github.event_name == 'push'
+
+    - name: SSH into server and update
+      uses: appleboy/ssh-action@master
+      with:
+        host: bluespawn.cloud
+        username: ubuntu
+        key: ${{ secrets.PRIVATE_KEY }}
+        port: 22
+        script: |
+          cd ~/BLUESPAWN
+          git fetch
+          git checkout ${{ github.head_ref }}
+          git pull
+          source ~/venv/bin/activate
+          cd docs
+          pip install -r requirements.txt
+          python3 manage.py makemigrations
+          python3 manage.py migrate
+          sudo /etc/init.d/nginx restart
+      if: github.event_name == 'pull_request'
