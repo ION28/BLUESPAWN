@@ -365,5 +365,42 @@ namespace FileSystem {
 		* @return all subfolders in the current folder
 		*/
 		std::vector<Folder> GetSubdirectories(__in_opt int recurDepth = 0);
+
+		/**
+		* Function to get the folder owner
+		*
+		* @return an Owner object representing the owner of the file
+		*/
+		std::optional<Permissions::Owner> GetFolderOwner() const;
+
+		/**
+		* Function to set a folder owner
+		*
+		* @param owner An Owner object representing the new folder owner
+		* @return true if the folder is now owned by the new user, false otherwise
+		*/
+		bool SetFolderOwner(const Permissions::Owner& owner);
+
+		/**
+		* Function to get the permissions a user or group has on a folder
+		*
+		* @param owner An Owner object to check permissions for
+		* @return An ACCESS_MASK object
+		*/
+		ACCESS_MASK GetAccessPermissions(const Permissions::Owner& owner);
+
+		/**
+		* Function to get permissions that the everyone group has
+		*
+		* @return the permissions granted to the everyone group
+		*/
+		ACCESS_MASK GetEveryonePermissions();
+
+		/**
+		* Function to set bluespawn's process owner as the owner of the folder
+		*
+		* @return true if successful, false otherwise
+		*/
+		bool TakeOwnership();
 	};
 }

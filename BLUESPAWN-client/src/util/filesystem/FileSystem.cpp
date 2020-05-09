@@ -132,7 +132,7 @@ namespace FileSystem{
 				bReadAccess = false;
 			}
 			else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
-				LOG_VERBOSE(2, "Couldn't open file, Access Denied" << path << ".");
+				LOG_VERBOSE(2, "Couldn't open file, Access Denied. " << path << ".");
 				bFileExists = true;
 				bReadAccess = false;
 			}
@@ -517,6 +517,10 @@ namespace FileSystem{
 	}
 
 	bool File::SetFileOwner(const Permissions::Owner& owner) {
+		if (!this->bWriteAccess) {
+			LOG_ERROR("Can't write owner of file " << FilePath << ". Lack permissions");
+			return false;
+		}
 		if (SetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
 			LOG_ERROR("Error setting the file owner for file " << FilePath << " to " << owner << ". Error: " << GetLastError());
 			return false;
@@ -717,5 +721,66 @@ namespace FileSystem{
 			}
 		} while(MoveToNextFile());
 		return toRet;
+	}
+
+	std::optional<Permissions::Owner> Folder::GetFolderOwner() const {
+		if (!bFolderExists) {
+			LOG_ERROR("Can't get owner of nonexistent folder " << FolderPath);
+			return std::nullopt;
+		}
+		PSID psOwnerSID = NULL;
+		PISECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetNamedSecurityInfoW((LPWSTR) FolderPath.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psOwnerSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting file owner for folder " << FolderPath << ". Error: " << GetLastError());
+			return std::nullopt;
+		}
+		pDesc->Owner = psOwnerSID;
+
+		Permissions::SecurityDescriptor secDesc(pDesc);
+		return Permissions::Owner(secDesc);
+	}
+
+
+	bool Folder::SetFolderOwner(const Permissions::Owner& owner) {
+		if (!this->bFolderExists) {
+			LOG_ERROR("Can't write owner of folder " << FolderPath << ". Folder doesn't exist");
+			return false;
+		}
+		if (SetNamedSecurityInfoW((LPWSTR)FolderPath.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
+			LOG_ERROR("Error setting the folder owner for folder " << FolderPath << " to " << owner << ". Error: " << GetLastError());
+			return false;
+		}
+		LOG_VERBOSE(3, "Set the owner for folder " << FolderPath << " to " << owner << ".");
+		return true;
+	}
+
+	ACCESS_MASK Folder::GetAccessPermissions(const Permissions::Owner& owner) {
+		if (!bFolderExists) {
+			LOG_ERROR("Can't get permissions of nonexistent folder " << FolderPath);
+			return 0;
+		}
+		PACL paDACL = NULL;
+		PISECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetNamedSecurityInfoW((LPWSTR) FolderPath.c_str(), SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting permissions on file " << FolderPath << " for owner " << owner << ". Error: " << GetLastError());
+			return 0;
+		}
+		Permissions::SecurityDescriptor secDesc = Permissions::SecurityDescriptor::CreateDACL(paDACL->AclSize);
+		memcpy(secDesc.GetDACL(), paDACL, paDACL->AclSize);
+		LocalFree(pDesc);
+		return Permissions::GetOwnerRightsFromACL(owner, secDesc);
+	}
+
+	ACCESS_MASK Folder::GetEveryonePermissions() {
+		Permissions::Owner everyone(L"Everyone");
+		return this->GetAccessPermissions(everyone);
+	}
+
+	bool Folder::TakeOwnership() {
+		std::optional<Permissions::Owner> BluespawnOwner = Permissions::GetProcessOwner();
+		if (BluespawnOwner == std::nullopt) {
+			return false;
+		}
+		return this->SetFolderOwner(*BluespawnOwner);
 	}
 }
