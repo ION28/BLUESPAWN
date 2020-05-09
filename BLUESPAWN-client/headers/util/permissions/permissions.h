@@ -34,8 +34,8 @@ namespace Permissions {
 	void AccessAddWriteOwner(ACCESS_MASK& access);
 
 	class SecurityDescriptor : public GenericWrapper<PISECURITY_DESCRIPTOR> {
-		PSID lpUserSid;
-		PSID lpGroupSid;
+		PSID lpUserSID;
+		PSID lpGroupSID;
 		PACL dacl;
 		PACL sacl;
 		
@@ -47,19 +47,63 @@ namespace Permissions {
 		SecurityDescriptor(DWORD dwSize, SecurityDataType type);
 
 	public:
+		/**
+		* Create a SecurityDescriptor to hold a UserSID
+		* 
+		* @param dwSize The size in bytes of the SID
+		* 
+		* @return a SecurityDescriptor with the lpUserSID value set to a pointer to dwSize
+		*	bytes of memory
+		*/
 		static SecurityDescriptor CreateUserSID(DWORD dwSize);
+		/**
+		* Create a SecurityDescriptor to hold a GroupSID
+		*
+		* @param dwSize The size in bytes of the SID
+		*
+		* @return a SecurityDescriptor with the lpGroupSID value set to a pointer to dwSize
+		*	bytes of memory
+		*/
 		static SecurityDescriptor CreateGroupSID(DWORD dwSize);
+		/**
+		* Create a SecurityDescriptor to hold a DACL
+		* 
+		* @param dwSize The size in bytes of the dacl
+		* 
+		* @return a SecurityDescriptor with the dacl value set to a pointer to dwSize
+		*	bytes of memory
+		*/
 		static SecurityDescriptor CreateDACL(DWORD dwSize);
+		/**
+		* Create a SecurityDescriptor to hold a sacl
+		*
+		* @param dwSize The size in bytes of the sacl
+		*
+		* @return a SecurityDescriptor with the sacl value set to a pointer to dwSize
+		*	bytes of memory
+		*/
 		static SecurityDescriptor CreateSACL(DWORD dwSize);
 
+		/**
+		* Constructor to create a security descriptor from a PISECURITY_DESCRIPTOR
+		* 
+		* @param lpSecurity A PISECURITY_DESCRIPTOR object. All valid fields in lpSecurity 
+		*	will be copied to the corresponding field in the SecurityDescriptor object, if
+		*	such a field exists
+		*/
 		SecurityDescriptor(PISECURITY_DESCRIPTOR lpSecurity = nullptr);
 		
+		/*Getter for the lpUserSID field*/
 		PSID GetUserSID() const;
+		/*Getter for the lpGroupSID field*/
 		PSID GetGroupSID() const;
+		/*Getter for the dacl field*/
 		PACL GetDACL() const;
+		/*Getter for the sacl field*/
 		PACL GetSACL() const;
 	};
 
+	/*Enum for storing type of Owner an Owner object is*/
 	enum OwnerType {
 		NONE, USER, GROUP 
 	};
@@ -82,28 +126,61 @@ namespace Permissions {
 		OwnerType otType;
 
 	public:
+		/**
+		* Constructor for an owner object based off name
+		*
+		* @param name A wstring containing the name of an object. Other fields will
+		*	be filled in if an owner of that name exists.
+		*/
 		Owner(IN const std::wstring& name);
+		/**
+		* Constructor for an owner object based off sid
+		* 
+		* @param sid A SecurityDescriptor with lpUserSID set to the sid of the owner. Other
+		*	fields will be filled in if an owner of that sid exists. 
+		*/
 		Owner(IN const SecurityDescriptor& sid);
+		/**
+		* Constructor for an owner object that sets wName, bExists, and otOwnerType, but no other fields
+		*
+		* @param name A wstring containing value to be copied to wName
+		* @param exists A boolean containing value to be copied ot bExists
+		* @param t An OwnerType containing value to be copied to otOwnerType
+		*/
 		Owner(IN const std::wstring& name, IN const bool& exists, IN const OwnerType& t);
+		/**
+		* Constructor for an owner object that sets sdSID, bExists, and otOwnerType, but no other fields
+		*
+		* @param sid A SecurityDescriptor containing value to be copied to sdSID. Should have lpUserSID set 
+		*	to valid PSID if t is USER, and lpGroupSID set to valid PSID if t is GROUP.
+		* @param exists A boolean containing value to be copied ot bExists
+		* @param t An OwnerType containing value to be copied to otOwnerType
+		*/
 		Owner(IN const SecurityDescriptor& sid, IN const bool& exists, IN const OwnerType& t);
+		/**
+		* Constructor for an owner object that sets all fields to given values. Performs no checking
+		* that given name and sid line up. 
+		*
+		* @param name A wstring containing value to be copied to wName
+		* @ param domain A wstring containing value to be copied to wDomain
+		* @param sid A SecurityDescriptor containing value to be copied to sdSID. Should have lpUserSID set 
+		*	to valid PSID if t is USER, and lpGroupSID set to valid PSID if t is GROUP.
+		* @param exists A boolean containing value to be copied ot bExists
+		* @param t An OwnerType containing value to be copied to otOwnerType
+		*/
 		Owner(IN const std::wstring& name, IN const std::wstring& domain, IN const SecurityDescriptor& sid, IN const bool& exists, IN const OwnerType& t);
 		/**
 		* Function to get whether or not the owner exists on the system
 		*
 		* @return true if the owner exists, false otherwise
 		*/
-		bool GetExists() const {
-			return bExists;
-		}
-
+		bool Exists() const;
 		/**
 		* Function to get the name of a user
 		*
 		* @return wstring containing the name of the owner in form
 		*/
-		std::wstring GetName() const {
-			return wName;
-		}
+		std::wstring GetName() const;
 
 
 		/**
@@ -111,28 +188,21 @@ namespace Permissions {
 		*
 		* @return wstring containing the domain name that the owner belongs to
 		*/
-		std::wstring GetDomainName() const {
-			return wDomainName;
-		}
+		std::wstring GetDomainName() const;
 
 		/**
 		* Function to get the SID of the owner
 		*
 		* @return SID structure with the owner's SID
 		*/
-		PSID GetSID() const {
-			if(otType == OwnerType::USER) return sdSID.GetUserSID();
-			return sdSID.GetGroupSID();
-		}
+		PSID GetSID() const;
 
 		/**
 		* Function to get the owner type
 		* 
 		* @return OwnerType value of GROUP, USER, or NONE
 		*/
-		OwnerType GetOwnerType() const {
-			return otType;
-		}
+		OwnerType GetOwnerType() const;
 
 		/**
 		 * Gets the owner's name
@@ -179,7 +249,22 @@ namespace Permissions {
 		*/
 		Group(IN const SecurityDescriptor& sid);
 	};
-
+	
+	/**
+	* Gets the rights a specific owner object has under a given acl
+	* 
+	* @param owner The owner object for whom to check rights
+	* @param acl The acl from which to read rights
+	*
+	* @return ACCESS_MASK containing the rights the owner object has
+	*/
 	ACCESS_MASK GetOwnerRightsFromACL(const Owner& owner, const SecurityDescriptor& acl);
+
+	/**
+	* Get the owner of the Bluespawn process
+	*
+	* @return An Owner object representing the owner of the Bluespawn process, 
+	*	or std::nullopt if the function failed
+	*/
 	std::optional<Owner> GetProcessOwner();
 }

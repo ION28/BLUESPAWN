@@ -14,7 +14,23 @@
 #define MD5LEN  16
 
 namespace FileSystem {
-	bool CheckFileExists(std::wstring);
+	/**
+	* Function to check if a file path is valid
+	*
+	* @param path A wstring containing the path to check
+	* 
+	* @return true if the path points to a valid file, false otherwise
+	*/
+	bool CheckFileExists(const std::wstring& path);
+
+	/**
+	* Function to find a file named name.exe in a registry dependent search path
+	*
+	* @param name A wstring containing the name of the file for which to search
+	* 
+	* @return A wstring containing the full path to the file if found, or std::nullopt
+	*	if the file wasn't found. 
+	*/
 	std::optional<std::wstring> SearchPathExecutable(const std::wstring& name);
 	
 	struct FileAttribs {
@@ -70,48 +86,28 @@ namespace FileSystem {
 		*/
 		File(IN const std::wstring& path);
 
-		/**
-		* Return the path to the file
-		*/
-		std::wstring GetFilePath() const {
-			return FilePath;
-		}
+		/*Getter for the FilePath field*/
+		std::wstring GetFilePath() const;
 
-		/**
-		* Function to get the file attributes
-		*
-		* @return the attributes struct for the file
-		*/
-		FileAttribs GetFileAttribs() const {
-			return Attribs;
-		}
+		/*Getter for the Attribs field*/
+		FileAttribs GetFileAttribs() const;
 
-		/**
-		* Function to get whether the file exists
-		*
-		* return true if file exists, false otherwise
-		*/
-		bool GetFileExists() const {
-			return bFileExists;
-		}
+		/*Getter for the bFileExists field*/
+		bool GetFileExists() const;
 
 		/**
 		* Function to check if program has write access to the file
-		* 
+		*
 		* return true if program has write access, false otherwise
 		*/
-		bool GetWriteAccess() const {
-			return bWriteAccess;
-		}
+		bool HasWriteAccess() const;
 
 		/**
 		* Function to check if program has read access to the file
 		*
 		* return true if program has read access, false otherwise
 		*/
-		bool GetReadAccess() const {
-			return bReadAccess;
-		}
+		bool HasReadAccess() const;
 
 		/**
 		* Function to write to arbitrary offset in the file
@@ -276,12 +272,8 @@ namespace FileSystem {
 		*/
 		Folder(const std::wstring& path);
 
-		/**
-		* Return the path to the file
-		*/
-		std::wstring GetFolderPath() const {
-			return FolderPath;
-		}
+		/*Getter for FolderPath field*/
+		std::wstring GetFolderPath() const;
 		
 		/**
 		* Function to move to the next file
@@ -298,23 +290,15 @@ namespace FileSystem {
 
 		bool MoveToBeginning();
 
-		/**
-		* Function to check if the folder exists
-		* 
-		* @return whether or not the folder exists.
-		*/
-		bool GetFolderExists() const {
-			return bFolderExists;
-		}
+		/*Getter for the bFolderExists field*/
+		bool GetFolderExists() const;
 
 		/**
 		* Function to check if current handle is directory or file
 		*
 		* @return true if current is a file, false otherwise. 
 		*/
-		bool GetCurIsFile() const {
-			return bIsFile;
-		}
+		bool GetCurIsFile() const;
 
 		/**
 		* Function to enter the current directory

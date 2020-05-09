@@ -56,8 +56,6 @@ namespace Permissions {
 		BuildTrusteeWithSidW(&tOwnerTrustee, owner.GetSID());
 		ACCESS_MASK amAccess{ 0 };
 		auto dacl = acl.GetDACL();
-		LPWSTR ac;
-		ConvertSecurityDescriptorToStringSecurityDescriptorW(acl, SDDL_REVISION_1, DACL_SECURITY_INFORMATION, &ac, nullptr);
 		auto x{ GetLastError() };
 		HRESULT hr = GetEffectiveRightsFromAclW(dacl, &tOwnerTrustee, &amAccess);
 		if (hr != ERROR_SUCCESS) {
@@ -72,10 +70,10 @@ namespace Permissions {
 			[](LPVOID memory) { HeapFree(GetProcessHeap(), 0, memory); }, nullptr) {
 		switch (type) {
 		case SecurityDescriptor::SecurityDataType::USER_SID:
-			lpUserSid = reinterpret_cast<PSID>(WrappedObject);
+			lpUserSID = reinterpret_cast<PSID>(WrappedObject);
 			break;
 		case SecurityDescriptor::SecurityDataType::GROUP_SID:
-			lpGroupSid = reinterpret_cast<PSID>(WrappedObject);
+			lpGroupSID = reinterpret_cast<PSID>(WrappedObject);
 			break;
 		case SecurityDescriptor::SecurityDataType::DACL:
 			dacl = reinterpret_cast<PACL>(WrappedObject);
@@ -89,8 +87,8 @@ namespace Permissions {
 	SecurityDescriptor::SecurityDescriptor(PISECURITY_DESCRIPTOR lpSecurity) :
 		GenericWrapper<PISECURITY_DESCRIPTOR>(lpSecurity, LocalFree, nullptr) {
 		if (lpSecurity) {
-			lpUserSid = lpSecurity->Owner;
-			lpGroupSid = lpSecurity->Group;
+			lpUserSID = lpSecurity->Owner;
+			lpGroupSID = lpSecurity->Group;
 			dacl = lpSecurity->Dacl;
 			sacl = lpSecurity->Sacl;
 		}
@@ -114,8 +112,8 @@ namespace Permissions {
 
 	PACL SecurityDescriptor::GetDACL() const { return this->dacl; }
 	PACL SecurityDescriptor::GetSACL() const { return this->sacl; }
-	PSID SecurityDescriptor::GetUserSID() const { return this->lpUserSid; }
-	PSID SecurityDescriptor::GetGroupSID() const { return this->lpGroupSid; }
+	PSID SecurityDescriptor::GetUserSID() const { return this->lpUserSID; }
+	PSID SecurityDescriptor::GetGroupSID() const { return this->lpGroupSID; }
 
 	Owner::Owner(IN const std::wstring& name) : wName{ name }, bExists{ true } {
 		DWORD dwSIDLen{};
@@ -219,6 +217,27 @@ namespace Permissions {
 
 	Owner::Owner(IN const std::wstring& name, IN const std::wstring& domain, IN const SecurityDescriptor& sid, IN const bool& exists, IN const OwnerType& type) :
 		wName{ name }, wDomainName{ domain }, sdSID{ sid }, bExists{ exists }, otType{ type } {}
+
+	bool Owner::Exists() const {
+		return bExists;
+	}
+
+	std::wstring Owner::GetName() const {
+		return wName;
+	}
+
+	std::wstring Owner::GetDomainName() const {
+		return wDomainName;
+	}
+
+	PSID Owner::GetSID() const {
+		if (otType == OwnerType::USER) return sdSID.GetUserSID();
+		return sdSID.GetGroupSID();
+	}
+
+	OwnerType Owner::GetOwnerType() const {
+		return otType;
+	}
 
 	std::wstring Owner::ToString() const {
 		return wName;

@@ -18,18 +18,18 @@
 #include "aclapi.h"
 
 namespace FileSystem{
-	bool CheckFileExists(std::wstring filename) {
-		auto attribs = GetFileAttributesW(filename.c_str());
+	bool CheckFileExists(const std::wstring& path) {
+		auto attribs = GetFileAttributesW(path.c_str());
 		if(INVALID_FILE_ATTRIBUTES == attribs && GetLastError() == ERROR_FILE_NOT_FOUND){
-			LOG_VERBOSE(3, "File " << filename << " does not exist.");
+			LOG_VERBOSE(3, "File " << path << " does not exist.");
 			return false;
 		}
 
 		if(attribs & FILE_ATTRIBUTE_DIRECTORY){
-			LOG_VERBOSE(3, "File " << filename << " is a directory.");
+			LOG_VERBOSE(3, "File " << path << " is a directory.");
 			return false;
 		}
-		LOG_VERBOSE(3, "File " << filename << " exists");
+		LOG_VERBOSE(3, "File " << path << " exists");
 		return true;
 	}
 
@@ -149,6 +149,26 @@ namespace FileSystem{
 			bReadAccess = true;
 		}
 		Attribs.extension = PathFindExtension(path.c_str());
+	}
+
+	std::wstring File::GetFilePath() const {
+		return FilePath;
+	}
+
+	FileAttribs File::GetFileAttribs() const{
+			return Attribs;
+	}
+
+	bool File::GetFileExists() const {
+		return bFileExists;
+	}
+
+	bool File::HasWriteAccess() const {
+		return bWriteAccess;
+	}
+
+	bool File::HasReadAccess() const {
+			return bReadAccess;
 	}
 
 	bool File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, __in_opt const bool truncate, __in_opt const bool insert) const {
@@ -517,6 +537,10 @@ namespace FileSystem{
 	}
 
 	bool File::SetFileOwner(const Permissions::Owner& owner) {
+		if (!bFileExists) {
+			LOG_ERROR("Can't set owner of nonexistent file " << FilePath);
+			return false;
+		}
 		if (!this->bWriteAccess) {
 			LOG_ERROR("Can't write owner of file " << FilePath << ". Lack permissions");
 			return false;
@@ -540,6 +564,9 @@ namespace FileSystem{
 			LOG_ERROR("Error getting permissions on file " << FilePath << " for owner " << owner << ". Error: " << GetLastError());
 			return 0;
 		}
+
+		//Correct positional memory of the ACL is weird and doesn't naturally work with the SecurityDescriptor class.
+		//This gets the right data to the right place
 		Permissions::SecurityDescriptor secDesc = Permissions::SecurityDescriptor::CreateDACL(paDACL->AclSize);
 		memcpy(secDesc.GetDACL(), paDACL, paDACL->AclSize);
 		LocalFree(pDesc);
@@ -577,6 +604,10 @@ namespace FileSystem{
 		}
 	}
 
+	std::wstring Folder::GetFolderPath() const {
+		return FolderPath;
+	}
+
 	bool Folder::MoveToNextFile() {
 		if(FindNextFileW(hCurFile, &ffd) != 0) {
 			if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
@@ -603,6 +634,14 @@ namespace FileSystem{
 			bIsFile = true;
 		}
 		return true;
+	}
+	
+	bool Folder::GetFolderExists() const {
+		return bFolderExists;
+	}
+
+	bool Folder::GetCurIsFile() const {
+		return bIsFile;
 	}
 
 	std::optional<File> Folder::Open() const {
@@ -740,9 +779,8 @@ namespace FileSystem{
 		return Permissions::Owner(secDesc);
 	}
 
-
 	bool Folder::SetFolderOwner(const Permissions::Owner& owner) {
-		if (!this->bFolderExists) {
+		if (!bFolderExists) {
 			LOG_ERROR("Can't write owner of folder " << FolderPath << ". Folder doesn't exist");
 			return false;
 		}
@@ -765,6 +803,8 @@ namespace FileSystem{
 			LOG_ERROR("Error getting permissions on file " << FolderPath << " for owner " << owner << ". Error: " << GetLastError());
 			return 0;
 		}
+		//Correct positional memory of the ACL is weird and doesn't naturally work with the SecurityDescriptor class.
+		//This gets the right data to the right place
 		Permissions::SecurityDescriptor secDesc = Permissions::SecurityDescriptor::CreateDACL(paDACL->AclSize);
 		memcpy(secDesc.GetDACL(), paDACL, paDACL->AclSize);
 		LocalFree(pDesc);
