@@ -2,13 +2,14 @@
 #include "hunt/HuntRegister.h"
 #include "reaction/Reaction.h"
 
-HuntInfo::HuntInfo(const std::wstring& HuntName, Aggressiveness HuntAggressiveness, DWORD HuntTactics, DWORD HuntCategories, DWORD HuntDatasources, long HuntStartTime) :
+HuntInfo::HuntInfo(const std::wstring& HuntName, Aggressiveness HuntAggressiveness, DWORD HuntTactics, DWORD HuntCategories, DWORD HuntDatasources) :
 	HuntName{ HuntName },
 	HuntAggressiveness{ HuntAggressiveness },
 	HuntTactics{ HuntTactics },
 	HuntCategories{ HuntCategories },
-	HuntDatasources{ HuntDatasources },
-	HuntStartTime{ HuntStartTime }{}
+	HuntDatasources{ HuntDatasources }{
+	GetSystemTime(&HuntStartTime);
+}
 
 Hunt::Hunt(const std::wstring& name) : 
 	name{ name }{

@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <common\Utils.h>
 
 namespace Log{
 
@@ -138,7 +139,8 @@ namespace Log{
 			hunt->SetAttribute("categories", static_cast<int64_t>(info->HuntCategories));
 			hunt->SetAttribute("datasources", static_cast<int64_t>(info->HuntDatasources));
 			hunt->SetAttribute("tactics", static_cast<int64_t>(info->HuntTactics));
-			hunt->SetAttribute("time", info->HuntStartTime);
+			hunt->SetAttribute("time", SystemTimeToInteger(info->HuntStartTime));
+			hunt->SetAttribute("datetime", WidestringToString(FormatWindowsTime(info->HuntStartTime)).c_str());
 
 			auto name = XMLDoc.NewElement("name");
 			name->SetText(WidestringToString(info->HuntName).c_str());
@@ -156,7 +158,9 @@ namespace Log{
 			Root->InsertEndChild(hunt);
 		} else if(level.Enabled()) {
 			auto msg = XMLDoc.NewElement(MessageTags[static_cast<DWORD>(level.severity)].c_str());
-			msg->SetAttribute("time", (long) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+			SYSTEMTIME st;
+			GetSystemTime(&st);
+			msg->SetAttribute("time", SystemTimeToInteger(st));
 			msg->SetText(message.c_str());
 			Root->InsertEndChild(msg);
 		}
