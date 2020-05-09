@@ -547,6 +547,14 @@ namespace FileSystem{
 		return this->GetAccessPermissions(everyone);
 	}
 
+	bool File::TakeOwnership() {
+		std::optional<Permissions::Owner> BluespawnOwner = Permissions::GetProcessOwner();
+		if (BluespawnOwner == std::nullopt) {
+			return false;
+		}
+		return this->SetFileOwner(*BluespawnOwner);
+	}
+
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
 		FolderPath = path;
 		std::wstring searchName = FolderPath;

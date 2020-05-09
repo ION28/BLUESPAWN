@@ -181,4 +181,5 @@ namespace Permissions {
 	};
 
 	ACCESS_MASK GetOwnerRightsFromACL(const Owner& owner, const SecurityDescriptor& acl);
+	std::optional<Owner> GetProcessOwner();
 }

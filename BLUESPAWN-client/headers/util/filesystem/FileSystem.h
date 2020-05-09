@@ -242,6 +242,13 @@ namespace FileSystem {
 		* @return the permissions granted to the everyone group
 		*/
 		ACCESS_MASK GetEveryonePermissions();
+
+		/**
+		* Function to set bluespawn's process owner as the owner of the file
+		*
+		* @return true if successful, false otherwise
+		*/
+		bool TakeOwnership();
 	};
 
 	class Folder {

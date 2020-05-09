@@ -337,4 +337,43 @@ namespace Permissions {
 			}
 		}
 	}
+
+	std::optional<Owner> GetProcessOwner() {
+		HANDLE hToken;
+		if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
+			LOG_ERROR("Couldn't access process token. Error " << GetLastError());
+			return std::nullopt;
+		}
+		DWORD dwSize{ 0 };
+		GetTokenInformation(hToken, TokenOwner, nullptr, dwSize, &dwSize);
+		PTOKEN_OWNER owner = (PTOKEN_OWNER)GlobalAlloc(GPTR, dwSize);
+		DWORD dwDomainLen{};
+		DWORD dwNameLen{};
+		SID_NAME_USE SIDType{ SidTypeUnknown };
+
+		std::vector<WCHAR> Domain(dwDomainLen);
+		std::vector<WCHAR> Name(dwNameLen);
+		if (owner == nullptr) {
+			LOG_ERROR("Unable to allocate space for owner token.");
+			goto fail;
+		}
+		if (!GetTokenInformation(hToken, TokenOwner, owner, dwSize, &dwSize)) {
+			LOG_ERROR("Couldn't get owner from token. Error " << GetLastError());
+			goto fail;
+		}
+		LookupAccountSidW(nullptr, owner->Owner, nullptr, &dwNameLen, nullptr, &dwDomainLen, &SIDType);
+		Domain = std::vector<WCHAR>(dwDomainLen);
+		Name = std::vector<WCHAR>(dwNameLen);
+
+		if (!LookupAccountSid(nullptr, owner->Owner, Name.data(), &dwNameLen, Domain.data(), &dwDomainLen, &SIDType)) {
+			LOG_ERROR("Error getting owner " << GetLastError());
+		}
+		if (owner != nullptr) GlobalFree(owner);
+		CloseHandle(hToken);
+		return Owner(Name.data());
+	fail:
+		if(owner != nullptr) GlobalFree(owner);
+		CloseHandle(hToken);
+		return std::nullopt;
+	}
 }
