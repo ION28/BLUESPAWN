@@ -51,5 +51,6 @@ jobs:
           pip install -r requirements.txt
           python3 manage.py makemigrations
           python3 manage.py migrate
+          sudo service uwsgi restart
           sudo /etc/init.d/nginx restart
       if: github.event_name == 'pull_request'

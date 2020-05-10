@@ -22,15 +22,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'lm+m&mmq=r3i&bbk#c750e10ir%2rdy2df9*s$!vo@jkv2y1!w'
 
-if os.environ.get("DEBUG") == 'False':
-    DEBUG = False
-else:
+DEBUG = False
+if os.environ.get("DEBUG") == "True":
     DEBUG = True
 
-if os.environ.get("DEBUG") == 'False':
-    ALLOWED_HOSTS = ['www.bluespawn.cloud', 'bluespawn.cloud']
-else:
+if os.environ.get("DEBUG") == "True":
     ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = ['www.bluespawn.cloud', 'bluespawn.cloud']
 
 # Application definition
 

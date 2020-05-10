@@ -1,15 +1,42 @@
-{% extends 'BLUESPAWN/base.html' %}
-{% block title %}About{% endblock %}
-{% block content %}
-{% load bootstrap4%}
-{% load static %}
-
-<div class="container">
-	<div class="row">
-		<div class="col-12 col-md-4 text-center mb-3">
-			<h1>About</h1>
-
-		</div>
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+  {% extends 'BLUESPAWN/base.html' %} {% block title %}About{% endblock %} {% block content %} {% load bootstrap4%} {% bootstrap_css %}
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-12">
+        <h1>Convert BLUESPAWN XML Report to DOCX</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <form action="/report/"
+              class="form-group"
+              enctype="multipart/form-data"
+              id="generate_report"
+              method="post"
+              name="generate_report">
+          {% csrf_token %}
+          <div class="form-group">
+		  <input type="file" name="scanxml">
+          </div><br>
+          <br>
+          <input class="btn btn-default"
+                type="submit"
+                value="Generate Report">
+        </form>
+      </div>
+    </div>
+    {% if generated_report_url %}
+    <div class="row">
+	<div class="col-12">
+		<p>Click to download report at <a href="/media/scans/{{ generated_report_url }}">this link</a></p>
 	</div>
-</div>
-{% endblock %}
+    </div>
+    {% endif %}
+  </div>{% endblock %}
+</body>
+</html>
