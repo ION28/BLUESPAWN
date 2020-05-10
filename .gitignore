@@ -15,3 +15,4 @@ BLUESPAWN-client/resources/indicators
 *.aps
 *.lock
 docs/db.sqlite3
+__pycache__/
