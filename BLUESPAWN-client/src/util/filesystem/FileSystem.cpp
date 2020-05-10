@@ -15,20 +15,21 @@
 #include <SoftPub.h>
 #include <mscat.h>
 #include "common/wrappers.hpp"
+#include "aclapi.h"
 
 namespace FileSystem{
-	bool CheckFileExists(std::wstring filename) {
-		auto attribs = GetFileAttributesW(filename.c_str());
+	bool CheckFileExists(const std::wstring& path) {
+		auto attribs = GetFileAttributesW(path.c_str());
 		if(INVALID_FILE_ATTRIBUTES == attribs && GetLastError() == ERROR_FILE_NOT_FOUND){
-			LOG_VERBOSE(3, "File " << filename << " does not exist.");
+			LOG_VERBOSE(3, "File " << path << " does not exist.");
 			return false;
 		}
 
 		if(attribs & FILE_ATTRIBUTE_DIRECTORY){
-			LOG_VERBOSE(3, "File " << filename << " is a directory.");
+			LOG_VERBOSE(3, "File " << path << " is a directory.");
 			return false;
 		}
-		LOG_VERBOSE(3, "File " << filename << " exists");
+		LOG_VERBOSE(3, "File " << path << " exists");
 		return true;
 	}
 
@@ -112,7 +113,7 @@ namespace FileSystem{
 	File::File(IN const std::wstring& path) : hFile{ nullptr }{
 		FilePath = path;
 		LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
-		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE | WRITE_OWNER, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
 			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
 		if(!hFile && GetLastError() == ERROR_FILE_NOT_FOUND){
 			LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
@@ -122,6 +123,7 @@ namespace FileSystem{
 		}
 		else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
 			bWriteAccess = false;
+			LOG_VERBOSE(3, "No write access available to file");
 			hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
 				FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
 			if (!hFile && GetLastError() == ERROR_FILE_NOT_FOUND) {
@@ -130,7 +132,7 @@ namespace FileSystem{
 				bReadAccess = false;
 			}
 			else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
-				LOG_VERBOSE(2, "Couldn't open file, Access Denied" << path << ".");
+				LOG_VERBOSE(2, "Couldn't open file, Access Denied. " << path << ".");
 				bFileExists = true;
 				bReadAccess = false;
 			}
@@ -147,6 +149,26 @@ namespace FileSystem{
 			bReadAccess = true;
 		}
 		Attribs.extension = PathFindExtension(path.c_str());
+	}
+
+	std::wstring File::GetFilePath() const {
+		return FilePath;
+	}
+
+	FileAttribs File::GetFileAttribs() const{
+			return Attribs;
+	}
+
+	bool File::GetFileExists() const {
+		return bFileExists;
+	}
+
+	bool File::HasWriteAccess() const {
+		return bWriteAccess;
+	}
+
+	bool File::HasReadAccess() const {
+			return bReadAccess;
 	}
 
 	bool File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, __in_opt const bool truncate, __in_opt const bool insert) const {
@@ -497,6 +519,73 @@ namespace FileSystem{
 		return FilePath;
 	}
 
+	std::optional<Permissions::Owner> File::GetFileOwner() const {
+		if (!bFileExists) {
+			LOG_ERROR("Can't get owner of nonexistent file " << FilePath);
+			return std::nullopt;
+		}
+		PSID psOwnerSID = NULL;
+		PISECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psOwnerSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR *>(&pDesc)) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting file owner for file " << FilePath << ". Error: " << GetLastError());
+			return std::nullopt;
+		}
+		pDesc->Owner = psOwnerSID;
+
+		Permissions::SecurityDescriptor secDesc(pDesc);
+		return Permissions::Owner(secDesc);
+	}
+
+	bool File::SetFileOwner(const Permissions::Owner& owner) {
+		if (!bFileExists) {
+			LOG_ERROR("Can't set owner of nonexistent file " << FilePath);
+			return false;
+		}
+		if (!this->bWriteAccess) {
+			LOG_ERROR("Can't write owner of file " << FilePath << ". Lack permissions");
+			return false;
+		}
+		if (SetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
+			LOG_ERROR("Error setting the file owner for file " << FilePath << " to " << owner << ". Error: " << GetLastError());
+			return false;
+		}
+		LOG_VERBOSE(3, "Set the owner for file " << FilePath << " to " << owner << ".");
+		return true;
+	}
+
+	ACCESS_MASK File::GetAccessPermissions(const Permissions::Owner& owner) {
+		if (!bFileExists) {
+			LOG_ERROR("Can't get permissions of nonexistent file " << FilePath);
+			return 0;
+		}
+		PACL paDACL = NULL;
+		PISECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting permissions on file " << FilePath << " for owner " << owner << ". Error: " << GetLastError());
+			return 0;
+		}
+
+		//Correct positional memory of the ACL is weird and doesn't naturally work with the SecurityDescriptor class.
+		//This gets the right data to the right place
+		Permissions::SecurityDescriptor secDesc = Permissions::SecurityDescriptor::CreateDACL(paDACL->AclSize);
+		memcpy(secDesc.GetDACL(), paDACL, paDACL->AclSize);
+		LocalFree(pDesc);
+		return Permissions::GetOwnerRightsFromACL(owner, secDesc);
+	}
+
+	ACCESS_MASK File::GetEveryonePermissions() {
+		Permissions::Owner everyone(L"Everyone");
+		return this->GetAccessPermissions(everyone);
+	}
+
+	bool File::TakeOwnership() {
+		std::optional<Permissions::Owner> BluespawnOwner = Permissions::GetProcessOwner();
+		if (BluespawnOwner == std::nullopt) {
+			return false;
+		}
+		return this->SetFileOwner(*BluespawnOwner);
+	}
+
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
 		FolderPath = path;
 		std::wstring searchName = FolderPath;
@@ -513,6 +602,10 @@ namespace FileSystem{
 		} else {
 			bIsFile = true;
 		}
+	}
+
+	std::wstring Folder::GetFolderPath() const {
+		return FolderPath;
 	}
 
 	bool Folder::MoveToNextFile() {
@@ -541,6 +634,14 @@ namespace FileSystem{
 			bIsFile = true;
 		}
 		return true;
+	}
+	
+	bool Folder::GetFolderExists() const {
+		return bFolderExists;
+	}
+
+	bool Folder::GetCurIsFile() const {
+		return bIsFile;
 	}
 
 	std::optional<File> Folder::Open() const {
@@ -659,5 +760,67 @@ namespace FileSystem{
 			}
 		} while(MoveToNextFile());
 		return toRet;
+	}
+
+	std::optional<Permissions::Owner> Folder::GetFolderOwner() const {
+		if (!bFolderExists) {
+			LOG_ERROR("Can't get owner of nonexistent folder " << FolderPath);
+			return std::nullopt;
+		}
+		PSID psOwnerSID = NULL;
+		PISECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetNamedSecurityInfoW((LPWSTR) FolderPath.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psOwnerSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting file owner for folder " << FolderPath << ". Error: " << GetLastError());
+			return std::nullopt;
+		}
+		pDesc->Owner = psOwnerSID;
+
+		Permissions::SecurityDescriptor secDesc(pDesc);
+		return Permissions::Owner(secDesc);
+	}
+
+	bool Folder::SetFolderOwner(const Permissions::Owner& owner) {
+		if (!bFolderExists) {
+			LOG_ERROR("Can't write owner of folder " << FolderPath << ". Folder doesn't exist");
+			return false;
+		}
+		if (SetNamedSecurityInfoW((LPWSTR)FolderPath.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
+			LOG_ERROR("Error setting the folder owner for folder " << FolderPath << " to " << owner << ". Error: " << GetLastError());
+			return false;
+		}
+		LOG_VERBOSE(3, "Set the owner for folder " << FolderPath << " to " << owner << ".");
+		return true;
+	}
+
+	ACCESS_MASK Folder::GetAccessPermissions(const Permissions::Owner& owner) {
+		if (!bFolderExists) {
+			LOG_ERROR("Can't get permissions of nonexistent folder " << FolderPath);
+			return 0;
+		}
+		PACL paDACL = NULL;
+		PISECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetNamedSecurityInfoW((LPWSTR) FolderPath.c_str(), SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting permissions on file " << FolderPath << " for owner " << owner << ". Error: " << GetLastError());
+			return 0;
+		}
+		//Correct positional memory of the ACL is weird and doesn't naturally work with the SecurityDescriptor class.
+		//This gets the right data to the right place
+		Permissions::SecurityDescriptor secDesc = Permissions::SecurityDescriptor::CreateDACL(paDACL->AclSize);
+		memcpy(secDesc.GetDACL(), paDACL, paDACL->AclSize);
+		LocalFree(pDesc);
+		return Permissions::GetOwnerRightsFromACL(owner, secDesc);
+	}
+
+	ACCESS_MASK Folder::GetEveryonePermissions() {
+		Permissions::Owner everyone(L"Everyone");
+		return this->GetAccessPermissions(everyone);
+	}
+
+	bool Folder::TakeOwnership() {
+		std::optional<Permissions::Owner> BluespawnOwner = Permissions::GetProcessOwner();
+		if (BluespawnOwner == std::nullopt) {
+			return false;
+		}
+		return this->SetFolderOwner(*BluespawnOwner);
 	}
 }
