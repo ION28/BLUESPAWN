@@ -289,21 +289,32 @@
     <None Include="resources\severe" />
     <None Include="resources\severe2" />
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="BLUESPAWN-client.exe.manifest" />
+  </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <GenerateManifest>true</GenerateManifest>
-    <EmbedManifest>true</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+    <EmbedManifest>
+    </EmbedManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <GenerateManifest>true</GenerateManifest>
-    <EmbedManifest>true</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+    <EmbedManifest>
+    </EmbedManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <GenerateManifest>true</GenerateManifest>
-    <EmbedManifest>true</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+    <EmbedManifest>
+    </EmbedManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <GenerateManifest>true</GenerateManifest>
-    <EmbedManifest>true</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+    <EmbedManifest>
+    </EmbedManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <BuildLog>
@@ -318,19 +329,55 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</EnableUAC>
-      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">RequireAdministrator</UACExecutionLevel>
-      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</UACUIAccess>
-      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</EnableUAC>
-      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">RequireAdministrator</UACExecutionLevel>
-      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</UACUIAccess>
-      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</EnableUAC>
-      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RequireAdministrator</UACExecutionLevel>
-      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</UACUIAccess>
-      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</EnableUAC>
-      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RequireAdministrator</UACExecutionLevel>
-      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</UACUIAccess>
+      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </EnableUAC>
+      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </UACExecutionLevel>
+      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </UACUIAccess>
+      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </EnableUAC>
+      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </UACExecutionLevel>
+      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </UACUIAccess>
+      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </EnableUAC>
+      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </UACExecutionLevel>
+      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </UACUIAccess>
+      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </EnableUAC>
+      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </UACExecutionLevel>
+      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </UACUIAccess>
     </Link>
+    <PostBuildEvent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Adding manifest to BLUESPAWN-client.exe</Message>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Adding manifest to BLUESPAWN-client.exe</Message>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Adding manifest to BLUESPAWN-client.exe</Message>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Adding manifest to BLUESPAWN-client.exe</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{159B2E72-9553-4E17-9BEC-CB92FCA8D0B0}</ProjectGuid>
