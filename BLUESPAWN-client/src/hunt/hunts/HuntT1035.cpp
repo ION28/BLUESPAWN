@@ -87,7 +87,7 @@ namespace Hunts {
 		auto services = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services" };
 
 		for (auto service : services.EnumerateSubkeys()) {
-			if (service.GetValue<DWORD>(L"Type") >= 0x10) {
+			if (service.GetValue<DWORD>(L"Type") >= 0x10u) {
 				detections += EvaluateService(service, reaction);
 			}
 		}
