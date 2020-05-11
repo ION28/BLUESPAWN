@@ -179,6 +179,13 @@ int main(int argc, char* argv[]){
 
 	print_banner();
 
+	BOOL bIsWow64 = FALSE;
+	IsWow64Process(GetCurrentProcess(), &bIsWow64);
+	if (bIsWow64) {
+		std::cout << "Please download and run the 64-bit version of BLUESPAWN as this system is x64." << std::endl;
+		exit(0);
+	}
+
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
 	options.add_options()
