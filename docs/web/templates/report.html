@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+  {% extends 'BLUESPAWN/base.html' %} {% block title %}About{% endblock %} {% block content %} {% load bootstrap4%} {% bootstrap_css %}
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-12">
+        <h1>Convert BLUESPAWN XML Report to DOCX</h1>
+	{% if request.GET.error == '1' %}
+	<div class="alert alert-danger" role="alert">Upload or Report Generation failed!</div>
+	{% endif %}
+      </div>
+    </div>
+    <br>
+    <div class="row">
+	<div class="col-12">
+	 	<p>Upload your BLUESPAWN XML Scan Report, and convert it to a .docx. Note that we have to process the XML on the server side in order to generate the .docx file. All generated reports get deleted after 1 day and the XML file uploaded only exists long enough to generate the report.</p>
+	</div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <form action="/report/"
+              class="form-group"
+              enctype="multipart/form-data"
+              id="generate_report"
+              method="post"
+              name="generate_report">
+          {% csrf_token %}
+          <div class="form-group">
+		  <input type="file" name="scanxml">
+          </div><br>
+          <br>
+          <input class="btn btn-success"
+                type="submit"
+                value="Generate Report">
+        </form>
+      </div>
+    </div>
+    {% if generated_report_url %}
+    <div class="row">
+	<div class="col-12">
+		<p>Click to download report at <a href="/media/scans/{{ generated_report_url }}">this link</a></p>
+	</div>
+    </div>
+    {% endif %}
+  </div>{% endblock %}
+</body>
+</html>
