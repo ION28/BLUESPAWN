@@ -9,7 +9,16 @@
     <div class="row">
       <div class="col-12 mb-12">
         <h1>Convert BLUESPAWN XML Report to DOCX</h1>
+	{% if request.GET.error == '1' %}
+	<div class="alert alert-danger" role="alert">Upload or Report Generation failed!</div>
+	{% endif %}
       </div>
+    </div>
+    <br>
+    <div class="row">
+	<div class="col-12">
+	 	<p>Upload your BLUESPAWN XML Scan Report, and convert it to a .docx. Note that we have to process the XML on the server side in order to generate the .docx file. All generated reports get deleted after 1 day and the XML file uploaded only exists long enough to generate the report.</p>
+	</div>
     </div>
     <div class="row">
       <div class="col-12">
@@ -24,7 +33,7 @@
 		  <input type="file" name="scanxml">
           </div><br>
           <br>
-          <input class="btn btn-default"
+          <input class="btn btn-success"
                 type="submit"
                 value="Generate Report">
         </form>

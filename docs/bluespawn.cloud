@@ -10,7 +10,7 @@ server {
 		uwsgi_pass unix:///run/uwsgi/app/django/socket;
 		include uwsgi_params;
 		uwsgi_read_timeout 300s;
-		client_max_body_size 32m;
+		client_max_body_size 5M;
 	}
 
 	location /static/ {
