@@ -289,6 +289,22 @@
     <None Include="resources\severe" />
     <None Include="resources\severe2" />
   </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <GenerateManifest>true</GenerateManifest>
+    <EmbedManifest>true</EmbedManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <GenerateManifest>true</GenerateManifest>
+    <EmbedManifest>true</EmbedManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <GenerateManifest>true</GenerateManifest>
+    <EmbedManifest>true</EmbedManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <GenerateManifest>true</GenerateManifest>
+    <EmbedManifest>true</EmbedManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <BuildLog>
       <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
@@ -302,6 +318,18 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</EnableUAC>
+      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">RequireAdministrator</UACExecutionLevel>
+      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</UACUIAccess>
+      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</EnableUAC>
+      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">RequireAdministrator</UACExecutionLevel>
+      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</UACUIAccess>
+      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</EnableUAC>
+      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RequireAdministrator</UACExecutionLevel>
+      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</UACUIAccess>
+      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</EnableUAC>
+      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RequireAdministrator</UACExecutionLevel>
+      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</UACUIAccess>
     </Link>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">
