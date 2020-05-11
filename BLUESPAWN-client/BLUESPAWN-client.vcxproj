@@ -329,54 +329,12 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </EnableUAC>
-      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </UACExecutionLevel>
-      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </UACUIAccess>
-      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </EnableUAC>
-      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </UACExecutionLevel>
-      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </UACUIAccess>
-      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </EnableUAC>
-      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </UACExecutionLevel>
-      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </UACUIAccess>
-      <EnableUAC Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </EnableUAC>
-      <UACExecutionLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </UACExecutionLevel>
-      <UACUIAccess Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </UACUIAccess>
     </Link>
     <PostBuildEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>
+      <Command>mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Adding manifest to BLUESPAWN-client.exe</Message>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Adding manifest to BLUESPAWN-client.exe</Message>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Adding manifest to BLUESPAWN-client.exe</Message>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>
-    </PostBuildEvent>
-    <PostBuildEvent>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Adding manifest to BLUESPAWN-client.exe</Message>
+      <Message>Adding manifest to BLUESPAWN-client.exe</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">

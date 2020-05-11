@@ -68,6 +68,9 @@
 #include <iostream>
 #include <VersionHelpers.h>
 
+DEFINE_FUNCTION(BOOL, IsWow64Process2, NTAPI, HANDLE hProcess, USHORT* pProcessMachine, USHORT* pNativeMachine);
+LINK_FUNCTION(IsWow64Process2, KERNEL32.DLL);
+
 const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{ io };
 MitigationRegister Bluespawn::mitigationRecord{ io };
@@ -177,18 +180,12 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 void Bluespawn::check_correct_arch() {
 	BOOL bIsWow64 = FALSE;
 	if (IsWindows10OrGreater()) {
-		typedef BOOL (WINAPI *LPFNIsWow64Process2) (HANDLE, PUSHORT, PUSHORT);
-
-		LPFNIsWow64Process2 fnIsWow64Process2;
 		USHORT ProcessMachine;
 		USHORT NativeMachine;
 
-		fnIsWow64Process2 = (LPFNIsWow64Process2)GetProcAddress(GetModuleHandle(TEXT("kernel32")), "IsWow64Process2");
-		if (NULL != fnIsWow64Process2) {
-			fnIsWow64Process2(GetCurrentProcess(), &ProcessMachine, &NativeMachine);
-			if (ProcessMachine != IMAGE_FILE_MACHINE_UNKNOWN) {
-				bIsWow64 = TRUE;
-			}
+		Linker::IsWow64Process2(GetCurrentProcess(), &ProcessMachine, &NativeMachine);
+		if (ProcessMachine != IMAGE_FILE_MACHINE_UNKNOWN) {
+			bIsWow64 = TRUE;
 		}
 	}
 	else {
