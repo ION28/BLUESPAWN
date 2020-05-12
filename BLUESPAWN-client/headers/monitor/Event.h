@@ -9,10 +9,12 @@
 #include "util/configurations/Registry.h"
 #include "util/configurations/RegistryValue.h"
 #include "util/eventlogs/XpathQuery.h"
+#include "util/filesystem/FileSystem.h"
 
 enum class EventType {
 	EventLog,
-	Registry
+	Registry,
+	FileSystem
 };
 
 class Event {
@@ -76,6 +78,26 @@ public:
 	const HandleWrapper& GetEvent() const;
 
 	const Registry::RegistryKey& GetKey() const;
+
+	virtual bool Subscribe();
+
+	virtual bool operator==(const Event& e) const;
+};
+
+class FileEvent : public Event {
+
+	/// Directory to be watched
+	FileSystem::Folder directory;
+
+	/// Event that is triggered when the key changes
+	GenericWrapper<HANDLE> hEvent;
+
+public:
+	FileEvent(const FileSystem::Folder& file);
+
+	const GenericWrapper<HANDLE>& GetEvent() const;
+
+	const FileSystem::Folder& GetFolder() const;
 
 	virtual bool Subscribe();
 

@@ -37,7 +37,7 @@ private:
 		std::map<HANDLE, std::vector<std::function<void()>>> map;
 
 		// Vector to keep track of handle wrappers to prevent premature destruction or leakage
-		std::vector<HandleWrapper> wrappers;
+		std::vector<GenericWrapper<HANDLE>> wrappers;
 
 		/// A critical section guarding accesses to `map`, `events`, `wrappers`, and `dwSlotsFree`
 		/// An SRW lock *may* perform better here, but in practice, most accesses will be writes
@@ -98,7 +98,7 @@ private:
 		 * @return True if the function completed successfully; false if hEvent couldn't be subscribed to.
 		 */
 		bool TrySubscribe(
-			IN const HandleWrapper& hEvent, 
+			IN const GenericWrapper<HANDLE>& hEvent, 
 			IN const std::vector<std::function<void()>>& callbacks
 		);
 
@@ -112,7 +112,7 @@ private:
 		 * @return An optional containing the callbacks for the event if present; otherwise std::nullopt
 		 */
 		std::optional<std::vector<std::function<void()>>> GetSubscription(
-			IN const HandleWrapper& hEvent
+			IN const GenericWrapper<HANDLE>& hEvent
 		) const;
 
 		/**
@@ -126,7 +126,7 @@ private:
 		 * @return True if the function completed successfully; false if hEvent wasn't subscribed to
 		 */
 		bool TryAddCallback(
-			IN const HandleWrapper& hEvent,
+			IN const GenericWrapper<HANDLE>& hEvent,
 			IN const std::function<void()>& callback
 		);
 
@@ -143,7 +143,7 @@ private:
 		 * @return True if the function is no longer in the subscription to hEvent; false if hEvent wasn't subscribed to
 		 */
 		bool TryRemoveCallback(
-			IN const HandleWrapper& hEvent,
+			IN const GenericWrapper<HANDLE>& hEvent,
 			IN const std::function<void()>& callback
 		);
 
@@ -156,7 +156,7 @@ private:
 		 * @return True if the function completed successfully; false if the function failed
 		 */
 		bool TryUnsubscribe(
-			IN const HandleWrapper& hEvent
+			IN const GenericWrapper<HANDLE>& hEvent
 		);
 	};
 
@@ -195,7 +195,7 @@ public:
 	 * @return True if the function completed successfully; false if hEvent couldn't be subscribed to.
 	 */
 	bool Subscribe(
-		const HandleWrapper& hEvent, 
+		const GenericWrapper<HANDLE>& hEvent,
 		const std::vector<std::function<void()>>& callbacks
 	);
 
@@ -209,7 +209,7 @@ public:
 	 * @return An optional containing the callbacks for the event if present; otherwise std::nullopt
 	 */
 	std::optional<std::vector<std::function<void()>>> GetSubscription(
-		IN const HandleWrapper& hEvent
+		IN const GenericWrapper<HANDLE>& hEvent
 	) const;
 
 	/**
@@ -225,7 +225,7 @@ public:
 	 * @return True if the function completed successfully; false if hEvent wasn't subscribed to
 	 */
 	bool AddCallback(
-		IN const HandleWrapper& hEvent, 
+		IN const GenericWrapper<HANDLE>& hEvent,
 		IN const std::function<void()>& callback
 	);
 
@@ -243,7 +243,7 @@ public:
 	 * @return True if the function is no longer in the subscription to hEvent; false if hEvent wasn't subscribed to
 	 */
 	bool RemoveCallback(
-		IN const HandleWrapper& hEvent, 
+		IN const GenericWrapper<HANDLE>& hEvent,
 		IN const std::function<void()>& callback
 	);
 
@@ -256,6 +256,6 @@ public:
 	 * @return True if the function completed successfully; false if the function failed
 	 */
 	bool Unsubscribe(
-		IN const HandleWrapper& hEvent
+		IN const GenericWrapper<HANDLE>& hEvent
 	);
 };

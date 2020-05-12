@@ -62,9 +62,16 @@ RegistryEvent::RegistryEvent(const Registry::RegistryKey& key, bool WatchSubkeys
 bool RegistryEvent::Subscribe(){
 	LOG_VERBOSE(1, L"Subscribing to Registry Key " << key.ToString());
 	auto& manager{ EventListener::GetInstance() };
+
+	// Make class members locals so they can be captured
+	auto key{ this->key };
+	auto WatchSubkeys{ this->WatchSubkeys };
+	auto hEvent{ this->hEvent };
+
 	auto subscription = manager.Subscribe(hEvent, {
-		[this](){
+		[key, WatchSubkeys, hEvent](){
 			auto status{ RegNotifyChangeKeyValue(key, WatchSubkeys, REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_THREAD_AGNOSTIC, hEvent, true) };
+			auto name{ key.GetName() };
 			if(ERROR_SUCCESS != status){
 				LOG_ERROR("Failed to resubscribe to changes to " << key << " (Error " << status << ")");
 			}
@@ -89,7 +96,7 @@ bool RegistryEvent::Subscribe(){
 bool RegistryEvent::operator==(const Event& e) const {
 	if(e.type == EventType::Registry && dynamic_cast<const RegistryEvent*>(&e)){
 		auto evt = dynamic_cast<const RegistryEvent*>(&e);
-		return evt->key == key && evt->WatchSubkeys == WatchSubkeys;
+		return evt->key.GetName() == key.GetName() && evt->WatchSubkeys == WatchSubkeys;
 	} else return false;
 }
 
@@ -101,12 +108,68 @@ const Registry::RegistryKey& RegistryEvent::GetKey() const{
 	return key;
 }
 
+FileEvent::FileEvent(const FileSystem::Folder& directory) :
+	Event(EventType::FileSystem),
+	directory{ directory },
+	hEvent{ nullptr }{}
+
+bool FileEvent::Subscribe(){
+	LOG_VERBOSE(1, L"Subscribing to File " << directory.GetFolderPath());
+
+	auto& manager{ EventListener::GetInstance() };
+
+	hEvent = GenericWrapper<HANDLE>{ FindFirstChangeNotificationW(directory.GetFolderPath().c_str(), false, 0x17F), FindCloseChangeNotification };
+	if(!hEvent){
+		LOG_ERROR("Failed to resubscribe to changes to " << directory.GetFolderPath() << " (Error " << GetLastError() << ")");
+		return false;
+	}
+
+	// Make local copies to be captured in the lambda
+	auto hEvent{ this->hEvent };
+	auto directory{ this->directory };
+
+	auto subscription = manager.Subscribe(hEvent, {
+		[directory, hEvent](){
+			auto status{ FindNextChangeNotification(hEvent) };
+			if(!status){
+				LOG_ERROR("Failed to resubscribe to changes to " << directory.GetFolderPath() << " (Error " << GetLastError() << ")");
+			}
+		},
+		std::bind(&FileEvent::RunCallbacks, this)
+	});
+	if(!subscription){
+		LOG_ERROR("Failed to register subscription for changes to " << directory.GetFolderPath());
+		return false;
+	}
+
+	return true;
+}
+
+bool FileEvent::operator==(const Event& e) const {
+	if(e.type == EventType::FileSystem && dynamic_cast<const FileEvent*>(&e)){
+		auto evt = dynamic_cast<const FileEvent*>(&e);
+		return evt->GetFolder().GetFolderPath() == directory.GetFolderPath();
+	} else return false;
+}
+
+const GenericWrapper<HANDLE>& FileEvent::GetEvent() const {
+	return hEvent;
+}
+
+const FileSystem::Folder& FileEvent::GetFolder() const {
+	return directory;
+}
+
 namespace Registry {
 	std::vector<std::shared_ptr<Event>> GetRegistryEvents(HKEY hkHive, const std::wstring& path, bool WatchWow64, bool WatchUsers, bool WatchSubkeys){
-		std::unordered_set<std::shared_ptr<Event>> vKeys{ { std::static_pointer_cast<Event>(std::make_shared<RegistryEvent>(RegistryKey{ hkHive, path })) } };
+		auto& base = std::make_shared<RegistryEvent>(RegistryKey{ hkHive, path });
+		std::unordered_set<std::shared_ptr<Event>> vKeys{};
+		if(base->GetKey().Exists()){
+			vKeys.emplace(base);
+		}
 		if(WatchWow64){
 			std::shared_ptr<RegistryEvent> Wow64Key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hkHive), path, true }) };
-			if(Wow64Key->GetKey().Exists()){
+			if(Wow64Key->GetKey().Exists() && Wow64Key->GetKey().GetName().find(L"WOW6432Node") != std::wstring::npos){
 				vKeys.emplace(std::static_pointer_cast<Event>(Wow64Key));
 			}
 		}
@@ -119,7 +182,7 @@ namespace Registry {
 				}
 				if(WatchWow64){
 					std::shared_ptr<RegistryEvent> Wow64Key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hive), path, true }) };
-					if(Wow64Key->GetKey().Exists()){
+					if(Wow64Key->GetKey().Exists() && Wow64Key->GetKey().GetName().find(L"WOW6432Node") != std::wstring::npos){
 						vKeys.emplace(std::static_pointer_cast<Event>(Wow64Key));
 					}
 				}

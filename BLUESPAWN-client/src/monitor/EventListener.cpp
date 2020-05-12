@@ -16,7 +16,7 @@ void EventListener::SubEventListener::ListenForEvents(){
 
         // Enter a critical section to ensure this function isn't accessing data that isn't ready
         EnterCriticalSection(hSection);
-        auto slots{ MAXIMUM_WAIT_OBJECTS - dwSlotsFree };
+        auto slots{ events.size() };
         auto data{ events.data() };
         LeaveCriticalSection(hSection);
 
@@ -25,7 +25,7 @@ void EventListener::SubEventListener::ListenForEvents(){
 
         // Manager is triggered
         if(status == WAIT_OBJECT_0){
-            LOG_VERBOSE(2, "Manager event has been signalled; restarting wait");
+            LOG_VERBOSE(3, "Manager event has been signalled; restarting wait");
 
             // Trigger manager response
             SetEvent(hManagerResponse);
@@ -45,7 +45,7 @@ void EventListener::SubEventListener::ListenForEvents(){
 
             // Handle the event notification
             EnterCriticalSection(hSection);
-            HandleEventNotify(events[status - WAIT_OBJECT_0 - 1]);
+            HandleEventNotify(events[status - WAIT_OBJECT_0]);
             LeaveCriticalSection(hSection);
 
             // Recalculate the number of slots and the events, begin wait again
@@ -53,7 +53,7 @@ void EventListener::SubEventListener::ListenForEvents(){
         }
 
         else {
-            LOG_ERROR("Failed to wait on events with (status " << status << "); Error code " << GetLastError());
+            LOG_ERROR("Failed to wait on events with (status " << std::hex << status << "); Error code " << GetLastError());
             dwFailureCount++;
             if(dwFailureCount >= 5){
                 LOG_ERROR("Five consecutive errors have occured in a SubEventListener; Abandoning " << slots - 1 << " events");
@@ -70,6 +70,7 @@ EventListener::SubEventListener::SubEventListener() :
     dwSlotsFree{ MAXIMUM_WAIT_OBJECTS - 1 },
     dwFailureCount{ 0 },
     events{},
+    terminate{ false },
     hThread{ &EventListener::SubEventListener::ListenForEvents, this }{
     events.emplace_back(hManager);
 }
@@ -78,7 +79,8 @@ EventListener::SubEventListener::~SubEventListener(){
     // Indicate that the thread should terminate next time hManager is set
     terminate = true;
 
-    // Set hManager, terminating the thread
+    // Set hManager, terminating the thread. No need to wait on the response; the join
+    // will take care of waiting the appropriate amount of time.
     SetEvent(hManager);
 
     // Wait for the thread to finish
@@ -86,7 +88,7 @@ EventListener::SubEventListener::~SubEventListener(){
 }
 
 bool EventListener::SubEventListener::TrySubscribe(
-    IN const HandleWrapper& hEvent,
+    IN const GenericWrapper<HANDLE>& hEvent,
     IN const std::vector<std::function<void()>>& callbacks
 ){
     // When reading or writing events, you must enter a critical section
@@ -135,7 +137,7 @@ bool EventListener::SubEventListener::TrySubscribe(
 }
 
 std::optional<std::vector<std::function<void()>>> EventListener::SubEventListener::GetSubscription(
-    IN const HandleWrapper& hEvent
+    IN const GenericWrapper<HANDLE>& hEvent
 ) const {
     // Enter a critical section before reading `map`
     auto lock{ BeginCriticalSection(hSection) };
@@ -149,7 +151,7 @@ std::optional<std::vector<std::function<void()>>> EventListener::SubEventListene
 }
 
 bool EventListener::SubEventListener::TryAddCallback(
-    IN const HandleWrapper& hEvent,
+    IN const GenericWrapper<HANDLE>& hEvent,
     IN const std::function<void()>& callback
 ){
     // Enter a critical section before reading `map`
@@ -172,7 +174,7 @@ LPVOID getAddress(std::function<void()> f){
 }
 
 bool EventListener::SubEventListener::TryRemoveCallback(
-    IN const HandleWrapper& hEvent,
+    IN const GenericWrapper<HANDLE>& hEvent,
     IN const std::function<void()>& callback
 ){
     // Enter a critical section before reading `map`
@@ -201,7 +203,7 @@ bool EventListener::SubEventListener::TryRemoveCallback(
 }
 
 bool EventListener::SubEventListener::TryUnsubscribe(
-    IN const HandleWrapper& hEvent
+    IN const GenericWrapper<HANDLE>& hEvent
 ){
     auto lock{ BeginCriticalSection(hSection) };
 
@@ -257,7 +259,7 @@ EventListener& EventListener::GetInstance(){
 }
 
 bool EventListener::Subscribe(
-    const HandleWrapper& hEvent,
+    const GenericWrapper<HANDLE>& hEvent,
     const std::vector<std::function<void()>>& callbacks
 ){
     // Acquire lock before accessing subeventlisteners
@@ -286,7 +288,7 @@ bool EventListener::Subscribe(
 }
 
 std::optional<std::vector<std::function<void()>>> EventListener::GetSubscription(
-    IN const HandleWrapper& hEvent
+    IN const GenericWrapper<HANDLE>& hEvent
 ) const {
     // Acquire lock before accessing subeventlisteners
     auto lock{ BeginCriticalSection(hSection) };
@@ -303,7 +305,7 @@ std::optional<std::vector<std::function<void()>>> EventListener::GetSubscription
 }
 
 bool EventListener::AddCallback(
-    IN const HandleWrapper& hEvent,
+    IN const GenericWrapper<HANDLE>& hEvent,
     IN const std::function<void()>& callback
 ){
     // Acquire lock before accessing subeventlisteners
@@ -321,7 +323,7 @@ bool EventListener::AddCallback(
 }
 
 bool EventListener::RemoveCallback(
-    IN const HandleWrapper& hEvent,
+    IN const GenericWrapper<HANDLE>& hEvent,
     IN const std::function<void()>& callback
 ){
     // Acquire lock before accessing subeventlisteners
@@ -339,7 +341,7 @@ bool EventListener::RemoveCallback(
 }
 
 bool EventListener::Unsubscribe(
-    IN const HandleWrapper& hEvent
+    IN const GenericWrapper<HANDLE>& hEvent
 ){
     // Acquire lock before accessing subeventlisteners
     auto lock{ BeginCriticalSection(hSection) };
