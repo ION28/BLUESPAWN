@@ -66,6 +66,10 @@
 #pragma warning(pop)
 
 #include <iostream>
+#include <VersionHelpers.h>
+
+DEFINE_FUNCTION(BOOL, IsWow64Process2, NTAPI, HANDLE hProcess, USHORT* pProcessMachine, USHORT* pNativeMachine);
+LINK_FUNCTION(IsWow64Process2, KERNEL32.DLL);
 
 const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{ io };
@@ -173,11 +177,33 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 	}
 }
 
+void Bluespawn::check_correct_arch() {
+	BOOL bIsWow64 = FALSE;
+	if (IsWindows10OrGreater()) {
+		USHORT ProcessMachine;
+		USHORT NativeMachine;
+
+		Linker::IsWow64Process2(GetCurrentProcess(), &ProcessMachine, &NativeMachine);
+		if (ProcessMachine != IMAGE_FILE_MACHINE_UNKNOWN) {
+			bIsWow64 = TRUE;
+		}
+	}
+	else {
+		IsWow64Process(GetCurrentProcess(), &bIsWow64);
+	}
+	if (bIsWow64) {
+		Bluespawn::io.AlertUser(L"Running the x86 version of BLUESPAWN on an x64 system! This configuration is not fully supported, so we recommend downloading the x64 version.", 5000, ImportanceLevel::MEDIUM);
+		LOG_WARNING("Running the x86 version of BLUESPAWN on an x64 system! This configuration is not fully supported, so we recommend downloading the x64 version.");
+	}
+}
+
 int main(int argc, char* argv[]){
 
 	Bluespawn bluespawn{};
 
 	print_banner();
+
+	bluespawn.check_correct_arch();
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 

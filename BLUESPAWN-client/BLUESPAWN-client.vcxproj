@@ -289,6 +289,33 @@
     <None Include="resources\severe" />
     <None Include="resources\severe2" />
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="BLUESPAWN-client.exe.manifest" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <GenerateManifest>false</GenerateManifest>
+    <EmbedManifest>
+    </EmbedManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <GenerateManifest>false</GenerateManifest>
+    <EmbedManifest>
+    </EmbedManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <GenerateManifest>false</GenerateManifest>
+    <EmbedManifest>
+    </EmbedManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <GenerateManifest>false</GenerateManifest>
+    <EmbedManifest>
+    </EmbedManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <BuildLog>
       <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
@@ -303,6 +330,12 @@
     <Link>
       <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Adding manifest to BLUESPAWN-client.exe</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{159B2E72-9553-4E17-9BEC-CB92FCA8D0B0}</ProjectGuid>
