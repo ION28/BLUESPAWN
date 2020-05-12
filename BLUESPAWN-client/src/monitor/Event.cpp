@@ -63,6 +63,13 @@ bool RegistryEvent::Subscribe(){
 	LOG_VERBOSE(1, L"Subscribing to Registry Key " << key.ToString());
 	auto& manager{ EventListener::GetInstance() };
 
+	auto keypath{ key.GetName() };
+	auto status{ RegNotifyChangeKeyValue(key, WatchSubkeys, REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_THREAD_AGNOSTIC, hEvent, true) };
+	if(ERROR_SUCCESS != status){
+		LOG_ERROR("Failed to subscribe to changes to " << key << " (Error " << status << ")");
+		return false;
+	}
+
 	// Make class members locals so they can be captured
 	auto key{ this->key };
 	auto WatchSubkeys{ this->WatchSubkeys };
@@ -81,12 +88,6 @@ bool RegistryEvent::Subscribe(){
 
 	if(!subscription){
 		LOG_ERROR("Failed to register subscription for changes to " << key);
-		return false;
-	}
-
-	auto status{ RegNotifyChangeKeyValue(key, WatchSubkeys, REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_THREAD_AGNOSTIC, hEvent, true) };
-	if(ERROR_SUCCESS != status){
-		LOG_ERROR("Failed to subscribe to changes to " << key << " (Error " << status << ")");
 		return false;
 	}
 

@@ -53,7 +53,7 @@ void EventListener::SubEventListener::ListenForEvents(){
         }
 
         else {
-            LOG_ERROR("Failed to wait on events with (status " << std::hex << status << "); Error code " << GetLastError());
+            LOG_ERROR("Failed to wait on events with status " << std::hex << status << "; Error code " << GetLastError());
             dwFailureCount++;
             if(dwFailureCount >= 5){
                 LOG_ERROR("Five consecutive errors have occured in a SubEventListener; Abandoning " << slots - 1 << " events");
@@ -88,7 +88,7 @@ EventListener::SubEventListener::~SubEventListener(){
 }
 
 bool EventListener::SubEventListener::TrySubscribe(
-    IN const GenericWrapper<HANDLE>& hEvent,
+    IN const HANDLE& hEvent,
     IN const std::vector<std::function<void()>>& callbacks
 ){
     // When reading or writing events, you must enter a critical section
@@ -127,8 +127,7 @@ bool EventListener::SubEventListener::TrySubscribe(
         }
 
         events.emplace_back(hEvent);
-        map.emplace(std::move(std::pair<HandleWrapper, std::vector<std::function<void()>>>{ hEvent, callbacks }));
-        wrappers.emplace_back(hEvent);
+        map.emplace(std::move(std::pair<HANDLE, std::vector<std::function<void()>>>{ hEvent, callbacks }));
         dwSlotsFree--;
         return true;
     }
@@ -137,7 +136,7 @@ bool EventListener::SubEventListener::TrySubscribe(
 }
 
 std::optional<std::vector<std::function<void()>>> EventListener::SubEventListener::GetSubscription(
-    IN const GenericWrapper<HANDLE>& hEvent
+    IN const HANDLE& hEvent
 ) const {
     // Enter a critical section before reading `map`
     auto lock{ BeginCriticalSection(hSection) };
@@ -151,7 +150,7 @@ std::optional<std::vector<std::function<void()>>> EventListener::SubEventListene
 }
 
 bool EventListener::SubEventListener::TryAddCallback(
-    IN const GenericWrapper<HANDLE>& hEvent,
+    IN const HANDLE& hEvent,
     IN const std::function<void()>& callback
 ){
     // Enter a critical section before reading `map`
@@ -174,7 +173,7 @@ LPVOID getAddress(std::function<void()> f){
 }
 
 bool EventListener::SubEventListener::TryRemoveCallback(
-    IN const GenericWrapper<HANDLE>& hEvent,
+    IN const HANDLE& hEvent,
     IN const std::function<void()>& callback
 ){
     // Enter a critical section before reading `map`
@@ -203,7 +202,7 @@ bool EventListener::SubEventListener::TryRemoveCallback(
 }
 
 bool EventListener::SubEventListener::TryUnsubscribe(
-    IN const GenericWrapper<HANDLE>& hEvent
+    IN const HANDLE& hEvent
 ){
     auto lock{ BeginCriticalSection(hSection) };
 
@@ -238,12 +237,6 @@ bool EventListener::SubEventListener::TryUnsubscribe(
             idx--;
         }
     }
-    for(unsigned idx = 0; idx < wrappers.size(); idx++){
-        if(wrappers[idx] == hEvent){
-            wrappers.erase(wrappers.begin() + idx);
-            idx--;
-        }
-    }
 
     dwSlotsFree++;
 
@@ -259,7 +252,7 @@ EventListener& EventListener::GetInstance(){
 }
 
 bool EventListener::Subscribe(
-    const GenericWrapper<HANDLE>& hEvent,
+    const HANDLE& hEvent,
     const std::vector<std::function<void()>>& callbacks
 ){
     // Acquire lock before accessing subeventlisteners
@@ -288,7 +281,7 @@ bool EventListener::Subscribe(
 }
 
 std::optional<std::vector<std::function<void()>>> EventListener::GetSubscription(
-    IN const GenericWrapper<HANDLE>& hEvent
+    IN const HANDLE& hEvent
 ) const {
     // Acquire lock before accessing subeventlisteners
     auto lock{ BeginCriticalSection(hSection) };
@@ -305,7 +298,7 @@ std::optional<std::vector<std::function<void()>>> EventListener::GetSubscription
 }
 
 bool EventListener::AddCallback(
-    IN const GenericWrapper<HANDLE>& hEvent,
+    IN const HANDLE& hEvent,
     IN const std::function<void()>& callback
 ){
     // Acquire lock before accessing subeventlisteners
@@ -323,7 +316,7 @@ bool EventListener::AddCallback(
 }
 
 bool EventListener::RemoveCallback(
-    IN const GenericWrapper<HANDLE>& hEvent,
+    IN const HANDLE& hEvent,
     IN const std::function<void()>& callback
 ){
     // Acquire lock before accessing subeventlisteners
@@ -341,7 +334,7 @@ bool EventListener::RemoveCallback(
 }
 
 bool EventListener::Unsubscribe(
-    IN const GenericWrapper<HANDLE>& hEvent
+    IN const HANDLE& hEvent
 ){
     // Acquire lock before accessing subeventlisteners
     auto lock{ BeginCriticalSection(hSection) };
