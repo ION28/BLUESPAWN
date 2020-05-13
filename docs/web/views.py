@@ -6,9 +6,9 @@ from django import template
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 
+from lxml import etree as ET
 import uuid
 import os
-import xml.etree.ElementTree as ET
 from docx import Document
 
 def generate_report(scanxml):
@@ -18,7 +18,7 @@ def generate_report(scanxml):
     report.add_heading('BLUESPAWN Host Compromise Analysis Report (HCAR)', 0)
 
     # Parse XML File
-    detections = list(report_root.iterfind('hunt/detection'))
+    detections = list(report_root.findall('hunt/detection'))
     detections_hunts = []
     detections_files = []
     detections_registry = []
@@ -41,14 +41,16 @@ def generate_report(scanxml):
                 detection.find('size').text if detection.find('size') is not None else "N/A", 
                 detection.find('md5').text if detection.find('md5') is not None else "N/A", 
                 detection.find('sha1').text if detection.find('sha1') is not None else "N/A", 
-                detection.find('sha256').text if detection.find('sha256') is not None else "N/A"
+                detection.find('sha256').text if detection.find('sha256') is not None else "N/A",
+                detection.getparent().find('name').text if detection.getparent().find('name').text is not None else "N/A"
             ])
         elif detection.get('type') == 'Registry':
             registry_cnt += 1
             detections_registry.append([
                 detection.find('key').text if detection.find('key') is not None else "N/A", 
                 detection.find('value').text if detection.find('value') is not None else "N/A", 
-                detection.find('data').text if detection.find('data') is not None else "N/A"
+                detection.find('data').text if detection.find('data') is not None else "N/A",
+                detection.getparent().find('name').text if detection.getparent().find('name').text is not None else "N/A"
             ]) 
         elif detection.get('type') == 'Process':
             process_cnt += 1
@@ -84,28 +86,32 @@ def generate_report(scanxml):
     report.add_heading('Indicators of Attack (IOAs)', level=1)
     report.add_heading('Files (%i)' % file_cnt, level=2)
     if file_cnt > 0:
-        file_table = report.add_table(rows=1, cols=2, style='Table Grid')
+        file_table = report.add_table(rows=1, cols=3, style='Table Grid')
         file_table_header = file_table.rows[0].cells
         file_table_header[0].text = 'Filename:'
         file_table_header[1].text = 'Details:'
+        file_table_header[2].text = 'Associated Technique:'
         for item in detections_files:
             r = file_table.add_row().cells
             r[0].text = str(item[0])
             r[1].text = ('Size: ' + str(item[1]) + '\nMD5: ' + str(item[2]) + 
                 '\nSHA1: ' + str(item[3]) + '\nSHA256: ' + str(item[4]))
+            r[2].text = str(item[5])
 
     report.add_heading('Registry (%i)' % registry_cnt, level=2)
     if registry_cnt > 0:
-        registry_table = report.add_table(rows=1, cols=3, style='Table Grid')
+        registry_table = report.add_table(rows=1, cols=4, style='Table Grid')
         registry_table_header = registry_table.rows[0].cells
         registry_table_header[0].text = 'Key:'
         registry_table_header[1].text = 'Value:'
         registry_table_header[2].text = 'Data:'
+        registry_table_header[3].text = 'Associated Technique:'
         for item in detections_registry:
             r = registry_table.add_row().cells
             r[0].text = str(item[0])
             r[1].text = str(item[1])
             r[2].text = str(item[2])
+            r[3].text = str(item[3])
     
     report.add_heading('Processes (%i)' % process_cnt, level=2)
     if process_cnt > 0:

@@ -23,14 +23,15 @@ jobs:
         port: 22
         script: |
           cd ~/BLUESPAWN
-          git fetch
+          git fetch --all
           git checkout ${{ github.ref }}
-          git pull
+          git pull origin ${{ github.ref }}
           source ~/venv/bin/activate
           cd docs
           pip install -r requirements.txt
           python3 manage.py makemigrations
           python3 manage.py migrate
+          sudo service uwsgi restart
           sudo /etc/init.d/nginx restart
       if: github.event_name == 'push'
 
@@ -43,9 +44,9 @@ jobs:
         port: 22
         script: |
           cd ~/BLUESPAWN
-          git fetch
+          git fetch --all
           git checkout ${{ github.head_ref }}
-          git pull
+          git pull origin ${{ github.head_ref }}
           source ~/venv/bin/activate
           cd docs
           pip install -r requirements.txt

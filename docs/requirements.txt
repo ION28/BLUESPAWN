@@ -2,3 +2,4 @@ gunicorn
 django
 django-bootstrap4
 python-docx
+lxml
