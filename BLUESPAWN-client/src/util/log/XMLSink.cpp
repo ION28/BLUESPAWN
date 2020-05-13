@@ -67,13 +67,19 @@ namespace Log{
 			auto FileDetection = std::static_pointer_cast<FILE_DETECTION>(detection);
 			auto Name = XMLDoc.NewElement("name");
 			auto Path = XMLDoc.NewElement("path");
-			auto Hash = XMLDoc.NewElement("hash");
+			auto MD5 = XMLDoc.NewElement("md5");
+			auto SHA1 = XMLDoc.NewElement("sha1");
+			auto SHA256 = XMLDoc.NewElement("sha256");
 			Name->SetText(WidestringToString(FileDetection->wsFileName).c_str());
 			Path->SetText(WidestringToString(FileDetection->wsFilePath).c_str());
-			Hash->SetText(FileDetection->hash.c_str());
+			MD5->SetText(WidestringToString(FileDetection->md5).c_str());
+			SHA1->SetText(WidestringToString(FileDetection->sha1).c_str());
+			SHA256->SetText(WidestringToString(FileDetection->sha256).c_str());
 			detect->InsertEndChild(Name);
 			detect->InsertEndChild(Path);
-			detect->InsertEndChild(Hash);
+			detect->InsertEndChild(MD5);
+			detect->InsertEndChild(SHA1);
+			detect->InsertEndChild(SHA256);
 		} else if(detection->Type == DetectionType::Process){
 			detect->SetAttribute("type", "Process");
 			auto ProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);

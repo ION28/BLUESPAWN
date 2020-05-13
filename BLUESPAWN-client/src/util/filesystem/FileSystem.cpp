@@ -110,43 +110,148 @@ namespace FileSystem{
 		return bFileFound;
 	}
 
-	File::File(IN const std::wstring& path) : hFile{ nullptr }{
-		FilePath = path;
-		LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
-		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE | WRITE_OWNER, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
-			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
-		if(!hFile && GetLastError() == ERROR_FILE_NOT_FOUND){
-			LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
-			bFileExists = false;
-			bWriteAccess = false;
-			bReadAccess = false;
+	std::optional<std::wstring> File::CalculateHashType(HashType sHashType) const {
+		if (!bFileExists) {
+			LOG_ERROR("Can't get hash of " << FilePath << ". File doesn't exist");
+			SetLastError(ERROR_FILE_NOT_FOUND);
+			return std::nullopt;
 		}
-		else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
-			bWriteAccess = false;
-			LOG_VERBOSE(3, "No write access available to file");
-			hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
-				FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
-			if (!hFile && GetLastError() == ERROR_FILE_NOT_FOUND) {
-				LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
-				bFileExists = false;
-				bReadAccess = false;
+		if (!bReadAccess) {
+			LOG_ERROR("Can't get hash of " << FilePath << ". Insufficient permissions.");
+			SetLastError(ERROR_ACCESS_DENIED);
+			return std::nullopt;
+		}
+		//Function from Microsoft
+		//https://docs.microsoft.com/en-us/windows/desktop/SecCrypto/example-c-program--creating-an-md-5-hash-from-file-content
+
+		// Get handle to the crypto provider
+		HCRYPTPROV hProv{};
+		if (!CryptAcquireContext(&hProv,
+			nullptr,
+			nullptr,
+			PROV_RSA_AES,
+			CRYPT_VERIFYCONTEXT)) {
+			LOG_ERROR("CryptAcquireContext failed: " << GetLastError() << " while getting hash of " << FilePath);
+			return std::nullopt;
+		}
+		auto provider{ GenericWrapper<HCRYPTPROV>(hProv, [hProv](auto v) { CryptReleaseContext(hProv, 0); }) };
+		
+		HCRYPTHASH hHash = 0;
+		auto rgbHash = AllocationWrapper{ nullptr, 0 };
+		DWORD cbHash = 0;
+		if (sHashType == HashType::SHA1_HASH) {
+			rgbHash = AllocationWrapper{ new BYTE[SHA1LEN], SHA1LEN, AllocationWrapper::CPP_ARRAY_ALLOC };
+			cbHash = SHA1LEN;
+			if (!CryptCreateHash(hProv, CALG_SHA1, 0, 0, &hHash)) {
+				LOG_ERROR("CryptCreateHash failed: " << GetLastError() << " while getting hash of " << FilePath);
+				return std::nullopt;
 			}
-			else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
-				LOG_VERBOSE(2, "Couldn't open file, Access Denied. " << path << ".");
-				bFileExists = true;
-				bReadAccess = false;
-			}
-			else {
-				LOG_VERBOSE(2, "File " << path << " opened.");
-				bFileExists = true;
-				bReadAccess = true;
+		}
+		else if (sHashType == HashType::SHA256_HASH) {
+			rgbHash = AllocationWrapper{ new BYTE[SHA256LEN], SHA256LEN, AllocationWrapper::CPP_ARRAY_ALLOC };
+			cbHash = SHA256LEN;
+			if (!CryptCreateHash(hProv, CALG_SHA_256, 0, 0, &hHash)) {
+				LOG_ERROR("CryptCreateHash failed: " << GetLastError() << " while getting hash of " << FilePath);
+				LOG_SYSTEM_ERROR(GetLastError());
+				return std::nullopt;
 			}
 		}
 		else {
-			LOG_VERBOSE(2, "File " << path << " opened.");
+			rgbHash = AllocationWrapper{ new BYTE[MD5LEN], MD5LEN, AllocationWrapper::CPP_ARRAY_ALLOC };
+			cbHash = MD5LEN;
+			if (!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash)) {
+				LOG_ERROR("CryptCreateHash failed: " << GetLastError() << " while getting hash of " << FilePath);
+				return std::nullopt;
+			}
+		}
+		auto HashData{ GenericWrapper<HCRYPTHASH>(hHash, CryptDestroyHash) };
+		
+		DWORD cbRead{};
+		std::wstring digits{ L"0123456789abcdef" };
+		std::vector<BYTE> file(BUFSIZE);
+		bool bResult{ false };
+		while((bResult = ReadFile(hFile, file.data(), file.size(), &cbRead, nullptr)) && cbRead){
+			if (!CryptHashData(hHash, file.data(), cbRead, 0)) {
+				LOG_ERROR("CryptHashData failed: " << GetLastError() << " while getting hash of " << FilePath);
+				return std::nullopt;
+			}
+		}
+		SetFilePointer(0);
+
+		if (!bResult) {
+			LOG_ERROR("ReadFile failed: " << GetLastError() << " while getting hash of " << FilePath);
+			return std::nullopt;
+		}
+
+		std::wstring buffer{};
+		std::wstring rgbDigits{ L"0123456789abcdef" };
+		if (CryptGetHashParam(hHash, HP_HASHVAL, reinterpret_cast<PBYTE>(LPVOID(rgbHash)), &cbHash, 0)) {
+			for (DWORD i = 0; i < cbHash; i++) {
+				buffer += rgbDigits[(rgbHash[i] >> 4) & 0xf];
+				buffer += rgbDigits[rgbHash[i] & 0xf];
+			}
+			LOG_VERBOSE(3, "Successfully got hash of " << FilePath);
+			return buffer;
+		}
+		else {
+			LOG_ERROR("CryptGetHashParam failed: " << GetLastError() << " while getting hash of " << FilePath);
+		}
+
+		return std::nullopt;
+	}
+
+	File::File(IN const std::wstring& path) : hFile{ nullptr }{
+		FilePath = path;
+		LOG_VERBOSE(2, "Attempting to open file: " << path);
+		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE | WRITE_OWNER, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
+		if (hFile && GetLastError() == ERROR_SUCCESS) {
+			LOG_VERBOSE(2, "File " << path << " opened");
 			bFileExists = true;
 			bWriteAccess = true;
 			bReadAccess = true;
+		}
+		else {
+			if (!hFile && GetLastError() == ERROR_FILE_NOT_FOUND) {
+				LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path);
+				bFileExists = false;
+				bWriteAccess = false;
+				bReadAccess = false;
+			}
+			else if (!hFile && (GetLastError() == ERROR_ACCESS_DENIED || GetLastError() == ERROR_SHARING_VIOLATION)) {
+				bWriteAccess = false;
+				LOG_VERBOSE(3, "No write access available to file");
+				hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+					FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
+				if (hFile && GetLastError() == ERROR_SUCCESS) {
+					LOG_VERBOSE(2, "File " << path << " opened with read access.");
+					bFileExists = true;
+					bReadAccess = true;
+				}
+				else if (!hFile && GetLastError() == ERROR_SHARING_VIOLATION) {
+					LOG_VERBOSE(2, "Cannot open the following file because it is in use by another process " << path);
+					bFileExists = true;
+					bReadAccess = false;
+				}
+				else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
+					LOG_VERBOSE(2, "Access denied trying to open " << path);
+					bFileExists = true;
+					bReadAccess = false;
+				}
+				else {
+					LOG_ERROR("Unable to open " << path);
+					LOG_SYSTEM_ERROR(GetLastError());
+					bFileExists = true;
+					bReadAccess = false;
+				}
+			}
+			else {
+				LOG_ERROR("Unable to open " << path);
+				LOG_SYSTEM_ERROR(GetLastError());
+				bFileExists = true;
+				bWriteAccess = false;
+				bReadAccess = false;
+			}
 		}
 		Attribs.extension = PathFindExtension(path.c_str());
 	}
@@ -339,98 +444,19 @@ namespace FileSystem{
 		return false;
 	}
 
-	std::optional<std::string> File::GetMD5Hash() const {
+	std::optional<std::wstring> File::GetMD5Hash() const {
 		LOG_VERBOSE(3, "Attempting to get MD5 hash of " << FilePath);
-		if(!bFileExists) {
-			LOG_ERROR("Can't get MD5 hash of " << FilePath << ". File doesn't exist");
-			SetLastError(ERROR_FILE_NOT_FOUND);
-			return std::nullopt;
-		}
-		if (!bReadAccess) {
-			LOG_ERROR("Can't get MD5 hash of " << FilePath << ". Insufficient permissions.");
-			SetLastError(ERROR_ACCESS_DENIED);
-			return std::nullopt;
-		}
-		//Function from Microsoft
-		//https://docs.microsoft.com/en-us/windows/desktop/SecCrypto/example-c-program--creating-an-md-5-hash-from-file-content
-		DWORD dwStatus = 0;
-		BOOL bResult = FALSE;
-		HCRYPTPROV hProv = 0;
-		HCRYPTHASH hHash = 0;
-		BYTE rgbFile[BUFSIZE];
-		DWORD cbRead = 0;
-		BYTE rgbHash[MD5LEN];
-		DWORD cbHash = 0;
-		CHAR rgbDigits[] = "0123456789abcdef";
+		return CalculateHashType(HashType::MD5_HASH);
+	}
 
-		// Get handle to the crypto provider
-		if(!CryptAcquireContext(&hProv,
-			NULL,
-			NULL,
-			PROV_RSA_FULL,
-			CRYPT_VERIFYCONTEXT))
-		{
-			dwStatus = GetLastError();
-			LOG_ERROR("CryptAcquireContext failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
-			return std::nullopt;
-		}
+	std::optional<std::wstring> File::GetSHA1Hash() const {
+		LOG_VERBOSE(3, "Attempting to get SHA1 hash of " << FilePath);
+		return CalculateHashType(HashType::SHA1_HASH);
+	}
 
-		if(!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash))
-		{
-			dwStatus = GetLastError();
-			LOG_ERROR("CryptCreateHash failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
-			CryptReleaseContext(hProv, 0);
-			return std::nullopt;
-		}
-
-		while(bResult = ReadFile(hFile, rgbFile, BUFSIZE,
-			&cbRead, NULL))
-		{
-			if(0 == cbRead)
-			{
-				break;
-			}
-
-			if(!CryptHashData(hHash, rgbFile, cbRead, 0))
-			{
-				dwStatus = GetLastError();
-				LOG_ERROR("CryptHashData failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
-				CryptReleaseContext(hProv, 0);
-				CryptDestroyHash(hHash);
-				return std::nullopt;
-			}
-		}
-
-		if(!bResult)
-		{
-			dwStatus = GetLastError();
-			LOG_ERROR("ReadFile failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
-			CryptReleaseContext(hProv, 0);
-			CryptDestroyHash(hHash);
-			return std::nullopt;
-		}
-
-		std::string buffer = {};
-
-		cbHash = MD5LEN;
-		if(CryptGetHashParam(hHash, HP_HASHVAL, rgbHash, &cbHash, 0))
-		{
-			for(DWORD i = 0; i < cbHash; i++)
-			{
-				buffer += rgbDigits[rgbHash[i] >> 4];
-				buffer += rgbDigits[rgbHash[i] & 0xf];
-			}
-			return buffer;
-		} else
-		{
-			dwStatus = GetLastError();
-			LOG_ERROR("CryptGetHashParam failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
-		}
-
-		CryptDestroyHash(hHash);
-		CryptReleaseContext(hProv, 0);
-		LOG_VERBOSE(3, "Successfully got MD5 Hash of " << FilePath);
-		return std::nullopt;
+	std::optional<std::wstring> File::GetSHA256Hash() const {
+		LOG_VERBOSE(3, "Attempting to get SHA256 hash of " << FilePath);
+		return CalculateHashType(HashType::SHA256_HASH);
 	}
 
 	bool File::Create() {

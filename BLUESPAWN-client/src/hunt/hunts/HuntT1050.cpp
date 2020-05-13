@@ -64,7 +64,7 @@ namespace Hunts {
 					if(!bFileSigned || (!ScanResult && ScanResult.vKnownBadRules.size() > 0)) {
 						detections++;
 						reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
-						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 					}
 				}
 
@@ -78,7 +78,7 @@ namespace Hunts {
 				if(imageName.find(L"mimikatz") != std::wstring::npos || imageName.find(L"mimidrv") != std::wstring::npos
 					|| imagePath.find(L"mimidrv.sys") != std::wstring::npos) {
 					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
-					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 					detections++;
 				}
 
@@ -86,7 +86,7 @@ namespace Hunts {
 				// the ones MSF generates https://www.offensive-security.com/metasploit-unleashed/psexec-pass-hash/
 				if(GetShannonEntropy(imageName) < 3.00 || GetShannonEntropy(imageName) > 5.00) {
 					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
-					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 					detections++;
 				}
 			}
@@ -117,7 +117,7 @@ namespace Hunts {
 					YaraScanResult ScanResult = yara.ScanFile(file);
 
 					if(!bFileSigned || (!ScanResult && ScanResult.vKnownBadRules.size() > 0)) {
-						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 					}
 				}
 			}
