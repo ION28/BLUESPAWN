@@ -49,7 +49,7 @@ namespace Hunts {
 			auto& yara = YaraScanner::GetInstance();
 			YaraScanResult result = yara.ScanFile(file);
 
-			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 			return 1;
 		}
 

@@ -52,7 +52,7 @@ namespace Hunts {
 			if (bFileSigned || (!result && result.vKnownBadRules.size() > 0)) {
 				detections++;
 				reaction.EventIdentified(EventLogs::EventLogItemToDetection(query));
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 			}
 		}
 
@@ -88,7 +88,7 @@ namespace Hunts {
 			reaction.EventIdentified(EventLogs::EventLogItemToDetection(query));
 
 			FileSystem::File file = FileSystem::File(query.GetProperty(L"Event/EventData/Data[@Name='TargetFilename']"));
-			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 		}
 
 		reaction.EndHunt();

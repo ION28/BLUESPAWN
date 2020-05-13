@@ -15,20 +15,21 @@
 #include <SoftPub.h>
 #include <mscat.h>
 #include "common/wrappers.hpp"
+#include "aclapi.h"
 
 namespace FileSystem{
-	bool CheckFileExists(std::wstring filename) {
-		auto attribs = GetFileAttributesW(filename.c_str());
+	bool CheckFileExists(const std::wstring& path) {
+		auto attribs = GetFileAttributesW(path.c_str());
 		if(INVALID_FILE_ATTRIBUTES == attribs && GetLastError() == ERROR_FILE_NOT_FOUND){
-			LOG_VERBOSE(3, "File " << filename << " does not exist.");
+			LOG_VERBOSE(3, "File " << path << " does not exist.");
 			return false;
 		}
 
 		if(attribs & FILE_ATTRIBUTE_DIRECTORY){
-			LOG_VERBOSE(3, "File " << filename << " is a directory.");
+			LOG_VERBOSE(3, "File " << path << " is a directory.");
 			return false;
 		}
-		LOG_VERBOSE(3, "File " << filename << " exists");
+		LOG_VERBOSE(3, "File " << path << " exists");
 		return true;
 	}
 
@@ -109,44 +110,170 @@ namespace FileSystem{
 		return bFileFound;
 	}
 
-	File::File(IN const std::wstring& path) : hFile{ nullptr }{
-		FilePath = path;
-		LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
-		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
-			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
-		if(!hFile && GetLastError() == ERROR_FILE_NOT_FOUND){
-			LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
-			bFileExists = false;
-			bWriteAccess = false;
-			bReadAccess = false;
+	std::optional<std::wstring> File::CalculateHashType(HashType sHashType) const {
+		if (!bFileExists) {
+			LOG_ERROR("Can't get hash of " << FilePath << ". File doesn't exist");
+			SetLastError(ERROR_FILE_NOT_FOUND);
+			return std::nullopt;
 		}
-		else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
-			bWriteAccess = false;
-			hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
-				FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
-			if (!hFile && GetLastError() == ERROR_FILE_NOT_FOUND) {
-				LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
-				bFileExists = false;
-				bReadAccess = false;
+		if (!bReadAccess) {
+			LOG_ERROR("Can't get hash of " << FilePath << ". Insufficient permissions.");
+			SetLastError(ERROR_ACCESS_DENIED);
+			return std::nullopt;
+		}
+		//Function from Microsoft
+		//https://docs.microsoft.com/en-us/windows/desktop/SecCrypto/example-c-program--creating-an-md-5-hash-from-file-content
+
+		// Get handle to the crypto provider
+		HCRYPTPROV hProv{};
+		if (!CryptAcquireContext(&hProv,
+			nullptr,
+			nullptr,
+			PROV_RSA_AES,
+			CRYPT_VERIFYCONTEXT)) {
+			LOG_ERROR("CryptAcquireContext failed: " << GetLastError() << " while getting hash of " << FilePath);
+			return std::nullopt;
+		}
+		auto provider{ GenericWrapper<HCRYPTPROV>(hProv, [hProv](auto v) { CryptReleaseContext(hProv, 0); }) };
+		
+		HCRYPTHASH hHash = 0;
+		auto rgbHash = AllocationWrapper{ nullptr, 0 };
+		DWORD cbHash = 0;
+		if (sHashType == HashType::SHA1_HASH) {
+			rgbHash = AllocationWrapper{ new BYTE[SHA1LEN], SHA1LEN, AllocationWrapper::CPP_ARRAY_ALLOC };
+			cbHash = SHA1LEN;
+			if (!CryptCreateHash(hProv, CALG_SHA1, 0, 0, &hHash)) {
+				LOG_ERROR("CryptCreateHash failed: " << GetLastError() << " while getting hash of " << FilePath);
+				return std::nullopt;
 			}
-			else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
-				LOG_VERBOSE(2, "Couldn't open file, Access Denied" << path << ".");
-				bFileExists = true;
-				bReadAccess = false;
-			}
-			else {
-				LOG_VERBOSE(2, "File " << path << " opened.");
-				bFileExists = true;
-				bReadAccess = true;
+		}
+		else if (sHashType == HashType::SHA256_HASH) {
+			rgbHash = AllocationWrapper{ new BYTE[SHA256LEN], SHA256LEN, AllocationWrapper::CPP_ARRAY_ALLOC };
+			cbHash = SHA256LEN;
+			if (!CryptCreateHash(hProv, CALG_SHA_256, 0, 0, &hHash)) {
+				LOG_ERROR("CryptCreateHash failed: " << GetLastError() << " while getting hash of " << FilePath);
+				LOG_SYSTEM_ERROR(GetLastError());
+				return std::nullopt;
 			}
 		}
 		else {
-			LOG_VERBOSE(2, "File " << path << " opened.");
+			rgbHash = AllocationWrapper{ new BYTE[MD5LEN], MD5LEN, AllocationWrapper::CPP_ARRAY_ALLOC };
+			cbHash = MD5LEN;
+			if (!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash)) {
+				LOG_ERROR("CryptCreateHash failed: " << GetLastError() << " while getting hash of " << FilePath);
+				return std::nullopt;
+			}
+		}
+		auto HashData{ GenericWrapper<HCRYPTHASH>(hHash, CryptDestroyHash) };
+		
+		DWORD cbRead{};
+		std::wstring digits{ L"0123456789abcdef" };
+		std::vector<BYTE> file(BUFSIZE);
+		bool bResult{ false };
+		while((bResult = ReadFile(hFile, file.data(), file.size(), &cbRead, nullptr)) && cbRead){
+			if (!CryptHashData(hHash, file.data(), cbRead, 0)) {
+				LOG_ERROR("CryptHashData failed: " << GetLastError() << " while getting hash of " << FilePath);
+				return std::nullopt;
+			}
+		}
+		SetFilePointer(0);
+
+		if (!bResult) {
+			LOG_ERROR("ReadFile failed: " << GetLastError() << " while getting hash of " << FilePath);
+			return std::nullopt;
+		}
+
+		std::wstring buffer{};
+		std::wstring rgbDigits{ L"0123456789abcdef" };
+		if (CryptGetHashParam(hHash, HP_HASHVAL, reinterpret_cast<PBYTE>(LPVOID(rgbHash)), &cbHash, 0)) {
+			for (DWORD i = 0; i < cbHash; i++) {
+				buffer += rgbDigits[(rgbHash[i] >> 4) & 0xf];
+				buffer += rgbDigits[rgbHash[i] & 0xf];
+			}
+			LOG_VERBOSE(3, "Successfully got hash of " << FilePath);
+			return buffer;
+		}
+		else {
+			LOG_ERROR("CryptGetHashParam failed: " << GetLastError() << " while getting hash of " << FilePath);
+		}
+
+		return std::nullopt;
+	}
+
+	File::File(IN const std::wstring& path) : hFile{ nullptr }{
+		FilePath = path;
+		LOG_VERBOSE(2, "Attempting to open file: " << path);
+		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE | WRITE_OWNER, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
+		if (hFile && GetLastError() == ERROR_SUCCESS) {
+			LOG_VERBOSE(2, "File " << path << " opened");
 			bFileExists = true;
 			bWriteAccess = true;
 			bReadAccess = true;
 		}
+		else {
+			if (!hFile && GetLastError() == ERROR_FILE_NOT_FOUND) {
+				LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path);
+				bFileExists = false;
+				bWriteAccess = false;
+				bReadAccess = false;
+			}
+			else if (!hFile && (GetLastError() == ERROR_ACCESS_DENIED || GetLastError() == ERROR_SHARING_VIOLATION)) {
+				bWriteAccess = false;
+				LOG_VERBOSE(3, "No write access available to file");
+				hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+					FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
+				if (hFile && GetLastError() == ERROR_SUCCESS) {
+					LOG_VERBOSE(2, "File " << path << " opened with read access.");
+					bFileExists = true;
+					bReadAccess = true;
+				}
+				else if (!hFile && GetLastError() == ERROR_SHARING_VIOLATION) {
+					LOG_VERBOSE(2, "Cannot open the following file because it is in use by another process " << path);
+					bFileExists = true;
+					bReadAccess = false;
+				}
+				else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
+					LOG_VERBOSE(2, "Access denied trying to open " << path);
+					bFileExists = true;
+					bReadAccess = false;
+				}
+				else {
+					LOG_ERROR("Unable to open " << path);
+					LOG_SYSTEM_ERROR(GetLastError());
+					bFileExists = true;
+					bReadAccess = false;
+				}
+			}
+			else {
+				LOG_ERROR("Unable to open " << path);
+				LOG_SYSTEM_ERROR(GetLastError());
+				bFileExists = true;
+				bWriteAccess = false;
+				bReadAccess = false;
+			}
+		}
 		Attribs.extension = PathFindExtension(path.c_str());
+	}
+
+	std::wstring File::GetFilePath() const {
+		return FilePath;
+	}
+
+	FileAttribs File::GetFileAttribs() const{
+			return Attribs;
+	}
+
+	bool File::GetFileExists() const {
+		return bFileExists;
+	}
+
+	bool File::HasWriteAccess() const {
+		return bWriteAccess;
+	}
+
+	bool File::HasReadAccess() const {
+			return bReadAccess;
 	}
 
 	bool File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, __in_opt const bool truncate, __in_opt const bool insert) const {
@@ -317,98 +444,19 @@ namespace FileSystem{
 		return false;
 	}
 
-	std::optional<std::string> File::GetMD5Hash() const {
+	std::optional<std::wstring> File::GetMD5Hash() const {
 		LOG_VERBOSE(3, "Attempting to get MD5 hash of " << FilePath);
-		if(!bFileExists) {
-			LOG_ERROR("Can't get MD5 hash of " << FilePath << ". File doesn't exist");
-			SetLastError(ERROR_FILE_NOT_FOUND);
-			return std::nullopt;
-		}
-		if (!bReadAccess) {
-			LOG_ERROR("Can't get MD5 hash of " << FilePath << ". Insufficient permissions.");
-			SetLastError(ERROR_ACCESS_DENIED);
-			return std::nullopt;
-		}
-		//Function from Microsoft
-		//https://docs.microsoft.com/en-us/windows/desktop/SecCrypto/example-c-program--creating-an-md-5-hash-from-file-content
-		DWORD dwStatus = 0;
-		BOOL bResult = FALSE;
-		HCRYPTPROV hProv = 0;
-		HCRYPTHASH hHash = 0;
-		BYTE rgbFile[BUFSIZE];
-		DWORD cbRead = 0;
-		BYTE rgbHash[MD5LEN];
-		DWORD cbHash = 0;
-		CHAR rgbDigits[] = "0123456789abcdef";
+		return CalculateHashType(HashType::MD5_HASH);
+	}
 
-		// Get handle to the crypto provider
-		if(!CryptAcquireContext(&hProv,
-			NULL,
-			NULL,
-			PROV_RSA_FULL,
-			CRYPT_VERIFYCONTEXT))
-		{
-			dwStatus = GetLastError();
-			LOG_ERROR("CryptAcquireContext failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
-			return std::nullopt;
-		}
+	std::optional<std::wstring> File::GetSHA1Hash() const {
+		LOG_VERBOSE(3, "Attempting to get SHA1 hash of " << FilePath);
+		return CalculateHashType(HashType::SHA1_HASH);
+	}
 
-		if(!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash))
-		{
-			dwStatus = GetLastError();
-			LOG_ERROR("CryptCreateHash failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
-			CryptReleaseContext(hProv, 0);
-			return std::nullopt;
-		}
-
-		while(bResult = ReadFile(hFile, rgbFile, BUFSIZE,
-			&cbRead, NULL))
-		{
-			if(0 == cbRead)
-			{
-				break;
-			}
-
-			if(!CryptHashData(hHash, rgbFile, cbRead, 0))
-			{
-				dwStatus = GetLastError();
-				LOG_ERROR("CryptHashData failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
-				CryptReleaseContext(hProv, 0);
-				CryptDestroyHash(hHash);
-				return std::nullopt;
-			}
-		}
-
-		if(!bResult)
-		{
-			dwStatus = GetLastError();
-			LOG_ERROR("ReadFile failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
-			CryptReleaseContext(hProv, 0);
-			CryptDestroyHash(hHash);
-			return std::nullopt;
-		}
-
-		std::string buffer = {};
-
-		cbHash = MD5LEN;
-		if(CryptGetHashParam(hHash, HP_HASHVAL, rgbHash, &cbHash, 0))
-		{
-			for(DWORD i = 0; i < cbHash; i++)
-			{
-				buffer += rgbDigits[rgbHash[i] >> 4];
-				buffer += rgbDigits[rgbHash[i] & 0xf];
-			}
-			return buffer;
-		} else
-		{
-			dwStatus = GetLastError();
-			LOG_ERROR("CryptGetHashParam failed: " << dwStatus << " while getting MD5 hash of " << FilePath);
-		}
-
-		CryptDestroyHash(hHash);
-		CryptReleaseContext(hProv, 0);
-		LOG_VERBOSE(3, "Successfully got MD5 Hash of " << FilePath);
-		return std::nullopt;
+	std::optional<std::wstring> File::GetSHA256Hash() const {
+		LOG_VERBOSE(3, "Attempting to get SHA256 hash of " << FilePath);
+		return CalculateHashType(HashType::SHA256_HASH);
 	}
 
 	bool File::Create() {
@@ -497,6 +545,73 @@ namespace FileSystem{
 		return FilePath;
 	}
 
+	std::optional<Permissions::Owner> File::GetFileOwner() const {
+		if (!bFileExists) {
+			LOG_ERROR("Can't get owner of nonexistent file " << FilePath);
+			return std::nullopt;
+		}
+		PSID psOwnerSID = NULL;
+		PISECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psOwnerSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR *>(&pDesc)) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting file owner for file " << FilePath << ". Error: " << GetLastError());
+			return std::nullopt;
+		}
+		pDesc->Owner = psOwnerSID;
+
+		Permissions::SecurityDescriptor secDesc(pDesc);
+		return Permissions::Owner(secDesc);
+	}
+
+	bool File::SetFileOwner(const Permissions::Owner& owner) {
+		if (!bFileExists) {
+			LOG_ERROR("Can't set owner of nonexistent file " << FilePath);
+			return false;
+		}
+		if (!this->bWriteAccess) {
+			LOG_ERROR("Can't write owner of file " << FilePath << ". Lack permissions");
+			return false;
+		}
+		if (SetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
+			LOG_ERROR("Error setting the file owner for file " << FilePath << " to " << owner << ". Error: " << GetLastError());
+			return false;
+		}
+		LOG_VERBOSE(3, "Set the owner for file " << FilePath << " to " << owner << ".");
+		return true;
+	}
+
+	ACCESS_MASK File::GetAccessPermissions(const Permissions::Owner& owner) {
+		if (!bFileExists) {
+			LOG_ERROR("Can't get permissions of nonexistent file " << FilePath);
+			return 0;
+		}
+		PACL paDACL = NULL;
+		PISECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting permissions on file " << FilePath << " for owner " << owner << ". Error: " << GetLastError());
+			return 0;
+		}
+
+		//Correct positional memory of the ACL is weird and doesn't naturally work with the SecurityDescriptor class.
+		//This gets the right data to the right place
+		Permissions::SecurityDescriptor secDesc = Permissions::SecurityDescriptor::CreateDACL(paDACL->AclSize);
+		memcpy(secDesc.GetDACL(), paDACL, paDACL->AclSize);
+		LocalFree(pDesc);
+		return Permissions::GetOwnerRightsFromACL(owner, secDesc);
+	}
+
+	ACCESS_MASK File::GetEveryonePermissions() {
+		Permissions::Owner everyone(L"Everyone");
+		return this->GetAccessPermissions(everyone);
+	}
+
+	bool File::TakeOwnership() {
+		std::optional<Permissions::Owner> BluespawnOwner = Permissions::GetProcessOwner();
+		if (BluespawnOwner == std::nullopt) {
+			return false;
+		}
+		return this->SetFileOwner(*BluespawnOwner);
+	}
+
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
 		FolderPath = path;
 		std::wstring searchName = FolderPath;
@@ -513,6 +628,10 @@ namespace FileSystem{
 		} else {
 			bIsFile = true;
 		}
+	}
+
+	std::wstring Folder::GetFolderPath() const {
+		return FolderPath;
 	}
 
 	bool Folder::MoveToNextFile() {
@@ -541,6 +660,14 @@ namespace FileSystem{
 			bIsFile = true;
 		}
 		return true;
+	}
+	
+	bool Folder::GetFolderExists() const {
+		return bFolderExists;
+	}
+
+	bool Folder::GetCurIsFile() const {
+		return bIsFile;
 	}
 
 	std::optional<File> Folder::Open() const {
@@ -659,5 +786,67 @@ namespace FileSystem{
 			}
 		} while(MoveToNextFile());
 		return toRet;
+	}
+
+	std::optional<Permissions::Owner> Folder::GetFolderOwner() const {
+		if (!bFolderExists) {
+			LOG_ERROR("Can't get owner of nonexistent folder " << FolderPath);
+			return std::nullopt;
+		}
+		PSID psOwnerSID = NULL;
+		PISECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetNamedSecurityInfoW((LPWSTR) FolderPath.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psOwnerSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting file owner for folder " << FolderPath << ". Error: " << GetLastError());
+			return std::nullopt;
+		}
+		pDesc->Owner = psOwnerSID;
+
+		Permissions::SecurityDescriptor secDesc(pDesc);
+		return Permissions::Owner(secDesc);
+	}
+
+	bool Folder::SetFolderOwner(const Permissions::Owner& owner) {
+		if (!bFolderExists) {
+			LOG_ERROR("Can't write owner of folder " << FolderPath << ". Folder doesn't exist");
+			return false;
+		}
+		if (SetNamedSecurityInfoW((LPWSTR)FolderPath.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
+			LOG_ERROR("Error setting the folder owner for folder " << FolderPath << " to " << owner << ". Error: " << GetLastError());
+			return false;
+		}
+		LOG_VERBOSE(3, "Set the owner for folder " << FolderPath << " to " << owner << ".");
+		return true;
+	}
+
+	ACCESS_MASK Folder::GetAccessPermissions(const Permissions::Owner& owner) {
+		if (!bFolderExists) {
+			LOG_ERROR("Can't get permissions of nonexistent folder " << FolderPath);
+			return 0;
+		}
+		PACL paDACL = NULL;
+		PISECURITY_DESCRIPTOR pDesc = NULL;
+		if (GetNamedSecurityInfoW((LPWSTR) FolderPath.c_str(), SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting permissions on file " << FolderPath << " for owner " << owner << ". Error: " << GetLastError());
+			return 0;
+		}
+		//Correct positional memory of the ACL is weird and doesn't naturally work with the SecurityDescriptor class.
+		//This gets the right data to the right place
+		Permissions::SecurityDescriptor secDesc = Permissions::SecurityDescriptor::CreateDACL(paDACL->AclSize);
+		memcpy(secDesc.GetDACL(), paDACL, paDACL->AclSize);
+		LocalFree(pDesc);
+		return Permissions::GetOwnerRightsFromACL(owner, secDesc);
+	}
+
+	ACCESS_MASK Folder::GetEveryonePermissions() {
+		Permissions::Owner everyone(L"Everyone");
+		return this->GetAccessPermissions(everyone);
+	}
+
+	bool Folder::TakeOwnership() {
+		std::optional<Permissions::Owner> BluespawnOwner = Permissions::GetProcessOwner();
+		if (BluespawnOwner == std::nullopt) {
+			return false;
+		}
+		return this->SetFolderOwner(*BluespawnOwner);
 	}
 }

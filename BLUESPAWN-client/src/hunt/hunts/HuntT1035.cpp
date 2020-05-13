@@ -42,7 +42,7 @@ namespace Hunts {
 			auto& yara = YaraScanner::GetInstance();
 			YaraScanResult result = yara.ScanFile(image);
 
-			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(image.GetFilePath()));
+			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(image));
 
 			detections += 2;
 		}
@@ -67,7 +67,7 @@ namespace Hunts {
 				auto& yara = YaraScanner::GetInstance();
 				YaraScanResult result = yara.ScanFile(servicedll);
 
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(servicedll.GetFilePath()));
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(servicedll));
 
 				detections += 2;
 			}

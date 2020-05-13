@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+  {% extends 'BLUESPAWN/base.html' %} {% block title %}About{% endblock %} {% block content %} {% load bootstrap4%} {% load static %}
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-12">
+        <h1>About BLUESPAWN</h1>
+		<hr>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <h2 id="contact-us">Contact Us</h2>
+      </div>
+      <div class="col-12">
+        <p>If you have any questions, comments, or suggestions, please feel free to send us an email at <a href=
+        "&#x6d;&#97;&#105;&#108;&#x74;&#111;&#58;&#98;&#108;&#x75;&#x65;&#x73;&#x70;&#x61;&#119;&#x6e;&#x40;&#118;&#105;&#x72;&#x67;&#105;&#x6e;&#105;&#97;&#x2e;&#101;&#x64;&#117;">&#98;&#108;&#x75;&#x65;&#x73;&#x70;&#x61;&#119;&#x6e;&#x40;&#118;&#105;&#x72;&#x67;&#105;&#x6e;&#105;&#97;&#x2e;&#101;&#x64;&#117;</a></p>
+      </div>
+    </div>
+    <h2 id="licensing-compliance">Licensing &amp; Compliance</h2>
+    <p>The core BLUESPAWN code is licensed under <a href="https://github.com/ION28/BLUESPAWN/blob/master/LICENSE">GNU General Public License (GPL) v3.0</a>.</p>
+    <p>Note that the project integrates several other libraries to provide additional features/detections. One of these is Florian Roth&#39;s <a href="https://github.com/Neo23x0/signature-base">signature-base</a> which is licensed under the <a href=
+    "http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>. YARA rules from this project are integrated into the standard build without any changes. In order to use BLUESPAWN for any
+    commercial purposes, you must remove everything under the &quot;Non-Commercial Only&quot; line in <a href="https://github.com/ION28/BLUESPAWN/blob/master/BLUESPAWN-client/resources/severe2.yar">this file</a> and recompile the project.</p>
+    <h2 id="project-authors">Project Authors</h2>
+    <p>Made with 💗 by the UVA Cyber Defense Team Windows Group</p>
+    <ul>
+      <li>Jake Smith (<a href="https://github.com/ION28">Github</a>, <a href="https://twitter.com/jtsmith282">Twitter</a>)
+      </li>
+      <li>Calvin Krist (<a href="https://github.com/CalvinKrist">Github</a>, <a href="https://twitter.com/CalvinKrist">Twitter</a>)
+      </li>
+      <li>Jack McDowell (<a href="https://github.com/jnmcd/">Github</a>)
+      </li>
+      <li>Will Mayes (<a href="https://github.com/wtm99">Github</a>, <a href="https://twitter.com/will_mayes99">Twitter</a>)
+      </li>
+      <li>Grant Matteo (<a href="https://github.com/GrantMatteo">Github</a>)
+      </li>
+    </ul>
+    <h2 id="contributors">Contributors</h2>
+    <p>Thanks to all of the folks listed below for their contributions to BLUESPAWN!</p>
+    <ul>
+      <li>Alexander Kluth (<a href="https://github.com/alexclooze">Github</a>)
+      </li>
+    </ul>
+    <p>Want to help? Take a look at the current issues, add ideas for new features, write some code, and create a pull request!</p>
+    <h2 id="special-thanks">Special Thanks</h2>
+    <p>We would like to provide a special thank you to the following projects that have helped us to build BLUESPAWN:</p>
+    <ul>
+      <li>Github&#39;s support of open-source projects, especially the ability for unlimited use Github Actions</li>
+      <li>Microsoft&#39;s documentation and examples on the Windows API</li>
+      <li>The Department of Defense&#39;s Defense Information Systems Agency (DISA) for their great work in publishing STIGs and various other technical security guidance for Windows.</li>
+      <li>
+        <a href="https://github.com/hasherezade">@hasherezade</a>&#39;s <a href="https://github.com/hasherezade/pe-sieve">PE Sieve</a>, which currently manages our process analytics
+      </li>
+      <li>VirusTotal&#39;s <a href="https://github.com/VirusTotal/yara">YARA</a> Project which we use to scan data for malicious identifiers
+      </li>
+      <li>The <a href="https://twitter.com/yararules">Yara Rules Project</a>&#39;s <a href="https://github.com/Yara-Rules/rules">Rules</a> repository which contains a large collection of open-source YARA rules
+      </li>
+      <li>
+        <a href="https://github.com/Neo23x0">@Neo23x0</a>&#39;s open-source <a href="https://github.com/Neo23x0/signature-base">signature-base</a> project which contains a large collection of YARA rules
+      </li>
+      <li>The <a href="https://attack.mitre.org/">MITRE&#39;s ATT&amp;CK Project</a> which has put together an amazing framework for which to consider, document, and categorize attacker tradercraft
+      </li>
+      <li>Red Canary&#39;s <a href="https://github.com/redcanaryco/atomic-red-team">Atomic Red Team</a> and <a href="https://github.com/redcanaryco/invoke-atomicredteam">Invoke-AtomicRedTeam</a> Projects which have been incredibly useful in helping
+      to test the detections we are building
+      </li>
+      <li>Amazon&#39;s <a href="https://aws.amazon.com/opensource/">Open Source at AWS Initiative</a> who has provided our team some AWS promotional credits to help us reserach and test BLUESPAWN better
+      </li>
+      <li>The <a href="https://github.com/nsacyber">NSA Cybersecurity Directorate</a>&#39;s Windows <a href="https://github.com/nsacyber/Event-Forwarding-Guidance">Event Forwarding Guidance</a>
+      </li>
+      <li>
+        <a href="https://twitter.com/PyroTek3">Sean Metcalf</a>&#39;s Active Directory Security blog <a href="https://adsecurity.org/">ADSecurity</a>
+      </li>
+      <li>
+        <a href="https://github.com/op7ic">@op7ic</a>&#39;s <a href="https://github.com/op7ic/EDR-Testing-Script">EDR-Testing-Script</a> Project
+      </li>
+      <li>The Japan Computer Emergency Response Team (JPCERT)&#39;s <a href="https://jpcertcc.github.io/ToolAnalysisResultSheet/">Tool Analysis Result Sheet</a> for its documentation of attacker behavior and correlation with detection opportunities
+      </li>
+      <li>
+        <a href="https://github.com/jarro2783">@jarro2783</a>&#39;s <a href="https://github.com/jarro2783/cxxopts">cxxopts</a> which we use to parse command line arguments
+      </li>
+      <li>
+        <a href="https://github.com/leethomason">@leethomason</a>&#39;s <a href="https://github.com/leethomason/tinyxml2">tinyxml2</a> library which we use to output scan information to XML
+      </li>
+    </ul>
+  </div>{% endblock %}
+</body>
+</html>

@@ -111,6 +111,7 @@ bool CLI::AlertUser(const std::wstring& information, DWORD dwMaximumDelay, Impor
 	Print(descriptions[static_cast<DWORD>(level)], colors[static_cast<DWORD>(level)], false);
 	Print(L" " + information);
 	Print(L"Press enter to continue. ", MessageColor::LIGHTGRAY, false);
+	Print(L"");
 	return GetInput(dwMaximumDelay).has_value();
 }
 
