@@ -31,9 +31,11 @@ struct FILE_DETECTION : public DETECTION {
 	std::wstring md5;
 	std::wstring sha1;
 	std::wstring sha256;
+	FileSystem::File fFile;
 	FILE_DETECTION(const FileSystem::File f) : 
 		DETECTION{ DetectionType::File },
-		wsFilePath{ f.GetFilePath() }{
+		wsFilePath{ f.GetFilePath() }, 
+		fFile{ f } {
 		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
 		if (f.GetMD5Hash()) {
 			md5 = f.GetMD5Hash().value();
