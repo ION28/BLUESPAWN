@@ -37,7 +37,7 @@ namespace Hunts {
 
 				if(!bFileSigned || (!result && result.vKnownBadRules.size() > 0)) {
 					detections++;
-					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 				}
 			}
 		}
@@ -58,7 +58,7 @@ namespace Hunts {
 				}
 
 				LOG_INFO(file.GetFilePath() << L" is not signed!");
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 				detections++;
 			}
 		}

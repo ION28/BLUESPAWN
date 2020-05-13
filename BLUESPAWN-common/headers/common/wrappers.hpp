@@ -13,15 +13,15 @@ protected:
 	std::shared_ptr<void> ReferenceCounter;
 
 	T WrappedObject;
-	T BadValue;
+	std::optional<T> BadValue;
 
 public:
 
-	GenericWrapper(T object, std::function<void(T)> freeFunction = [](T object){ delete object; }, T BadValue = nullptr) : 
+	GenericWrapper(T object, std::function<void(T)> freeFunction = [](T object){ delete object; }, std::optional<T> BadValue = std::nullopt) : 
 		WrappedObject{ object }, 
 		BadValue{ BadValue },
 		ReferenceCounter{ nullptr, [object, BadValue, freeFunction](LPVOID memory){ 
-		    if(object != BadValue && object){ freeFunction(object); } 
+		    if((!BadValue || object != BadValue) && object){ freeFunction(object); } 
 	    }}{}
 
 	operator T() const { return WrappedObject; }
@@ -58,7 +58,7 @@ public:
 
 class AllocationWrapper {
 	std::optional<std::shared_ptr<char[]>> Memory;
-	const PCHAR pointer;
+	PCHAR pointer;
 	SIZE_T AllocationSize;
 
 public:

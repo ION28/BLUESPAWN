@@ -12,6 +12,14 @@
 
 #define BUFSIZE 1024
 #define MD5LEN  16
+#define SHA1LEN 20
+#define SHA256LEN 32
+
+enum class HashType {
+	MD5_HASH,
+	SHA1_HASH,
+	SHA256_HASH
+};
 
 namespace FileSystem {
 	/**
@@ -76,6 +84,14 @@ namespace FileSystem {
 		* return true if the file is signed in the system catalogs, false if it isn't or on error
 		*/
 		bool GetFileInSystemCatalogs() const;
+		/**
+		* Function to assist in retrieving file hashes
+		* 
+		* @param HashType
+		*
+		* return std::wstring value of the requested hash type
+		*/
+		std::optional<std::wstring> CalculateHashType(HashType sHashType) const;
 	public:
 
 		/**
@@ -148,12 +164,24 @@ namespace FileSystem {
 
 		/**
 		* Function to compute the MD5 hash of the file
-		* 
-		* @param buffer The buffer to write the hash to
 		*
-		* @return true if hashing successful, false if hashing unsuccessful
+		* @return The MD5 hash of the object or an empty string if unable to calculate hash
 		*/
-		std::optional<std::string> GetMD5Hash() const;
+		std::optional<std::wstring> GetMD5Hash() const;
+
+		/**
+		* Function to compute the SHA1 hash of the file
+		*
+		* @return The SHA1 hash of the object or an empty string if unable to calculate hash
+		*/
+		std::optional<std::wstring> GetSHA1Hash() const;
+
+		/**
+		* Function to compute the SHA256 hash of the file
+		*
+		* @return The SHA256 hash of the object or an empty string if unable to calculate hash
+		*/
+		std::optional<std::wstring> GetSHA256Hash() const;
 
 		/**
 		* Function to see if a file matches a given set of search criteria

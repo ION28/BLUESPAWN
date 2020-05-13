@@ -38,7 +38,7 @@ namespace Hunts {
 
 			if (!file->GetFileSigned()) {
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ key, name, key.GetValue<std::vector<std::wstring>>(name).value() }));
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file->GetFilePath()));
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(*file));
 				detections += 2;
 			}
 		}
