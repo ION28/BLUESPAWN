@@ -42,6 +42,7 @@ typedef std::shared_ptr<FILE_DETECTION> FileDetection;
 typedef std::function<void(std::shared_ptr<FILE_DETECTION>)> DetectFile;
 
 enum class RegistryDetectionType {
+	CommandReference, // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a command used to run program
 	FileReference,    // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a file
 	FolderReference,  // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a folder
 	PipeReference,    // The associated value is either a REG_SZ that references a named pipe

@@ -35,13 +35,17 @@ namespace FileSystem{
 	std::optional<std::wstring> SearchPathExecutable(const std::wstring& name){
 		auto size = SearchPathW(nullptr, name.c_str(), L".exe", 0, nullptr, nullptr);
 		if(!size){
-			return std::nullopt;
+			size = SearchPathW(nullptr, name.c_str(), L".dll", 0, nullptr, nullptr);
+			if(!size)
+				return std::nullopt;
 		}
 
 		std::vector<WCHAR> buffer(static_cast<size_t>(size) + 1);
 		WCHAR* filename{};
 		if(!SearchPathW(nullptr, name.c_str(), L".exe", size + 1, buffer.data(), &filename)){
-			return std::nullopt;
+			if(!SearchPathW(nullptr, name.c_str(), L".dll", size + 1, buffer.data(), &filename)){
+				return std::nullopt;
+			}
 		}
 
 		return buffer.data();

@@ -8,11 +8,11 @@
 
 /// Represents the degree of certainty that a detection is malicious
 enum class Certainty {
-	Certain,  // 1.00
-	Strong,   // 0.75
-	Moderate, // 0.5
-	Weak,     // 0.25
-	None,     // 0.00
+	Certain = 0,  // 1.00
+	Strong = 1,   // 0.75
+	Moderate = 2, // 0.50
+	Weak = 3,     // 0.25
+	None = 4,     // 0.00
 };
 
 /// An association is the degree of certainty that two detections are related
@@ -41,7 +41,7 @@ Association MultiplyAssociation(Association a1, Association a2);
 class ScanNode {
 
 	/// A mapping of scan nodes to their association with the current node.
-	std::map<std::shared_ptr<ScanNode>, Association> associations;
+	std::map<ScanNode, Association> associations;
 
 	/// The detection referenced by the scan node
 	Detection detection;
@@ -52,9 +52,32 @@ class ScanNode {
 public:
 	ScanNode(const Detection& detection);
 
-	std::map<std::shared_ptr<ScanNode>, Association> GetAssociations() const;
+	const std::map<ScanNode, Association>& GetAssociations() const;
 
-	void AddAssociations(const std::map<std::shared_ptr<ScanNode>, Association>& associations);
+	void AddAssociations(const std::map<ScanNode, Association>& associations);
 
 	bool operator==(const ScanNode& node);
+};
+
+// Forward declare DetectionCollector so that it can be a friend;
+class DetectionCollector;
+
+/**
+ * Represents a network of related ScanNode objects
+ */
+class DetectionNetwork {
+private:
+	
+	std::vector<ScanNode> nodes;
+
+	void GrowNetwork(Aggressiveness aggressiveness);
+
+	friend class DetectionCollector;
+
+public:
+	DetectionNetwork(const ScanNode& node);
+
+	bool IntersectsNetwork(const DetectionNetwork& network);
+
+	DetectionNetwork MergeNetworks(const DetectionNetwork& network);
 };
