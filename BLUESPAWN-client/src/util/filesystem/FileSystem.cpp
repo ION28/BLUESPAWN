@@ -612,6 +612,19 @@ namespace FileSystem{
 		return this->SetFileOwner(*BluespawnOwner);
 	}
 
+	bool File::GrantPermissions(const Permissions::Owner& owner, const ACCESS_MASK& amAccess) {
+		return Permissions::UpdateObjectACL(FilePath, SE_FILE_OBJECT, owner, amAccess);
+	}
+
+	bool File::DenyPermissions(const Permissions::Owner& owner, const ACCESS_MASK& amAccess) {
+		return Permissions::UpdateObjectACL(FilePath, SE_FILE_OBJECT, owner, amAccess, true);
+	}
+
+	bool File::Quarantine() {
+		//TODO Set up permissions for quarantine
+		return DenyPermissions(Permissions::Owner(L"Everyone"), 0);
+	}
+
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
 		FolderPath = path;
 		std::wstring searchName = FolderPath;

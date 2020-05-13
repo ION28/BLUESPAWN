@@ -65,6 +65,52 @@ namespace Permissions {
 		return amAccess;
 	}
 
+	bool UpdateObjectACL(const std::wstring& wsObjectName, const SE_OBJECT_TYPE& seObjectType, const Owner& oOwner, const ACCESS_MASK& amDesiredAccess, const bool& bDeny) {
+		bool success{ true };
+		PACL pOldDacl;
+		PSECURITY_DESCRIPTOR pDesc{ nullptr };
+		HRESULT hr = GetNamedSecurityInfoW(reinterpret_cast<LPCWSTR>(wsObjectName.c_str()), seObjectType, DACL_SECURITY_INFORMATION, nullptr, nullptr, &pOldDacl, nullptr, &pDesc);
+		PACL pNewDacl{ nullptr };
+		if (hr != ERROR_SUCCESS) {
+			success = false;
+			LOG_ERROR("Couldn't read current DACL for object " << wsObjectName << ". (Error " << hr << ")");
+			SetLastError(hr);
+			goto end;
+		}
+		ACCESS_MODE amAccessMode = bDeny ? DENY_ACCESS : GRANT_ACCESS;
+		EXPLICIT_ACCESS ea;
+		ZeroMemory(&ea, sizeof(EXPLICIT_ACCESS));
+		ea.grfAccessPermissions = amDesiredAccess;
+		ea.grfAccessMode = amAccessMode;
+		ea.grfInheritance = OBJECT_INHERIT_ACE | CONTAINER_INHERIT_ACE;
+		BuildTrusteeWithSidW(&ea.Trustee, oOwner.GetSID());
+
+		hr = SetEntriesInAcl(1, &ea, pOldDacl, &pNewDacl);
+		if (hr != ERROR_SUCCESS) {
+			success = false;
+			LOG_ERROR("Couldn't update DACL for object " << wsObjectName << ". (Error " << hr << ")");
+			SetLastError(hr);
+			goto end;
+		}
+
+		hr = SetNamedSecurityInfoW(const_cast<LPWSTR>(wsObjectName.c_str()), seObjectType,
+			DACL_SECURITY_INFORMATION,
+			NULL, NULL, pNewDacl, NULL);
+		if (hr != ERROR_SUCCESS) {
+			success = false;
+			LOG_ERROR("Couldn't set new DACL for object " << wsObjectName << ". (Error " << hr << ")");
+			SetLastError(hr);
+			goto end;
+		}
+
+
+	end:
+		if (pDesc != nullptr) LocalFree(pDesc);
+		if (pNewDacl != nullptr) LocalFree(pNewDacl);
+		return success;
+	}
+
+
 	SecurityDescriptor::SecurityDescriptor(DWORD dwSize, SecurityDescriptor::SecurityDataType type) :
 		GenericWrapper<PISECURITY_DESCRIPTOR>(reinterpret_cast<PISECURITY_DESCRIPTOR>(HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwSize)),
 			[](LPVOID memory) { HeapFree(GetProcessHeap(), 0, memory); }, nullptr) {
