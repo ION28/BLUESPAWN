@@ -13,6 +13,17 @@ namespace Reactions {
 			if (!detection->fFile.TakeOwnership()) {
 				LOG_ERROR("Unable to take ownership of file, still attempting to delete. (Error: " << GetLastError() << ")");
 			}
+			ACCESS_MASK amDelete{ 0 };
+			Permissions::AccessAddDelete(amDelete);
+			std::optional<Permissions::Owner> BluespawnOwner = Permissions::GetProcessOwner();
+			if (BluespawnOwner == std::nullopt) {
+				LOG_ERROR("Unable to get process owner, still attempting to delete. (Error: " << GetLastError() << ")");
+			}
+			else {
+				if (!detection->fFile.GrantPermissions(*BluespawnOwner, amDelete)) {
+					LOG_ERROR("Unable to grant delete permission, still attempting to delete. (Error: " << GetLastError() << ")");
+				}
+			}
 			if (!detection->fFile.Delete()) {
 				LOG_ERROR("Unable to delete file " << detection->wsFilePath << ". (Error " << GetLastError() << ")");
 			}

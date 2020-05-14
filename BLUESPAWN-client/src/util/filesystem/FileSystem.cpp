@@ -492,6 +492,7 @@ namespace FileSystem{
 			LOG_ERROR("Can't delete file " << FilePath << ". File doesn't exist");
 			return false;
 		}
+		CloseHandle(hFile);
 		if(!DeleteFileW(FilePath.c_str())) {
 			DWORD dwStatus = GetLastError();
 			LOG_ERROR("Deleting file " << FilePath << " failed with error " << dwStatus);

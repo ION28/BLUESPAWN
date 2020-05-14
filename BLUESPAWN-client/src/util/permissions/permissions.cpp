@@ -31,6 +31,11 @@ namespace Permissions {
 			((access & WRITE_OWNER) == WRITE_OWNER);
 	}
 
+	bool AccessContainsDelete(const ACCESS_MASK& access) {
+		return AccessIncludesAll(access) ||
+			((access & DELETE) == DELETE);
+	}
+
 	void AccessAddAll(ACCESS_MASK& access) {
 		access |= GENERIC_ALL;
 	}
@@ -49,6 +54,10 @@ namespace Permissions {
 
 	void AccessAddWriteOwner(ACCESS_MASK& access) {
 		access |= WRITE_OWNER;
+	}
+
+	void AccessAddDelete(ACCESS_MASK& access) {
+		access |= DELETE;
 	}
 
 	ACCESS_MASK GetOwnerRightsFromACL(const Owner& owner, const SecurityDescriptor& acl) {

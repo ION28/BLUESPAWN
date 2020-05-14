@@ -21,6 +21,7 @@ namespace Permissions {
 	bool AccessIncludesRead(const ACCESS_MASK& access);
 	bool AccessIncludesExecute(const ACCESS_MASK& access);
 	bool AccessIncludesWriteOwner(const ACCESS_MASK& access);
+	bool AccessIncludesDelete(const ACCESS_MASK& access);
 
 	/**
 	* Function to add an access to an access mask
@@ -32,6 +33,7 @@ namespace Permissions {
 	void AccessAddRead(ACCESS_MASK& access);
 	void AccessAddExecute(ACCESS_MASK& access);
 	void AccessAddWriteOwner(ACCESS_MASK& access);
+	void AccessAddDelete(ACCESS_MASK& access);
 
 	class SecurityDescriptor : public GenericWrapper<PISECURITY_DESCRIPTOR> {
 		PSID lpUserSID;

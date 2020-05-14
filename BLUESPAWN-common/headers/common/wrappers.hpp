@@ -38,7 +38,19 @@ public:
 class HandleWrapper : public GenericWrapper<HANDLE> {
 public:
 	HandleWrapper(HANDLE handle) :
-		GenericWrapper(handle, std::function<void(HANDLE)>(CloseHandle), INVALID_HANDLE_VALUE){};
+		GenericWrapper(handle, std::function<void(HANDLE)>(SafeCloseHandle), INVALID_HANDLE_VALUE){};
+	static void SafeCloseHandle(HANDLE handle) {
+		BY_HANDLE_FILE_INFORMATION hInfo;
+		if (GetFileInformationByHandle(handle, &hInfo)) {
+			CloseHandle(handle);
+		}
+		else {
+			HRESULT a = GetLastError();
+			if (a != ERROR_INVALID_HANDLE) {
+				CloseHandle(handle);
+			}
+		}
+	}
 };
 
 class FindWrapper : public GenericWrapper<HANDLE> {
