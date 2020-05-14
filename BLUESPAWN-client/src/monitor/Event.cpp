@@ -163,13 +163,13 @@ const FileSystem::Folder& FileEvent::GetFolder() const {
 
 namespace Registry {
 	std::vector<std::shared_ptr<Event>> GetRegistryEvents(HKEY hkHive, const std::wstring& path, bool WatchWow64, bool WatchUsers, bool WatchSubkeys){
-		auto& base = std::make_shared<RegistryEvent>(RegistryKey{ hkHive, path });
+		auto& base = std::make_shared<RegistryEvent>(RegistryKey{ hkHive, path }, WatchSubkeys);
 		std::unordered_set<std::shared_ptr<Event>> vKeys{};
 		if(base->GetKey().Exists()){
 			vKeys.emplace(base);
 		}
 		if(WatchWow64){
-			std::shared_ptr<RegistryEvent> Wow64Key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hkHive), path, true }) };
+			std::shared_ptr<RegistryEvent> Wow64Key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hkHive), path, true }, WatchSubkeys) };
 			if(Wow64Key->GetKey().Exists() && Wow64Key->GetKey().GetName().find(L"WOW6432Node") != std::wstring::npos){
 				vKeys.emplace(std::static_pointer_cast<Event>(Wow64Key));
 			}
@@ -177,12 +177,12 @@ namespace Registry {
 		if(WatchUsers){
 			std::vector<RegistryKey> hkUserHives{ RegistryKey{HKEY_USERS}.EnumerateSubkeys() };
 			for(auto& hive : hkUserHives){
-				std::shared_ptr<RegistryEvent> key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hive), path, false }) };
+				std::shared_ptr<RegistryEvent> key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hive), path, false }, WatchSubkeys) };
 				if(key->GetKey().Exists()){
 					vKeys.emplace(std::static_pointer_cast<Event>(key));
 				}
 				if(WatchWow64){
-					std::shared_ptr<RegistryEvent> Wow64Key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hive), path, true }) };
+					std::shared_ptr<RegistryEvent> Wow64Key{ std::make_shared<RegistryEvent>(RegistryKey{ HKEY(hive), path, true }, WatchSubkeys) };
 					if(Wow64Key->GetKey().Exists() && Wow64Key->GetKey().GetName().find(L"WOW6432Node") != std::wstring::npos){
 						vKeys.emplace(std::static_pointer_cast<Event>(Wow64Key));
 					}
