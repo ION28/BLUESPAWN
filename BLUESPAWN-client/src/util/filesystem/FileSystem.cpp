@@ -565,10 +565,12 @@ namespace FileSystem{
 	bool File::SetFileOwner(const Permissions::Owner& owner) {
 		if (!bFileExists) {
 			LOG_ERROR("Can't set owner of nonexistent file " << FilePath);
+			SetLastError(ERROR_FILE_NOT_FOUND);
 			return false;
 		}
 		if (!this->bWriteAccess) {
 			LOG_ERROR("Can't write owner of file " << FilePath << ". Lack permissions");
+			SetLastError(ERROR_ACCESS_DENIED);
 			return false;
 		}
 		if (SetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
@@ -582,6 +584,7 @@ namespace FileSystem{
 	ACCESS_MASK File::GetAccessPermissions(const Permissions::Owner& owner) {
 		if (!bFileExists) {
 			LOG_ERROR("Can't get permissions of nonexistent file " << FilePath);
+			SetLastError(ERROR_FILE_NOT_FOUND);
 			return 0;
 		}
 		PACL paDACL = NULL;
@@ -623,6 +626,7 @@ namespace FileSystem{
 	bool File::Quarantine() {
 		if (!bFileExists) {
 			LOG_ERROR("Can't quarantine file " << FilePath << ". File doesn't exist");
+			SetLastError(ERROR_FILE_NOT_FOUND);
 			return false;
 		}
 		ACCESS_MASK amEveryoneDeniedAccess{ 0 };
