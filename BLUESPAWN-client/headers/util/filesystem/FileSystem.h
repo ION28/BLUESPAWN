@@ -273,6 +273,33 @@ namespace FileSystem {
 		* @return true if successful, false otherwise
 		*/
 		bool TakeOwnership();
+
+		/**
+		* Function to grant certain permissions to certain user or group
+		*
+		* @param owner The user or group to grant permissions to
+		* @param amAccess The access to grant to owner
+		*
+		* @return true if the permissions were granted, false otherwise
+		*/
+		bool GrantPermissions(const Permissions::Owner& owner, const ACCESS_MASK& amAccess);
+
+		/**
+		* Function to deny certain permissions to certain user or group
+		*
+		* @param owner The user or group to deny permissions to
+		* @param amAccess The access to deny the owner
+		*
+		* @return true if the permissions were denied, false otherwise
+		*/
+		bool DenyPermissions(const Permissions::Owner& owner, const ACCESS_MASK& amAccess);
+
+		/**
+		* Function to quarantine file
+		*
+		* @return true if the file is quarantined, false otherwise
+		*/
+		bool Quarantine();
 	};
 
 	class Folder {
