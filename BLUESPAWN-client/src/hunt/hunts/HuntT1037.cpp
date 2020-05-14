@@ -118,6 +118,21 @@ namespace Hunts{
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1037::GetMonitoringEvents() {
-		return Registry::GetRegistryEvents(HKEY_CURRENT_USER, L"Environment", true, true, false);
+		std::vector<std::shared_ptr<Event>> events;
+
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_CURRENT_USER, L"Environment", true, true, false));
+
+		events.push_back(std::make_shared<FileEvent>(FileSystem::Folder(L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp")));
+		
+		auto userFolders = FileSystem::Folder(L"C:\\Users").GetSubdirectories(1);
+
+		for (auto userFolder : userFolders) {
+			auto folder = FileSystem::Folder(userFolder.GetFolderPath() + L"\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp");
+			if (folder.GetFolderExists()) {
+				events.push_back(std::make_shared<FileEvent>(folder));
+			}
+		}
+
+		return events;
 	}
 }
