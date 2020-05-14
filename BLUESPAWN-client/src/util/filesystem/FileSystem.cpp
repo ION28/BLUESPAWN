@@ -492,7 +492,6 @@ namespace FileSystem{
 			LOG_ERROR("Can't delete file " << FilePath << ". File doesn't exist");
 			return false;
 		}
-		CloseHandle(hFile);
 		if(!DeleteFileW(FilePath.c_str())) {
 			DWORD dwStatus = GetLastError();
 			LOG_ERROR("Deleting file " << FilePath << " failed with error " << dwStatus);
@@ -621,7 +620,10 @@ namespace FileSystem{
 	}
 
 	bool File::Quarantine() {
-		//TODO Set up permissions for quarantine
+		if (!bFileExists) {
+			LOG_ERROR("Can't quarantine file " << FilePath << ". File doesn't exist");
+			return false;
+		}
 		ACCESS_MASK amEveryoneDeniedAccess{ 0 };
 		Permissions::AccessAddAll(amEveryoneDeniedAccess);
 		return DenyPermissions(Permissions::Owner(L"Everyone"), amEveryoneDeniedAccess);
