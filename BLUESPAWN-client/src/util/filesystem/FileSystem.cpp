@@ -622,7 +622,9 @@ namespace FileSystem{
 
 	bool File::Quarantine() {
 		//TODO Set up permissions for quarantine
-		return DenyPermissions(Permissions::Owner(L"Everyone"), 0);
+		ACCESS_MASK amEveryoneDeniedAccess{ 0 };
+		Permissions::AccessAddAll(amEveryoneDeniedAccess);
+		return DenyPermissions(Permissions::Owner(L"Everyone"), amEveryoneDeniedAccess);
 	}
 
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
