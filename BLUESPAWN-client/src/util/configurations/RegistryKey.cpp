@@ -452,6 +452,19 @@ namespace Registry {
 		return vSubKeys;
 	}
 
+	std::wstring RegistryKey::GetNameWithoutHive() const {
+		std::wstring ret = GetName();
+		auto location = ret.find(L"HKEY_LOCAL_MACHINE");
+		if (location != std::string::npos) {
+			ret.replace(location, 19, L"");
+		}
+		location = ret.find(L"HKEY_USERS");
+		if (location != std::string::npos) {
+			ret.replace(location, 11, L"");
+		}
+		return ret;
+	}
+
 	std::wstring RegistryKey::GetName() const {
 		if(!Exists()){
 			SetLastError(ERROR_NOT_FOUND);

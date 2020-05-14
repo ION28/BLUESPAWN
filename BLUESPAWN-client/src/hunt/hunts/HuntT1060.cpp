@@ -63,12 +63,36 @@ namespace Hunts {
 		int detections = 0;
 		
 		for(auto& key : RunKeys){
-			for(auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, key)){
+			for (auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, key)) {
 				if (EvaluateFile(detection.ToString(), reaction)) {
 					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
 				}
 				detections++;
 			}
+			for (auto& sub : CheckSubkeys(HKEY_LOCAL_MACHINE, key)) {
+				for (auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, sub.GetNameWithoutHive())) {
+					if (EvaluateFile(detection.ToString(), reaction)) {
+						reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+					}
+					detections++;
+				}
+			}
+		}
+
+		for (auto& detection : CheckValues(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", {
+			{ L"load", L"", false, CheckSzEmpty },
+			{ L"run", L"", false, CheckSzEmpty }
+			})) {
+			detections += EvaluateFile(detection.ToString(), reaction);
+			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			detections++;
+		}
+
+		for (auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager", {
+			{ L"BootExecute", {L"autocheck autochk *"}, false, CheckMultiSzSubset }
+			})) {
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+				detections++;
 		}
 
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Command Processor", {
@@ -98,6 +122,8 @@ namespace Hunts {
 			detections++;
 		}
 
+
+
 		reaction.EndHunt();
 		return detections;
 	}
@@ -106,10 +132,12 @@ namespace Hunts {
 		std::vector<std::shared_ptr<Event>> events;
 
 		for(auto key : RunKeys){ 
-			ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, key));
+			ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, key, true, true, true));
 		}
 
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Command Processor"));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", true, true, false));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager", true, false, false));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Command Processor", true, false, true));
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders"));
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"))
 

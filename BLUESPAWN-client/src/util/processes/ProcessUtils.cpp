@@ -109,14 +109,14 @@ std::wstring GetProcessCommandline(DWORD dwPID){
 }
 
 std::wstring GetImagePathFromCommand(std::wstring wsCmd){
-    if(wsCmd.substr(0, 11) == L"\\SystemRoot"){
+    if(wsCmd.length() >= 11 && wsCmd.substr(0, 11) == L"\\SystemRoot"){
         wsCmd = L"%SYSTEMROOT%" + wsCmd.substr(11);
     }
 
     wsCmd = ExpandEnvStringsW(wsCmd);
     
     auto start = wsCmd.find_first_not_of(L" \f\v\t\n\r", 0);
-    if(wsCmd.substr(start, 4) == L"\\??\\"){
+    if(start + 4 <= wsCmd.length() && wsCmd.substr(start, 4) == L"\\??\\"){
         start += 4;
     }
     if(start == std::wstring::npos){

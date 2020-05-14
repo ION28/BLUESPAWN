@@ -25,13 +25,13 @@ public:
 	    }}{}
 
 	operator T() const { return WrappedObject; }
-	T* operator *(){ return WrappedObject; }
-	T operator ->(){ return WrappedObject; }
-	T& operator &(){ return &WrappedObject; }
-	bool operator ==(T object){ return WrappedObject == object; }
-	bool operator !(){ return !WrappedObject || WrappedObject == BadValue; }
-	operator bool(){ return !operator!(); }
-
+	T* operator *() const{ return WrappedObject; }
+	T operator ->() const{ return WrappedObject; }
+	T& operator &() const{ return &WrappedObject; }
+	bool operator ==(T object) const{ return WrappedObject == object; }
+	bool operator !() const{ return !WrappedObject || WrappedObject == BadValue; }
+	operator bool() const{ return !operator!(); }
+	T Release(){ auto tmp = WrappedObject; WrappedObject = BadValue; return tmp; }
 	T Get() const { return WrappedObject; }
 };
 
@@ -60,12 +60,43 @@ public:
 };
 
 typedef HandleWrapper MutexType;
-class AcquireMutex : public GenericWrapper<MutexType> {
+class AcquireMutex {
+	MutexType hMutex;
+	std::shared_ptr<void> tracker;
+
 public:
-	explicit AcquireMutex(MutexType hMutex) :
-		GenericWrapper(hMutex, std::function<void(MutexType)>(ReleaseMutex), INVALID_HANDLE_VALUE){
-		WaitForSingleObject(hMutex, INFINITE);
-	};
+	explicit AcquireMutex(const MutexType& mutex) :
+		hMutex{ mutex },
+		tracker{ nullptr, [&](LPVOID nul){ ReleaseMutex(hMutex); } }{
+		::WaitForSingleObject(hMutex, INFINITE);
+	}
+};
+
+class CriticalSection {
+	CRITICAL_SECTION section;
+	std::shared_ptr<CRITICAL_SECTION> tracker;
+
+public:
+	CriticalSection() :
+		section{ nullptr, 0, 0, nullptr, nullptr, 0 },
+		tracker{ &section, [](PCRITICAL_SECTION section){ DeleteCriticalSection(section); } }{
+		InitializeCriticalSection(&section);
+	}
+
+	operator PCRITICAL_SECTION(){ return &section; }
+	operator CRITICAL_SECTION(){ return section; }
+};
+
+class BeginCriticalSection {
+	CriticalSection critsec;
+	std::shared_ptr<void> tracker;
+
+public:
+	explicit BeginCriticalSection(const CriticalSection& section) :
+		critsec{ section },
+		tracker{ nullptr, [&](LPVOID nul){ LeaveCriticalSection(critsec); } }{
+		::EnterCriticalSection(critsec);
+	}
 };
 
 class AllocationWrapper {
@@ -75,7 +106,7 @@ class AllocationWrapper {
 
 public:
 	enum AllocationFunction {
-		VIRTUAL_ALLOC, HEAP_ALLOC, MALLOC, CPP_ALLOC, CPP_ARRAY_ALLOC, STACK_ALLOC
+		VIRTUAL_ALLOC, HEAP_ALLOC, MALLOC, CPP_ALLOC, CPP_ARRAY_ALLOC, STACK_ALLOC, LOCAL_ALLOC, GLOBAL_ALLOC
 	};
 
 	AllocationWrapper(LPVOID memory, SIZE_T size, AllocationFunction AllocationType = STACK_ALLOC) :
@@ -86,13 +117,17 @@ public:
 					if(AllocationType == CPP_ALLOC)
 						delete value;
 					else if(AllocationType == CPP_ARRAY_ALLOC)
-						delete[] value; 
+						delete[] value;
 					else if(AllocationType == MALLOC)
 						free(value);
 					else if(AllocationType == HEAP_ALLOC)
 						HeapFree(GetProcessHeap(), 0, value);
 					else if(AllocationType == VIRTUAL_ALLOC)
 						VirtualFree(value, 0, MEM_RELEASE);
+					else if(AllocationType == GLOBAL_ALLOC)
+						GlobalFree(value);
+					else if(AllocationType == LOCAL_ALLOC)
+						LocalFree(value);
 				}
 			}} : std::nullopt
 	    },
@@ -173,6 +208,11 @@ public:
 			return true;
 		}
 		return false;
+	}
+
+	template<class T = LPVOID>
+	T* GetAsPointer(){ 
+		return reinterpret_cast<T*>(pointer); 
 	}
 };
 
