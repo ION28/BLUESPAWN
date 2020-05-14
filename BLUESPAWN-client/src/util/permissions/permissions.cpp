@@ -75,16 +75,14 @@ namespace Permissions {
 	}
 
 	bool UpdateObjectACL(const std::wstring& wsObjectName, const SE_OBJECT_TYPE& seObjectType, const Owner& oOwner, const ACCESS_MASK& amDesiredAccess, const bool& bDeny) {
-		bool success{ true };
 		PACL pOldDacl;
 		PSECURITY_DESCRIPTOR pDesc{ nullptr };
 		HRESULT hr = GetNamedSecurityInfoW(reinterpret_cast<LPCWSTR>(wsObjectName.c_str()), seObjectType, DACL_SECURITY_INFORMATION, nullptr, nullptr, &pOldDacl, nullptr, &pDesc);
-		PACL pNewDacl{ nullptr };
+		AllocationWrapper awDesc{ pDesc, 0, AllocationWrapper::LOCAL_ALLOC };
 		if (hr != ERROR_SUCCESS) {
-			success = false;
 			LOG_ERROR("Couldn't read current DACL for object " << wsObjectName << ". (Error " << hr << ")");
 			SetLastError(hr);
-			goto end;
+			return false;
 		}
 		ACCESS_MODE amAccessMode = bDeny ? DENY_ACCESS : GRANT_ACCESS;
 		EXPLICIT_ACCESS ea;
@@ -94,29 +92,24 @@ namespace Permissions {
 		ea.grfInheritance = OBJECT_INHERIT_ACE | CONTAINER_INHERIT_ACE;
 		BuildTrusteeWithSidW(&ea.Trustee, oOwner.GetSID());
 
+		PACL pNewDacl{ nullptr };
 		hr = SetEntriesInAcl(1, &ea, pOldDacl, &pNewDacl);
+		AllocationWrapper awNewDacl{ pNewDacl, 0, AllocationWrapper::LOCAL_ALLOC };
 		if (hr != ERROR_SUCCESS) {
-			success = false;
 			LOG_ERROR("Couldn't update DACL for object " << wsObjectName << ". (Error " << hr << ")");
 			SetLastError(hr);
-			goto end;
+			return false;
 		}
 
 		hr = SetNamedSecurityInfoW(const_cast<LPWSTR>(wsObjectName.c_str()), seObjectType,
 			DACL_SECURITY_INFORMATION,
 			NULL, NULL, pNewDacl, NULL);
 		if (hr != ERROR_SUCCESS) {
-			success = false;
 			LOG_ERROR("Couldn't set new DACL for object " << wsObjectName << ". (Error " << hr << ")");
 			SetLastError(hr);
-			goto end;
+			return false;
 		}
-
-
-	end:
-		if (pDesc != nullptr) LocalFree(pDesc);
-		if (pNewDacl != nullptr) LocalFree(pNewDacl);
-		return success;
+		return true;
 	}
 
 
