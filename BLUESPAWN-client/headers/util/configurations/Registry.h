@@ -194,6 +194,13 @@ namespace Registry {
 		std::vector<RegistryKey> EnumerateSubkeys() const;
 
 		/**
+		 * Returns the full path of the referenced registry key witout the Hive.
+		 *
+		 * @return the full path of the referenced registry key without the Hive.
+		 */
+		std::wstring GetNameWithoutHive() const;
+
+		/**
 		 * Returns the full path of the referenced registry key.
 		 *
 		 * @return the full path of the referenced registry key.
