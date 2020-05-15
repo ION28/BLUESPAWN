@@ -13,6 +13,8 @@
 #include "util/log/Loggable.h"
 
 DEFINE_FUNCTION(DWORD, NtQueryKey, NTAPI, HANDLE KeyHandle, int KeyInformationClass, PVOID KeyInformation, ULONG Length, PULONG ResultLength);
+DEFINE_FUNCTION(NTSTATUS, NtQueryValueKey, NTAPI, HANDLE KeyHandle, PUNICODE_STRING ValueName, int KeyInformationClass, PVOID KeyInformation, ULONG Length, PULONG ResultLength);
+DEFINE_FUNCTION(NTSTATUS, NtDeleteValueKey, NTAPI, HANDLE KeyHandle, PUNICODE_STRING ValueName);
 
 /**
  * This enum represents the datatypes stored in the registry.

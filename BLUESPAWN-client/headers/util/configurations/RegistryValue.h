@@ -31,6 +31,8 @@ namespace Registry {
 
 		RegistryType GetType() const;
 
+		std::wstring GetPrintableName() const;
+
 		virtual std::wstring ToString() const;
 	};
 }

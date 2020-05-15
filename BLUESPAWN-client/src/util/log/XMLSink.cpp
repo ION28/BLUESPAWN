@@ -57,7 +57,7 @@ namespace Log{
 			auto Value = XMLDoc.NewElement("value");
 			auto Data = XMLDoc.NewElement("data");
 			Key->SetText(WidestringToString(RegistryDetection->value.key.ToString()).c_str());
-			Value->SetText(WidestringToString(RegistryDetection->value.wValueName).c_str());
+			Value->SetText(WidestringToString(RegistryDetection->value.GetPrintableName()).c_str());
 			Data->SetText(WidestringToString(RegistryDetection->value.ToString()).c_str());
 			detect->InsertEndChild(Key);
 			detect->InsertEndChild(Value);
