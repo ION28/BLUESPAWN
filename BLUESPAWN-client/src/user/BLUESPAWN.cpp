@@ -9,6 +9,8 @@
 #include "reaction/SuspendProcess.h"
 #include "reaction/RemoveValue.h"
 #include "reaction/CarveMemory.h"
+#include "reaction/DeleteFile.h"
+#include "reaction/QuarantineFile.h"
 #include "util/permissions/permissions.h"
 
 #include "hunt/hunts/HuntT1004.h"
@@ -282,6 +284,8 @@ int main(int argc, char* argv[]){
 				{"remove-value", Reactions::RemoveValueReaction{ bluespawn.io }},
 				{"suspend", Reactions::SuspendProcessReaction{ bluespawn.io }},
 				{"carve-memory", Reactions::CarveProcessReaction{ bluespawn.io }},
+				{"delete-file", Reactions::DeleteFileReaction{ bluespawn.io }},
+				{"quarantine-file", Reactions::QuarantineFileReaction{ bluespawn.io}},
 			};
 
 			auto UserReactions = result["reaction"].as<std::string>();

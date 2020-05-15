@@ -45,6 +45,8 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateV71769.h" />
     <ClInclude Include="headers\monitor\EventListener.h" />
     <ClInclude Include="headers\reaction\CarveMemory.h" />
+    <ClInclude Include="headers\reaction\DeleteFile.h" />
+    <ClInclude Include="headers\reaction\QuarantineFile.h" />
     <ClInclude Include="headers\reaction\RemoveValue.h" />
     <ClInclude Include="headers\reaction\SuspendProcess.h" />
     <ClInclude Include="headers\hunt\RegistryHunt.h" />
@@ -176,6 +178,8 @@
     <ClCompile Include="src\mitigation\mitigations\MitigateV71769.cpp" />
     <ClCompile Include="src\monitor\EventListener.cpp" />
     <ClCompile Include="src\reaction\CarveMemory.cpp" />
+    <ClCompile Include="src\reaction\DeleteFile.cpp" />
+    <ClCompile Include="src\reaction\QuarantineFile.cpp" />
     <ClCompile Include="src\reaction\RemoveValue.cpp" />
     <ClCompile Include="src\reaction\SuspendProcess.cpp" />
     <ClCompile Include="src\hunt\RegistryHunt.cpp" />
