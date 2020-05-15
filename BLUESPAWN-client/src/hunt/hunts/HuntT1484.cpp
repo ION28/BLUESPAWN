@@ -33,6 +33,7 @@ namespace Hunts {
 	std::vector<std::shared_ptr<Event>> HuntT1484::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
 
+		events.push_back(std::make_shared<FileEvent>(FileSystem::Folder(L"C:\\Users")));
 		auto userFolders = FileSystem::Folder(L"C:\\Users").GetSubdirectories(1);
 		for (auto userFolder : userFolders) {
 			events.push_back(std::make_shared<FileEvent>(userFolder));
