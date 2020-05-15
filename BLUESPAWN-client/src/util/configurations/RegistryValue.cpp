@@ -60,4 +60,8 @@ namespace Registry {
 			return string;
 		}
 	}
+
+	bool RegistryValue::operator==(const RegistryValue& value) const{
+		return value.key == key && value.wValueName == wValueName && value.data == data;
+	}
 }

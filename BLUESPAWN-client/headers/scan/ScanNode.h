@@ -32,6 +32,13 @@ Association AddAssociation(Association a1, Association a2);
  */
 Association MultiplyAssociation(Association a1, Association a2);
 
+/// Forward declare scanners so they can be friends
+class RegistryScanner;
+class ProcessScanner;
+class FileScanner; 
+
+class DetectionNetwork;
+
 /**
  * A ScanNode is the core unit of BLUESPAWN's scan functionality. Each detection is converted to a 
  * ScanNode. From there, each scan node identifies other detections related to its detection. These
@@ -47,16 +54,34 @@ class ScanNode {
 	Detection detection;
 
 	/// The degree of certainty that the detection referenced by this scan node is malicious
+	/// Note that this ignores all associations
 	Certainty certainty;
+
+	/// The degree of certainty that the detection referenced by this scan node is malicious
+	/// Note that this is calculated only based on associations
+	Certainty cAssociativeCertainty;
+
+	/// Indicates whether cAssociativeCertainty has gone stale and must be recalculated
+	bool bAssociativeStale;
+
+	/// Allow RegistryScanner, FileScanner, and ProcessScanner access to private variables
+	friend class RegistryScanner;
+	friend class FileScanner;
+	friend class ProcessScanner;
+	
+	friend class DetectionNetwork;
+
+	void AddAssociation(const ScanNode& node, Association strength);
 
 public:
 	ScanNode(const Detection& detection);
 
-	const std::map<ScanNode, Association>& GetAssociations() const;
+	const std::map<ScanNode, Association>& GetAssociations();
 
-	void AddAssociations(const std::map<ScanNode, Association>& associations);
+	Certainty GetCertainty();
 
-	bool operator==(const ScanNode& node);
+	bool operator==(const ScanNode& node) const;
+	bool operator<(const ScanNode& node) const;
 };
 
 // Forward declare DetectionCollector so that it can be a friend;
@@ -70,14 +95,16 @@ private:
 	
 	std::vector<ScanNode> nodes;
 
-	void GrowNetwork(Aggressiveness aggressiveness);
+	void GrowNetwork();
 
 	friend class DetectionCollector;
+
+	DetectionNetwork(std::vector<ScanNode>&& nodes);
 
 public:
 	DetectionNetwork(const ScanNode& node);
 
 	bool IntersectsNetwork(const DetectionNetwork& network);
 
-	DetectionNetwork MergeNetworks(const DetectionNetwork& network);
+	DetectionNetwork MergeNetworks(const DetectionNetwork& network) const;
 };

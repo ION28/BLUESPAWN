@@ -1,16 +1,16 @@
 #include "scan/CollectDetections.h"
 
-DetectionCollector::DetectionCollector(Aggressiveness aggressiveness) : aggressiveness{ aggressiveness }{}
+DetectionCollector::DetectionCollector(){}
 
 void DetectionCollector::AddDetection(const Detection& detection){
-	DetectionNetwork& network{ detection };
+	DetectionNetwork network(ScanNode{ detection });
 	for(auto& net : detections){
 		if(net.IntersectsNetwork(network)){
 			return;
 		}
 	}
 
-	network.GrowNetwork(aggressiveness);
+	network.GrowNetwork();
 
 	// A smart data structure would likely speed this up
 	// TODO: run BLUESPAWN through a profiler and see how big of an issue this is...

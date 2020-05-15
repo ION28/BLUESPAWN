@@ -10,10 +10,8 @@
 class DetectionCollector {
 	std::vector<DetectionNetwork> detections;
 
-	Aggressiveness aggressiveness;
-
 public:
-	DetectionCollector(Aggressiveness aggressiveness = Aggressiveness::Normal);
+	DetectionCollector();
 
 	void AddDetection(const Detection& detection);
 

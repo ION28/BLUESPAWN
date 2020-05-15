@@ -45,5 +45,6 @@ class Bluespawn {
 
 		static HuntRegister huntRecord;
 		static MitigationRegister mitigationRecord;
+		static Aggressiveness aggressiveness;
 		static const IOBase& io;
 };

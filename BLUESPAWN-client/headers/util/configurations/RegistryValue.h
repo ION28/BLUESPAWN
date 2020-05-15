@@ -32,5 +32,7 @@ namespace Registry {
 		RegistryType GetType() const;
 
 		virtual std::wstring ToString() const;
+
+		bool operator==(const RegistryValue& value) const;
 	};
 }

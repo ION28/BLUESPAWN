@@ -5,23 +5,26 @@
 #include "util/processes/ProcessUtils.h"
 #include "util/configurations/Registry.h"
 #include "hunt/Hunt.h"
-#include "scan/YaraScanner.h"
+#include "user/bluespawn.h"
 
+#include "scan/YaraScanner.h"
 #include "scan/FileScanner.h"
 #include "scan/RegistryScanner.h"
 
-std::map<ScanNode, Association> ProcessScanner::GetAssociatedDetections(const Detection& base, Aggressiveness level){
-	if(!base || base->Type != DetectionType::Process){
+std::map<ScanNode, Association> ProcessScanner::GetAssociatedDetections(const ScanNode& node){
+	if(!node.detection || node.detection->Type != DetectionType::Process){
 		return {};
 	}
 
-	ProcessDetection detection = std::static_pointer_cast<PROCESS_DETECTION>(base);
+	ProcessDetection detection = std::static_pointer_cast<PROCESS_DETECTION>(node.detection);
 	HandleWrapper hProcess{ OpenProcess(PROCESS_ALL_ACCESS, false, detection->PID) };
 	std::map<ScanNode, Association> detections{};
 
 	auto mapped{ GetMappedFile(hProcess, detection->lpAllocationBase) };
 	if(mapped){
-		detections.emplace(ScanNode(std::make_shared<FILE_DETECTION>(mapped->GetFilePath())), Association::Strong);
+		std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(mapped->GetFilePath())), Association::Strong);
+		association.first.AddAssociation(node, association.second);
+		detections.emplace(association);
 	}
 
 	auto modules = EnumModules(hProcess);
@@ -29,30 +32,38 @@ std::map<ScanNode, Association> ProcessScanner::GetAssociatedDetections(const De
 		if(FileSystem::CheckFileExists(path)){
 			FileSystem::File file{ path };
 			if(!file.GetFileSigned()){
-				detections.emplace(ScanNode(std::make_shared<FILE_DETECTION>(path)), Association::Strong);
+				std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(path)), Association::Strong);
+				association.first.AddAssociation(node, association.second);
+				detections.emplace(association);
 			}
-			if(level > Aggressiveness::Cursory){
+			if(Bluespawn::aggressiveness > Aggressiveness::Cursory){
 				auto& scanner{ YaraScanner::GetInstance() };
 				if(scanner.ScanFile(file)){
-					detections.emplace(ScanNode(std::make_shared<FILE_DETECTION>(path)), Association::Strong);
+					std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(path)), Association::Strong);
+					association.first.AddAssociation(node, association.second);
+					detections.emplace(association);
 				}
 			}
 		}
 	}
 
-	if(detection->lpAllocationBase && level > Aggressiveness::Cursory){
+	if(detection->lpAllocationBase && Bluespawn::aggressiveness > Aggressiveness::Cursory){
 		auto memory{ Utils::Process::ReadProcessMemory(detection->PID, detection->lpAllocationBase, detection->dwAllocationSize) };
 		if(memory){
 			auto strings = FileScanner::ExtractStrings(memory, 8);
 			auto filenames = FileScanner::ExtractFilePaths(strings);
 			for(auto filename : filenames){
-				detections.emplace(ScanNode(std::make_shared<FILE_DETECTION>(filename)), Association::Moderate);
+				std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(filename)), Association::Moderate);
+				association.first.AddAssociation(node, association.second);
+				detections.emplace(association);
 			}
 
 			auto keynames = RegistryScanner::ExtractRegistryKeys(strings);
 			for(auto keyname : keynames){
 				Registry::RegistryValue value{ Registry::RegistryKey{ keyname }, L"Unknown", std::move(std::wstring{ L"Unknown" }) };
-				detections.emplace(ScanNode(std::make_shared<FILE_DETECTION>(value)), Association::Weak);
+				std::pair<ScanNode, Association> association(ScanNode(std::make_shared<REGISTRY_DETECTION>(value)), Association::Weak);
+				association.first.AddAssociation(node, association.second);
+				detections.emplace(association);
 			}
 		}
 	}
@@ -75,12 +86,12 @@ std::vector<FileSystem::File> ProcessScanner::ScanCommand(const std::wstring& co
 			// Find the dll
 		} else if(mem.CompareMemory(FileSystem::File(L"explorer.exe").Read())){
 			// Find LNK file
-		}
+		} else if(mem.CompareMemory(FileSystem::File(L"RegSrv.exe").Read()))
 		return { file };
 	}
 	return {};
 }
 
-Certainty ProcessScanner::ScanItem(const Detection& base, Aggressiveness level){
+Certainty ProcessScanner::ScanItem(ScanNode& base){
 	return Certainty::None;
 }
