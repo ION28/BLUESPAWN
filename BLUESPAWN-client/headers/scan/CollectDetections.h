@@ -14,6 +14,4 @@ public:
 	DetectionCollector();
 
 	void AddDetection(const Detection& detection);
-
-	std::vector<DetectionNetwork> Finalize();
 };

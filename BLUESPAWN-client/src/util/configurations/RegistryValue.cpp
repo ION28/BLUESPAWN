@@ -64,4 +64,9 @@ namespace Registry {
 	bool RegistryValue::operator==(const RegistryValue& value) const{
 		return value.key == key && value.wValueName == wValueName && value.data == data;
 	}
+
+	bool RegistryValue::operator<(const RegistryValue& value) const{
+		return value.key < key ||
+			(value.key == key && value.wValueName < wValueName);
+	}
 }

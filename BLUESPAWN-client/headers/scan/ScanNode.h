@@ -48,7 +48,7 @@ class DetectionNetwork;
 class ScanNode {
 
 	/// A mapping of scan nodes to their association with the current node.
-	std::map<ScanNode, Association> associations;
+	std::map<std::shared_ptr<ScanNode>, Association> associations;
 
 	/// The detection referenced by the scan node
 	Detection detection;
@@ -71,12 +71,12 @@ class ScanNode {
 	
 	friend class DetectionNetwork;
 
-	void AddAssociation(const ScanNode& node, Association strength);
+	void AddAssociation(const std::shared_ptr<ScanNode>& node, Association strength);
 
 public:
 	ScanNode(const Detection& detection);
 
-	const std::map<ScanNode, Association>& GetAssociations();
+	static const std::map<std::shared_ptr<ScanNode>, Association>& GetAssociations(const std::shared_ptr<ScanNode>& node);
 
 	Certainty GetCertainty();
 
@@ -93,16 +93,16 @@ class DetectionCollector;
 class DetectionNetwork {
 private:
 	
-	std::vector<ScanNode> nodes;
+	std::vector<std::shared_ptr<ScanNode>> nodes;
 
 	void GrowNetwork();
 
 	friend class DetectionCollector;
 
-	DetectionNetwork(std::vector<ScanNode>&& nodes);
+	DetectionNetwork(std::vector<std::shared_ptr<ScanNode>>&& nodes);
 
 public:
-	DetectionNetwork(const ScanNode& node);
+	DetectionNetwork(const std::shared_ptr<ScanNode>& node);
 
 	bool IntersectsNetwork(const DetectionNetwork& network);
 

@@ -143,9 +143,9 @@ typedef std::function<void(std::shared_ptr<EVENT_DETECTION>)> DetectEvent;
 
 struct OTHER_DETECTION : public DETECTION {
 	std::wstring type;
-	std::unordered_map<std::wstring, std::wstring> params;
+	std::map<std::wstring, std::wstring> params;
 
-	OTHER_DETECTION(const std::wstring& type, const std::unordered_map<std::wstring, std::wstring>& params) : 
+	OTHER_DETECTION(const std::wstring& type, const std::map<std::wstring, std::wstring>& params) : 
 		DETECTION{ DetectionType::Other },
 		type{ type },
 		params{ params }{}

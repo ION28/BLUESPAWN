@@ -9,7 +9,7 @@
 
 class ProcessScanner {
 public:
-	static std::map<ScanNode, Association> GetAssociatedDetections(const ScanNode& node);
+	static std::map<std::shared_ptr<ScanNode>, Association> GetAssociatedDetections(const std::shared_ptr<ScanNode>& node);
 	static std::vector<FileSystem::File> ScanCommand(const std::wstring& command);
-	static Certainty ScanItem(ScanNode& base);
+	static Certainty ScanItem(const std::shared_ptr<ScanNode>& base);
 };

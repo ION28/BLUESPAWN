@@ -34,5 +34,6 @@ namespace Registry {
 		virtual std::wstring ToString() const;
 
 		bool operator==(const RegistryValue& value) const;
+		bool operator<(const RegistryValue& value) const;
 	};
 }

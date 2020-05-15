@@ -3,7 +3,7 @@
 DetectionCollector::DetectionCollector(){}
 
 void DetectionCollector::AddDetection(const Detection& detection){
-	DetectionNetwork network(ScanNode{ detection });
+	DetectionNetwork network(std::make_shared<ScanNode>(detection));
 	for(auto& net : detections){
 		if(net.IntersectsNetwork(network)){
 			return;

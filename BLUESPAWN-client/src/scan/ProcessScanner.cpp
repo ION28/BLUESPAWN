@@ -11,19 +11,19 @@
 #include "scan/FileScanner.h"
 #include "scan/RegistryScanner.h"
 
-std::map<ScanNode, Association> ProcessScanner::GetAssociatedDetections(const ScanNode& node){
-	if(!node.detection || node.detection->Type != DetectionType::Process){
+std::map<std::shared_ptr<ScanNode>, Association> ProcessScanner::GetAssociatedDetections(const std::shared_ptr<ScanNode>& node){
+	if(!node->detection || node->detection->Type != DetectionType::Process){
 		return {};
 	}
 
-	ProcessDetection detection = std::static_pointer_cast<PROCESS_DETECTION>(node.detection);
+	ProcessDetection detection = std::static_pointer_cast<PROCESS_DETECTION>(node->detection);
 	HandleWrapper hProcess{ OpenProcess(PROCESS_ALL_ACCESS, false, detection->PID) };
-	std::map<ScanNode, Association> detections{};
+	std::map<std::shared_ptr<ScanNode>, Association> detections{};
 
 	auto mapped{ GetMappedFile(hProcess, detection->lpAllocationBase) };
 	if(mapped){
-		std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(mapped->GetFilePath())), Association::Strong);
-		association.first.AddAssociation(node, association.second);
+		std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(mapped->GetFilePath())), Association::Strong);
+		association.first->AddAssociation(node, association.second);
 		detections.emplace(association);
 	}
 
@@ -32,15 +32,15 @@ std::map<ScanNode, Association> ProcessScanner::GetAssociatedDetections(const Sc
 		if(FileSystem::CheckFileExists(path)){
 			FileSystem::File file{ path };
 			if(!file.GetFileSigned()){
-				std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(path)), Association::Strong);
-				association.first.AddAssociation(node, association.second);
+				std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(path)), Association::Strong);
+				association.first->AddAssociation(node, association.second);
 				detections.emplace(association);
 			}
 			if(Bluespawn::aggressiveness > Aggressiveness::Cursory){
 				auto& scanner{ YaraScanner::GetInstance() };
 				if(scanner.ScanFile(file)){
-					std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(path)), Association::Strong);
-					association.first.AddAssociation(node, association.second);
+					std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(path)), Association::Strong);
+					association.first->AddAssociation(node, association.second);
 					detections.emplace(association);
 				}
 			}
@@ -53,16 +53,16 @@ std::map<ScanNode, Association> ProcessScanner::GetAssociatedDetections(const Sc
 			auto strings = FileScanner::ExtractStrings(memory, 8);
 			auto filenames = FileScanner::ExtractFilePaths(strings);
 			for(auto filename : filenames){
-				std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(filename)), Association::Moderate);
-				association.first.AddAssociation(node, association.second);
+				std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(filename)), Association::Moderate);
+				association.first->AddAssociation(node, association.second);
 				detections.emplace(association);
 			}
 
 			auto keynames = RegistryScanner::ExtractRegistryKeys(strings);
 			for(auto keyname : keynames){
 				Registry::RegistryValue value{ Registry::RegistryKey{ keyname }, L"Unknown", std::move(std::wstring{ L"Unknown" }) };
-				std::pair<ScanNode, Association> association(ScanNode(std::make_shared<REGISTRY_DETECTION>(value)), Association::Weak);
-				association.first.AddAssociation(node, association.second);
+				std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<REGISTRY_DETECTION>(value)), Association::Weak);
+				association.first->AddAssociation(node, association.second);
 				detections.emplace(association);
 			}
 		}
@@ -86,12 +86,13 @@ std::vector<FileSystem::File> ProcessScanner::ScanCommand(const std::wstring& co
 			// Find the dll
 		} else if(mem.CompareMemory(FileSystem::File(L"explorer.exe").Read())){
 			// Find LNK file
-		} else if(mem.CompareMemory(FileSystem::File(L"RegSrv.exe").Read()))
-		return { file };
+		} else if(mem.CompareMemory(FileSystem::File(L"RegSrv.exe").Read())){
+
+		} else return { file };
 	}
 	return {};
 }
 
-Certainty ProcessScanner::ScanItem(ScanNode& base){
+Certainty ProcessScanner::ScanItem(const std::shared_ptr<ScanNode>& base){
 	return Certainty::None;
 }

@@ -12,6 +12,9 @@
 
 #include <regex>
 
+FILETIME FileScanner::lastupdate = { 0, 0 };
+std::map<std::wstring, std::set<DWORD>> FileScanner::modules{};
+
 bool GetFilesSimilar(const AllocationWrapper& lpFile1, const AllocationWrapper& lpFile2){
 	return lpFile1.GetSize() == lpFile2.GetSize() && lpFile1.GetSize() == RtlCompareMemory(lpFile1, lpFile2, lpFile1.GetSize());
 }
@@ -37,8 +40,9 @@ std::vector<std::wstring> FileScanner::ExtractStrings(const AllocationWrapper& d
 	}
 
 	dwStringStart = 0;
+	PWCHAR mem{ reinterpret_cast<PWCHAR>(LPVOID(data)) };
 	for(DWORD idx = 0; 2 * idx < data.GetSize(); idx++){
-		if(!(data[idx * 2] >= 0x20 && data[idx * 2] < 0x7E)){
+		if(!(mem[idx] >= 0x20 && mem[idx] < 0x7E)){
 			dwStringLength = idx - dwStringStart;
 			if(dwStringLength >= dwMinLength){
 				strings.emplace_back(std::wstring{ PWCHAR(LPVOID(data)) + dwStringStart, dwStringLength });
@@ -48,9 +52,9 @@ std::vector<std::wstring> FileScanner::ExtractStrings(const AllocationWrapper& d
 		}
 	}
 
-	dwStringLength = data.GetSize() - dwStringStart;
-	if(dwStringLength >= dwMinLength){
-		strings.emplace_back(std::wstring{ PWCHAR(PCHAR(LPVOID(data))) + dwStringStart, dwStringLength });
+	dwStringLength = data.GetSize() / 2 - dwStringStart;
+	if(dwStringLength >= dwMinLength && data.GetSize() / 2 > dwStringStart){
+		strings.emplace_back(std::wstring{ mem + dwStringStart, dwStringLength });
 	}
 
 	return strings;
@@ -72,98 +76,110 @@ std::vector<std::wstring> FileScanner::ExtractFilePaths(const std::vector<std::w
 	return filepaths;
 }
 
-std::map<ScanNode, Association> FileScanner::GetAssociatedDetections(const ScanNode& node){
-	if(!node.detection || node.detection->Type != DetectionType::File){
+void FileScanner::UpdateModules(){
+	FILETIME time{};
+	GetSystemTimeAsFileTime(&time);
+
+	uint64_t tdiff{ (static_cast<uint64_t>(time.dwHighDateTime - lastupdate.dwHighDateTime) << 32) + time.dwLowDateTime - lastupdate.dwLowDateTime };
+	DWORD dwSecondsElapsed = tdiff / 10000000;
+	if(dwSecondsElapsed > 60){
+		modules.clear();
+
+		std::vector<DWORD> processes(1024);
+		DWORD dwBytesNeeded{};
+		auto success{ EnumProcesses(processes.data(), 1024 * sizeof(DWORD), &dwBytesNeeded) };
+		if(dwBytesNeeded > 1024 * sizeof(DWORD)){
+			processes.resize(dwBytesNeeded / sizeof(DWORD));
+			success = EnumProcesses(processes.data(), dwBytesNeeded, &dwBytesNeeded);
+		}
+
+		auto dwProcCount{ dwBytesNeeded / sizeof(DWORD) };
+		for(int i = 0; i < dwProcCount; i++){
+			auto modules{ EnumModules(processes[i]) };
+			for(auto& mod : modules){
+				auto name{ ToLowerCaseW(mod) };
+				if(FileScanner::modules.find(name) == FileScanner::modules.end()){
+					FileScanner::modules.emplace(name, std::set<DWORD>{ processes[i] });
+				} else FileScanner::modules.at(name).emplace(processes[i]);
+			}
+		}
+	}
+}
+
+std::map<std::shared_ptr<ScanNode>, Association> FileScanner::GetAssociatedDetections(const std::shared_ptr<ScanNode>& node){
+	if(!node->detection || node->detection->Type != DetectionType::File){
 		return {};
 	}
-	std::map<ScanNode, Association> detections{};
+	std::map<std::shared_ptr<ScanNode>, Association> detections{};
 
-	auto detection = *std::static_pointer_cast<FILE_DETECTION>(node.detection);
+	auto detection = *std::static_pointer_cast<FILE_DETECTION>(node->detection);
 	auto ext = detection.wsFileName.substr(detection.wsFileName.size() - 4);
 	if(ext != L".exe" && ext != L".dll"){
 		return detections;
 	}
 
 	auto file{ FileSystem::File(detection.wsFilePath) };
-	auto contents{ file.Read() };
+	if(file.GetFileExists()){
+		FileScanner::UpdateModules();
 
-	std::vector<DWORD> processes(1024);
-	DWORD dwBytesNeeded{};
-	auto success{ EnumProcesses(processes.data(), 1024 * sizeof(DWORD), &dwBytesNeeded) };
-	if(dwBytesNeeded > 1024 * sizeof(DWORD)){
-		processes.resize(dwBytesNeeded / sizeof(DWORD));
-		success = EnumProcesses(processes.data(), dwBytesNeeded, &dwBytesNeeded);
-	}
-	if(success){
-		auto dwProcCount{ dwBytesNeeded / sizeof(DWORD) };
-		for(int i = 0; i < dwProcCount; i++){
-			auto modules{ EnumModules(processes[i]) };
-			for(auto mod : modules){
-				if(Bluespawn::aggressiveness >= Aggressiveness::Cursory && mod == detection.wsFilePath){
-					auto alloc = GetModuleAddress(processes[i], mod);
+		auto contents{ file.Read() };
+		auto path{ ToLowerCaseW(detection.wsFilePath) };
+
+		for(auto mod : modules){
+			if(Bluespawn::aggressiveness >= Aggressiveness::Cursory && mod.first == path){
+				for(auto& pid : mod.second){
+					auto alloc = GetModuleAddress(pid, mod.first);
 					if(alloc){
-						auto dwAllocSize = GetRegionSize(processes[i], alloc);
-						auto detection{ std::make_shared<PROCESS_DETECTION>(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i], 
-																			alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File)) };
-						ScanNode associated{ std::static_pointer_cast<DETECTION>(detection) };
-						associated.AddAssociation(node, Association::Certain);
+						auto dwAllocSize = GetRegionSize(pid, alloc);
+						auto detection{ std::make_shared<PROCESS_DETECTION>(GetProcessImage(pid), GetProcessCommandline(pid), pid, alloc,
+																			dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File)) };
+						std::shared_ptr<ScanNode> associated{ std::make_shared<ScanNode>(detection) };
+						associated->AddAssociation(node, Association::Certain);
 						detections.emplace(associated, Association::Certain);
 					}
-				} else if(Bluespawn::aggressiveness >= Aggressiveness::Normal && FileSystem::CheckFileExists(mod)){
-					auto ModuleContents = FileSystem::File(mod).Read();
-					if(contents.GetSize() == ModuleContents.GetSize() && contents.GetSize() == RtlCompareMemory(contents, ModuleContents, contents.GetSize())){
-						auto alloc = GetModuleAddress(processes[i], mod);
+				}
+			} else if(Bluespawn::aggressiveness == Aggressiveness::Intensive && FileSystem::CheckFileExists(mod.first)){
+				auto ModuleContents = FileSystem::File(mod.first).Read();
+				if(contents.GetSize() == ModuleContents.GetSize() && contents.GetSize() == RtlCompareMemory(contents, ModuleContents, contents.GetSize())){
+					for(auto& pid : mod.second){
+						auto alloc = GetModuleAddress(pid, mod.first);
 						if(alloc){
-							auto dwAllocSize = GetRegionSize(processes[i], alloc);
-							auto detection{ std::make_shared<PROCESS_DETECTION>(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i],
-																				alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File)) };
-							ScanNode associated{ std::static_pointer_cast<DETECTION>(detection) };
-							associated.AddAssociation(node, Association::Certain);
+							auto dwAllocSize = GetRegionSize(pid, alloc);
+							auto detection{ std::make_shared<PROCESS_DETECTION>(GetProcessImage(pid), GetProcessCommandline(pid), pid, alloc,
+																				dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File)) };
+							std::shared_ptr<ScanNode> associated{ std::make_shared<ScanNode>(detection) };
+							associated->AddAssociation(node, Association::Certain);
 							detections.emplace(associated, Association::Certain);
-						}
-						continue;
-					}
-				} else if(Bluespawn::aggressiveness == Aggressiveness::Intensive && FileSystem::CheckFileExists(mod)){
-					auto ModuleContents = FileSystem::File(mod).Read();
-					if(GetFilesSimilar(contents, ModuleContents)){
-						auto alloc = GetModuleAddress(processes[i], mod);
-						if(alloc){
-							auto dwAllocSize = GetRegionSize(processes[i], alloc);
-							auto detection{ std::make_shared<PROCESS_DETECTION>(GetProcessImage(processes[i]), GetProcessCommandline(processes[i]), processes[i],
-																				alloc, dwAllocSize, static_cast<DWORD>(ProcessDetectionMethod::File)) };
-							ScanNode associated{ std::static_pointer_cast<DETECTION>(detection) };
-							associated.AddAssociation(node, Association::Strong);
-							detections.emplace(associated, Association::Strong);
 						}
 					}
 				}
 			}
 		}
-	}
 
-	auto strings = ExtractStrings(contents, 8);
-	auto filenames = ExtractFilePaths(strings);
-	for(auto& filename : filenames){
-		ScanNode associated{ std::static_pointer_cast<DETECTION>(std::make_shared<FILE_DETECTION>(filename)) };
-		associated.AddAssociation(node, Association::Moderate);
-		detections.emplace(associated, Association::Moderate);
-	}
+		auto strings = ExtractStrings(contents, 8);
+		auto filenames = ExtractFilePaths(strings);
+		for(auto& filename : filenames){
+			std::shared_ptr<ScanNode> associated{ std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(filename)) };
+			associated->AddAssociation(node, Association::Moderate);
+			detections.emplace(associated, Association::Moderate);
+		}
 
-	auto keynames = RegistryScanner::ExtractRegistryKeys(strings);
-	for(auto keyname : keynames){
-		Registry::RegistryValue value{ Registry::RegistryKey{ keyname }, L"Unknown", std::move(std::wstring{ L"Unknown" }) };
-		ScanNode associated{ std::static_pointer_cast<DETECTION>(std::make_shared<REGISTRY_DETECTION>(value)) };
-		associated.AddAssociation(node, Association::Weak);
-		detections.emplace(associated, Association::Weak);
+		auto keynames = RegistryScanner::ExtractRegistryKeys(strings);
+		for(auto keyname : keynames){
+			Registry::RegistryValue value{ Registry::RegistryKey{ keyname }, L"Unknown", std::move(std::wstring{ L"Unknown" }) };
+			std::shared_ptr<ScanNode> associated{ std::make_shared<ScanNode>(std::make_shared<REGISTRY_DETECTION>(value)) };
+			associated->AddAssociation(node, Association::Weak);
+			detections.emplace(associated, Association::Weak);
+		}
 	}
 
 	return detections;
 }
 
-Certainty FileScanner::ScanItem(ScanNode& detection){
+Certainty FileScanner::ScanItem(const std::shared_ptr<ScanNode>& detection){
 	Certainty certainty{ Certainty::None };
-	if(detection.detection->Type == DetectionType::File){
-		auto& file{ std::static_pointer_cast<FILE_DETECTION>(detection.detection) };
+	if(detection->detection->Type == DetectionType::File){
+		auto& file{ std::static_pointer_cast<FILE_DETECTION>(detection->detection) };
 		if(FileSystem::CheckFileExists(file->wsFilePath)){
 			auto& f{ FileSystem::File(file->wsFilePath) };
 			if(Bluespawn::aggressiveness >= Aggressiveness::Normal){
@@ -195,6 +211,6 @@ Certainty FileScanner::ScanItem(ScanNode& detection){
 		}
 	}
 
-	detection.certainty = AddAssociation(detection.certainty, certainty);
+	detection->certainty = AddAssociation(detection->certainty, certainty);
 	return certainty;
 }

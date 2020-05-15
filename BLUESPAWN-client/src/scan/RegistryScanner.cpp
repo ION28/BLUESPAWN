@@ -28,13 +28,13 @@ std::vector<std::wstring> RegistryScanner::ExtractRegistryKeys(const std::vector
 	return keys;
 }
 
-std::map<ScanNode, Association> RegistryScanner::GetAssociatedDetections(const ScanNode& node){
-	if(!node.detection || node.detection->Type != DetectionType::Registry){
+std::map<std::shared_ptr<ScanNode>, Association> RegistryScanner::GetAssociatedDetections(const std::shared_ptr<ScanNode>& node){
+	if(!node->detection || node->detection->Type != DetectionType::Registry){
 		return {};
 	}
-	std::map<ScanNode, Association> detections{};
+	std::map<std::shared_ptr<ScanNode>, Association> detections{};
 
-	auto detection = std::static_pointer_cast<REGISTRY_DETECTION>(node.detection);
+	auto detection = std::static_pointer_cast<REGISTRY_DETECTION>(node->detection);
 	if(detection){
 		if(detection->type == RegistryDetectionType::CommandReference){
 			if(detection->multitype){
@@ -42,16 +42,16 @@ std::map<ScanNode, Association> RegistryScanner::GetAssociatedDetections(const S
 				for(auto& entry : data){
 					auto& files{ ProcessScanner::ScanCommand(entry) };
 					for(auto& file : files){
-						std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(file.GetFilePath())), Association::Certain);
-						association.first.AddAssociation(node, association.second);
+						std::pair<std::shared_ptr<ScanNode>, Association> association{ std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(file.GetFilePath())), Association::Certain };
+						association.first->AddAssociation(node, association.second);
 						detections.emplace(association);
 					}
 				}
 			} else{
 				auto& files{ ProcessScanner::ScanCommand(std::get<std::wstring>(detection->value.data)) };
 				for(auto& file : files){
-					std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(file.GetFilePath())), Association::Certain);
-					association.first.AddAssociation(node, association.second);
+					std::pair<std::shared_ptr<ScanNode>, Association> association{ std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(file.GetFilePath())), Association::Certain };
+					association.first->AddAssociation(node, association.second);
 					detections.emplace(association);
 				}
 			}
@@ -62,16 +62,16 @@ std::map<ScanNode, Association> RegistryScanner::GetAssociatedDetections(const S
 				for(auto& entry : data){
 					auto file = FileSystem::SearchPathExecutable(entry);
 					if(file){
-						std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(*file)), Association::Certain);
-						association.first.AddAssociation(node, association.second);
+						std::pair<std::shared_ptr<ScanNode>, Association> association{ std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(*file)), Association::Certain };
+						association.first->AddAssociation(node, association.second);
 						detections.emplace(association);
 					}
 				}
 			} else{
 				auto file = FileSystem::SearchPathExecutable(std::get<std::wstring>(detection->value.data));
 				if(file){
-					std::pair<ScanNode, Association> association(ScanNode(std::make_shared<FILE_DETECTION>(*file)), Association::Certain);
-					association.first.AddAssociation(node, association.second);
+					std::pair<std::shared_ptr<ScanNode>, Association> association{ std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(*file)), Association::Certain };
+					association.first->AddAssociation(node, association.second);
 					detections.emplace(association);
 				}
 			}
@@ -79,75 +79,75 @@ std::map<ScanNode, Association> RegistryScanner::GetAssociatedDetections(const S
 			if(detection->multitype){
 				auto data{ std::get<std::vector<std::wstring>>(detection->value.data) };
 				for(auto& entry : data){
-					std::pair<ScanNode, Association> association(ScanNode(std::make_shared<OTHER_DETECTION>(L"Folder",
-																				  std::unordered_map<std::wstring, std::wstring>{
+					std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<OTHER_DETECTION>(L"Folder",
+																				  std::map<std::wstring, std::wstring>{
 																					  { L"Path", entry }
 					})), Association::Certain);
-					association.first.AddAssociation(node, association.second);
+					association.first->AddAssociation(node, association.second);
 					detections.emplace(association);
 				}
 			} else{
-				std::pair<ScanNode, Association> association(ScanNode(std::make_shared<OTHER_DETECTION>(L"Folder",
-																			  std::unordered_map<std::wstring, std::wstring>{
+				std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<OTHER_DETECTION>(L"Folder",
+																			  std::map<std::wstring, std::wstring>{
 																				  { L"Path", std::get<std::wstring>(detection->value.data) }
 				})), Association::Certain);
-				association.first.AddAssociation(node, association.second);
+				association.first->AddAssociation(node, association.second);
 				detections.emplace(association);
 			}
 		} else if(detection->type == RegistryDetectionType::UserReference){
 			if(detection->multitype){
 				auto data{ std::get<std::vector<std::wstring>>(detection->value.data) };
 				for(auto& entry : data){
-					std::pair<ScanNode, Association> association(ScanNode(std::make_shared<OTHER_DETECTION>(L"User",
-																				  std::unordered_map<std::wstring, std::wstring>{
+					std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<OTHER_DETECTION>(L"User",
+																				  std::map<std::wstring, std::wstring>{
 																					  { L"Identifier", entry }
 					})), Association::Strong);
-					association.first.AddAssociation(node, association.second);
+					association.first->AddAssociation(node, association.second);
 					detections.emplace(association);
 				}
 			} else{
-				std::pair<ScanNode, Association> association(ScanNode(std::make_shared<OTHER_DETECTION>(L"User",
-																			  std::unordered_map<std::wstring, std::wstring>{
+				std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<OTHER_DETECTION>(L"User",
+																			  std::map<std::wstring, std::wstring>{
 																				  { L"Identifier", std::get<std::wstring>(detection->value.data) }
 				})), Association::Strong);
-				association.first.AddAssociation(node, association.second);
+				association.first->AddAssociation(node, association.second);
 				detections.emplace(association);
 			}
 		} else if(detection->type == RegistryDetectionType::PipeReference){
 			if(detection->multitype){
 				auto data{ std::get<std::vector<std::wstring>>(detection->value.data) };
 				for(auto& entry : data){
-					std::pair<ScanNode, Association> association(ScanNode(std::make_shared<OTHER_DETECTION>(L"Pipe",
-																				  std::unordered_map<std::wstring, std::wstring>{
+					std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<OTHER_DETECTION>(L"Pipe",
+																				  std::map<std::wstring, std::wstring>{
 																					  { L"Identifier", entry }
 					})), Association::Moderate);
-					association.first.AddAssociation(node, association.second);
+					association.first->AddAssociation(node, association.second);
 					detections.emplace(association);
 				}
 			} else{
-				std::pair<ScanNode, Association> association(ScanNode(std::make_shared<OTHER_DETECTION>(L"Pipe",
-																			  std::unordered_map<std::wstring, std::wstring>{
+				std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<OTHER_DETECTION>(L"Pipe",
+																			  std::map<std::wstring, std::wstring>{
 																				  { L"Identifier", std::get<std::wstring>(detection->value.data) }
 				})), Association::Moderate);
-				association.first.AddAssociation(node, association.second);
+				association.first->AddAssociation(node, association.second);
 				detections.emplace(association);
 			}
 		} else if(detection->type == RegistryDetectionType::ShareReference){
 			auto data{ std::get<std::vector<std::wstring>>(detection->value.data) };
 			for(auto& entry : data){
-				std::pair<ScanNode, Association> association(ScanNode(std::make_shared<OTHER_DETECTION>(L"Share",
-																			  std::unordered_map<std::wstring, std::wstring>{
+				std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<OTHER_DETECTION>(L"Share",
+																			  std::map<std::wstring, std::wstring>{
 																				  { L"Name", entry }
 				})), Association::Moderate);
-				association.first.AddAssociation(node, association.second);
+				association.first->AddAssociation(node, association.second);
 				detections.emplace(association);
 			}
 		} else{
-			std::pair<ScanNode, Association> association(ScanNode(std::make_shared<OTHER_DETECTION>(L"Share",
-																		  std::unordered_map<std::wstring, std::wstring>{
+			std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<OTHER_DETECTION>(L"Share",
+																		  std::map<std::wstring, std::wstring>{
 																			  { L"Name", std::get<std::wstring>(detection->value.data) }
 			})), Association::Moderate);
-			association.first.AddAssociation(node, association.second);
+			association.first->AddAssociation(node, association.second);
 			detections.emplace(association);
 		}
 	}
@@ -155,9 +155,9 @@ std::map<ScanNode, Association> RegistryScanner::GetAssociatedDetections(const S
 	return detections;
 }
 
-Certainty RegistryScanner::ScanItem(ScanNode& detection){
-	if(Bluespawn::aggressiveness == Aggressiveness::Intensive && detection.detection->Type == DetectionType::Registry){
-		auto reg{ std::static_pointer_cast<REGISTRY_DETECTION>(detection.detection) };
+Certainty RegistryScanner::ScanItem(const std::shared_ptr<ScanNode>& detection){
+	if(Bluespawn::aggressiveness == Aggressiveness::Intensive && detection->detection->Type == DetectionType::Registry){
+		auto reg{ std::static_pointer_cast<REGISTRY_DETECTION>(detection->detection) };
 		if(reg){
 			auto data{ reg->value.key.GetRawValue(reg->value.wValueName) };
 			if(data.GetSize() > 0x10){
@@ -165,10 +165,10 @@ Certainty RegistryScanner::ScanItem(ScanNode& detection){
 				auto result{ yara.ScanMemory(data) };
 				if(!result){
 					if(result.vKnownBadRules.size() <= 1){
-						detection.certainty = AddAssociation(detection.certainty, Certainty::Weak);
+						detection->certainty = AddAssociation(detection->certainty, Certainty::Weak);
 					} else if(result.vKnownBadRules.size() == 2){
-						return detection.certainty = AddAssociation(detection.certainty, Certainty::Moderate);
-					} else return detection.certainty = AddAssociation(detection.certainty, Certainty::Strong);
+						return detection->certainty = AddAssociation(detection->certainty, Certainty::Moderate);
+					} else return detection->certainty = AddAssociation(detection->certainty, Certainty::Strong);
 				}
 			}
 		}
