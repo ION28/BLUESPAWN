@@ -41,6 +41,7 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1138.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1484.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV71769.h" />
     <ClInclude Include="headers\monitor\EventListener.h" />
     <ClInclude Include="headers\reaction\CarveMemory.h" />
@@ -171,6 +172,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1138.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1484.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV71769.cpp" />
     <ClCompile Include="src\monitor\EventListener.cpp" />
     <ClCompile Include="src\reaction\CarveMemory.cpp" />

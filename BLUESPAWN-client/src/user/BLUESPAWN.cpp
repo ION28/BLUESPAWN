@@ -28,6 +28,7 @@
 #include "hunt/hunts/HuntT1138.h"
 #include "hunt/hunts/HuntT1182.h"
 #include "hunt/hunts/HuntT1183.h"
+#include "hunt/hunts/HuntT1484.h"
 
 #include "monitor/ETW_Wrapper.h"
 
@@ -94,6 +95,7 @@ Bluespawn::Bluespawn(){
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1138>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1182>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1183>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1484>());
 
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1025>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1035RDP>());
