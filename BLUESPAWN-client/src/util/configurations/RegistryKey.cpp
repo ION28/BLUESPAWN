@@ -195,10 +195,7 @@ namespace Registry {
 		ULONG size{};
 		NTSTATUS status{ Linker::NtQueryValueKey(hkBackingKey, &RegistryKeyName, 0, nullptr, 0, &size) }; //First 0 is KeyValueBasicInformation
 
-		std::vector<CHAR> data(size);
-		status = Linker::NtQueryValueKey(hkBackingKey, &RegistryKeyName, 0, data.data(), size, &size);
-
-		return NT_SUCCESS(status);
+		return status != 0xC0000034; //0xC0000034 = STATUS_OBJECT_NAME_NOT_FOUND
 	}
 
 	bool RegistryKey::Create(){
