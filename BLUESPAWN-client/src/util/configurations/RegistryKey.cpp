@@ -9,6 +9,7 @@
 
 LINK_FUNCTION(NtQueryKey, ntdll.dll);
 LINK_FUNCTION(NtQueryValueKey, ntdll.dll);
+LINK_FUNCTION(NtDeleteValueKey, ntdll.dll);
 
 namespace Registry {
 	std::map<std::wstring, HKEY> vHiveNames{
@@ -229,7 +230,6 @@ namespace Registry {
 	}
 
 	AllocationWrapper RegistryKey::GetRawValue(const std::wstring& ValueName) const {
-		// TODO: UPDATE THIS FUNCTION
 		if(!Exists()){
 			SetLastError(FILE_DOES_NOT_EXIST);
 			return { nullptr, 0 };
@@ -260,7 +260,6 @@ namespace Registry {
 	}
 
 	std::optional<RegistryType> RegistryKey::GetValueType(const std::wstring& ValueName) const {
-		// TODO: UPDATE THIS FUNCTION
 		if(!Exists()){
 			SetLastError(FILE_DOES_NOT_EXIST);
 			return std::nullopt;
@@ -278,7 +277,7 @@ namespace Registry {
 
 		DWORD dwType = KeyValueInfo->Type;
 
-		if(status != ERROR_SUCCESS) {
+		if(!NT_SUCCESS(status)) {
 			SetLastError(status);
 			return std::nullopt;
 		}
@@ -511,7 +510,7 @@ namespace Registry {
 					result = Linker::NtQueryKey(hkBackingKey, 3, buffer, size, &size);
 					if(result == 0){
 						buffer[size / sizeof(wchar_t)] = L'\0';
-						keyPath = std::wstring(buffer + 2, size - 1);
+						keyPath = std::wstring(buffer + 2);
 					}
 					delete[] buffer;
 					auto location = keyPath.find(L"\\REGISTRY\\MACHINE");
@@ -541,9 +540,10 @@ namespace Registry {
 	}
 
 	bool RegistryKey::RemoveValue(const std::wstring& wsValueName) const {
-		auto status = RegDeleteValueW(hkBackingKey, wsValueName.c_str());
+		UNICODE_STRING RegistryKeyName{ wsValueName.length() * 2, wsValueName.length() * 2, const_cast<PWSTR>(wsValueName.c_str()) };
+		NTSTATUS status{ Linker::NtDeleteValueKey(hkBackingKey, &RegistryKeyName)};
 		SetLastError(status);
-		return status == ERROR_SUCCESS;
+		return NT_SUCCESS(status);
 	}
 
 	RegistryKey::operator HKEY() const {
