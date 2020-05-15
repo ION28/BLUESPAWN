@@ -76,6 +76,8 @@ std::map<std::string, std::shared_ptr<Reaction>> reactions = {
 	{"carve-memory", std::make_shared<Reactions::CarveProcessReaction>( Bluespawn::io )},
 };
 
+Aggressiveness Bluespawn::aggressiveness{ Aggressiveness::Normal };
+
 Bluespawn::Bluespawn(){
 
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1004>());
@@ -166,6 +168,7 @@ void Bluespawn::EnableMode(BluespawnMode mode, int option){
 }
 
 void Bluespawn::Run(){
+
 	if(modes.find(BluespawnMode::MITIGATE) != modes.end()){
 		RunMitigations(modes[BluespawnMode::MITIGATE] & 0x01, modes[BluespawnMode::MITIGATE] & 0x02);
 	}

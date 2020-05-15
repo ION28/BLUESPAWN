@@ -91,6 +91,8 @@ bool ScanNode::operator==(const ScanNode& node) const{
 	} else return false;
 }
 
+bool ScanNode::operator<(const ScanNode& node) const{ return true; }
+
 Certainty ScanNode::GetCertainty(){ 
 	if(bAssociativeStale){
 		cAssociativeCertainty = Certainty::None;
@@ -160,8 +162,9 @@ bool DetectionNetwork::IntersectsNetwork(const DetectionNetwork& network){
 	for(auto& node : network.nodes){
 		if(set.count(node))
 			return true;
-		else return false;
 	}
+
+	return false;
 }
 
 DetectionNetwork::DetectionNetwork(std::vector<ScanNode>&& nodes) :

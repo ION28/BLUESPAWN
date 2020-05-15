@@ -16,6 +16,8 @@
 #include <mscat.h>
 #include "common/wrappers.hpp"
 
+LINK_FUNCTION(NtCreateFile, ntdll.dll)
+
 namespace FileSystem{
 	bool CheckFileExists(std::wstring filename) {
 		auto attribs = GetFileAttributesW(filename.c_str());
@@ -116,41 +118,72 @@ namespace FileSystem{
 	File::File(IN const std::wstring& path) : hFile{ nullptr }{
 		FilePath = path;
 		LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
-		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
-			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
-		if(!hFile && GetLastError() == ERROR_FILE_NOT_FOUND){
-			LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
-			bFileExists = false;
-			bWriteAccess = false;
-			bReadAccess = false;
-		}
-		else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
-			bWriteAccess = false;
-			hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
-				FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
-			if (!hFile && GetLastError() == ERROR_FILE_NOT_FOUND) {
+		if(FilePath.at(0) == L'\\'){
+			HANDLE hFile{};
+			UNICODE_STRING UnicodeName{ path.length() * 2, path.length() * 2, const_cast<PWCHAR>(path.c_str()) };
+			OBJECT_ATTRIBUTES attributes{};
+			IO_STATUS_BLOCK IoStatus{};
+			InitializeObjectAttributes(&attributes, &UnicodeName, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, nullptr, nullptr);
+			NTSTATUS Status{ Linker::NtCreateFile(&hFile, GENERIC_READ | GENERIC_WRITE, &attributes, &IoStatus, nullptr, FILE_ATTRIBUTE_NORMAL, 
+												  FILE_SHARE_READ, FILE_OPEN, FILE_SEQUENTIAL_ONLY, nullptr, 0) };
+			if(NT_SUCCESS(Status)){
+				this->hFile = hFile;
+				bFileExists = true;
+				bWriteAccess = true;
+				bReadAccess = true;
+			} else if(Status == 0xC0000022 || Status == 0xC0000043){ // STATUS_ACCESS_DENIED or STATUS_SHARING_VIOLATION
+				Status = Linker::NtCreateFile(&hFile, GENERIC_READ, &attributes, &IoStatus, nullptr, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ, 
+											  FILE_OPEN, FILE_SEQUENTIAL_ONLY, nullptr, 0);
+				if(NT_SUCCESS(Status)){
+					this->hFile = hFile;
+					bFileExists = true;
+					bWriteAccess = true;
+					bReadAccess = false;
+				} else{
+					LOG_ERROR("Unable to create a file handle for file " << path << " (NTSTATUS " << Status << ")");
+					bFileExists = true;
+					bWriteAccess = false;
+					bReadAccess = false;
+				}
+			} else{
+				LOG_VERBOSE(2, "Couldn't open file since file doesn't exist (" << path << ").");
+				bFileExists = false;
+				bWriteAccess = false;
+				bReadAccess = false;
+			}
+		} else{
+			hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+								FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
+			if(!hFile && GetLastError() == ERROR_FILE_NOT_FOUND){
 				LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
 				bFileExists = false;
+				bWriteAccess = false;
 				bReadAccess = false;
-			}
-			else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
-				LOG_VERBOSE(2, "Couldn't open file, Access Denied" << path << ".");
-				bFileExists = true;
-				bReadAccess = false;
-			}
-			else {
+			} else if(!hFile && GetLastError() == ERROR_ACCESS_DENIED){
+				bWriteAccess = false;
+				hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+									FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
+				if(!hFile && GetLastError() == ERROR_FILE_NOT_FOUND){
+					LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
+					bFileExists = false;
+					bReadAccess = false;
+				} else if(!hFile && GetLastError() == ERROR_ACCESS_DENIED){
+					LOG_VERBOSE(2, "Couldn't open file, Access Denied" << path << ".");
+					bFileExists = true;
+					bReadAccess = false;
+				} else{
+					LOG_VERBOSE(2, "File " << path << " opened.");
+					bFileExists = true;
+					bReadAccess = true;
+				}
+			} else{
 				LOG_VERBOSE(2, "File " << path << " opened.");
 				bFileExists = true;
+				bWriteAccess = true;
 				bReadAccess = true;
 			}
+			Attribs.extension = PathFindExtension(path.c_str());
 		}
-		else {
-			LOG_VERBOSE(2, "File " << path << " opened.");
-			bFileExists = true;
-			bWriteAccess = true;
-			bReadAccess = true;
-		}
-		Attribs.extension = PathFindExtension(path.c_str());
 	}
 
 	bool File::Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, __in_opt const bool truncate, __in_opt const bool insert) const {
@@ -421,24 +454,35 @@ namespace FileSystem{
 			LOG_ERROR("Can't create " << FilePath << ". File already exists.");
 			return false;
 		}
-		hFile = CreateFileW(FilePath.c_str(),
-			GENERIC_READ | GENERIC_WRITE,
-			FILE_SHARE_READ,
-			NULL,
-			CREATE_NEW,
-			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL,
-			NULL);
-		if(INVALID_HANDLE_VALUE == hFile)
-		{
-			DWORD dwStatus = GetLastError();
-			LOG_ERROR("Error creating file " << FilePath << ". Error code = " << dwStatus);
-			bFileExists = false;
-			return false;
+
+		if(FilePath.at(0) == L'\\'){
+			HANDLE hFile{};
+			UNICODE_STRING UnicodeName{ FilePath.length() * 2, FilePath.length() * 2, const_cast<PWCHAR>(FilePath.c_str()) };
+			OBJECT_ATTRIBUTES attributes{};
+			IO_STATUS_BLOCK IoStatus{};
+			InitializeObjectAttributes(&attributes, &UnicodeName, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, nullptr, nullptr);
+			NTSTATUS Status{ Linker::NtCreateFile(&hFile, GENERIC_READ | GENERIC_WRITE, &attributes, &IoStatus, nullptr, FILE_ATTRIBUTE_NORMAL,
+												  FILE_SHARE_READ, FILE_OPEN, FILE_SEQUENTIAL_ONLY, nullptr, FILE_CREATE) };
+			if(!NT_SUCCESS(Status)){
+				LOG_ERROR("Error creating file " << FilePath << ". (NTSTATUS " << Status << ")");
+				return false;
+			}
+			LOG_VERBOSE(1, FilePath << " successfully created.");
+			bFileExists = true;
+			bReadAccess = true;
+			bWriteAccess = true;
+		} else{
+			hFile = CreateFileW(FilePath.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_FLAG_SEQUENTIAL_SCAN |
+								FILE_ATTRIBUTE_NORMAL, NULL);
+			if(INVALID_HANDLE_VALUE == hFile){
+				LOG_ERROR("Error creating file " << FilePath << ". (Error " << GetLastError() << ")");
+				return false;
+			}
+			LOG_VERBOSE(1, FilePath << " successfully created.");
+			bFileExists = true;
+			bReadAccess = true;
+			bWriteAccess = true;
 		}
-		LOG_VERBOSE(1, FilePath << " successfully created.");
-		bFileExists = true;
-		bReadAccess = true;
-		bWriteAccess = true;
 		return true;
 	}
 

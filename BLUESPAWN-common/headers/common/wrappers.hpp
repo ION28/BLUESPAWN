@@ -162,6 +162,8 @@ public:
 		}
 		return false;
 	}
+
+	bool operator==(const AllocationWrapper& wrapper) const{ return CompareMemory(wrapper); }
 };
 
 template<class T = CHAR>

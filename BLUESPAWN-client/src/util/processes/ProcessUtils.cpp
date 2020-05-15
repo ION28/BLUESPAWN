@@ -307,6 +307,26 @@ DWORD GetRegionSize(DWORD dwPID, LPVOID lpBaseAddress){
 
 }
 
+std::optional<FileSystem::File> GetMappedFile(DWORD dwPID, LPVOID lpAllocationBase){
+    HandleWrapper hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, dwPID);
+    if(hProcess){
+        return GetMappedFile(hProcess, lpAllocationBase);
+    } else{
+        LOG_ERROR("Unable to open process with PID " << dwPID << " to determine size of region at " << lpAllocationBase << " (error " << GetLastError() << ")");
+        return {};
+    }
+}
+
+std::optional<FileSystem::File> GetMappedFile(const HandleWrapper& hProcess, LPVOID lpAllocationBase){
+    std::vector<WCHAR> filename(MAX_PATH);
+    auto len = GetMappedFileNameW(hProcess, lpAllocationBase, filename.data(), MAX_PATH);
+    if(!len){
+        return std::nullopt;
+    }
+
+    return FileSystem::File(std::wstring{ filename.data(), len });
+}
+
 namespace Utils::Process{
     AllocationWrapper ReadProcessMemory(const HandleWrapper& hProcess, LPVOID lpBaseAddress, DWORD dwSize){
         if(hProcess){
@@ -324,6 +344,7 @@ namespace Utils::Process{
         } else {
             LOG_ERROR("Unable to read memory from invalid process!");
         }
+        return { nullptr, 0 };
     }
 
     AllocationWrapper ReadProcessMemory(DWORD dwPID, LPVOID lpBaseAddress, DWORD dwSize){
