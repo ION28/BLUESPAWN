@@ -146,7 +146,12 @@
             "color": "#FCF26B",
 			"comment": "DLL Safe Search mode is enabled (V-3479)",
             "techniqueID": "T1038"
-        }
+        },
+		{
+			"color": "#FCF26B",
+			"comment": "Covered by checking for ntuser.man files in all user directories and monitoring for these files",
+			"techniqueID": "T1484"
+		}
     ],
     "legendItems": [
         {
