@@ -105,6 +105,7 @@ We would like to provide a special thank you to the following projects that have
 * Amazon's [Open Source at AWS Initiative](https://aws.amazon.com/opensource/) who has provided our team some AWS promotional credits to help us reserach and test BLUESPAWN better
 * The [NSA Cybersecurity Directorate](https://github.com/nsacyber)'s Windows [Event Forwarding Guidance](https://github.com/nsacyber/Event-Forwarding-Guidance)
 * [Sean Metcalf](https://twitter.com/PyroTek3)'s Active Directory Security blog [ADSecurity](https://adsecurity.org/)
+* Geoff Chappell's [website on Windows components](https://www.geoffchappell.com/index.htm)
 * [@op7ic](https://github.com/op7ic)'s [EDR-Testing-Script](https://github.com/op7ic/EDR-Testing-Script) Project
 * The Japan Computer Emergency Response Team (JPCERT)'s [Tool Analysis Result Sheet](https://jpcertcc.github.io/ToolAnalysisResultSheet/) for its documentation of attacker behavior and correlation with detection opportunities
 * [@jarro2783](https://github.com/jarro2783)'s [cxxopts](https://github.com/jarro2783/cxxopts) which we use to parse command line arguments
