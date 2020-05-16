@@ -190,7 +190,11 @@ namespace Registry {
 	}
 
 	bool RegistryKey::ValueExists(const std::wstring& wsValueName) const {
-		UNICODE_STRING RegistryKeyName{ wsValueName.length() * 2, wsValueName.length() * 2, const_cast<PWSTR>(wsValueName.c_str()) };
+		UNICODE_STRING RegistryKeyName{ 
+			static_cast<USHORT>(wsValueName.length() * 2), 
+			static_cast<USHORT>(wsValueName.length() * 2), 
+			const_cast<PWSTR>(wsValueName.c_str()) 
+		};
 
 		ULONG size{};
 		NTSTATUS status{ Linker::NtQueryValueKey(hkBackingKey, &RegistryKeyName, 0, nullptr, 0, &size) }; //First 0 is KeyValueBasicInformation
@@ -232,7 +236,11 @@ namespace Registry {
 			return { nullptr, 0 };
 		}
 
-		UNICODE_STRING RegistryKeyName{ ValueName.length() * 2, ValueName.length() * 2, const_cast<PWSTR>(ValueName.c_str()) };
+		UNICODE_STRING RegistryKeyName{
+			static_cast<USHORT>(ValueName.length() * 2),
+			static_cast<USHORT>(ValueName.length() * 2),
+			const_cast<PWSTR>(ValueName.c_str())
+		};
 
 		ULONG size{};
 		NTSTATUS status{ Linker::NtQueryValueKey(hkBackingKey, &RegistryKeyName, 1, nullptr, 0, &size) }; //First 1 is KeyValueFullInformation
@@ -262,7 +270,11 @@ namespace Registry {
 			return std::nullopt;
 		}
 
-		UNICODE_STRING RegistryKeyName{ ValueName.length() * 2, ValueName.length() * 2, const_cast<PWSTR>(ValueName.c_str()) };
+		UNICODE_STRING RegistryKeyName{
+			static_cast<USHORT>(ValueName.length() * 2),
+			static_cast<USHORT>(ValueName.length() * 2),
+			const_cast<PWSTR>(ValueName.c_str())
+		};
 
 		ULONG size{};
 		NTSTATUS status{ Linker::NtQueryValueKey(hkBackingKey, &RegistryKeyName, 0, nullptr, 0, &size) }; //First 0 is KeyValueBasicInformation
@@ -537,7 +549,12 @@ namespace Registry {
 	}
 
 	bool RegistryKey::RemoveValue(const std::wstring& wsValueName) const {
-		UNICODE_STRING RegistryKeyName{ wsValueName.length() * 2, wsValueName.length() * 2, const_cast<PWSTR>(wsValueName.c_str()) };
+		UNICODE_STRING RegistryKeyName{ 
+			static_cast<USHORT>(wsValueName.length() * 2), 
+			static_cast<USHORT>(wsValueName.length() * 2),
+			const_cast<PWSTR>(wsValueName.c_str()) 
+		};
+
 		NTSTATUS status{ Linker::NtDeleteValueKey(hkBackingKey, &RegistryKeyName)};
 		SetLastError(status);
 		return NT_SUCCESS(status);

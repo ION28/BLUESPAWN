@@ -78,12 +78,14 @@ namespace FileSystem {
 		* @param upper - variable to store pointer to upper value
 		*/
 		DWORD SetFilePointer(DWORD64 dwFilePointer) const;
+
 		/**
 		* Function to check if a file is signed in the system catalogs
 		*
 		* return true if the file is signed in the system catalogs, false if it isn't or on error
 		*/
 		bool GetFileInSystemCatalogs() const;
+
 		/**
 		* Function to assist in retrieving file hashes
 		* 
@@ -198,6 +200,13 @@ namespace FileSystem {
 		 * @return true if the file is properly signed; false if not signed or an error occured.
 		 */
 		bool GetFileSigned() const;
+
+		/**
+		 * Indicates whether the file was signed by Microsoft.
+		 *
+		 * @return true if the file is properly signed by microsoft; false otherwise
+		 */
+		bool IsMicrosoftSigned() const;
 
 		/**
 		* Function to create the file if it doesn't exist

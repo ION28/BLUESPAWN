@@ -57,8 +57,8 @@ namespace FileSystem{
 		return ::SetFilePointer(hFile, lowerVal, reinterpret_cast<PLONG>(&upperVal), 0);
 	}
 
-	bool File::GetFileInSystemCatalogs() const {
-		bool bFileFound = false; //Whether the file was found in system catalogs
+	std::optional<std::wstring> GetCatalog(const HandleWrapper& hFile){
+		std::optional<std::wstring> catalogfile; //Whether the file was found in system catalogs
 		HCATADMIN hCatAdmin = NULL; //Context for enumerating system catalogs
 		HCATINFO hCatInfo = NULL;
 		GUID gAction = DRIVER_ACTION_VERIFY;
@@ -90,24 +90,27 @@ namespace FileSystem{
 		//Search catalogs for hash
 		hCatInfo = CryptCATAdminEnumCatalogFromHash(hCatAdmin, pbHash, dwHashLength, 0, &hCatInfo);
 		while (hCatInfo != NULL) {
-			bFileFound = true;
 			CATALOG_INFO ciCatalogInfo = {};
 			ciCatalogInfo.cbStruct = sizeof(ciCatalogInfo);
 
 			if (!CryptCATCatalogInfoFromContext(hCatInfo, &ciCatalogInfo, 0))	{
-				LOG_ERROR("Couldn't get catalog info for catalog containing hash of file " << FilePath);
+				LOG_ERROR("Couldn't get catalog info for catalog containing hash of file");
 				break;
 			}
 
-			LOG_VERBOSE(3, "Hash for file " << FilePath << " found in catalog " << ciCatalogInfo.wszCatalogFile);
-
+			LOG_VERBOSE(3, "Hash for file found in catalog " << ciCatalogInfo.wszCatalogFile);
+			catalogfile = ciCatalogInfo.wszCatalogFile;
 			hCatInfo = CryptCATAdminEnumCatalogFromHash(hCatAdmin, pbHash, dwHashLength, 0, &hCatInfo);
 		}
 	end:
 		if (hCatInfo != NULL) CryptCATAdminReleaseCatalogContext(&hCatAdmin, &hCatInfo, 0);
 		if (hCatAdmin != NULL) CryptCATAdminReleaseContext(&hCatAdmin, 0);
 		if (pbHash != NULL) HeapFree(GetProcessHeap(), 0, pbHash);
-		return bFileFound;
+		return catalogfile;
+	}
+
+	bool File::GetFileInSystemCatalogs() const {
+		return GetCatalog(hFile) != std::nullopt;
 	}
 
 	std::optional<std::wstring> File::CalculateHashType(HashType sHashType) const {
@@ -441,6 +444,81 @@ namespace FileSystem{
 			}
 		}
 		LOG_VERBOSE(1, FilePath << " not signed or located in system catalogs.");
+		return false;
+	}
+
+	std::optional<std::wstring> GetCertificateIssuer(const std::wstring& wsFilePath){
+		DWORD dwEncoding{};
+		DWORD dwContentType{};
+		DWORD dwFormatType{};
+		GenericWrapper<HCERTSTORE> hStore{ nullptr, [](HCERTSTORE store){ CertCloseStore(store, 0); }, INVALID_HANDLE_VALUE };
+		GenericWrapper<HCRYPTMSG> hMsg{ nullptr, CryptMsgClose, INVALID_HANDLE_VALUE };
+		auto status{ CryptQueryObject(CERT_QUERY_OBJECT_FILE, wsFilePath.c_str(), CERT_QUERY_CONTENT_FLAG_PKCS7_SIGNED_EMBED,
+			CERT_QUERY_FORMAT_FLAG_BINARY, 0, &dwEncoding, &dwContentType, &dwFormatType, &hStore, &hMsg, nullptr) };
+		if(!status){
+			LOG_ERROR("Failed to query signature for " << wsFilePath << ": " << SYSTEM_ERROR);
+			return std::nullopt;
+		}
+
+		DWORD dwSignerInfoSize{};
+		status = CryptMsgGetParam(hMsg, CMSG_SIGNER_INFO_PARAM, 0, nullptr, &dwSignerInfoSize);
+		if(!status){
+			LOG_ERROR("Failed to query signer information size for " << wsFilePath << ": " << SYSTEM_ERROR);
+			return std::nullopt;
+		}
+
+		std::vector<CHAR> info(dwSignerInfoSize);
+		status = CryptMsgGetParam(hMsg, CMSG_SIGNER_INFO_PARAM, 0, info.data(), &dwSignerInfoSize);
+		if(!status){
+			LOG_ERROR("Failed to query signer information for " << wsFilePath << ": " << SYSTEM_ERROR);
+			return std::nullopt;
+		}
+		
+		auto signer{ reinterpret_cast<PCMSG_SIGNER_INFO>(info.data())->Issuer };
+		DWORD dwSize = CertNameToStrW(X509_ASN_ENCODING, &signer, CERT_SIMPLE_NAME_STR, nullptr, 0);
+
+		std::vector<WCHAR> buffer(dwSize);
+		CertNameToStrW(X509_ASN_ENCODING, &signer, CERT_SIMPLE_NAME_STR, buffer.data(), dwSize);
+
+		return std::wstring{ buffer.data(), dwSize };
+	}
+
+	bool File::IsMicrosoftSigned() const{
+		if(!bFileExists){
+			LOG_ERROR("Can't check file signature for " << FilePath << ". File doesn't exist.");
+			SetLastError(ERROR_FILE_NOT_FOUND);
+			return false;
+		}
+		if(!bReadAccess){
+			LOG_ERROR("Can't check file signature for " << FilePath << ". Insufficient permissions.");
+			SetLastError(ERROR_ACCESS_DENIED);
+			return false;
+		}
+
+		if(!GetFileSigned()){
+			return false;
+		}
+
+		if(File::GetFileInSystemCatalogs()){
+			auto catalog{ GetCatalog(hFile) };
+			if(catalog){
+				auto signer{ GetCertificateIssuer(*catalog) };
+				if(signer){
+					return ToLowerCaseW(*signer).find(L"microsoft") != std::wstring::npos;
+				} else{
+					LOG_ERROR("Unable to get the certificate issuer for " << *catalog << ": " << SYSTEM_ERROR);
+				}
+			} else{
+				LOG_ERROR("Unable to get the catalog for " << FilePath << ": " << SYSTEM_ERROR);
+			}
+		} else{
+			auto signer{ GetCertificateIssuer(FilePath) };
+			if(signer){
+				return ToLowerCaseW(*signer).find(L"microsoft") != std::wstring::npos;
+			} else{
+				LOG_ERROR("Unable to get the certificate issuer for " << FilePath << ": " << SYSTEM_ERROR);
+			}
+		}
 		return false;
 	}
 
