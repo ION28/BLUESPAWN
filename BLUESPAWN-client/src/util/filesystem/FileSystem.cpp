@@ -34,14 +34,16 @@ namespace FileSystem{
 	}
 
 	std::optional<std::wstring> SearchPathExecutable(const std::wstring& name){
-		auto size = SearchPathW(nullptr, name.c_str(), L".exe", 0, nullptr, nullptr);
+		std::wstring fullname = ExpandEnvStringsW(name);
+
+		auto size = SearchPathW(nullptr, fullname.c_str(), L".exe", 0, nullptr, nullptr);
 		if(!size){
 			return std::nullopt;
 		}
 
 		std::vector<WCHAR> buffer(static_cast<size_t>(size) + 1);
 		WCHAR* filename{};
-		if(!SearchPathW(nullptr, name.c_str(), L".exe", size + 1, buffer.data(), &filename)){
+		if(!SearchPathW(nullptr, fullname.c_str(), L".exe", size + 1, buffer.data(), &filename)){
 			return std::nullopt;
 		}
 
