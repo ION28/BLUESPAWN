@@ -5,6 +5,7 @@
 #include "util/filesystem/Filesystem.h"
 #include "util/log/Log.h"
 #include "util/log/HuntLogMessage.h"
+#include "util/processes/ProcessUtils.h"
 
 #include "common/Utils.h"
 
@@ -18,16 +19,23 @@ namespace Hunts{
 		dwSupportedScans = (DWORD) Aggressiveness::Intensive;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
-		dwTacticsUsed = (DWORD) Tactic::Persistence;
+		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::DefenseEvasion;
+	}
+
+#define ADD_FILE(file, ...)                                             \
+	if(files.find(file) != files.end()){                                \
+	    files.at(file).emplace_back(__VA_ARGS__);                       \
+	} else {                                                            \
+		files.emplace(file, std::vector<RegistryValue>{ __VA_ARGS__ }); \
 	}
 
 	int HuntT1122::ScanIntensive(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for " << name << " at level Cursory");
+		LOG_INFO("Hunting for " << name << " at level Intensive");
 		reaction.BeginHunt(GET_INFO());
 
 		int detections = 0;
 
-		std::map<std::wstring, std::vector<RegistryKey>> files{};
+		std::map<std::wstring, std::vector<RegistryValue>> files{};
 
 		for(auto key : CheckSubkeys(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Classes\\CLSID", true, true)){
 			RegistryKey subkey{ key, L"InprocServer32" };
@@ -35,21 +43,60 @@ namespace Hunts{
 				auto filename{ *subkey.GetValue<std::wstring>(L"") };
 				auto path{ FileSystem::SearchPathExecutable(filename) };
 				if(path){
-					if(files.find(*path) != files.end()){
-						files.at(*path).emplace_back(subkey);
-					} else{
-						files.emplace(*path, std::vector<RegistryKey>{ subkey });
-					}
+					ADD_FILE(*path, RegistryValue{ subkey, L"", std::move(filename) });
+				}
+			}
+			subkey = { key, L"InprocServer" };
+			if(subkey.Exists() && subkey.ValueExists(L"")){
+				auto filename{ *subkey.GetValue<std::wstring>(L"") };
+				auto path{ FileSystem::SearchPathExecutable(filename) };
+				if(path){
+					ADD_FILE(*path, RegistryValue{ subkey, L"", std::move(filename) });
+				}
+			}
+			if(key.ValueExists(L"InprocHandler32")){
+				auto filename{ *key.GetValue<std::wstring>(L"InprocHandler32") };
+				auto path{ FileSystem::SearchPathExecutable(filename) };
+				if(path){
+					ADD_FILE(*path, RegistryValue{ key, L"InprocHandler32", std::move(filename) });
+				}
+			}
+			if(key.ValueExists(L"InprocHandler")){
+				auto filename{ *key.GetValue<std::wstring>(L"InprocHandler") };
+				auto path{ FileSystem::SearchPathExecutable(filename) };
+				if(path){
+					ADD_FILE(*path, RegistryValue{ key, L"InprocHandler", std::move(filename) });
+				}
+			}
+			if(key.ValueExists(L"LocalServer")){
+				auto filename{ *key.GetValue<std::wstring>(L"LocalServer") };
+				auto path{ GetImagePathFromCommand(filename) };
+				if(FileSystem::CheckFileExists(path)){
+					ADD_FILE(path, RegistryValue{ key, L"LocalServer", std::move(filename) });
+				}
+			}
+			subkey = { key, L"LocalServer32" };
+			if(subkey.Exists() && subkey.ValueExists(L"")){
+				auto filename{ *subkey.GetValue<std::wstring>(L"") };
+				auto path{ GetImagePathFromCommand(filename) };
+				if(FileSystem::CheckFileExists(path)){
+					ADD_FILE(path, RegistryValue{ subkey, L"", std::move(filename) });
+				}
+			}
+			if(subkey.Exists() && subkey.ValueExists(L"ServerExecutable")){
+				auto filename{ *subkey.GetValue<std::wstring>(L"ServerExecutable") };
+				auto path{ GetImagePathFromCommand(filename) };
+				auto name{ subkey.GetName() };
+				if(FileSystem::CheckFileExists(path)){
+					ADD_FILE(path, RegistryValue{ subkey, L"ServerExecutable", std::move(filename) });
 				}
 			}
 		}
 
 		for(auto& pair : files){
 			FileSystem::File file{ pair.first };
-			if(file.GetFileExists() && !file.GetFileSigned()){
-				for(auto& key : pair.second){
-					auto path{ key.GetName() };
-					RegistryValue value{ key, L"", *key.GetValue<std::wstring>(L"") };
+			if(file.GetFileExists() && (!file.GetFileSigned() || file.IsLolbin())){
+				for(auto& value : pair.second){
 					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(value));
 				}
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));

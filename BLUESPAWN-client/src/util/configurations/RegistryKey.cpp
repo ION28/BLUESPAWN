@@ -190,6 +190,10 @@ namespace Registry {
 	}
 
 	bool RegistryKey::ValueExists(const std::wstring& wsValueName) const {
+		if(!Exists()){
+			return false;
+		}
+
 		UNICODE_STRING RegistryKeyName{ 
 			static_cast<USHORT>(wsValueName.length() * 2), 
 			static_cast<USHORT>(wsValueName.length() * 2), 

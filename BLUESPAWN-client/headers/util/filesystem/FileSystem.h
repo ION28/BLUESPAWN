@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <set>
 
 #include "util/log/Loggable.h"
 #include "common/wrappers.hpp"
@@ -50,6 +51,12 @@ namespace FileSystem {
 	};
 
 	class File : public Loggable {
+
+		// A list of living off the land binaries used commonly by attackers for persistence
+		static std::vector<std::wstring> lolbins;
+
+		// A list of hashes of living off the land binaries present on the system
+		static std::set<std::wstring> LolbinHashes;
 
 		//Whether or not this current file actually exists on the filesystem
 		bool bFileExists; 
@@ -245,6 +252,15 @@ namespace FileSystem {
 		 */
 		virtual std::wstring ToString() const;
 
+		/**
+		 * Checks whether the file referenced by this is a well known living off the land binary.
+		 * This is done by comparing the hash of this file against that of known lolbins such
+		 * as cmd.exe, powershell.exe, netsh.exe, net.exe, net1.exe, explorer.exe, rundll32.exe,
+		 * wscript.exe, wmic.exe, regsvr32.exe, and cscript.exe
+		 *
+		 * @return true if this file is a lolbin; false otherwise
+		 */
+		bool IsLolbin() const;
 
 		/**
 		* Function to get the file owner

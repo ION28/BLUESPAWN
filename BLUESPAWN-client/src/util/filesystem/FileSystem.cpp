@@ -48,6 +48,22 @@ namespace FileSystem{
 		return buffer.data();
 	}
 
+	std::vector<std::wstring> File::lolbins{
+		L"cmd.exe",
+		L"powershell.exe",
+		L"netsh.exe",
+		L"net.exe",
+		L"net1.exe",
+		L"explorer.exe",
+		L"rundll32.exe",
+		L"wscript.exe",
+		L"wmic.exe",
+		L"regsvr32.exe",
+		L"cscript.exe"
+	};
+
+	std::set<std::wstring> File::LolbinHashes{};
+
 	DWORD File::SetFilePointer(DWORD64 val) const {
 		//Calculate the offset into format needed for SetFilePointer
 		long lowerMask = 0xFFFFFFFF;
@@ -657,6 +673,31 @@ namespace FileSystem{
 		}
 		LOG_VERBOSE(3, "Set the owner for file " << FilePath << " to " << owner << ".");
 		return true;
+	}
+
+	bool File::IsLolbin() const{
+		if(!bFileExists){
+			return false;
+		}
+
+		if(!LolbinHashes.size()){
+			for(auto name : lolbins){
+				auto path{ SearchPathExecutable(name) };
+				if(path){
+					auto hash{ File{ *path }.GetSHA256Hash() };
+					if(hash){
+						LolbinHashes.emplace(*hash);
+					}
+				}
+			}
+		}
+
+		auto hash{ GetSHA256Hash() };
+		if(hash && LolbinHashes.count(*hash)){
+			return true;
+		}
+
+		return false;
 	}
 
 	ACCESS_MASK File::GetAccessPermissions(const Permissions::Owner& owner) {
