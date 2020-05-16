@@ -20,7 +20,7 @@ namespace Hunts {
 
 		int detections = 0;
 
-		for(auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls")){
+		for(auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls", false, false)){
 			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
 			detections++;
 		}
@@ -32,7 +32,7 @@ namespace Hunts {
 	std::vector<std::shared_ptr<Event>> HuntT1182::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
 
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager" }));
+		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls", false }));
 
 		return events;
 	}
