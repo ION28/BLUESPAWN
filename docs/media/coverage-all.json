@@ -146,7 +146,12 @@
             "color": "#FCF26B",
 			"comment": "DLL Safe Search mode is enabled (V-3479)",
             "techniqueID": "T1038"
-        }
+        },
+		{
+			"color": "#FCF26B",
+			"comment": "Covered by checking Services in the registry for things like FailureCommands that are suspicious.",
+			"techniqueID": "T1031"
+		}
     ],
     "legendItems": [
         {
