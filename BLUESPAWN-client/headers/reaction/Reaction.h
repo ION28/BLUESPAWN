@@ -22,6 +22,7 @@ protected:
 	std::vector<DetectService> vServiceReactions;
 	std::vector<DetectProcess> vProcessReactions;
 	std::vector<DetectEvent> vEventReactions;
+	std::vector<DetectOther> vOtherReactions;
 	
 	/// Handlers for startting and beginning hunts
 	std::vector<HuntStart> vStartHuntProcs;
@@ -38,6 +39,7 @@ public:
 	void ProcessIdentified(std::shared_ptr<PROCESS_DETECTION>);
 	void ServiceIdentified(std::shared_ptr<SERVICE_DETECTION>);
 	void EventIdentified(std::shared_ptr<EVENT_DETECTION>);
+	void OtherIdentified(OtherDetection);
 
 	/// These functions add handlers for beginning and ending hunts
 	void AddHuntBegin(HuntStart handler);
@@ -49,6 +51,7 @@ public:
 	void AddProcessReaction(DetectProcess handler);
 	void AddServiceReaction(DetectService handler);
 	void AddEventReaction(DetectEvent handler);
+	void AddOtherReaction(DetectOther handler);
 
 	/// Merges the given reaction into the current reaction
 	Reaction& Combine(const Reaction& reaction);

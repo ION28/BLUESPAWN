@@ -45,11 +45,17 @@ namespace Reactions {
 			LOG_ERROR("Potentially malicious service " << detection->wsServiceName << " detected outside of a hunt!");
 		}
 	}
-	void LogReaction::LogEventIdentified(std::shared_ptr<EVENT_DETECTION> detection) {
-		if (HuntBegun) {
+	void LogReaction::LogEventIdentified(std::shared_ptr<EVENT_DETECTION> detection){
+		if(HuntBegun){
 			_HuntLogMessage->AddDetection(std::static_pointer_cast<DETECTION>(detection));
+		} else{
+			LOG_ERROR("Potentially malicious event " << detection->channel << " detected outside of a hunt!");
 		}
-		else {
+	}
+	void LogReaction::LogEventIdentified(std::shared_ptr<EVENT_DETECTION> detection){
+		if(HuntBegun){
+			_HuntLogMessage->AddDetection(std::static_pointer_cast<DETECTION>(detection));
+		} else{
 			//LOG_ERROR("Potentially malicious service " << detection->wsServiceName << " detected outside of a hunt!");
 		}
 	}

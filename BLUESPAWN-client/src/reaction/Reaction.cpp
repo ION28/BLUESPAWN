@@ -31,8 +31,13 @@ void Reaction::ServiceIdentified(std::shared_ptr<SERVICE_DETECTION> info){
 		reaction(info);
 	}
 }
-void Reaction::EventIdentified(std::shared_ptr<EVENT_DETECTION> info) {
-	for (auto reaction : vEventReactions) {
+void Reaction::EventIdentified(std::shared_ptr<EVENT_DETECTION> info){
+	for(auto reaction : vEventReactions){
+		reaction(info);
+	}
+}
+void Reaction::OtherIdentified(OtherDetection info){
+	for(auto reaction : vOtherReactions){
 		reaction(info);
 	}
 }
@@ -56,8 +61,11 @@ void Reaction::AddProcessReaction(DetectProcess handler){
 void Reaction::AddServiceReaction(DetectService handler){
 	vServiceReactions.emplace_back(handler);
 }
-void Reaction::AddEventReaction(DetectEvent handler) {
+void Reaction::AddEventReaction(DetectEvent handler){
 	vEventReactions.emplace_back(handler);
+}
+void Reaction::AddOtherReaction(DetectOther handler){
+	vOtherReactions.emplace_back(handler);
 }
 
 Reaction& Reaction::Combine(const Reaction& reaction){
@@ -74,8 +82,10 @@ Reaction& Reaction::Combine(const Reaction& reaction){
 		vProcessReactions.emplace_back(function);
 	for(auto function : reaction.vServiceReactions)
 		vServiceReactions.emplace_back(function);
-	for (auto function : reaction.vEventReactions)
+	for(auto function : reaction.vEventReactions)
 		vEventReactions.emplace_back(function);
+	for(auto function : reaction.vOtherReactions)
+		vOtherReactions.emplace_back(function);
 
 	return *this;
 }
@@ -94,8 +104,10 @@ Reaction& Reaction::Combine(Reaction&& reaction){
 		vProcessReactions.emplace_back(function);
 	for(auto function : reaction.vServiceReactions)
 		vServiceReactions.emplace_back(function);
-	for (auto function : reaction.vEventReactions)
+	for(auto function : reaction.vEventReactions)
 		vEventReactions.emplace_back(function);
+	for(auto function : reaction.vOtherReactions)
+		vOtherReactions.emplace_back(function);
 
 	return *this;
 }

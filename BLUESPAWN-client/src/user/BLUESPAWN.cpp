@@ -160,7 +160,7 @@ void Bluespawn::RunMonitor() {
 }
 
 void Bluespawn::AddReaction(const std::shared_ptr<Reaction>& reaction){
-	this->reaction.Combine(*reaction);
+	Bluespawn::reaction.Combine(*reaction);
 }
 
 void Bluespawn::EnableMode(BluespawnMode mode, int option){
@@ -168,7 +168,9 @@ void Bluespawn::EnableMode(BluespawnMode mode, int option){
 }
 
 void Bluespawn::Run(){
-
+	if(modes.find(BluespawnMode::SCAN) != modes.end()){
+		aggressiveness = static_cast<Aggressiveness>(modes.at(BluespawnMode::SCAN));
+	}
 	if(modes.find(BluespawnMode::MITIGATE) != modes.end()){
 		RunMitigations(modes[BluespawnMode::MITIGATE] & 0x01, modes[BluespawnMode::MITIGATE] & 0x02);
 	}
@@ -244,7 +246,18 @@ Aggressiveness GetAggressiveness(const cxxopts::OptionValue& value){
 	return aHuntLevel;
 }
 
+#include "scan/CollectDetections.h"
 int main(int argc, char* argv[]){
+	DetectionCollector collector{};
+	Registry::RegistryKey key{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run" };
+	collector.AddDetection(std::make_shared<REGISTRY_DETECTION>(Registry::RegistryValue{
+		key, L"malware", *key.GetValue<std::wstring>(L"malware")
+	}, RegistryDetectionType::CommandReference));
+
+	return 0;
+}
+
+int main2(int argc, char* argv[]){
 
 	Bluespawn bluespawn{};
 
@@ -256,17 +269,15 @@ int main(int argc, char* argv[]){
 		("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
 		("n,monitor", "Monitor the System for Malicious Activity. Available options are Cursory, Normal, or Intensive.", cxxopts::value<std::string>()->implicit_value("Normal"))
 		("m,mitigate", "Mitigates vulnerabilities by applying security settings. Available options are audit and enforce.", cxxopts::value<std::string>()->implicit_value("audit"))
-		("s,scan", "Mitigates vulnerabilities by applying security settings. Available options are audit and enforce.", cxxopts::value<std::string>()->implicit_value("audit"))
+		("s,scan", "Scans possible detections to decide if they are malicious and determine associated detections.", cxxopts::value<std::string>()->default_value("Normal"))
 		("help", "Help Information. You can also specify a category for help on a specific module such as hunt.", cxxopts::value<std::string>()->implicit_value("general"))
 		("log", "Specify how Bluespawn should log events. Options are console (default), xml, and debug.", cxxopts::value<std::string>()->default_value("console"))
 		("r,react", "Specifies how bluespawn should react to potential threats dicovered during hunts.", cxxopts::value<std::string>()->default_value("log"))
 		("v,verbose", "Verbosity", cxxopts::value<int>()->default_value("0"))
 		("debug", "Enable Debug Output", cxxopts::value<bool>());
 
-	options.add_options("scan")("l,level", "Aggressiveness of scan. Either Cursory, Normal, or Intensive", cxxopts::value<std::string>()->default_value("Normal"));
 	options.add_options("mitigate")("force", "Use this option to forcibly apply mitigations with no prompt", cxxopts::value<bool>());
 
-	options.parse_positional({ "level" });
 	try {
 		auto result = options.parse(argc, argv);
 
@@ -308,7 +319,7 @@ int main(int argc, char* argv[]){
 		}
 
 		if (result.count("scan")) {
-			bluespawn.EnableMode(BluespawnMode::SCAN, static_cast<DWORD>(GetAggressiveness(result["level"])));
+			bluespawn.EnableMode(BluespawnMode::SCAN, static_cast<DWORD>(GetAggressiveness(result["scan"])));
 		}
 		if (result.count("mitigate")) {
 			bool bForceEnforce = false;

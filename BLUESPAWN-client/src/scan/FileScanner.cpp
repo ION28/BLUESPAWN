@@ -82,7 +82,7 @@ void FileScanner::UpdateModules(){
 
 	uint64_t tdiff{ (static_cast<uint64_t>(time.dwHighDateTime - lastupdate.dwHighDateTime) << 32) + time.dwLowDateTime - lastupdate.dwLowDateTime };
 	DWORD dwSecondsElapsed = tdiff / 10000000;
-	if(dwSecondsElapsed > 60){
+	if(dwSecondsElapsed > 120){
 		modules.clear();
 
 		std::vector<DWORD> processes(1024);
@@ -103,6 +103,8 @@ void FileScanner::UpdateModules(){
 				} else FileScanner::modules.at(name).emplace(processes[i]);
 			}
 		}
+
+		lastupdate = time;
 	}
 }
 

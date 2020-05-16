@@ -8,6 +8,7 @@
 
 #include "hunt/HuntInfo.h"
 #include "util/configurations/RegistryValue.h"
+#include "util/filesystem/FileSystem.h"
 #include <common\StringUtils.h>
 
 enum class DetectionType {
@@ -19,9 +20,27 @@ enum class DetectionType {
 	Other
 };
 
+class Hunt;
+
+enum class DetectionSource {
+	Association, Hunt
+};
+
 struct DETECTION {
 	DetectionType Type;
-	DETECTION(DetectionType Type) : Type{ Type }{}
+	std::vector<DWORD> AssociatedDetections;
+	DWORD dwID;
+	DetectionSource source;
+	std::optional<std::wstring> hunt;
+	DETECTION(DetectionType Type, const std::wstring& hunt) : 
+		Type{ Type },
+		source{ DetectionSource::Hunt },
+		hunt{ hunt }{}
+
+	DETECTION(DetectionType Type) :
+		Type{ Type },
+		source{ DetectionSource::Association },
+		hunt{ std::nullopt }{}
 };
 typedef std::shared_ptr<DETECTION> Detection;
 
@@ -31,9 +50,32 @@ struct FILE_DETECTION : public DETECTION {
 	std::wstring wsFileName;
 	std::wstring wsFilePath;
 	std::string hash;
-	FILE_DETECTION(const std::wstring& wsFilePath) : 
+	FileSystem::File file;
+	FILE_DETECTION(const std::wstring& wsFilePath) :
 		DETECTION{ DetectionType::File },
 		wsFilePath{ wsFilePath },
+		file{ wsFilePath },
+		hash{}{
+		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
+	}
+	FILE_DETECTION(const std::wstring& wsFilePath, const std::wstring& hunt) :
+		DETECTION{ DetectionType::File, hunt },
+		wsFilePath{ wsFilePath },
+		file{ wsFilePath },
+		hash{}{
+		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
+	}
+	FILE_DETECTION(const FileSystem::File& file) :
+		DETECTION{ DetectionType::File },
+		wsFilePath{ file.GetFilePath() },
+		file{ file },
+		hash{}{
+		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
+	}
+	FILE_DETECTION(const FileSystem::File& file, const std::wstring& hunt) :
+		DETECTION{ DetectionType::File, hunt },
+		wsFilePath{ file.GetFilePath() },
+		file{ file },
 		hash{}{
 		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
 	}
@@ -57,9 +99,16 @@ struct REGISTRY_DETECTION : public DETECTION {
 	Registry::RegistryValue value;
 	RegistryDetectionType type;
 	bool multitype;
-	REGISTRY_DETECTION(const Registry::RegistryValue& value, RegistryDetectionType type = RegistryDetectionType::Configuration, 
-					   bool multitype = false) :
+	REGISTRY_DETECTION(const Registry::RegistryValue& value, RegistryDetectionType type = RegistryDetectionType::Association) :
 		DETECTION{ DetectionType::Registry },
+		type{ type },
+		multitype{ false },
+		value{ value }{}
+
+	REGISTRY_DETECTION(const Registry::RegistryValue& value, const std::wstring& hunt, 
+					   RegistryDetectionType type = RegistryDetectionType::Configuration,
+					   bool multitype = false) :
+		DETECTION{ DetectionType::Registry, hunt },
 		type{ type },
 		multitype{ multitype },
 		value{ value }{}
@@ -71,6 +120,7 @@ typedef std::function<void(std::shared_ptr<REGISTRY_DETECTION>)> DetectRegistry;
 struct SERVICE_DETECTION : public DETECTION {
 	std::wstring wsServiceName;
 	std::wstring wsServiceExecutablePath;
+	std::optional<std::wstring> wsServiceDll;
 	SERVICE_DETECTION(const std::wstring& wsServiceName, const std::wstring& wsServiceExecutablePath) :
 		DETECTION{ DetectionType::Service },
 		wsServiceName{ wsServiceName },

@@ -26,8 +26,6 @@ enum class BluespawnMode {
 };
 
 class Bluespawn {
-
-	Reaction reaction;
 	
 	std::map<BluespawnMode, int> modes;
 
@@ -46,5 +44,7 @@ class Bluespawn {
 		static HuntRegister huntRecord;
 		static MitigationRegister mitigationRecord;
 		static Aggressiveness aggressiveness;
+
+		static Reaction reaction;
 		static const IOBase& io;
 };

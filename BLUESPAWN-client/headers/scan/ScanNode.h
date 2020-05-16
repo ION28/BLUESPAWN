@@ -5,24 +5,54 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <atomic>
 
 /// Represents the degree of certainty that a detection is malicious
-enum class Certainty {
-	Certain = 0,  // 1.00
-	Strong = 1,   // 0.75
-	Moderate = 2, // 0.50
-	Weak = 3,     // 0.25
-	None = 4,     // 0.00
+class Certainty {
+	double confidence;
+
+public:
+
+	const static Certainty Certain;
+	const static Certainty Strong;
+	const static Certainty Moderate;
+	const static Certainty Weak;
+	const static Certainty None;
+
+	Certainty(double value);
+	operator double();
+
+	/**
+	 * If the strengths of two associations are to be combined, this function will compute the
+	 * resulting association. Using the numerical value of associations, the formula is
+	 * 1 - (1 - a1) * (1 - a2).
+	 */
+	Certainty operator+(Certainty c);
+
+	/**
+	 * If an association is to be the composite of two associations, this function will compute the
+	 * resulting association. Using the numerical value of associations, the formula is
+	 * a1 * a2.
+	 */
+	Certainty operator*(Certainty c);
+
+	/**
+	 * Used for comparing between certainties. Note that is computes approximate comparisons rather
+	 * than exact comparisons. Thus, any value within 0.125 of `confidence` is considered equal
+	 */
+	bool operator==(Certainty c);
+	bool operator!=(Certainty c);
+	bool operator<=(Certainty c);
+	bool operator>=(Certainty c);
+
+	// These functions use exact comparisons rather than approximate comparisons
+	bool operator>(Certainty c);
+	bool operator<(Certainty c);
 };
 
 /// An association is the degree of certainty that two detections are related
 typedef Certainty Association;
 
-/**
- * If the strengths of two associations are to be combined, this function will compute the
- * resulting association. Using the numerical value of associations, the formula is
- * 1 - (1 - a1) * (1 - a2), rounded to the nearest association.
- */
 Association AddAssociation(Association a1, Association a2);
 
 /**
@@ -32,11 +62,10 @@ Association AddAssociation(Association a1, Association a2);
  */
 Association MultiplyAssociation(Association a1, Association a2);
 
-/// Forward declare scanners so they can be friends
+/// Forward declare scanners and DetectionNetwork so they can be friends
 class RegistryScanner;
 class ProcessScanner;
 class FileScanner; 
-
 class DetectionNetwork;
 
 /**
@@ -46,6 +75,8 @@ class DetectionNetwork;
  * identify as much malicious activity as possible.
  */
 class ScanNode {
+
+	static std::atomic<DWORD> IDCounter;
 
 	/// A mapping of scan nodes to their association with the current node.
 	std::map<std::shared_ptr<ScanNode>, Association> associations;
@@ -64,11 +95,13 @@ class ScanNode {
 	/// Indicates whether cAssociativeCertainty has gone stale and must be recalculated
 	bool bAssociativeStale;
 
-	/// Allow RegistryScanner, FileScanner, and ProcessScanner access to private variables
+	/// A unique identifier for this node
+	DWORD dwID;
+
+	/// Allow RegistryScanner, FileScanner, ProcessScanner, and DetectionNetwork access to private variables
 	friend class RegistryScanner;
 	friend class FileScanner;
 	friend class ProcessScanner;
-	
 	friend class DetectionNetwork;
 
 	void AddAssociation(const std::shared_ptr<ScanNode>& node, Association strength);
@@ -79,6 +112,8 @@ public:
 	static const std::map<std::shared_ptr<ScanNode>, Association>& GetAssociations(const std::shared_ptr<ScanNode>& node);
 
 	Certainty GetCertainty();
+	DWORD GetID();
+
 
 	bool operator==(const ScanNode& node) const;
 	bool operator<(const ScanNode& node) const;

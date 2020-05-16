@@ -9,35 +9,31 @@
 
 #include "user/bluespawn.h"
 
-Association AddAssociation(Association a1, Association a2){
-	Association combined[5][5] = {
-		{ Association::Certain, Association::Certain, Association::Certain,  Association::Certain,  Association::Certain  },
-		{ Association::Certain, Association::Certain, Association::Strong,   Association::Strong,   Association::Strong   },
-		{ Association::Certain, Association::Strong,  Association::Strong,   Association::Moderate, Association::Moderate },
-		{ Association::Certain, Association::Strong,  Association::Moderate, Association::Moderate, Association::Weak     },
-		{ Association::Certain, Association::Strong,  Association::Moderate, Association::Weak,     Association::None     },
-	};
+const Certainty Certainty::Certain =  1.00;
+const Certainty Certainty::Strong =   0.75;
+const Certainty Certainty::Moderate = 0.50;
+const Certainty Certainty::Weak =     0.25;
+const Certainty Certainty::None =     0.00;
 
-	return combined[static_cast<DWORD>(a1)][static_cast<DWORD>(a2)];
-}
+Certainty::Certainty(double certainty) : confidence{ certainty }{}
+Certainty::operator double(){ return confidence; }
+Certainty Certainty::operator*(Certainty c){ return confidence * c.confidence; }
+Certainty Certainty::operator+(Certainty c){ return 1 - (1 - confidence) * (1 - c.confidence); }
+bool Certainty::operator==(Certainty c){ return c.confidence > confidence ? c.confidence - confidence <= 0.125 : confidence - c.confidence <= 0.125; }
+bool Certainty::operator!=(Certainty c){ return c.confidence > confidence ? c.confidence - confidence > 0.125 : confidence - c.confidence > 0.125; }
+bool Certainty::operator>=(Certainty c){ return *this > c || *this == c; }
+bool Certainty::operator<=(Certainty c){ return *this > c || *this == c; }
+bool Certainty::operator>(Certainty c){ return confidence > c.confidence; }
+bool Certainty::operator<(Certainty c){ return confidence < c.confidence; }
 
-Association MultiplyAssociation(Association a1, Association a2){
-	Association combined[5][5] = {
-		{ Association::Certain,  Association::Strong,   Association::Moderate, Association::Weak, Association::None },
-		{ Association::Strong,   Association::Moderate, Association::Moderate, Association::Weak, Association::None },
-		{ Association::Moderate, Association::Moderate, Association::Weak,     Association::Weak, Association::None },
-		{ Association::Weak,     Association::Weak,     Association::Weak,     Association::None, Association::None },
-		{ Association::None,     Association::None,     Association::None,     Association::None, Association::None },
-	};
-
-	return combined[static_cast<DWORD>(a1)][static_cast<DWORD>(a2)];
-}
+std::atomic<DWORD> ScanNode::IDCounter{ 1 };
 
 ScanNode::ScanNode(const Detection& detection) : 
 	detection{ detection },
 	certainty{ Certainty::None },
 	cAssociativeCertainty{ Certainty::None },
 	associations{},
+	dwID{ IDCounter += 1 },
 	bAssociativeStale{ true }{}
 
 void MergeMaps(std::map<std::shared_ptr<ScanNode>, Association>& destination, const std::map<std::shared_ptr<ScanNode>, Association>& source){
@@ -93,42 +89,7 @@ bool ScanNode::operator==(const ScanNode& node) const{
 }
 
 bool ScanNode::operator<(const ScanNode& node) const{ 
-	if(node.detection->Type == detection->Type){
-		switch(detection->Type){
-		case DetectionType::Event:
-			return static_pointer_cast<EVENT_DETECTION>(detection)->rawXML <
-				static_pointer_cast<EVENT_DETECTION>(node.detection)->rawXML;
-		case DetectionType::File:
-			return static_pointer_cast<FILE_DETECTION>(detection)->wsFilePath <
-				static_pointer_cast<FILE_DETECTION>(node.detection)->wsFilePath;
-		case DetectionType::Other:
-		{
-			auto& d1 = static_pointer_cast<OTHER_DETECTION>(detection);
-			auto& d2 = static_pointer_cast<OTHER_DETECTION>(detection);
-			return d1->type < d2->type || (d1->type == d2->type && d1->params < d2->params);
-		}
-		case DetectionType::Process:
-		{
-			auto& d1 = static_pointer_cast<PROCESS_DETECTION>(detection);
-			auto& d2 = static_pointer_cast<PROCESS_DETECTION>(detection);
-			return d1->PID < d2->PID ||
-				(d1->PID == d2->PID && d1->lpAllocationBase < d2->lpAllocationBase) ||
-				(d1->PID == d2->PID && d1->lpAllocationBase == d2->lpAllocationBase && d1->dwAllocationSize < d2->dwAllocationSize);
-		}
-		case DetectionType::Registry:
-			return static_pointer_cast<REGISTRY_DETECTION>(detection)->value <
-				static_pointer_cast<REGISTRY_DETECTION>(node.detection)->value;
-		case DetectionType::Service:
-		{
-			auto& d1 = static_pointer_cast<SERVICE_DETECTION>(detection);
-			auto& d2 = static_pointer_cast<SERVICE_DETECTION>(detection);
-			return d1->wsServiceName < d2->wsServiceName || (d1->wsServiceName == d2->wsServiceName && 
-															 d1->wsServiceExecutablePath < d2->wsServiceExecutablePath);
-		}
-		default:
-			return false;
-		}
-	} else return node.detection->Type < detection->Type;
+	return dwID < node.dwID;
 }
 
 Certainty ScanNode::GetCertainty(){ 
@@ -186,7 +147,7 @@ void DetectionNetwork::GrowNetwork(){
 		FileScanner::ScanItem(node);
 		ProcessScanner::ScanItem(node);
 		
-		if(node->GetCertainty() <= Certainty::Moderate || !nodes.size()){
+		if(node->GetCertainty() >= Certainty::Moderate || !nodes.size()){
 			grew.emplace(node);
 
 			auto& associations{ ScanNode::GetAssociations(node) };
@@ -198,7 +159,7 @@ void DetectionNetwork::GrowNetwork(){
 			}
 		}
 
-		if(node->GetCertainty() != Certainty::None){
+		if(node->GetCertainty() > Certainty::Weak){
 			nodes.emplace_back(node);
 		}
 
