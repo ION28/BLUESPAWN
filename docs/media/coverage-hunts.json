@@ -14,6 +14,11 @@
     "techniques": [
         {
             "color": "#5AADFF",
+			"comment": "Covered by checking all Netsh Helper Dlls and monitoring for them",
+            "techniqueID": "T1128"
+        },
+        {
+            "color": "#5AADFF",
 			"comment": "Covered by checking Services key/subkeys and analyzing each of the binaries",
             "techniqueID": "T1035"
         },
