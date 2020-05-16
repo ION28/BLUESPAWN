@@ -46,7 +46,7 @@ namespace Hunts {
 
 			detections += 2;
 		}
-		
+
 		auto name = key.GetName();
 		name = name.substr(name.find_last_of(L"\\") + 1);
 		RegistryKey subkey = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\" + name + L"\\Parameters" };
@@ -58,9 +58,9 @@ namespace Hunts {
 
 			std::wstring value = L"ServiceDll";
 			if (regkey.ValueExists(value)) {
-				auto filepath2 = GetImagePathFromCommand(regkey.GetValue<std::wstring>(value).value());
-				if (FileSystem::CheckFileExists(filepath2)) {
-					FileSystem::File servicedll = FileSystem::File(filepath2);
+				auto filepath2 = FileSystem::SearchPathExecutable(regkey.GetValue<std::wstring>(value).value());
+				if (filepath2 && FileSystem::CheckFileExists(*filepath2)) {
+					FileSystem::File servicedll = FileSystem::File(*filepath2);
 
 					if (!servicedll.GetFileSigned()) {
 						reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ regkey, value, regkey.GetValue<std::wstring>(value).value() }));
@@ -79,7 +79,7 @@ namespace Hunts {
 		return detections;
 	}
 
-	int HuntT1035::ScanNormal(const Scope& scope, Reaction reaction){
+	int HuntT1035::ScanNormal(const Scope& scope, Reaction reaction) {
 		LOG_INFO(L"Hunting for " << name << " at level Normal");
 		reaction.BeginHunt(GET_INFO());
 
