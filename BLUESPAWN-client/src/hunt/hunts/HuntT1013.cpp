@@ -4,7 +4,6 @@
 #include "util/configurations/Registry.h"
 #include "util/filesystem/FileSystem.h"
 #include "util/filesystem/YaraScanner.h"
-#include "util/processes/ProcessUtils.h"
 
 using namespace Registry;
 
@@ -27,10 +26,10 @@ namespace Hunts {
 
 		for (auto monitor : monitors.EnumerateSubkeys()) {
 			if (monitor.ValueExists(L"Driver")) {
-				auto filepath = GetImagePathFromCommand(monitor.GetValue<std::wstring>(L"Driver").value());
+				auto filepath = FileSystem::SearchPathExecutable(monitor.GetValue<std::wstring>(L"Driver").value());
 
-				if (FileSystem::CheckFileExists(filepath)) {
-					FileSystem::File monitordll = FileSystem::File(filepath);
+				if (filepath && FileSystem::CheckFileExists(*filepath)) {
+					FileSystem::File monitordll = FileSystem::File(*filepath);
 
 					if (!monitordll.GetFileSigned()) {
 						reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ monitor, L"Driver", monitor.GetValue<std::wstring>(L"Driver").value() }));
@@ -53,7 +52,7 @@ namespace Hunts {
 	std::vector<std::shared_ptr<Event>> HuntT1013::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
 
-
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Print\\Monitors", false, false, true));
 
 		return events;
 	}

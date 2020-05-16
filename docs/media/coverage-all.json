@@ -14,6 +14,11 @@
     "techniques": [
         {
             "color": "#5AADFF",
+			"comment": "Covered by checking the port monitors on the system and their associated drivers",
+            "techniqueID": "T1013"
+        },
+        {
+            "color": "#5AADFF",
 			"comment": "Covered by checking Services key/subkeys and analyzing each of the binaries",
             "techniqueID": "T1035"
         },
