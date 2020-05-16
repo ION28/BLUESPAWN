@@ -151,6 +151,11 @@
 			"color": "#FCF26B",
 			"comment": "Covered by checking Services in the registry for things like FailureCommands that are suspicious.",
 			"techniqueID": "T1031"
+    },
+    {
+			"color": "#FCF26B",
+			"comment": "Covered by checking for ntuser.man files in all user directories and monitoring for these files",
+			"techniqueID": "T1484"
 		}
     ],
     "legendItems": [
