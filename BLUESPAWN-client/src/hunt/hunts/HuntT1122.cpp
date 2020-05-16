@@ -98,8 +98,10 @@ namespace Hunts{
 			if(file.GetFileExists() && (!file.GetFileSigned() || file.IsLolbin())){
 				for(auto& value : pair.second){
 					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(value));
+					detections++;
 				}
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+				detections++;
 			}
 		}
 
