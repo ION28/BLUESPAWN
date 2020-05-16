@@ -55,22 +55,22 @@ namespace Hunts {
 			if (!regkey.Exists()) {
 				continue;
 			}
-			for (auto value : { L"ServiceDll", L"ServiceMain", L"ServiceDllUnloadOnStop" }) {
-				if (regkey.ValueExists(value)) {
-					auto filepath2 = GetImagePathFromCommand(regkey.GetValue<std::wstring>(value).value());
-					if (FileSystem::CheckFileExists(filepath2)) {
-						FileSystem::File servicedll = FileSystem::File(filepath2);
 
-						if (!servicedll.GetFileSigned()) {
-							reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ regkey, value, regkey.GetValue<std::wstring>(value).value() }));
+			std::wstring value = L"ServiceDll";
+			if (regkey.ValueExists(value)) {
+				auto filepath2 = GetImagePathFromCommand(regkey.GetValue<std::wstring>(value).value());
+				if (FileSystem::CheckFileExists(filepath2)) {
+					FileSystem::File servicedll = FileSystem::File(filepath2);
 
-							auto& yara = YaraScanner::GetInstance();
-							YaraScanResult result = yara.ScanFile(servicedll);
+					if (!servicedll.GetFileSigned()) {
+						reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ regkey, value, regkey.GetValue<std::wstring>(value).value() }));
 
-							reaction.FileIdentified(std::make_shared<FILE_DETECTION>(servicedll));
+						auto& yara = YaraScanner::GetInstance();
+						YaraScanResult result = yara.ScanFile(servicedll);
 
-							detections += 2;
-						}
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(servicedll));
+
+						detections += 2;
 					}
 				}
 			}
