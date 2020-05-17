@@ -459,6 +459,35 @@ namespace Registry {
 		return vSubKeys;
 	}
 
+	std::vector<std::wstring> RegistryKey::EnumerateSubkeyNames() const{
+		if(!Exists()){
+			SetLastError(ERROR_NOT_FOUND);
+			return {};
+		}
+
+		DWORD dwSubkeyCount{};
+		DWORD dwLongestSubkey{};
+		LSTATUS status = RegQueryInfoKeyW(hkBackingKey, nullptr, nullptr, 0, &dwSubkeyCount, &dwLongestSubkey,
+										 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+
+		std::vector<std::wstring> vSubKeys{};
+
+		if(status == ERROR_SUCCESS && dwSubkeyCount){
+			for(unsigned i = 0; i < dwSubkeyCount; i++){
+				std::vector<WCHAR> name(dwLongestSubkey + 1);
+				status = RegEnumKeyW(hkBackingKey, i, name.data(), dwLongestSubkey + 1);
+
+				if(status == ERROR_SUCCESS){
+					vSubKeys.push_back(std::wstring{ name.data() });
+				}
+			}
+		} else{
+			SetLastError(status);
+		}
+
+		return vSubKeys;
+	}
+
 	std::vector<std::wstring> RegistryKey::EnumerateValues() const {
 		if(!Exists()){
 			SetLastError(ERROR_NOT_FOUND);
