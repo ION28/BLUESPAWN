@@ -13,6 +13,8 @@ namespace Hunts {
 	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1068 : public Hunt {
+	private:
+		int HuntCVE20201048(Reaction reaction);
 	public:
 		HuntT1068();
 
