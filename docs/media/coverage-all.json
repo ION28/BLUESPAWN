@@ -24,6 +24,11 @@
         },
         {
             "color": "#5AADFF",
+			"comment": "Covered by checking all configured CLSIDs and their associated files",
+            "techniqueID": "T1122"
+        },
+        {
+            "color": "#5AADFF",
 			"comment": "Covered by checking all Netsh Helper Dlls and monitoring for them",
             "techniqueID": "T1128"
         },
