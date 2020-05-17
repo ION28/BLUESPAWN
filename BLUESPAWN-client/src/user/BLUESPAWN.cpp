@@ -14,6 +14,7 @@
 #include "util/permissions/permissions.h"
 
 #include "hunt/hunts/HuntT1004.h"
+#include "hunt/hunts/HuntT1013.h"
 #include "hunt/hunts/HuntT1015.h"
 #include "hunt/hunts/HuntT1031.h"
 #include "hunt/hunts/HuntT1035.h"
@@ -22,6 +23,7 @@
 #include "hunt/hunts/HuntT1053.h"
 #include "hunt/hunts/HuntT1055.h"
 #include "hunt/hunts/HuntT1060.h"
+#include "hunt/hunts/HuntT1068.h"
 #include "hunt/hunts/HuntT1099.h"
 #include "hunt/hunts/HuntT1100.h"
 #include "hunt/hunts/HuntT1101.h"
@@ -83,6 +85,7 @@ MitigationRegister Bluespawn::mitigationRecord{ io };
 Bluespawn::Bluespawn(){
 
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1004>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1013>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1015>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1031>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1035>());
@@ -91,6 +94,7 @@ Bluespawn::Bluespawn(){
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1053>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1055>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1060>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1068>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1099>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1100>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1101>());

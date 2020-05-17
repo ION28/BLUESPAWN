@@ -203,7 +203,7 @@ namespace FileSystem{
 	}
 
 	File::File(IN const std::wstring& path) : hFile{ nullptr }{
-		FilePath = path;
+		FilePath = ExpandEnvStringsW(path);
 		LOG_VERBOSE(2, "Attempting to open file: " << path);
 		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE | WRITE_OWNER, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
 			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
