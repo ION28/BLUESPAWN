@@ -44,12 +44,14 @@ namespace Hunts {
 		}
 		for(auto& detection : notifies){
 			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+			detections++;
+
 			auto filename{ std::get<std::wstring>(detection.data) };
 			auto filepath{ FileSystem::SearchPathExecutable(filename) };
 			if(filepath){
 				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(FileSystem::File{ *filepath }));
+				detections++;
 			}
-			detections++;
 		}
 
 		reaction.EndHunt();

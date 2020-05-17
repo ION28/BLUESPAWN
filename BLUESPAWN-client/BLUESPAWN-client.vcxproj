@@ -25,6 +25,7 @@
     <ClInclude Include="headers\hunt\HuntInfo.h" />
     <ClInclude Include="headers\hunt\HuntRegister.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1004.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1013.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1015.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1031.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1035.h" />
@@ -33,6 +34,7 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1053.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1055.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1060.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1068.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1099.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1100.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1101.h" />
@@ -161,6 +163,7 @@
     <ClCompile Include="src\hunt\Hunt.cpp" />
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1004.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1013.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1015.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1031.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1035.cpp" />
@@ -169,6 +172,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1053.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1055.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1060.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1068.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1099.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1100.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1101.cpp" />

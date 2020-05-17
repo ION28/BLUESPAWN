@@ -13,6 +13,21 @@
     "domain": "mitre-enterprise",
     "techniques": [
         {
+            "color": "#FCF26B",
+			"comment": "Covered by checking for printer ports that reference a file (CVE-2020-1048)",
+            "techniqueID": "T1068"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by checking the port monitors on the system and their associated drivers",
+            "techniqueID": "T1013"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by checking all configured CLSIDs and their associated files",
+            "techniqueID": "T1122"
+        },
+        {
             "color": "#5AADFF",
 			"comment": "Covered by checking all Netsh Helper Dlls and monitoring for them",
             "techniqueID": "T1128"
