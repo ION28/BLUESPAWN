@@ -20,7 +20,7 @@ using namespace Registry;
 namespace Hunts{
 
 	HuntT1198::HuntT1198() : Hunt(L"T1198 - SIP and Trust Provider Hijacking"){
-		dwSupportedScans = (DWORD) Aggressiveness::Normal;
+		dwSupportedScans = (DWORD) Aggressiveness::Intensive;
 		dwCategoriesAffected = (DWORD) Category::Configurations;
 		dwSourcesInvolved = (DWORD) DataSource::Registry;
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::DefenseEvasion;
@@ -65,8 +65,8 @@ namespace Hunts{
 		return map;
 	}
 
-	int HuntT1198::ScanNormal(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for " << name << " at level Normal");
+	int HuntT1198::ScanIntensive(const Scope& scope, Reaction reaction){
+		LOG_INFO("Hunting for " << name << " at level Intensive");
 		reaction.BeginHunt(GET_INFO());
 
 		int detections = 0;

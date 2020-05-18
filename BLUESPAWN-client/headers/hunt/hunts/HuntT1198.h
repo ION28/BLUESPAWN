@@ -12,14 +12,14 @@ namespace Hunts{
 	 * establish persistence
 	 *
 	 * @scans Cursory Scan not supported.
-	 * @scans Normal Scans SIPs and trust providers and ensures they are valid.
-	 * @scans Intensive Scan not supported.
+	 * @scans Normal Scan not supported.
+	 * @scans Intensive Scans SIPs and trust providers and ensures they are valid..
 	 */
 	class HuntT1198 : public Hunt {
 	public:
 		HuntT1198();
 
-		virtual int ScanNormal(const Scope& scope, Reaction reaction) override;
+		virtual int ScanIntensive(const Scope& scope, Reaction reaction) override;
 		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
 	};
 }
