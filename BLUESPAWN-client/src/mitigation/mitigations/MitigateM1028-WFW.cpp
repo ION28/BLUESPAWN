@@ -36,11 +36,6 @@ namespace Mitigations {
 				LOG_VERBOSE(1, L"Value for DisableNotifications is not set to 0 for " << key.ToString());
 				return false;
 			}
-			// V-17407
-			if (!key.ValueExists(L"DoNotAllowExceptions") || key.GetValue<DWORD>(L"DoNotAllowExceptions") != 1) {
-				LOG_VERBOSE(1, L"Value for DoNotAllowExceptions is not set to 1 for " << key.ToString());
-				return false;
-			}
 			// V-17418
 			if (!key.ValueExists(L"DefaultInboundAction") || key.GetValue<DWORD>(L"DefaultInboundAction") != 1) {
 				LOG_VERBOSE(1, L"Value for DefaultInboundAction is not set to 1 for " << key.ToString());
@@ -65,11 +60,6 @@ namespace Mitigations {
 
 			LOG_VERBOSE(1, L"Attempting to set DisableNotifications to 0 for " << key.ToString());
 			if (!key.SetValue<DWORD>(L"DisableNotifications", 0)) {
-				return false;
-			}
-
-			LOG_VERBOSE(1, L"Attempting to set DoNotAllowExceptions to 1 for " << key.ToString());
-			if (!key.SetValue<DWORD>(L"DoNotAllowExceptions", 1)) {
 				return false;
 			}
 
