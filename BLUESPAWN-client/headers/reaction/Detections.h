@@ -8,6 +8,7 @@
 
 #include "hunt/HuntInfo.h"
 #include "util/configurations/RegistryValue.h"
+#include "util/filesystem/FileSystem.h"
 #include <common\StringUtils.h>
 
 enum class DetectionType {
@@ -24,16 +25,27 @@ struct DETECTION {
 };
 
 /// A struct containing information about a file identified in a hunt
-/// Note that the hash will have to be manually set.
 struct FILE_DETECTION : public DETECTION {
 	std::wstring wsFileName;
 	std::wstring wsFilePath;
-	std::string hash;
-	FILE_DETECTION(const std::wstring& wsFilePath) : 
+	std::wstring md5;
+	std::wstring sha1;
+	std::wstring sha256;
+	FileSystem::File fFile;
+	FILE_DETECTION(const FileSystem::File f) : 
 		DETECTION{ DetectionType::File },
-		wsFilePath{ wsFilePath },
-		hash{}{
+		wsFilePath{ f.GetFilePath() }, 
+		fFile{ f } {
 		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
+		if (f.GetMD5Hash()) {
+			md5 = f.GetMD5Hash().value();
+		}
+		if (f.GetSHA1Hash()) {
+			sha1 = f.GetSHA1Hash().value();
+		}
+		if (f.GetSHA256Hash()) {
+			sha256 = f.GetSHA256Hash().value();
+		}
 	}
 };
 typedef std::function<void(std::shared_ptr<FILE_DETECTION>)> DetectFile;

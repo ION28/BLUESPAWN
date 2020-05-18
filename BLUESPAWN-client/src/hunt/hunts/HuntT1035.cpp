@@ -26,7 +26,7 @@ namespace Hunts {
 		for (std::wstring val : vSuspicious) {
 			if (filepath.find(val) != std::wstring::npos) {
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ key, L"ImagePath", key.GetValue<std::wstring>(L"ImagePath").value() }));
-				return 1;
+				detections++;
 			}
 		}
 
@@ -42,43 +42,44 @@ namespace Hunts {
 			auto& yara = YaraScanner::GetInstance();
 			YaraScanResult result = yara.ScanFile(image);
 
-			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(image.GetFilePath()));
+			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(image));
 
 			detections += 2;
 		}
 
 		auto name = key.GetName();
 		name = name.substr(name.find_last_of(L"\\") + 1);
-
 		RegistryKey subkey = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\" + name + L"\\Parameters" };
 
-		if (subkey.Exists() && subkey.ValueExists(L"ServiceDll")) {
-			auto filepath2 = GetImagePathFromCommand(subkey.GetValue<std::wstring>(L"ServiceDll").value());
-
-			if (!FileSystem::CheckFileExists(filepath2)) {
-				return detections;
+		for (auto regkey : { key, subkey }) {
+			if (!regkey.Exists()) {
+				continue;
 			}
 
-			FileSystem::File servicedll = FileSystem::File(filepath2);
+			std::wstring value = L"ServiceDll";
+			if (regkey.ValueExists(value)) {
+				auto filepath2 = FileSystem::SearchPathExecutable(regkey.GetValue<std::wstring>(value).value());
+				if (filepath2 && FileSystem::CheckFileExists(*filepath2)) {
+					FileSystem::File servicedll = FileSystem::File(*filepath2);
 
-			if (!servicedll.GetFileSigned()) {
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ subkey, L"ServiceDll", subkey.GetValue<std::wstring>(L"ServiceDll").value() }));
+					if (!servicedll.GetFileSigned()) {
+						reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ regkey, value, regkey.GetValue<std::wstring>(value).value() }));
 
-				auto& yara = YaraScanner::GetInstance();
-				YaraScanResult result = yara.ScanFile(servicedll);
+						auto& yara = YaraScanner::GetInstance();
+						YaraScanResult result = yara.ScanFile(servicedll);
 
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(servicedll.GetFilePath()));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(servicedll));
 
-				detections += 2;
+						detections += 2;
+					}
+				}
 			}
 		}
 
-
-		
 		return detections;
 	}
 
-	int HuntT1035::ScanNormal(const Scope& scope, Reaction reaction){
+	int HuntT1035::ScanNormal(const Scope& scope, Reaction reaction) {
 		LOG_INFO(L"Hunting for " << name << " at level Normal");
 		reaction.BeginHunt(GET_INFO());
 
@@ -87,7 +88,7 @@ namespace Hunts {
 		auto services = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services" };
 
 		for (auto service : services.EnumerateSubkeys()) {
-			if (service.GetValue<DWORD>(L"Type") >= 0x10) {
+			if (service.GetValue<DWORD>(L"Type") >= 0x10u) {
 				detections += EvaluateService(service, reaction);
 			}
 		}
@@ -99,7 +100,7 @@ namespace Hunts {
 	std::vector<std::shared_ptr<Event>> HuntT1035::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
 
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services", false, false));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services", false, false, true));
 
 		return events;
 	}

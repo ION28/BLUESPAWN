@@ -96,7 +96,7 @@ namespace Registry {
 		std::vector<RegistryKey> vKeys{ RegistryKey{hkHive, path} };
 		if(CheckWow64){
 			RegistryKey Wow64Key{ hkHive, path, true };
-			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key)){
+			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key) == 0){
 				vKeys.emplace_back(Wow64Key);
 			}
 		}
@@ -129,7 +129,7 @@ namespace Registry {
 						}
 					} else if(!check(*data)){
 						auto value = RegistryValue{ key, check.name, std::move(*data) };
-						LOG_INFO("Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
+						LOG_INFO("Under key " << key << ", value " << value.GetPrintableName() << " had potentially malicious data " << value);
 						vIdentifiedValues.emplace_back(value);
 					}
 				} else if(check.GetType() == RegistryType::REG_MULTI_SZ_T){
@@ -141,7 +141,7 @@ namespace Registry {
 						}
 					} else if(!check(*data)){
 						auto value = RegistryValue{ key, check.name, std::move(*data) };
-						LOG_INFO("Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
+						LOG_INFO("Under key " << key << ", value " << value.GetPrintableName() << " had potentially malicious data " << value);
 						vIdentifiedValues.emplace_back(value);
 					}
 				} else if(check.GetType() == RegistryType::REG_DWORD_T){
@@ -153,7 +153,7 @@ namespace Registry {
 						}
 					} else if(!check(*data)){
 						auto value = RegistryValue{ key, check.name, std::move(*data) };
-						LOG_INFO("Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
+						LOG_INFO("Under key " << key << ", value " << value.GetPrintableName() << " had potentially malicious data " << value);
 						vIdentifiedValues.emplace_back(value);
 					}
 				} else if(check.GetType() == RegistryType::REG_BINARY_T){
@@ -165,7 +165,7 @@ namespace Registry {
 						}
 					} else if(!check(data)){
 						auto value = RegistryValue{ key, check.name, std::move(data) };
-						LOG_INFO("Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
+						LOG_INFO("Under key " << key << ", value " << value.GetPrintableName() << " had potentially malicious data " << value);
 						vIdentifiedValues.emplace_back(value);
 					}
 				}
@@ -179,7 +179,7 @@ namespace Registry {
 		std::vector<RegistryKey> vKeys{ RegistryKey{hkHive, path} };
 		if(CheckWow64){
 			RegistryKey Wow64Key{ hkHive, path, true };
-			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key)){
+			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key) == 0){
 				vKeys.emplace_back(Wow64Key);
 			}
 		}
@@ -209,28 +209,28 @@ namespace Registry {
 					auto data = key.GetValue<std::wstring>(value);
 					auto regValue = RegistryValue{ key, value, std::move(!data ? L"" : *data) };
 
-					LOG_INFO("Under key " << key << ", value " << value << " was present with data " << regValue);
+					LOG_INFO("Under key " << key << ", value " << regValue.GetPrintableName() << " was present with data " << regValue);
 
 					vRegValues.emplace_back(regValue);
 				} else if(type == RegistryType::REG_MULTI_SZ_T){
 					auto data = key.GetValue<std::vector<std::wstring>>(value);
 					auto regValue = RegistryValue{ key, value, std::move(!data ? std::vector<std::wstring>{} : *data) };
 
-					LOG_INFO("Under key " << key << ", value " << value << " was present with data " << regValue);
+					LOG_INFO("Under key " << key << ", value " << regValue.GetPrintableName() << " was present with data " << regValue);
 
 					vRegValues.emplace_back(regValue);
 				} else if(type == RegistryType::REG_DWORD_T){
 					auto data = key.GetValue<DWORD>(value);
 					auto regValue = RegistryValue{ key, value, std::move(!data ? 0 : *data) };
 
-					LOG_INFO("Under key " << key << ", value " << value << " was present with data " << regValue);
+					LOG_INFO("Under key " << key << ", value " << regValue.GetPrintableName() << " was present with data " << regValue);
 
 					vRegValues.emplace_back(regValue);
 				} else {
 					auto data = key.GetRawValue(value);
 					auto regValue = RegistryValue{ key, value, std::move(data) };
 
-					LOG_INFO("Under key " << key << ", value " << value << " was present with data " << regValue);
+					LOG_INFO("Under key " << key << ", value " << regValue.GetPrintableName() << " was present with data " << regValue);
 
 					vRegValues.emplace_back(regValue);
 				}
@@ -245,7 +245,7 @@ namespace Registry {
 		std::vector<RegistryKey> vKeys{ RegistryKey{hkHive, path} };
 		if(CheckWow64){
 			RegistryKey Wow64Key{ hkHive, path, true };
-			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key)){
+			if(Wow64Key.Exists() && std::count(vKeys.begin(), vKeys.end(), Wow64Key) == 0){
 				vKeys.emplace_back(Wow64Key);
 			}
 		}

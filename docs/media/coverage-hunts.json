@@ -1,0 +1,156 @@
+{
+    "description": "Current Coverage of Hunts in BLUESPAWN",
+	"filters": {
+		"stages": [
+			"act"
+		],
+		"platforms": [
+			"windows"
+		]
+	},
+    "version": "2.2",
+    "name": "BLUESPAWN Hunts",
+    "domain": "mitre-enterprise",
+    "techniques": [
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by checking all of the SIP and Trust Providers on the system",
+            "techniqueID": "T1198"
+        },
+        {
+            "color": "#FCF26B",
+			"comment": "Covered by checking for printer ports that reference a file (CVE-2020-1048)",
+            "techniqueID": "T1068"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by checking the port monitors on the system and their associated drivers",
+            "techniqueID": "T1013"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by checking all configured CLSIDs and their associated files",
+            "techniqueID": "T1122"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by checking all Netsh Helper Dlls and monitoring for them",
+            "techniqueID": "T1128"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by checking Services key/subkeys and analyzing each of the binaries",
+            "techniqueID": "T1035"
+        },
+        {
+            "color": "#FCF26B",
+			"comment": "Covered by checking EventLogs for Security/4698, Task-Scheduler/106 events and monitoring for these events",
+            "techniqueID": "T1053"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by checking EventLogs for Security/4720 events and monitoring for these events",
+            "techniqueID": "T1136"
+        },
+		{
+            "color": "#5AADFF",
+			"comment": "Covered by registry checking HKCU\\Environment\\UserInitMprLogonScript",
+            "techniqueID": "T1037"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by registry checking AppInit_DLLs and LoadAppInit_DLLs keys",
+			"techniqueID": "T1103"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Coverd by checking most Run* keys. Future coverage will be obtained through checking files in Startup folders",
+            "techniqueID": "T1060"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by registry checking AppCert DLLs",
+            "techniqueID": "T1182"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by registry checking for Application Shimming and Custom DBs",
+            "techniqueID": "T1138"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by registry checking for any additional SSPs",
+            "techniqueID": "T1101"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by registry checking for any additional Auth/Notif Packages",
+            "techniqueID": "T1131"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by registry checking the Notify, Userinit, and Shell values",
+            "techniqueID": "T1004"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by analyzing files in web locations for bad functions/strings",
+            "techniqueID": "T1100"
+        },
+        {
+            "color": "#5AADFF",
+			"comment": "Covered by notifying a user when event logs are created for new service creation.",
+            "techniqueID": "T1050"
+        },
+		{
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection.",
+			"techniqueID": "T1055"
+		},
+		{
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection.",
+			"techniqueID": "T1093"
+		},
+		{
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection.",
+			"techniqueID": "T1186"
+		},
+		{
+			"color": "#5AADFF",
+			"comment": "Covered by checking Registry keys for Image File Execution Options.",
+			"techniqueID": "T1183"
+		},
+		{
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking looking for Debuggers and YARA scanning Accessibility Files",
+			"techniqueID": "T1015"
+		},
+		{
+			"color": "#5AADFF",
+			"comment": "Covered by checking Sysmon Logs for EID 2 events, YARA scanning those files, and monitoring for these events",
+			"techniqueID": "T1099"
+		},
+		{
+			"color": "#FCF26B",
+			"comment": "Covered by checking Services in the registry for things like FailureCommands that are suspicious.",
+			"techniqueID": "T1031"
+    },
+    {
+			"color": "#FCF26B",
+			"comment": "Covered by checking for ntuser.man files in all user directories and monitoring for these files",
+			"techniqueID": "T1484"
+		}
+    ],
+    "legendItems": [
+        {
+            "label": "Strong BLUESPAWN Coverage",
+            "color": "#5AADFF"
+        },
+        {
+            "label": "Partial BLUESPAWN Coverage",
+            "color": "#FCF26B"
+        }
+    ]
+}

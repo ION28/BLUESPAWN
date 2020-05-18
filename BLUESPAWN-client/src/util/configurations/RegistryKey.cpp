@@ -5,8 +5,11 @@
 
 #include "util/configurations/Registry.h"
 #include "common/StringUtils.h"
+#include "common/Internals.h"
 
 LINK_FUNCTION(NtQueryKey, ntdll.dll);
+LINK_FUNCTION(NtQueryValueKey, ntdll.dll);
+LINK_FUNCTION(NtDeleteValueKey, ntdll.dll);
 
 namespace Registry {
 	std::map<std::wstring, HKEY> vHiveNames{
@@ -106,9 +109,9 @@ namespace Registry {
 		auto wLowerPath = ToLowerCase(path);
 
 		bWow64 = WoW64 || wLowerPath.find(L"wow6432node") != std::wstring::npos;
-		LSTATUS status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_ALL_ACCESS | (bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
+		LSTATUS status = RegOpenKeyExW(hive, path.c_str(), 0, KEY_ALL_ACCESS | (bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
 		if(status == ERROR_ACCESS_DENIED){
-			status = RegOpenKeyEx(hive, path.c_str(), 0, KEY_READ | KEY_NOTIFY | (bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
+			status = RegOpenKeyExW(hive, path.c_str(), 0, KEY_READ | KEY_NOTIFY | (bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &hkBackingKey);
 		}
 
 		if(status != ERROR_SUCCESS){
@@ -187,7 +190,20 @@ namespace Registry {
 	}
 
 	bool RegistryKey::ValueExists(const std::wstring& wsValueName) const {
-		return ERROR_SUCCESS == RegQueryValueExW(hkBackingKey, wsValueName.c_str(), nullptr, nullptr, nullptr, nullptr);
+		if(!Exists()){
+			return false;
+		}
+
+		UNICODE_STRING RegistryKeyName{ 
+			static_cast<USHORT>(wsValueName.length() * 2), 
+			static_cast<USHORT>(wsValueName.length() * 2), 
+			const_cast<PWSTR>(wsValueName.c_str()) 
+		};
+
+		ULONG size{};
+		NTSTATUS status{ Linker::NtQueryValueKey(hkBackingKey, &RegistryKeyName, 0, nullptr, 0, &size) }; //First 0 is KeyValueBasicInformation
+
+		return status != 0xC0000034; //0xC0000034 = STATUS_OBJECT_NAME_NOT_FOUND
 	}
 
 	bool RegistryKey::Create(){
@@ -224,22 +240,32 @@ namespace Registry {
 			return { nullptr, 0 };
 		}
 
-		DWORD dwDataSize{};
+		UNICODE_STRING RegistryKeyName{
+			static_cast<USHORT>(ValueName.length() * 2),
+			static_cast<USHORT>(ValueName.length() * 2),
+			const_cast<PWSTR>(ValueName.c_str())
+		};
 
-		LSTATUS status = RegQueryValueExW(hkBackingKey, ValueName.c_str(), 0, nullptr, nullptr, &dwDataSize);
-		if(status != ERROR_SUCCESS && status != ERROR_MORE_DATA){
+		ULONG size{};
+		NTSTATUS status{ Linker::NtQueryValueKey(hkBackingKey, &RegistryKeyName, 1, nullptr, 0, &size) }; //First 1 is KeyValueFullInformation
+
+		auto data = AllocationWrapper{ new CHAR[size], size, AllocationWrapper::CPP_ARRAY_ALLOC };
+		status = Linker::NtQueryValueKey(hkBackingKey, &RegistryKeyName, 1, data, size, &size);
+
+		if (!NT_SUCCESS(status)) {
 			SetLastError(status);
 			return { nullptr, 0 };
 		}
+
+		KEY_VALUE_FULL_INFORMATION* KeyValueInfo{ data.GetAsPointer<KEY_VALUE_FULL_INFORMATION>() };
+
+		DWORD dwDataSize = KeyValueInfo->DataLength;
+		DWORD dwDataOffset = KeyValueInfo->DataOffset;
 
 		auto lpbValue = new BYTE[dwDataSize];
-		status = RegQueryValueExW(hkBackingKey, ValueName.c_str(), 0, nullptr, lpbValue, &dwDataSize);
-		if(status != ERROR_SUCCESS){
-			SetLastError(status);
-			return { nullptr, 0 };
-		}
+		MoveMemory(lpbValue, reinterpret_cast<PCHAR>(KeyValueInfo) + dwDataOffset, dwDataSize);
 
-		return { lpbValue, dwDataSize };
+		return { lpbValue, dwDataSize, AllocationWrapper::CPP_ARRAY_ALLOC };
 	}
 
 	std::optional<RegistryType> RegistryKey::GetValueType(const std::wstring& ValueName) const {
@@ -248,10 +274,23 @@ namespace Registry {
 			return std::nullopt;
 		}
 
-		DWORD dwType{};
+		UNICODE_STRING RegistryKeyName{
+			static_cast<USHORT>(ValueName.length() * 2),
+			static_cast<USHORT>(ValueName.length() * 2),
+			const_cast<PWSTR>(ValueName.c_str())
+		};
 
-		LSTATUS status = RegQueryValueExW(hkBackingKey, ValueName.c_str(), 0, &dwType, nullptr, nullptr);
-		if(status != ERROR_SUCCESS && status != ERROR_MORE_DATA){
+		ULONG size{};
+		NTSTATUS status{ Linker::NtQueryValueKey(hkBackingKey, &RegistryKeyName, 0, nullptr, 0, &size) }; //First 0 is KeyValueBasicInformation
+
+		std::vector<CHAR> data(size);
+		status = Linker::NtQueryValueKey(hkBackingKey, &RegistryKeyName, 0, data.data(), size, &size);
+
+		auto KeyValueInfo{ reinterpret_cast<KEY_VALUE_BASIC_INFORMATION*>(data.data()) };
+
+		DWORD dwType = KeyValueInfo->Type;
+
+		if(!NT_SUCCESS(status)) {
 			SetLastError(status);
 			return std::nullopt;
 		}
@@ -420,6 +459,35 @@ namespace Registry {
 		return vSubKeys;
 	}
 
+	std::vector<std::wstring> RegistryKey::EnumerateSubkeyNames() const{
+		if(!Exists()){
+			SetLastError(ERROR_NOT_FOUND);
+			return {};
+		}
+
+		DWORD dwSubkeyCount{};
+		DWORD dwLongestSubkey{};
+		LSTATUS status = RegQueryInfoKeyW(hkBackingKey, nullptr, nullptr, 0, &dwSubkeyCount, &dwLongestSubkey,
+										 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+
+		std::vector<std::wstring> vSubKeys{};
+
+		if(status == ERROR_SUCCESS && dwSubkeyCount){
+			for(unsigned i = 0; i < dwSubkeyCount; i++){
+				std::vector<WCHAR> name(dwLongestSubkey + 1);
+				status = RegEnumKeyW(hkBackingKey, i, name.data(), dwLongestSubkey + 1);
+
+				if(status == ERROR_SUCCESS){
+					vSubKeys.push_back(std::wstring{ name.data() });
+				}
+			}
+		} else{
+			SetLastError(status);
+		}
+
+		return vSubKeys;
+	}
+
 	std::vector<std::wstring> RegistryKey::EnumerateValues() const {
 		if(!Exists()){
 			SetLastError(ERROR_NOT_FOUND);
@@ -440,7 +508,7 @@ namespace Registry {
 				status = RegEnumValueW(hkBackingKey, i, lpwName, &length, nullptr, nullptr, nullptr, nullptr);
 
 				if(status == ERROR_SUCCESS) {
-					vSubKeys.push_back({ lpwName });
+					vSubKeys.push_back({ lpwName, length });
 				}
 
 				delete[] lpwName;
@@ -450,6 +518,19 @@ namespace Registry {
 		}
 
 		return vSubKeys;
+	}
+
+	std::wstring RegistryKey::GetNameWithoutHive() const {
+		std::wstring ret = GetName();
+		auto location = ret.find(L"HKEY_LOCAL_MACHINE");
+		if (location != std::string::npos) {
+			ret.replace(location, 19, L"");
+		}
+		location = ret.find(L"HKEY_USERS");
+		if (location != std::string::npos) {
+			ret.replace(location, 11, L"");
+		}
+		return ret;
 	}
 
 	std::wstring RegistryKey::GetName() const {
@@ -501,9 +582,15 @@ namespace Registry {
 	}
 
 	bool RegistryKey::RemoveValue(const std::wstring& wsValueName) const {
-		auto status = RegDeleteValueW(hkBackingKey, wsValueName.c_str());
+		UNICODE_STRING RegistryKeyName{ 
+			static_cast<USHORT>(wsValueName.length() * 2), 
+			static_cast<USHORT>(wsValueName.length() * 2),
+			const_cast<PWSTR>(wsValueName.c_str()) 
+		};
+
+		NTSTATUS status{ Linker::NtDeleteValueKey(hkBackingKey, &RegistryKeyName)};
 		SetLastError(status);
-		return status == ERROR_SUCCESS;
+		return NT_SUCCESS(status);
 	}
 
 	RegistryKey::operator HKEY() const {

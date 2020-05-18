@@ -33,7 +33,7 @@ namespace Mitigations {
 			return false;
 		}
 
-		if(key.GetValue<DWORD>(value) > 1){
+		if(key.GetValue<DWORD>(value) > static_cast<DWORD>(1)){
 			LOG_VERBOSE(1, L"Value for " << value << L" is greater than 1.");
 			return false;
 		}

@@ -69,7 +69,8 @@ namespace Hunts{
 
 			for(auto module : report->scan_report->module_reports){
 				if(module->status & SCAN_SUSPICIOUS){
-					reaction.ProcessIdentified(std::make_shared<PROCESS_DETECTION>(path, GetProcessCommandline(pid), pid, module->module, module->moduleSize, identifiers));
+					reaction.ProcessIdentified(std::make_shared<PROCESS_DETECTION>(path, GetProcessCommandline(pid), pid, module->module, 
+																				   static_cast<DWORD>(module->moduleSize), identifiers));
 				}
 			}
 

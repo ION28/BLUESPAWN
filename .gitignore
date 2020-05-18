@@ -13,3 +13,10 @@ BLUESPAWN-client/resources/indicators
 *.bak
 *.lib
 *.aps
+
+# BLUESPAWN Project Site - docs/
+*.lock
+docs/db.sqlite3
+__pycache__/
+docs/media/scans/
+docs/*/migrations/

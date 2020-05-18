@@ -30,6 +30,7 @@ class Bluespawn {
 		void dispatch_hunt(Aggressiveness aHuntLevel, vector<string> vExcludedHunts, vector<string> vIncludedHunts);
 		void dispatch_mitigations_analysis(MitigationMode mode, bool bForceEnforce);
 		void monitor_system(Aggressiveness aHuntLevel);
+		void check_correct_arch();
 
 		static HuntRegister huntRecord;
 		static MitigationRegister mitigationRecord;

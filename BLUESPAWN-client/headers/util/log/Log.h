@@ -9,6 +9,7 @@
 #include "LogLevel.h"
 #include "Loggable.h"
 #include "LogSink.h"
+#include "common/Utils.h"
 
 // A generic macro to log a message with a given set of sinks at a given level
 #define LOG(SINK, LEVEL, ...) \
@@ -17,6 +18,13 @@
 // A macro to log an error in the set of sinks specified by AddSink and RemoveSink
 #define LOG_ERROR(...) \
    LOG(Log::_LogCurrentSinks, Log::LogLevel::LogError, __VA_ARGS__ << Log::endlog)
+
+// A macro to print out system error information
+#define LOG_SYSTEM_ERROR(ERROR_ID) \
+   LOG(Log::_LogCurrentSinks, Log::LogLevel::LogError, "System Error Code 0x" << std::uppercase << std::hex << ERROR_ID << ": " << Log::FormatErrorMessage(ERROR_ID) << Log::endlog);
+
+#define SYSTEM_ERROR \
+	"System Error Code 0x" << std::uppercase << std::hex << GetLastError() << ": " << Log::FormatErrorMessage(GetLastError())
 
 // A macro to log a warning in the set of sinks specified by AddSink and RemoveSink
 #define LOG_WARNING(...) \
@@ -172,4 +180,13 @@ namespace Log {
 	 * @return A boolean indicating whether or not the sink was removed
 	 */
 	bool RemoveSink(const std::shared_ptr<LogSink>& Sink);
+
+	/**
+	* Gets a System Error Message's Description given the error code
+	* 
+	* @param DWORD returned from GetLastError()
+	*
+	* @return A std::wstring containing the System Error Message Description
+	*/
+	std::wstring FormatErrorMessage(DWORD dwNum);
 }

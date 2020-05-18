@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <common\Utils.h>
 
 namespace Log{
 
@@ -56,7 +57,7 @@ namespace Log{
 			auto Value = XMLDoc.NewElement("value");
 			auto Data = XMLDoc.NewElement("data");
 			Key->SetText(WidestringToString(RegistryDetection->value.key.ToString()).c_str());
-			Value->SetText(WidestringToString(RegistryDetection->value.wValueName).c_str());
+			Value->SetText(WidestringToString(RegistryDetection->value.GetPrintableName()).c_str());
 			Data->SetText(WidestringToString(RegistryDetection->value.ToString()).c_str());
 			detect->InsertEndChild(Key);
 			detect->InsertEndChild(Value);
@@ -66,13 +67,19 @@ namespace Log{
 			auto FileDetection = std::static_pointer_cast<FILE_DETECTION>(detection);
 			auto Name = XMLDoc.NewElement("name");
 			auto Path = XMLDoc.NewElement("path");
-			auto Hash = XMLDoc.NewElement("hash");
+			auto MD5 = XMLDoc.NewElement("md5");
+			auto SHA1 = XMLDoc.NewElement("sha1");
+			auto SHA256 = XMLDoc.NewElement("sha256");
 			Name->SetText(WidestringToString(FileDetection->wsFileName).c_str());
 			Path->SetText(WidestringToString(FileDetection->wsFilePath).c_str());
-			Hash->SetText(FileDetection->hash.c_str());
+			MD5->SetText(WidestringToString(FileDetection->md5).c_str());
+			SHA1->SetText(WidestringToString(FileDetection->sha1).c_str());
+			SHA256->SetText(WidestringToString(FileDetection->sha256).c_str());
 			detect->InsertEndChild(Name);
 			detect->InsertEndChild(Path);
-			detect->InsertEndChild(Hash);
+			detect->InsertEndChild(MD5);
+			detect->InsertEndChild(SHA1);
+			detect->InsertEndChild(SHA256);
 		} else if(detection->Type == DetectionType::Process){
 			detect->SetAttribute("type", "Process");
 			auto ProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);
@@ -138,7 +145,8 @@ namespace Log{
 			hunt->SetAttribute("categories", static_cast<int64_t>(info->HuntCategories));
 			hunt->SetAttribute("datasources", static_cast<int64_t>(info->HuntDatasources));
 			hunt->SetAttribute("tactics", static_cast<int64_t>(info->HuntTactics));
-			hunt->SetAttribute("time", info->HuntStartTime);
+			hunt->SetAttribute("time", SystemTimeToInteger(info->HuntStartTime));
+			hunt->SetAttribute("datetime", WidestringToString(FormatWindowsTime(info->HuntStartTime)).c_str());
 
 			auto name = XMLDoc.NewElement("name");
 			name->SetText(WidestringToString(info->HuntName).c_str());
@@ -156,7 +164,9 @@ namespace Log{
 			Root->InsertEndChild(hunt);
 		} else if(level.Enabled()) {
 			auto msg = XMLDoc.NewElement(MessageTags[static_cast<DWORD>(level.severity)].c_str());
-			msg->SetAttribute("time", (long) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+			SYSTEMTIME st;
+			GetSystemTime(&st);
+			msg->SetAttribute("time", SystemTimeToInteger(st));
 			msg->SetText(message.c_str());
 			Root->InsertEndChild(msg);
 		}

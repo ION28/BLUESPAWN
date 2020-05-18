@@ -15,8 +15,7 @@ class HuntRegister;
 #define GET_INFO() \
     HuntInfo{ this->name, __func__ == std::string{"ScanCursory"}  ? Aggressiveness::Cursory  :                             \
                           __func__ == std::string{"ScanNormal"} ? Aggressiveness::Normal : Aggressiveness::Intensive, \
-              this->dwTacticsUsed, this->dwCategoriesAffected, this->dwSourcesInvolved,                                    \
-              (long) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() }
+              this->dwTacticsUsed, this->dwCategoriesAffected, this->dwSourcesInvolved }
 
 class Hunt {
 protected:
