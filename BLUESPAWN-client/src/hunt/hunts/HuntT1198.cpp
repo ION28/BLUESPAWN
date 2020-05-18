@@ -55,6 +55,8 @@ namespace Hunts{
 				auto path{ FileSystem::SearchPathExecutable(parts[1]) };
 				if(path){
 					values.emplace(parts[0], std::pair<std::wstring, std::wstring>{ ToLowerCaseW(*path), parts[2] });
+				} else{
+					values.emplace(parts[0], std::pair<std::wstring, std::wstring>{ ToLowerCaseW(parts[1]), parts[2] });
 				}
 			}
 			map.emplace(type, std::move(values));
@@ -90,6 +92,7 @@ namespace Hunts{
 							auto& pair{ entry.at(GUID) };
 							if(func && func != pair.second){
 								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ GUIDInfo, L"FuncName", std::move(*func) }));
+								detections++;
 							}
 
 							if(dll){
@@ -110,14 +113,17 @@ namespace Hunts{
 
 							if(func){
 								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ GUIDInfo, L"FuncName", std::move(*func) }));
+								detections++;
 							}
 
 							if(dll){
 								auto path{ FileSystem::SearchPathExecutable(*dll) };
 								if(path){
 									reaction.FileIdentified(std::make_shared<FILE_DETECTION>(FileSystem::File{ *path }));
+									detections++;
 								}
 								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ GUIDInfo, L"Dll", std::move(*dll) }));
+								detections++;
 							}
 						}
 					}
@@ -127,7 +133,7 @@ namespace Hunts{
 
 		// Verify that the installed Trust Providers are good
 		auto goodTrustProviders{ ParseResource(GoodTrustProviders) };
-		for(auto keypath : { L"SOFTWARE\\Microsoft\\Cryptography\\OID\\EncodingType 0", L"SOFTWARE\\WoW6432Node\\Microsoft\\Cryptography\\OID\\EncodingType 0" }){
+		for(auto keypath : { L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust", L"SOFTWARE\\WoW6432Node\\Microsoft\\Cryptography\\Providers\\Trust" }){
 			RegistryKey key{ HKEY_LOCAL_MACHINE, keypath };
 			for(auto& subkey : key.EnumerateSubkeyNames()){
 				if(goodTrustProviders.find(subkey) != goodTrustProviders.end()){
@@ -138,11 +144,13 @@ namespace Hunts{
 						RegistryKey GUIDInfo{ ProviderType, GUID };
 						auto dll{ GUIDInfo.GetValue<std::wstring>(L"$DLL") };
 						auto func{ GUIDInfo.GetValue<std::wstring>(L"$Function") };
+						GUID = GUID.substr(1, GUID.length() - 2);
 
 						if(entry.find(GUID) != entry.end()){
 							auto& pair{ entry.at(GUID) };
 							if(func && func != pair.second){
 								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ GUIDInfo, L"$Function", std::move(*func) }));
+								detections++;
 							}
 
 							if(files.find(*dll) == files.end()){
@@ -157,18 +165,21 @@ namespace Hunts{
 								});
 							}
 						} else{
-							LOG_INFO("Nonstandard subject interface provider GUID " << GUID << " (DLL: " << *dll << ", Function: " << *func << ")");
+							LOG_INFO("Nonstandard trust provider GUID " << GUID << " for " << subkey << " (DLL: " << *dll << ", Function: " << *func << ")");
 
 							if(func){
 								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ GUIDInfo, L"$Function", std::move(*func) }));
+								detections++;
 							}
 
 							if(dll){
 								auto path{ FileSystem::SearchPathExecutable(*dll) };
 								if(path){
 									reaction.FileIdentified(std::make_shared<FILE_DETECTION>(FileSystem::File{ *path }));
+									detections++;
 								}
 								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ GUIDInfo, L"$DLL", std::move(*dll) }));
+								detections++;
 							}
 						}
 					}
@@ -184,6 +195,7 @@ namespace Hunts{
 				for(auto& value : pair.second){
 					LOG_INFO("DLL " << pair.first << " not found and may be a target for hijacking");
 					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(value.first));
+					detections++;
 				}
 			} else{
 				dllpath = ToLowerCaseW(*dllpath);
@@ -192,10 +204,12 @@ namespace Hunts{
 					dllpath->replace(dllpath->begin() + location, dllpath->begin() + location + 8, L"system32");
 				}
 				for(auto& value : pair.second){
-					if(dllpath != value.second){
+					if(dllpath != value.second && (dllpath->length() >= value.second.length() && 
+												   dllpath->substr(dllpath->length() - value.second.length()) != value.second)){
 						LOG_INFO("Path for dll " << *dllpath << " does not match " << value.second << " and may have been hijacked");
 						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(FileSystem::File{ *dllpath }));
 						reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(value.first));
+						detections += 2;
 					}
 				}
 			}
@@ -224,9 +238,11 @@ namespace Hunts{
 								if(!file.IsMicrosoftSigned()){
 									reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 									reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ check, val, *check.GetValue<std::wstring>(val) }));
+									detections += 2;
 								}
 							} else if(ToLowerCaseW(val).find(L"dll") != std::wstring::npos){
 								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ check, val, *check.GetValue<std::wstring>(val) }));
+								detections++;
 							}
 						}
 					}
@@ -244,7 +260,8 @@ namespace Hunts{
 	std::vector<std::shared_ptr<Event>> HuntT1198::GetMonitoringEvents(){
 		std::vector<std::shared_ptr<Event>> events;
 
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Classes\\CLSID", true, true, true));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Cryptography\\OID\\EncodingType 0", true, false, true));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust", true, false, true));
 
 		return events;
 	}
