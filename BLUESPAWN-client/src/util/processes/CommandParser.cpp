@@ -1,0 +1,115 @@
+#include "util/processes/ProcessUtils.h"
+
+#include <string>
+
+#include "common/StringUtils.h"
+
+#include "util/filesystem/FileSystem.h"
+
+std::wstring GetImagePathFromCommand(std::wstring wsCmd){
+    if(wsCmd.substr(0, 11) == L"\\SystemRoot"){
+        wsCmd = L"%SYSTEMROOT%" + wsCmd.substr(11);
+    }
+
+    wsCmd = ExpandEnvStringsW(wsCmd);
+
+    auto start = wsCmd.find_first_not_of(L" \f\v\t\n\r", 0);
+    if(wsCmd.substr(start, 4) == L"\\??\\"){
+        start += 4;
+    }
+    if(start == std::wstring::npos){
+        return L"";
+    } else if(wsCmd.at(start) == '"' || wsCmd.at(start) == '\''){
+        auto name = wsCmd.substr(start + 1, wsCmd.find_first_of(L"'\"", start + 1) - start - 1);
+        auto path = FileSystem::SearchPathExecutable(name);
+        if(path){
+            return *path;
+        } else return name;
+    } else{
+        auto idx = start;
+        while(idx != std::wstring::npos){
+            auto spacepos = wsCmd.find(L" ", idx);
+            auto name = wsCmd.substr(start, spacepos - start);
+            auto path = FileSystem::SearchPathExecutable(name);
+            if(path && FileSystem::CheckFileExists(*path)){
+                return *path;
+            }
+
+            if(name.length() > 4 && CompareIgnoreCaseW(name.substr(name.length() - 4), L".exe")){
+                return name;
+            }
+
+            if(spacepos == std::wstring::npos){
+                return name;
+            }
+
+            idx = spacepos + 1;
+        }
+
+        return wsCmd.substr(start, wsCmd.find_first_of(L" \t\n\r", start) - start);
+    }
+}
+
+std::vector<std::wstring> TokenizeCommand(const std::wstring& command){
+    std::vector<std::wstring> tokens{};
+
+    std::vector<std::wstring> words{ SplitStringW(command, L" ") };
+
+    std::wstring quoted{};
+
+    bool inquotes = false;
+    bool singlequotes = false;
+    for(auto& str : words){
+        if(inquotes){
+            if(str.length() && ((!singlequotes && str.find_last_of(L"\"") == str.length() - 1) ||
+                                (singlequotes && str.find_last_of(L"'") == str.length() - 1))){
+                inquotes = false;
+                quoted += L" " + str.substr(0, str.length() - 1);
+                for(size_t idx = 0; idx < quoted.length() - 1; idx++){
+                    if(!singlequotes && str.at(idx) == L'\\' && str.at(idx + 1) == L'"'){
+                        str.replace(str.begin() + idx, str.begin() + idx + 2, L"\"");
+                    }
+                    if(singlequotes && str.at(idx) == L'\\' && str.at(idx + 1) == L'\''){
+                        str.replace(str.begin() + idx, str.begin() + idx + 2, L"'");
+                    }
+                }
+                tokens.emplace_back(quoted);
+            } else{
+                quoted += L" " + str;
+            }
+        } else{
+            if(str.at(0) == L'"' || str.at(0) == '\''){
+                quoted = str.substr(1);
+                inquotes = true;
+                singlequotes = str.at(0) == '\'';
+            } else{
+                tokens.emplace_back(str);
+            }
+        }
+    }
+
+    if(inquotes){
+        tokens.emplace_back(quoted);
+    }
+
+    return tokens;
+}
+
+std::vector<std::wstring> GetArgumentTokens(const std::wstring& command){
+    auto tokens{ TokenizeCommand(command) };
+     
+    std::wstring executable{};
+
+    for(size_t idx = 0; idx < tokens.size(); idx++){
+        if(executable.length()){
+            executable += tokens[idx];
+        } else executable += L" " + tokens[idx];
+
+        auto path = FileSystem::SearchPathExecutable(executable);
+        if(path){
+            return std::vector<std::wstring>(tokens.begin() + idx, tokens.end());
+        }
+    }
+
+    return {};
+}

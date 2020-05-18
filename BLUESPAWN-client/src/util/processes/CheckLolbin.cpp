@@ -1,0 +1,1 @@
+bool IsLolbinMalicious(const std::wstring& command);
