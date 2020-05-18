@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 /**
 * Gets the Shannon Entropy of a string
@@ -86,3 +87,17 @@ template<class T>
 bool CompareIgnoreCase(const T& in1, const T& in2);
 #define CompareIgnoreCaseA CompareIgnoreCase<std::string>
 #define CompareIgnoreCaseW CompareIgnoreCase<std::wstring>
+
+/**
+ * Split a string into substrings based on a delimter. This currently
+ * does not support regular expressions.
+ *
+ * @param in The string/wstring to split.
+ * @param delimiter The substring to split on. 
+ *
+ * @return A vector containing the components of `in` split by `delimiter`
+ */
+template<class T>
+std::vector<std::basic_string<T>> SplitString(const std::basic_string<T>& in, const std::basic_string<T>& delimiter);
+#define SplitStringA SplitString<CHAR>
+#define SplitStringW SplitString<WCHAR>

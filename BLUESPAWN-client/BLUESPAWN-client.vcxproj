@@ -46,6 +46,7 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1138.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1198.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1484.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV71769.h" />
     <ClInclude Include="headers\monitor\EventListener.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1138.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1198.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1484.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV71769.cpp" />
     <ClCompile Include="src\monitor\EventListener.cpp" />
@@ -306,29 +308,13 @@
     <None Include="resources\indicators" />
     <None Include="resources\severe" />
     <None Include="resources\severe2" />
+    <None Include="resources\SIP" />
+    <None Include="resources\TrustProviders" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="BLUESPAWN-client.exe.manifest" />
   </ItemGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <GenerateManifest>false</GenerateManifest>
-    <EmbedManifest>
-    </EmbedManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <GenerateManifest>false</GenerateManifest>
-    <EmbedManifest>
-    </EmbedManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <GenerateManifest>false</GenerateManifest>
-    <EmbedManifest>
-    </EmbedManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>
     </EmbedManifest>

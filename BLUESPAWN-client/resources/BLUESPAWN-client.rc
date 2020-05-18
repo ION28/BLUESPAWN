@@ -93,6 +93,8 @@ YaraSevere2             yararule                "resources\\severe2"
 
 YaraIndicators          yararule                "resources\\indicators"
 
+GoodSIP                 textfile                "resources\\SIP"
+GoodTrustProviders      textfile                "resources\\TrustProviders"
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////

@@ -196,6 +196,13 @@ namespace Registry {
 		std::vector<RegistryKey> EnumerateSubkeys() const;
 
 		/**
+		 * Returns a list of subkey names under the currently referenced registry key.
+		 *
+		 * @return a list of subkey names under the currently referenced registry key.
+		 */
+		std::vector<std::wstring> EnumerateSubkeyNames() const;
+
+		/**
 		 * Returns the full path of the referenced registry key witout the Hive.
 		 *
 		 * @return the full path of the referenced registry key without the Hive.
