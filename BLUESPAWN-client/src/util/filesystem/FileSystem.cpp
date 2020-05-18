@@ -223,18 +223,18 @@ namespace FileSystem{
 
 	File::File(IN const std::wstring& path) : hFile{ nullptr }{
 		FilePath = ExpandEnvStringsW(path);
-		LOG_VERBOSE(2, "Attempting to open file: " << path);
-		hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE | WRITE_OWNER, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+		LOG_VERBOSE(2, "Attempting to open file: " << FilePath);
+		hFile = CreateFileW(FilePath.c_str(), GENERIC_READ | GENERIC_WRITE | WRITE_OWNER, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
 			FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
 		if (hFile && GetLastError() == ERROR_SUCCESS) {
-			LOG_VERBOSE(2, "File " << path << " opened");
+			LOG_VERBOSE(2, "File " << FilePath << " opened");
 			bFileExists = true;
 			bWriteAccess = true;
 			bReadAccess = true;
 		}
 		else {
 			if (!hFile && GetLastError() == ERROR_FILE_NOT_FOUND) {
-				LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path);
+				LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << FilePath);
 				bFileExists = false;
 				bWriteAccess = false;
 				bReadAccess = false;
@@ -242,39 +242,39 @@ namespace FileSystem{
 			else if (!hFile && (GetLastError() == ERROR_ACCESS_DENIED || GetLastError() == ERROR_SHARING_VIOLATION)) {
 				bWriteAccess = false;
 				LOG_VERBOSE(3, "No write access available to file");
-				hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+				hFile = CreateFileW(FilePath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
 					FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
 				if (hFile && GetLastError() == ERROR_SUCCESS) {
-					LOG_VERBOSE(2, "File " << path << " opened with read access.");
+					LOG_VERBOSE(2, "File " << FilePath << " opened with read access.");
 					bFileExists = true;
 					bReadAccess = true;
 				}
 				else if (!hFile && GetLastError() == ERROR_SHARING_VIOLATION) {
-					LOG_VERBOSE(2, "Cannot open the following file because it is in use by another process " << path);
+					LOG_VERBOSE(2, "Cannot open the following file because it is in use by another process " << FilePath);
 					bFileExists = true;
 					bReadAccess = false;
 				}
 				else if (!hFile && GetLastError() == ERROR_ACCESS_DENIED) {
-					LOG_VERBOSE(2, "Access denied trying to open " << path);
+					LOG_VERBOSE(2, "Access denied trying to open " << FilePath);
 					bFileExists = true;
 					bReadAccess = false;
 				}
 				else {
-					LOG_ERROR("Unable to open " << path);
+					LOG_ERROR("Unable to open " << FilePath);
 					LOG_SYSTEM_ERROR(GetLastError());
 					bFileExists = true;
 					bReadAccess = false;
 				}
 			}
 			else {
-				LOG_ERROR("Unable to open " << path);
+				LOG_ERROR("Unable to open " << FilePath);
 				LOG_SYSTEM_ERROR(GetLastError());
 				bFileExists = true;
 				bWriteAccess = false;
 				bReadAccess = false;
 			}
 		}
-		Attribs.extension = PathFindExtension(path.c_str());
+		Attribs.extension = PathFindExtension(FilePath.c_str());
 	}
 
 	std::wstring File::GetFilePath() const {
