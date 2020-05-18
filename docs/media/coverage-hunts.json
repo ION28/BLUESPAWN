@@ -19,6 +19,11 @@
         },
         {
             "color": "#FCF26B",
+			"comment": "Covered by checking for bypasses to Windows Firewall in the Registry through AuthorizedApplications and GloballyAccessiblePorts",
+            "techniqueID": "T1089"
+        },
+        {
+            "color": "#FCF26B",
 			"comment": "Covered by checking for printer ports that reference a file (CVE-2020-1048)",
             "techniqueID": "T1068"
         },
