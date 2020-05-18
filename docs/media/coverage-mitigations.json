@@ -14,6 +14,11 @@
     "techniques": [
         {
             "color": "#FCF26B",
+			"comment": "Checks a variety of firewall/Windows Security Notification Center settings (M1028-WFW, M1054-WSC, V-73511)",
+            "techniqueID": "T1089"
+        },
+        {
+            "color": "#FCF26B",
 			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
             "techniqueID": "T1003"
         },
