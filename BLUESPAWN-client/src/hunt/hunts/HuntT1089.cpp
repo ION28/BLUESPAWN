@@ -26,7 +26,7 @@ namespace Hunts {
 		auto PublicProfile = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\PublicProfile" };
 
 		for (auto key : { DomainProfile, StandardProfile, PublicProfile }) {
-			auto allowedapps = RegistryKey{ HKEY_LOCAL_MACHINE, key.GetNameWithoutHive() + L"\\AuthorizedApplications\\List" };
+			auto allowedapps = RegistryKey{ key, L"AuthorizedApplications\\List" };
 			if (allowedapps.Exists()) {
 				for (auto ProgramException : allowedapps.EnumerateValues()) {
 					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ allowedapps, ProgramException, allowedapps.GetValue<std::wstring>(ProgramException).value() }));
@@ -37,7 +37,7 @@ namespace Hunts {
 				}
 			}
 
-			auto ports = RegistryKey{ HKEY_LOCAL_MACHINE, key.GetNameWithoutHive() + L"\\GloballyOpenPorts\\List" };
+			auto ports = RegistryKey{ key, L"GloballyOpenPorts\\List" };
 			if (ports.Exists()) {
 				for (auto PortsException : ports.EnumerateValues()) {
 					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ ports, PortsException, ports.GetValue<std::wstring>(PortsException).value() }));
