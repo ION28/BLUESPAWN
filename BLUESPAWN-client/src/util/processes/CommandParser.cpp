@@ -1,4 +1,5 @@
 #include "util/processes/ProcessUtils.h"
+#include "util/processes/CommandParser.h"
 
 #include <string>
 
@@ -14,7 +15,7 @@ std::wstring GetImagePathFromCommand(std::wstring wsCmd){
     wsCmd = ExpandEnvStringsW(wsCmd);
 
     auto start = wsCmd.find_first_not_of(L" \f\v\t\n\r", 0);
-    if(wsCmd.substr(start, 4) == L"\\??\\"){
+    if(wsCmd.size() >= 4 && wsCmd.substr(start, 4) == L"\\??\\"){
         start += 4;
     }
     if(start == std::wstring::npos){
@@ -96,10 +97,21 @@ std::vector<std::wstring> TokenizeCommand(const std::wstring& command){
 }
 
 std::vector<std::wstring> GetArgumentTokens(const std::wstring& command){
-    auto tokens{ TokenizeCommand(command) };
-     
     std::wstring executable{};
+    auto start = command.find_first_not_of(L" \f\v\t\n\r", 0);
 
+    if(command.substr(start, 4) == L"\\??\\"){
+        start += 4;
+    }
+    if(start == std::wstring::npos){
+        return {};
+    } else if(command.at(start) == '"' || command.at(start) == '\''){
+        auto end{ command.find_first_of(L"'\"", start + 1) - start - 1 };
+        start = command.find_first_not_of(L" \f\v\t\n\r", end);
+        return TokenizeCommand(command.substr(start));
+    }
+
+    auto tokens{ TokenizeCommand(command.substr(start)) };
     for(size_t idx = 0; idx < tokens.size(); idx++){
         if(executable.length()){
             executable += tokens[idx];

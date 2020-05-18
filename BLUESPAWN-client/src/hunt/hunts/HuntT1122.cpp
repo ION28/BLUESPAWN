@@ -6,6 +6,7 @@
 #include "util/log/Log.h"
 #include "util/log/HuntLogMessage.h"
 #include "util/processes/ProcessUtils.h"
+#include "util/processes/CheckLolbin.h"
 
 #include "common/Utils.h"
 
@@ -70,32 +71,30 @@ namespace Hunts{
 			}
 			if(key.ValueExists(L"LocalServer")){
 				auto filename{ *key.GetValue<std::wstring>(L"LocalServer") };
-				auto path{ GetImagePathFromCommand(filename) };
-				if(FileSystem::CheckFileExists(path)){
-					ADD_FILE(path, RegistryValue{ key, L"LocalServer", std::move(filename) });
-				}
+				ADD_FILE(filename, RegistryValue{ key, L"LocalServer", std::move(filename) });
 			}
 			subkey = { key, L"LocalServer32" };
 			if(subkey.Exists() && subkey.ValueExists(L"")){
 				auto filename{ *subkey.GetValue<std::wstring>(L"") };
-				auto path{ GetImagePathFromCommand(filename) };
-				if(FileSystem::CheckFileExists(path)){
-					ADD_FILE(path, RegistryValue{ subkey, L"", std::move(filename) });
-				}
+				ADD_FILE(filename, RegistryValue{ subkey, L"", std::move(filename) });
 			}
 			if(subkey.Exists() && subkey.ValueExists(L"ServerExecutable")){
 				auto filename{ *subkey.GetValue<std::wstring>(L"ServerExecutable") };
-				auto path{ GetImagePathFromCommand(filename) };
-				auto name{ subkey.GetName() };
-				if(FileSystem::CheckFileExists(path)){
-					ADD_FILE(path, RegistryValue{ subkey, L"ServerExecutable", std::move(filename) });
-				}
+				ADD_FILE(filename, RegistryValue{ subkey, L"ServerExecutable", std::move(filename) });
 			}
 		}
 
-		for(auto& pair : files){
-			FileSystem::File file{ pair.first };
-			if(file.GetFileExists() && (!file.GetFileSigned() || file.IsLolbin())){
+		for(auto pair : files){
+			auto path{ pair.first };
+			if(!FileSystem::CheckFileExists(path)){
+				path = GetImagePathFromCommand(path);
+				if(!FileSystem::CheckFileExists(path)){
+					continue;
+				}
+			}
+
+			FileSystem::File file{ path };
+			if((!CompareIgnoreCaseW(file.GetFileAttribs().extension, L".dll") && IsLolbinMalicious(pair.first)) || !file.GetFileSigned()){
 				for(auto& value : pair.second){
 					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(value));
 					detections++;
