@@ -27,11 +27,11 @@ namespace Hunts {
 		auto netshKey = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Netsh", true };
 
 		for (auto& helperDllValue : CheckKeyValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Netsh", true, false)) {
-			auto filepath = GetImagePathFromCommand(helperDllValue.ToString());
+			auto filepath = FileSystem::SearchPathExecutable(std::get<std::wstring>(helperDllValue.data));
 
-			FileSystem::File helperDll = FileSystem::File(filepath);
 
-			if (helperDll.GetFileExists()) {
+			if (filepath) {
+				FileSystem::File helperDll{ *filepath };
 				if (!helperDll.GetFileSigned()) {
 					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(helperDllValue));
 

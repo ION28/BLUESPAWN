@@ -14,8 +14,6 @@ namespace Hunts {
 	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1031 : public Hunt {
-	private:
-		std::vector<std::wstring> vSuspicious = { L"cmd.exe", L"powershell.exe", L"cscript.exe", L"wscript.exe", L"net.exe", L"net1.exe" };
 	public:
 		HuntT1031();
 

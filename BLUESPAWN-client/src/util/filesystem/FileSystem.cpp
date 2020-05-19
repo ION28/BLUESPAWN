@@ -15,6 +15,7 @@
 #include <SoftPub.h>
 #include <mscat.h>
 #include "common/wrappers.hpp"
+#include "common/StringUtils.h"
 #include "aclapi.h"
 
 LINK_FUNCTION(NtCreateFile, ntdll.dll)
@@ -209,11 +210,15 @@ namespace FileSystem{
 
 
 	File::File(IN const std::wstring& path) : hFile{ nullptr }{
-		FilePath = path;
+		FilePath = ExpandEnvStringsW(path);
 		LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
 		if(FilePath.at(0) == L'\\'){
 			HANDLE hFile{};
-			UNICODE_STRING UnicodeName{ path.length() * 2, path.length() * 2, const_cast<PWCHAR>(path.c_str()) };
+			UNICODE_STRING UnicodeName{ 
+				static_cast<USHORT>(path.length() * 2), 
+				static_cast<USHORT>(path.length() * 2), 
+				const_cast<PWCHAR>(path.c_str()) 
+			};
 			OBJECT_ATTRIBUTES attributes{};
 			IO_STATUS_BLOCK IoStatus{};
 			InitializeObjectAttributes(&attributes, &UnicodeName, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, nullptr, nullptr);
@@ -252,7 +257,7 @@ namespace FileSystem{
 				bFileExists = false;
 				bWriteAccess = false;
 				bReadAccess = false;
-			} else if(!hFile && GetLastError() == ERROR_ACCESS_DENIED){
+			} else if(!hFile && (GetLastError() == ERROR_ACCESS_DENIED || GetLastError() == ERROR_SHARING_VIOLATION)){
 				bWriteAccess = false;
 				hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
 									FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
@@ -273,11 +278,16 @@ namespace FileSystem{
 					bFileExists = true;
 					bReadAccess = true;
 				}
-			} else{
+			} else if(ERROR_SUCCESS == GetLastError()){
 				LOG_VERBOSE(2, "File " << path << " opened.");
 				bFileExists = true;
 				bWriteAccess = true;
 				bReadAccess = true;
+			} else{
+				LOG_VERBOSE(2, "File " << path << " failed to open with error " << GetLastError());
+				bFileExists = false;
+				bWriteAccess = false;
+				bReadAccess = false;
 			}
 			Attribs.extension = PathFindExtensionW(path.c_str());
 		}

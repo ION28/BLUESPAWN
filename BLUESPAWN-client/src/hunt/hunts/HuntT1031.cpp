@@ -5,6 +5,7 @@
 #include "hunt/RegistryHunt.h"
 #include "util/filesystem/YaraScanner.h"
 #include "util/processes/ProcessUtils.h"
+#include "util/processes/CheckLolbin.h"
 
 #include "util/log/Log.h"
 
@@ -42,30 +43,26 @@ namespace Hunts {
 			if (!service.ValueExists(L"FailureCommand")) {
 				continue;
 			}
-			auto filepath = GetImagePathFromCommand(service.GetValue<std::wstring>(L"FailureCommand").value());
 
-			for (std::wstring val : vSuspicious) {
-				if (filepath.find(val) != std::wstring::npos) {
-					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ service, L"FailureCommand", service.GetValue<std::wstring>(L"FailureCommand").value() }));
-					detections++;
-					continue;
-				}
-			}
+			auto cmd{ *service.GetValue<std::wstring>(L"FailureCommand") };
 
-			if (!FileSystem::CheckFileExists(filepath)) {
-				continue;
-			}
-			FileSystem::File image = FileSystem::File(filepath);
-
-			if (!image.GetFileSigned()) {
+			if(IsLolbinMalicious(cmd)){
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ service, L"FailureCommand", service.GetValue<std::wstring>(L"FailureCommand").value() }));
+				detections++;
+			} else {
+				auto filepath = GetImagePathFromCommand(cmd);
 
-				auto& yara = YaraScanner::GetInstance();
-				YaraScanResult result = yara.ScanFile(image);
+				FileSystem::File image = FileSystem::File(filepath);
+				if(image.GetFileExists() && !image.GetFileSigned()){
+					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ service, L"FailureCommand", service.GetValue<std::wstring>(L"FailureCommand").value() }));
 
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(image));
+					auto& yara = YaraScanner::GetInstance();
+					YaraScanResult result = yara.ScanFile(image);
 
-				detections += 2;
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(image));
+
+					detections += 2;
+				}
 			}
 		}
 

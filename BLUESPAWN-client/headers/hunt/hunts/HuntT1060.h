@@ -15,8 +15,7 @@ namespace Hunts {
 	class HuntT1060 : public Hunt {
 	private:
 		std::vector<std::wstring> RunKeys;
-		std::vector<std::wstring> vSuspicious = { L"cmd.exe", L"powershell.exe", L"cscript.exe", L"wscript.exe", L"net.exe", L"net1.exe" };
-		int EvaluateFile(std::wstring wLaunchString, Reaction reaction);
+		int EvaluateFile(const std::wstring& wLaunchString, Reaction& reaction);
 
 	public:
 		HuntT1060();
