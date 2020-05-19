@@ -18,22 +18,14 @@ namespace Hunts {
 
 		int detections = 0;
 
-		std::vector<FileSystem::Folder> dirs;
+		FileSystem::FileSearchAttribs searchFilters;
+		searchFilters.extensions = susExts;
 
 		for (auto folder : writableFolders) {
 			auto f = FileSystem::Folder(folder);
 			if (f.GetFolderExists()) {
-				dirs.push_back(f);
-				for (auto subdir : f.GetSubdirectories(20)) {
-					dirs.push_back(subdir);
-				}
-			}
-		}
-
-		for (auto f : dirs) {
-			LOG_VERBOSE(1, L"Scanning " << f.GetFolderPath());
-			for (auto value : f.GetFiles(std::nullopt, -1)) {
-				if ((std::find(susExts.begin(), susExts.end(), value.GetFileAttribs().extension) != susExts.end())) {
+				LOG_VERBOSE(1, L"Scanning " << f.GetFolderPath());
+				for (auto value : f.GetFiles(searchFilters, -1)) {
 					if (value.GetFileAttribs().extension == L".exe" || value.GetFileAttribs().extension == L".dll") {
 						if (!value.GetFileSigned()) {
 							reaction.FileIdentified(std::make_shared<FILE_DETECTION>(value));
@@ -58,7 +50,7 @@ namespace Hunts {
 			auto f = FileSystem::Folder(folder);
 			if (f.GetFolderExists()) {
 				events.push_back(std::make_shared<FileEvent>(f));
-				for (auto subdir : f.GetSubdirectories(20)) {
+				for (auto subdir : f.GetSubdirectories(-1)) {
 					events.push_back(std::make_shared<FileEvent>(subdir));
 				}
 			}
