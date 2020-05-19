@@ -3,6 +3,7 @@
 
 #include "util/log/Log.h"
 #include "util/configurations/Registry.h"
+#include "util/filesystem/FileSystem.h"
 
 using namespace Registry;
 
@@ -23,6 +24,12 @@ namespace Hunts {
 		for(auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls", false, false)){
 			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
 			detections++;
+
+			auto filepath = FileSystem::SearchPathExecutable(detection.ToString());
+			if (filepath) {
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(FileSystem::File{ filepath.value() }));
+				detections++;
+			}
 		}
 
 		reaction.EndHunt();
@@ -32,7 +39,7 @@ namespace Hunts {
 	std::vector<std::shared_ptr<Event>> HuntT1182::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
 
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls", false }));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\AppCertDlls", false, false, false));
 
 		return events;
 	}

@@ -8,7 +8,7 @@
 namespace Hunts {
 
 	/**
-	 * HuntT1004 examines AppInit DLLs related registry keys that can be used for
+	 * HuntT1103 examines AppInit DLLs related registry keys that can be used for
 	 * persistence and privilege escalation.
 	 * 
 	 * @scans Cursory checks the values of the associated AppInit DLLs keys that can be abused.
