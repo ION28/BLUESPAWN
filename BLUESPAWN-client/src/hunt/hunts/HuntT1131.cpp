@@ -5,6 +5,7 @@
 #include "util/configurations/Registry.h"
 #include "util/filesystem/FileSystem.h"
 #include "util/filesystem/YaraScanner.h"
+#include "common/StringUtils.h"
 
 using namespace Registry;
 
@@ -53,10 +54,13 @@ namespace Hunts {
 		int detections = 0;
 
 		auto lsa = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
-		auto vAuthPackages = *lsa.GetValue<std::vector<std::wstring>>(L"Authentication Packages");
-		auto vNotifPackages = *lsa.GetValue<std::vector<std::wstring>>(L"Notification Packages");
-		detections += EvaluatePackages(lsa, vAuthPackages, L"Authentication Packages", reaction);
-		detections += EvaluatePackages(lsa, vNotifPackages, L"Notification Packages", reaction);
+		auto AuthPackages = lsa.GetValue<std::vector<std::wstring>>(L"Authentication Packages").value();
+		auto NotifPackages = lsa.GetValue<std::vector<std::wstring>>(L"Notification Packages").value();
+
+		for (const auto& PackageGroup : { AuthPackages, NotifPackages }) {
+			std::wstring k = L"lima";
+			SplitStringW(k, L" ");
+		}
 
 		reaction.EndHunt();
 		return detections;
@@ -65,7 +69,7 @@ namespace Hunts {
 	std::vector<std::shared_ptr<Event>> HuntT1131::GetMonitoringEvents() {
 		std::vector<std::shared_ptr<Event>> events;
 
-		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" }));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", false, false, true));
 
 		return events;
 	}
