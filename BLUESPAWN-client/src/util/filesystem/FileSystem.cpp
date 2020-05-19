@@ -756,14 +756,14 @@ namespace FileSystem{
 	}
 
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
-		FolderPath = path;
+		FolderPath = ExpandEnvStringsW(path);
 		std::wstring searchName = FolderPath;
 		searchName += L"\\*";
 		bFolderExists = true;
 		auto f = FindFirstFileW(searchName.c_str(), &ffd);
 		hCurFile = { f };
 		if(hCurFile == INVALID_HANDLE_VALUE) {
-			LOG_ERROR("Couldn't open folder " << path);
+			LOG_ERROR("Couldn't open folder " << FolderPath);
 			bFolderExists = false;
 		}
 		if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
