@@ -35,6 +35,7 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1055.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1060.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1068.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1089.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1099.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1100.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1101.h" />
@@ -46,8 +47,12 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1138.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1198.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1484.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1028-WFW.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1054-WSC.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV71769.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV73511.h" />
     <ClInclude Include="headers\monitor\EventListener.h" />
     <ClInclude Include="headers\reaction\CarveMemory.h" />
     <ClInclude Include="headers\reaction\DeleteFile.h" />
@@ -173,6 +178,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1055.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1060.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1068.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1089.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1099.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1100.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1101.cpp" />
@@ -184,8 +190,12 @@
     <ClCompile Include="src\hunt\hunts\HuntT1138.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1198.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1484.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1028-WFW.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1054-WSC.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV71769.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV73511.cpp" />
     <ClCompile Include="src\monitor\EventListener.cpp" />
     <ClCompile Include="src\reaction\CarveMemory.cpp" />
     <ClCompile Include="src\reaction\DeleteFile.cpp" />
@@ -306,29 +316,13 @@
     <None Include="resources\indicators" />
     <None Include="resources\severe" />
     <None Include="resources\severe2" />
+    <None Include="resources\SIP" />
+    <None Include="resources\TrustProviders" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="BLUESPAWN-client.exe.manifest" />
   </ItemGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <GenerateManifest>false</GenerateManifest>
-    <EmbedManifest>
-    </EmbedManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <GenerateManifest>false</GenerateManifest>
-    <EmbedManifest>
-    </EmbedManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <GenerateManifest>false</GenerateManifest>
-    <EmbedManifest>
-    </EmbedManifest>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>
     </EmbedManifest>

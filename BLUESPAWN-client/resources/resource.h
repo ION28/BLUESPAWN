@@ -5,6 +5,8 @@
 #define YaraSevere                      6
 #define YaraSevere2                     7
 #define YaraIndicators                  8
+#define GoodSIP                         9
+#define GoodTrustProviders              10
 #define IDR_YARARULE2                   101
 
 // Next default values for new objects
