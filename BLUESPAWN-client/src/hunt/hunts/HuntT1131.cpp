@@ -17,50 +17,74 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	int HuntT1131::EvaluatePackages(Registry::RegistryKey key, std::vector<std::wstring> vPackages, std::wstring name, Reaction reaction) {
-		int detections = 0;
-
-		FileSystem::File* file;
-
-		for (auto package : vPackages) {
-			if (package == L"\"\"") {
-				continue;
-			}
-			if (FileSystem::File(package).GetFileExists()) {
-				file = new FileSystem::File(package);
-			}
-			else {
-				file = new FileSystem::File(ExpandEnvStringsW(L"%SYSTEMROOT%\\System32\\") + package + L".dll");
-				if (!file->GetFileExists()) { continue; }
-			}
-
-			auto& yara = YaraScanner::GetInstance();
-			YaraScanResult result = yara.ScanFile(*file);
-
-			if (!file->GetFileSigned()) {
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ key, name, key.GetValue<std::vector<std::wstring>>(name).value() }));
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(*file));
-				detections += 2;
-			}
-		}
-
-		return detections;
-	}
-
-	int HuntT1131::ScanCursory(const Scope& scope, Reaction reaction){
+	int HuntT1131::ScanCursory(const Scope& scope, Reaction reaction) {
 		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
 		reaction.BeginHunt(GET_INFO());
 
 		int detections = 0;
 
+		// LSA Configuration
 		auto lsa = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
-		auto AuthPackages = lsa.GetValue<std::vector<std::wstring>>(L"Authentication Packages").value();
-		auto NotifPackages = lsa.GetValue<std::vector<std::wstring>>(L"Notification Packages").value();
 
-		for (const auto& PackageGroup : { AuthPackages, NotifPackages }) {
-			std::wstring k = L"lima";
-			SplitStringW(k, L" ");
+		for (auto PackageGroup : { L"Authentication Packages", L"Notification Packages" }) {
+			auto Packages = lsa.GetValue<std::vector<std::wstring>>(PackageGroup);
+			if (Packages) {
+				for (auto Package : Packages.value()) {
+					if (Package != L"\"\"") {
+						auto filepath = FileSystem::SearchPathExecutable(Package + L".dll");
+
+						if (filepath) {
+							FileSystem::File file = FileSystem::File(filepath.value());
+							if (file.GetFileExists() && !file.GetFileSigned()) {
+								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ lsa, PackageGroup, lsa.GetValue<std::vector<std::wstring>>(PackageGroup).value() }));
+								reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+								detections += 2;
+							}
+						}
+					}
+				}
+			}
 		}
+
+		// LSA Extensions Configuration
+		auto lsaext = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\LsaExtensionConfig" };
+
+		for (auto subkeyName : lsaext.EnumerateSubkeyNames()) {
+			if (subkeyName == L"Interfaces") {
+				for (auto subkey : RegistryKey{ lsaext, L"Interfaces" }.EnumerateSubkeys()) {
+					auto ext = subkey.GetValue<std::wstring>(L"Extension");
+					if (ext) {
+						auto filepath = FileSystem::SearchPathExecutable(ext.value());
+						if (filepath) {
+							FileSystem::File file = FileSystem::File(filepath.value());
+							if (file.GetFileExists() && !file.GetFileSigned()) {
+								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ subkey, L"Extension", subkey.GetValue<std::wstring>(L"Extension").value() }));
+								reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+								detections += 2;
+							}
+						}
+					}
+				}
+			}
+			else {
+				auto subkey = RegistryKey{ lsaext, subkeyName };
+				auto exts = subkey.GetValue<std::vector<std::wstring>>(L"Extensions");
+				if (exts) {
+					for (auto ext : exts.value()) {
+						auto filepath = FileSystem::SearchPathExecutable(ext);
+						if (filepath) {
+							FileSystem::File file = FileSystem::File(filepath.value());
+							if (file.GetFileExists() && !file.GetFileSigned()) {
+								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ subkey, L"Extensions", subkey.GetValue<std::wstring>(L"Extensions").value() }));
+								reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+								detections += 2;
+							}
+						}
+					}
+				}
+			}
+		}
+
 
 		reaction.EndHunt();
 		return detections;
@@ -70,6 +94,7 @@ namespace Hunts {
 		std::vector<std::shared_ptr<Event>> events;
 
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", false, false, true));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\LsaExtensionConfig", false, false, true));
 
 		return events;
 	}

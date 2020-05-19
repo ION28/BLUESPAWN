@@ -38,6 +38,8 @@ namespace Hunts {
 
 		ADD_ALL_VECTOR(events, GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB"));
 		ADD_ALL_VECTOR(events, GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom"));
+		events.push_back(std::make_shared<FileEvent>(FileSystem::Folder{ L"C:\\Windows\\AppPatch\\Custom" }));
+		events.push_back(std::make_shared<FileEvent>(FileSystem::Folder{ L"C:\\Windows\\AppPatch\\Custom\\Custom64" }));
 
 		return events;
 	}
