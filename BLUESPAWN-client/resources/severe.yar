@@ -1,8 +1,6 @@
 include "bluespawn-original/kernel32_kernelbase_ror13.yar"
 
-
 /* https://github.com/nsacyber/Mitigating-Web-Shells */
-include "third-party-integration/core.webshell_detection.yara"
 include "third-party-integration/extended.webshell_detection.yara"
 
 /* https://github.com/gentilkiwi/mimikatz */

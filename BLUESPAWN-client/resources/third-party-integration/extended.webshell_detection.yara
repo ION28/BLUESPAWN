@@ -207,7 +207,7 @@ private rule IRC
         5 of them
 }
 
-private rule base64
+private rule base64rule
 {
     meta:
         source = "https://github.com/nbs-system/php-malware-finder"
@@ -284,7 +284,7 @@ private rule SuspiciousEncoding
         source = "https://github.com/nbs-system/php-malware-finder"
 		
     condition:
-        (base64 or hex or strrev or Hpack)
+        (base64rule or hex or strrev or Hpack)
 }
 
 private rule DodgyStrings
