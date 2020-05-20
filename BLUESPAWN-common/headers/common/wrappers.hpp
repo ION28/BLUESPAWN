@@ -233,7 +233,7 @@ public:
 			return *address;
 		} else {
 			T mem = {};
-			ReadProcessMemory(process, address, &mem, MemorySize, nullptr);
+			ReadProcessMemory(process, address, &mem, sizeof(T), nullptr);
 			return mem;
 		}
 	}
@@ -252,7 +252,7 @@ public:
 			return address;
 		} else {
 			LocalCopy = {};
-			if(ReadProcessMemory(process, address, &LocalCopy, MemorySize, nullptr)){
+			if(ReadProcessMemory(process, address, &LocalCopy, sizeof(LocalCopy), nullptr)){
 				return &LocalCopy;
 			} else {
 				return nullptr;
@@ -343,6 +343,35 @@ public:
 
 	operator bool() const { return address; }
 	bool operator !() const { return !address; }
+
+	AllocationWrapper ToAllocationWrapper(DWORD size = MemorySize){
+		size = min(size, MemorySize);
+		if(size > 0x8000){
+			AllocationWrapper wrapper{ ::VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE), size, AllocationWrapper::VIRTUAL_ALLOC };
+			if(process){
+				if(ReadProcessMemory(process, address, wrapper, size, nullptr)){
+					return wrapper;
+				} else{
+					return { nullptr, 0 };
+				}
+			} else{
+				MoveMemory(wrapper, address, size);
+				return wrapper;
+			}
+		} else{
+			AllocationWrapper wrapper{ ::HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size), size, AllocationWrapper::HEAP_ALLOC };
+			if(process){
+				if(ReadProcessMemory(process, address, wrapper, size, nullptr)){
+					return wrapper;
+				} else{
+					return { nullptr, 0 };
+				}
+			} else{
+				MoveMemory(wrapper, address, size);
+				return wrapper;
+			}
+		}
+	}
 };
 
 #define WRAP(type, name, value, function) \
