@@ -37,5 +37,6 @@ namespace Hunts {
 
 		virtual int ScanCursory(const Scope& scope, Reaction reaction = Reactions::LogReaction());
 		virtual int ScanNormal(const Scope& scope, Reaction reaction = Reactions::LogReaction());
+		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

@@ -2,7 +2,6 @@
 
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
-#include "util/log/HuntLogMessage.h"
 #include "util/filesystem/YaraScanner.h"
 #include "util/processes/ProcessUtils.h"
 
@@ -13,7 +12,6 @@
 namespace Hunts {
 
 	HuntT1050::HuntT1050() : Hunt(L"T1050 - New Service") {
-		// TODO: update these categories
 		dwSupportedScans = (DWORD) Aggressiveness::Normal | (DWORD) Aggressiveness::Intensive;
 		dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Files;
 		dwSourcesInvolved = (DWORD) DataSource::Registry | (DWORD) DataSource::FileSystem;
