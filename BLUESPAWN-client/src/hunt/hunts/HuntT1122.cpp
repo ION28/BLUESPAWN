@@ -71,16 +71,16 @@ namespace Hunts{
 			}
 			if(key.ValueExists(L"LocalServer")){
 				auto filename{ *key.GetValue<std::wstring>(L"LocalServer") };
-				ADD_FILE(filename, RegistryValue{ key, L"LocalServer", std::move(filename) });
+				ADD_FILE(filename, RegistryValue{ key, L"LocalServer", *subkey.GetValue<std::wstring>(L"") });
 			}
 			subkey = { key, L"LocalServer32" };
 			if(subkey.Exists() && subkey.ValueExists(L"")){
 				auto filename{ *subkey.GetValue<std::wstring>(L"") };
-				ADD_FILE(filename, RegistryValue{ subkey, L"", std::move(filename) });
+				ADD_FILE(filename, RegistryValue{ subkey, L"", *subkey.GetValue<std::wstring>(L"") });
 			}
 			if(subkey.Exists() && subkey.ValueExists(L"ServerExecutable")){
 				auto filename{ *subkey.GetValue<std::wstring>(L"ServerExecutable") };
-				ADD_FILE(filename, RegistryValue{ subkey, L"ServerExecutable", std::move(filename) });
+				ADD_FILE(filename, RegistryValue{ subkey, L"ServerExecutable", *subkey.GetValue<std::wstring>(L"") });
 			}
 		}
 

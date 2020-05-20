@@ -36,8 +36,10 @@ namespace Hunts {
 	int HuntT1060::EvaluateFile(const std::wstring& cmd, Reaction& reaction) {
 
 		if(IsLolbinMalicious(cmd)){
+			LOG_VERBOSE(1, "When evaluating " << cmd << ", it was determined that this was a malicious use of a lolbin");
 			return true;
 		} else{
+			LOG_VERBOSE(2, "When evaluating " << cmd << ", it was determined that this was not a malicious use of a lolbin");
 			auto filepath = GetImagePathFromCommand(cmd);
 			auto image{ FileSystem::File(filepath) };
 

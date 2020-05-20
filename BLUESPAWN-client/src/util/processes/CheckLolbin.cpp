@@ -126,28 +126,74 @@ bool IsLolbin(const FileSystem::File& file){
 
 bool IsLolbinMalicious(const std::wstring& command){
 	std::wstring executable{ GetImagePathFromCommand(command) };
+
+	LOG_VERBOSE(1, "Checking if " << command << " will execute a lolbin maliciously");
 	
 	if(!IsLolbin(executable)){
 		return false;
 	}
 
 	auto args{ GetArgumentTokens(command) };
+
+	LOG_VERBOSE(3, "Getting hash of " << executable);
 	auto hash{ FileSystem::File(executable).GetSHA256Hash() };
-	if(hashmap.at(L"Rundll32.exe") == hash){
+
+	LOG_VERBOSE(3, "Checking if " << executable << " is rundll32");
+	if(hashmap.count(L"Rundll32.exe") && hashmap.at(L"Rundll32.exe") == hash){
 		if(args.size()){
 			auto arg{ args[0] };
-			auto dll{ arg.substr(0, arg.find_first_of(L" \t,")) };
+			auto br{ arg.find_first_of(L" \t,") };
+			auto dll{ arg.substr(0, br) };
 			auto dllpath{ FileSystem::SearchPathExecutable(dll) };
-			if(!dllpath || FileSystem::File(*dllpath).GetFileSigned()){
+
+			FileSystem::File dllfile{ *dllpath };
+			if(!dllpath || !dllfile.GetFileSigned()){
 				LOG_INFO("rundll32 found to be executing " << dll);
 				return true;
-			} else if(IsLolbin(FileSystem::File(*dllpath))){
+			} 
+			
+			if(hashmap.count(L"Shell32.dll") && hashmap.at(L"Shell32.dll") == dllfile.GetSHA256Hash() && br != std::wstring::npos){
+				auto start{ arg.find_first_not_of(L" ,\t", br) };
+				auto func{ arg.substr(start, arg.find_first_of(L" ,\t", start)) };
+				LOG_INFO("rundll32 found to be executing shell32");
+				return !CompareIgnoreCaseW(func, L"SHCreateLocalServerRunDll");
+			} else{
 				LOG_INFO("rundll32 found to be executing " << dll);
 				return true;
 			}
 		}
 		return false;
-	} else if(hashmap.at(L"explorer.exe") == hash){
+	}
+
+	LOG_VERBOSE(3, "Checking if " << executable << " is mmc.exe");
+	if(hashmap.count(L"Mmc.exe") && hashmap.at(L"Mmc.exe") == hash){
+		for(auto& arg : args){
+			if(FileSystem::SearchPathExecutable(arg)){
+				LOG_INFO("mmc found to be executing " << arg);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	LOG_VERBOSE(3, "Checking if " << executable << " is presentationhost");
+	if(hashmap.count(L"Presentationhost.exe") && hashmap.at(L"Presentationhost.exe") == hash){
+		for(auto& arg : args){
+			if(FileSystem::SearchPathExecutable(arg)){
+				LOG_INFO("mmc found to be executing " << arg);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	LOG_VERBOSE(3, "Checking if " << executable << " is Mshta.exe");
+	if(hashmap.count(L"Mshta.exe") && hashmap.at(L"Mshta.exe") == hash){
+		return args.size();
+	}
+
+	LOG_VERBOSE(3, "Checking if " << executable << " is explorer.exe");
+	if(hashmap.count(L"explorer.exe") && hashmap.at(L"explorer.exe") == hash){
 		for(auto& arg : args){
 			if(FileSystem::SearchPathExecutable(arg)){
 				LOG_INFO("explorer found to be executing " << arg);

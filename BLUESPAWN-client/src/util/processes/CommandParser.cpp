@@ -6,6 +6,7 @@
 #include "common/StringUtils.h"
 
 #include "util/filesystem/FileSystem.h"
+#include "util/log/Log.h"
 
 std::wstring GetImagePathFromCommand(std::wstring wsCmd){
     if(wsCmd.substr(0, 11) == L"\\SystemRoot"){
@@ -66,7 +67,7 @@ std::vector<std::wstring> TokenizeCommand(const std::wstring& command){
                                 (singlequotes && str.find_last_of(L"'") == str.length() - 1))){
                 inquotes = false;
                 quoted += L" " + str.substr(0, str.length() - 1);
-                for(size_t idx = 0; idx < quoted.length() - 1; idx++){
+                for(size_t idx = 0; idx < str.length() - 1; idx++){
                     if(!singlequotes && str.at(idx) == L'\\' && str.at(idx + 1) == L'"'){
                         str.replace(str.begin() + idx, str.begin() + idx + 2, L"\"");
                     }
@@ -97,6 +98,8 @@ std::vector<std::wstring> TokenizeCommand(const std::wstring& command){
 }
 
 std::vector<std::wstring> GetArgumentTokens(const std::wstring& command){
+    LOG_VERBOSE(2, "Finding arguments for command " << command);
+
     std::wstring executable{};
     auto start = command.find_first_not_of(L" \f\v\t\n\r", 0);
 
@@ -108,18 +111,23 @@ std::vector<std::wstring> GetArgumentTokens(const std::wstring& command){
     } else if(command.at(start) == '"' || command.at(start) == '\''){
         auto end{ command.find_first_of(L"'\"", start + 1) - start - 1 };
         start = command.find_first_not_of(L" \f\v\t\n\r", end);
+        
+        LOG_VERBOSE(3, "Command is quoted; rest begins at " << start);
         return TokenizeCommand(command.substr(start));
     }
 
+    LOG_VERBOSE(3, "Command is not quoted; searching for executable");
     auto tokens{ TokenizeCommand(command.substr(start)) };
+    LOG_VERBOSE(3, "Successfully tokenized command");
     for(size_t idx = 0; idx < tokens.size(); idx++){
-        if(executable.length()){
+        if(!executable.length()){
             executable += tokens[idx];
         } else executable += L" " + tokens[idx];
 
+        LOG_VERBOSE(3, "Trying " << executable);
         auto path = FileSystem::SearchPathExecutable(executable);
         if(path){
-            return std::vector<std::wstring>(tokens.begin() + idx, tokens.end());
+            return std::vector<std::wstring>(tokens.begin() + idx + 1, tokens.end());
         }
     }
 

@@ -210,6 +210,12 @@ namespace FileSystem{
 
 
 	File::File(IN const std::wstring& path) : hFile{ nullptr }{
+		if(!path.length()){
+			bFileExists = false;
+			bWriteAccess = false;
+			bReadAccess = false;
+			return;
+		}
 		FilePath = ExpandEnvStringsW(path);
 		LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
 		if(FilePath.at(0) == L'\\'){
