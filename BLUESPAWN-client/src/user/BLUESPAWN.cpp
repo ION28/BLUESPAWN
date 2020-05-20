@@ -205,7 +205,7 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 
 void Bluespawn::check_correct_arch() {
 	BOOL bIsWow64 = FALSE;
-	if (IsWindows10OrGreater()) {
+	if (IsWindows10OrGreater() && Linker::IsWow64Process2) {
 		USHORT ProcessMachine;
 		USHORT NativeMachine;
 
@@ -224,7 +224,6 @@ void Bluespawn::check_correct_arch() {
 }
 
 int main(int argc, char* argv[]){
-
 	Bluespawn bluespawn{};
 
 	print_banner();
@@ -390,4 +389,6 @@ int main(int argc, char* argv[]){
 	catch (cxxopts::OptionParseException e1) {
 		LOG_ERROR(e1.what());
 	}
+
+	return 0;
 }

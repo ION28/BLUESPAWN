@@ -6,6 +6,7 @@
 #include "util/filesystem/FileSystem.h"
 #include "util/filesystem/YaraScanner.h"
 #include "util/processes/ProcessUtils.h"
+#include "util/processes/CheckLolbin.h"
 
 #include "common/Utils.h"
 
@@ -32,28 +33,27 @@ namespace Hunts {
 		};
 	}
 
-	int HuntT1060::EvaluateFile(std::wstring wLaunchString, Reaction reaction) {
-		auto filepath = GetImagePathFromCommand(wLaunchString);
+	int HuntT1060::EvaluateFile(const std::wstring& cmd, Reaction& reaction) {
 
-		FileSystem::File file = FileSystem::File(filepath);
+		if(IsLolbinMalicious(cmd)){
+			LOG_VERBOSE(1, "When evaluating " << cmd << ", it was determined that this was a malicious use of a lolbin");
+			return true;
+		} else{
+			LOG_VERBOSE(2, "When evaluating " << cmd << ", it was determined that this was not a malicious use of a lolbin");
+			auto filepath = GetImagePathFromCommand(cmd);
+			auto image{ FileSystem::File(filepath) };
 
-		bool bFileSigned = file.GetFileSigned();
+			if(image.GetFileExists() && !image.GetFileSigned()){
+				auto& yara = YaraScanner::GetInstance();
+				YaraScanResult result{ yara.ScanFile(image) };
 
-		for (std::wstring val : vSuspicious) {
-			if (filepath.find(val) != std::wstring::npos) {
-				return 1;
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(image));
+
+				return true;
 			}
 		}
 
-		if (!bFileSigned) {
-			auto& yara = YaraScanner::GetInstance();
-			YaraScanResult result = yara.ScanFile(file);
-
-			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
-			return 1;
-		}
-
-		return 0;
+		return false;
 	}
 
 	int HuntT1060::ScanCursory(const Scope& scope, Reaction reaction){

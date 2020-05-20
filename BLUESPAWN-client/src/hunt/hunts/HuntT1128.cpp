@@ -27,22 +27,18 @@ namespace Hunts {
 		auto netshKey = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Netsh", true };
 
 		for (auto& helperDllValue : CheckKeyValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Netsh", true, false)) {
-			auto filepath = FileSystem::SearchPathExecutable(helperDllValue.ToString());
-
+			auto filepath = FileSystem::SearchPathExecutable(std::get<std::wstring>(helperDllValue.data));
 			if (filepath) {
-				FileSystem::File helperDll = FileSystem::File(filepath.value());
+				FileSystem::File helperDll{ *filepath };
+				if (!helperDll.GetFileSigned()) {
+					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(helperDllValue));
 
-				if (helperDll.GetFileExists()) {
-					if (!helperDll.GetFileSigned()) {
-						reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(helperDllValue));
+					auto& yara = YaraScanner::GetInstance();
+					YaraScanResult result = yara.ScanFile(helperDll);
 
-						auto& yara = YaraScanner::GetInstance();
-						YaraScanResult result = yara.ScanFile(helperDll);
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(helperDll));
 
-						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(helperDll));
-
-						detections += 2;
-					}
+					detections += 2;
 				}
 			}
 		}
