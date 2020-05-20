@@ -18,7 +18,7 @@ namespace Hunts {
 	class HuntT1037 : public Hunt {
 	private:
 		std::vector<std::wstring> sus_exts = { L".bat", L".cmd", L".dll", L".job", L".js", L".jse", 
-					L".lnk", L".ps1", L".sct", L".vb", L".vbe", L".vbs", L".vbscript" };
+					L".lnk", L".ps1", L".sct", L".vb", L".vbe", L".vbs", L".vbscript", L".hta" };
 
 		int HuntT1037::EvaluateStartupFile(FileSystem::File file, Reaction& reaction, Aggressiveness level);
 	public:

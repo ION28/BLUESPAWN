@@ -5,6 +5,7 @@
 #include "hunt/RegistryHunt.h"
 #include "util/filesystem/YaraScanner.h"
 #include "util/processes/ProcessUtils.h"
+#include "util/processes/CheckLolbin.h"
 
 #include "util/log/Log.h"
 
@@ -25,16 +26,92 @@ namespace Hunts {
 
 		int detections = 0;
 
-		std::vector<RegistryValue> dnsServerPlugins{ CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\DNS\\Parameters", {
-			{ L"ServerLevelPluginDll", L"", false, CheckSzEmpty },
-		}, false, false) };
+		// DNS Service Audit
 
-		for (auto& detection : dnsServerPlugins) {
-			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
-			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(FileSystem::File(detection.ToString())));
-			detections++;
-			detections++;
+		if (RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\DNS\\Parameters" }.Exists()) {
+			std::vector<RegistryValue> dnsServerPlugins{ CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\DNS\\Parameters", {
+				{ L"ServerLevelPluginDll", L"", false, CheckSzEmpty },
+			}, false, false) };
+
+			for (auto& detection : dnsServerPlugins) {
+				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(FileSystem::File(detection.ToString())));
+				detections += 2;
+			}
 		}
+
+
+		// NTDS Service Audit
+		if (RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\NTDS" }.Exists()) {
+			std::vector<RegistryValue> lsassDlls{ CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\NTDS", {
+				{ L"LsaDbExtPt", L"", false, CheckSzEmpty },
+				{ L"DirectoryServiceExtPt", L"", false, CheckSzEmpty },
+			}, false, false) };
+
+			for (auto& detection : lsassDlls) {
+				auto file = FileSystem::File{ detection.ToString() };
+				if (file.GetFileExists() && !file.GetFileSigned()) {
+					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+					detections += 2;
+				}
+			}
+		}
+
+
+		// Winsock2 Service Audit
+
+		auto winsock2 = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\WinSock2\\Parameters" };
+		
+		for (auto paramdll : { L"AutodialDLL", L"NameSpace_Callout" }) {
+			auto filepath = winsock2.GetValue<std::wstring>(paramdll);
+			if (filepath) {
+				auto file = FileSystem::File{ filepath.value() };
+				if (file.GetFileExists() && !file.GetFileSigned()) {
+					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ winsock2, paramdll, winsock2.GetValue<std::wstring>(paramdll).value() }));
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(FileSystem::File(file)));
+					detections += 2;
+				}
+			}
+		}
+
+		auto appids = RegistryKey{ winsock2, L"AppId_Catalog" };
+
+		if (appids.Exists()) {
+			for (auto subkey : appids.EnumerateSubkeys()) {
+				auto filepath = subkey.GetValue<std::wstring>(L"AppFullPath");
+				if (filepath) {
+					auto file = FileSystem::File{ filepath.value() };
+					if (file.GetFileExists() && !file.GetFileSigned()) {
+						reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ subkey, L"AppFullPath", subkey.GetValue<std::wstring>(L"AppFullPath").value() }));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(FileSystem::File(file)));
+						detections += 2;
+					}
+				}
+			}
+		}
+
+		auto currentCallout = winsock2.GetValue<std::wstring>(L"Current_NameSpace_Catalog");
+		if (currentCallout) {
+			auto namespaceCatalog = RegistryKey{ winsock2, currentCallout.value() + L"\\Catalog_Entries" };
+			auto namespaceCatalog64 = RegistryKey{ winsock2, currentCallout.value() + L"\\Catalog_Entries64" };
+			for (auto subkey : { namespaceCatalog, namespaceCatalog64 }) {
+				for (auto entry : subkey.EnumerateSubkeys()) {
+					auto filepath = entry.GetValue<std::wstring>(L"LibraryPath");
+					if (filepath) {
+						auto file = FileSystem::File{ filepath.value() };
+						if (file.GetFileExists() && !file.GetFileSigned()) {
+							reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ entry, L"LibraryPath", entry.GetValue<std::wstring>(L"LibraryPath").value() }));
+							reaction.FileIdentified(std::make_shared<FILE_DETECTION>(FileSystem::File(file)));
+							detections += 2;
+						}
+					}
+				}
+			}
+		}
+
+
+		// Service Failure Audit
 
 		auto services = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services" };
 
@@ -42,30 +119,26 @@ namespace Hunts {
 			if (!service.ValueExists(L"FailureCommand")) {
 				continue;
 			}
-			auto filepath = GetImagePathFromCommand(service.GetValue<std::wstring>(L"FailureCommand").value());
 
-			for (std::wstring val : vSuspicious) {
-				if (filepath.find(val) != std::wstring::npos) {
-					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ service, L"FailureCommand", service.GetValue<std::wstring>(L"FailureCommand").value() }));
-					detections++;
-					continue;
-				}
-			}
+			auto cmd{ *service.GetValue<std::wstring>(L"FailureCommand") };
 
-			if (!FileSystem::CheckFileExists(filepath)) {
-				continue;
-			}
-			FileSystem::File image = FileSystem::File(filepath);
-
-			if (!image.GetFileSigned()) {
+			if(IsLolbinMalicious(cmd)){
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ service, L"FailureCommand", service.GetValue<std::wstring>(L"FailureCommand").value() }));
+				detections++;
+			} else {
+				auto filepath = GetImagePathFromCommand(cmd);
 
-				auto& yara = YaraScanner::GetInstance();
-				YaraScanResult result = yara.ScanFile(image);
+				FileSystem::File image = FileSystem::File(filepath);
+				if(image.GetFileExists() && !image.GetFileSigned()){
+					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ service, L"FailureCommand", service.GetValue<std::wstring>(L"FailureCommand").value() }));
 
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(image));
+					auto& yara = YaraScanner::GetInstance();
+					YaraScanResult result = yara.ScanFile(image);
 
-				detections += 2;
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(image));
+
+					detections += 2;
+				}
 			}
 		}
 
@@ -78,6 +151,7 @@ namespace Hunts {
 
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services", false, false));
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\DNS\\Parameters", false, false, false));
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\WinSock2\\Parameters", false, false, true));
 
 		return events;
 	}

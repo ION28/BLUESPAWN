@@ -13,6 +13,11 @@
     "domain": "mitre-enterprise",
     "techniques": [
         {
+            "color": "#FCF26B",
+			"comment": "Covered by checking for bad files in user writable folders in %WINDIR%",
+            "techniqueID": "T1036"
+        },
+        {
             "color": "#5AADFF",
 			"comment": "Covered by checking all of the SIP and Trust Providers on the system",
             "techniqueID": "T1198"

@@ -29,6 +29,7 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1015.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1031.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1035.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1036.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1037.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1050.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1053.h" />
@@ -160,6 +161,8 @@
     <ClInclude Include="headers\reaction\Log.h" />
     <ClInclude Include="headers\reaction\Reaction.h" />
     <ClInclude Include="headers\util\processes\ParseCobalt.h" />
+    <ClInclude Include="headers\util\processes\CheckLolbin.h" />
+    <ClInclude Include="headers\util\processes\CommandParser.h" />
     <ClInclude Include="headers\util\processes\PERemover.h" />
     <ClInclude Include="headers\util\processes\ProcessChecker.h" />
     <ClInclude Include="headers\util\processes\ProcessUtils.h" />
@@ -173,6 +176,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1015.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1031.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1035.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1036.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1037.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1050.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1053.cpp" />
@@ -299,6 +303,8 @@
     <ClCompile Include="src\reaction\ReactLog.cpp" />
     <ClCompile Include="src\reaction\Reaction.cpp" />
     <ClCompile Include="src\util\processes\ParseCobalt.cpp" />
+    <ClCompile Include="src\util\processes\CheckLolbin.cpp" />
+    <ClCompile Include="src\util\processes\CommandParser.cpp" />
     <ClCompile Include="src\util\processes\PERemover.cpp" />
     <ClCompile Include="src\util\processes\ProcessUtils.cpp" />
     <ClInclude Include="resources\resource.h" />
@@ -340,6 +346,10 @@
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreaded</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MultiThreadedDebug</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebug</RuntimeLibrary>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>

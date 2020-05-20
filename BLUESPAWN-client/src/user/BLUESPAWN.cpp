@@ -18,6 +18,7 @@
 #include "hunt/hunts/HuntT1015.h"
 #include "hunt/hunts/HuntT1031.h"
 #include "hunt/hunts/HuntT1035.h"
+#include "hunt/hunts/HuntT1036.h"
 #include "hunt/hunts/HuntT1037.h"
 #include "hunt/hunts/HuntT1050.h"
 #include "hunt/hunts/HuntT1053.h"
@@ -95,6 +96,7 @@ Bluespawn::Bluespawn(){
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1015>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1031>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1035>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1036>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1037>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1050>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1053>());
@@ -222,7 +224,6 @@ void Bluespawn::check_correct_arch() {
 }
 
 int main(int argc, char* argv[]){
-
 	Bluespawn bluespawn{};
 
 	print_banner();

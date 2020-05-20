@@ -4,7 +4,6 @@
 #include "hunt/hunts/HuntT1055.h"
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
-#include "util/log/HuntLogMessage.h"
 #include "util/processes/ProcessUtils.h"
 #include "util/processes/ParseCobalt.h"
 #include "common/wrappers.hpp"
