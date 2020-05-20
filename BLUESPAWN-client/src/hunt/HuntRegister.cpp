@@ -4,6 +4,7 @@
 #include "monitor/EventManager.h"
 #include "util/log/Log.h"
 #include "common/StringUtils.h"
+#include "user/bluespawn.h"
 
 HuntRegister::HuntRegister(const IOBase& io) : io(io) {}
 
@@ -48,28 +49,31 @@ bool HuntRegister::HuntShouldRun(Hunt& hunt, vector<string> vExcludedHunts, vect
 	return true;
 }
 
+bool CallFunctionSafe(const std::function<void()>& func){
+	__try{
+		func();
+		return true;
+	} __except(EXCEPTION_EXECUTE_HANDLER){
+		return false;
+	}
+}
+
 void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction, vector<string> vExcludedHunts, vector<string>vIncludedHunts){
 	io.InformUser(L"Starting a hunt for " + std::to_wstring(vRegisteredHunts.size()) + L" techniques.");
-	int huntsRan = 0;
+	DWORD huntsRan = 0;
 
   for (auto name : vRegisteredHunts) {
 	  if (HuntShouldRun(*name, vExcludedHunts, vIncludedHunts)) {
 		  int huntRunStatus = 0;
 		  auto level = getLevelForHunt(*name, aggressiveness);
-		  switch (level) {
-		  case Aggressiveness::Intensive:
-			  huntRunStatus = name->ScanIntensive(scope, reaction);
-			  break;
-		  case Aggressiveness::Normal:
-			  huntRunStatus = name->ScanNormal(scope, reaction);
-			  break;
-		  case Aggressiveness::Cursory:
-			  huntRunStatus = name->ScanCursory(scope, reaction);
-			  break;
-		  }
-
-		  if (huntRunStatus != -1) {
-			  ++huntsRan;
+		  bool status{ false };
+		  status |= level == Aggressiveness::Cursory && CallFunctionSafe([&](){ huntRunStatus = name->ScanCursory(scope, reaction); });
+		  status |= level == Aggressiveness::Normal && CallFunctionSafe([&](){ huntRunStatus = name->ScanNormal(scope, reaction); });
+		  status |= level == Aggressiveness::Intensive && CallFunctionSafe([&](){ huntRunStatus = name->ScanIntensive(scope, reaction); });
+		  if(!status){
+			  Bluespawn::io.InformUser(L"An issue occured in hunt " + name->GetName() + L", preventing it from being run", ImportanceLevel::HIGH);
+		  } else if(huntRunStatus != -1){
+			  huntsRan++;
 		  }
 	  }
 	}
