@@ -29,6 +29,7 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1015.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1031.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1035.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1036.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1037.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1050.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1053.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1015.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1031.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1035.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1036.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1037.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1050.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1053.cpp" />
@@ -342,6 +344,10 @@
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreaded</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MultiThreadedDebug</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebug</RuntimeLibrary>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>

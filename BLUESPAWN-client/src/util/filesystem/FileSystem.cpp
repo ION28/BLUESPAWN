@@ -217,13 +217,13 @@ namespace FileSystem{
 			return;
 		}
 		FilePath = ExpandEnvStringsW(path);
-		LOG_VERBOSE(2, "Attempting to open file: " << path << ".");
+		LOG_VERBOSE(2, "Attempting to open file: " << FilePath << ".");
 		if(FilePath.at(0) == L'\\'){
 			HANDLE hFile{};
 			UNICODE_STRING UnicodeName{ 
 				static_cast<USHORT>(path.length() * 2), 
 				static_cast<USHORT>(path.length() * 2), 
-				const_cast<PWCHAR>(path.c_str()) 
+				const_cast<PWCHAR>(FilePath.c_str()) 
 			};
 			OBJECT_ATTRIBUTES attributes{};
 			IO_STATUS_BLOCK IoStatus{};
@@ -244,58 +244,58 @@ namespace FileSystem{
 					bWriteAccess = true;
 					bReadAccess = false;
 				} else{
-					LOG_ERROR("Unable to create a file handle for file " << path << " (NTSTATUS " << Status << ")");
+					LOG_ERROR("Unable to create a file handle for file " << FilePath << " (NTSTATUS " << Status << ")");
 					bFileExists = true;
 					bWriteAccess = false;
 					bReadAccess = false;
 				}
 			} else{
-				LOG_VERBOSE(2, "Couldn't open file since file doesn't exist (" << path << ").");
+				LOG_VERBOSE(2, "Couldn't open file since file doesn't exist (" << FilePath << ").");
 				bFileExists = false;
 				bWriteAccess = false;
 				bReadAccess = false;
 			}
 		} else{
-			hFile = CreateFileW(path.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+			hFile = CreateFileW(FilePath.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
 								FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
 			if(!hFile && GetLastError() == ERROR_FILE_NOT_FOUND){
-				LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << path << ".");
+				LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << FilePath << ".");
 				bFileExists = false;
 				bWriteAccess = false;
 				bReadAccess = false;
 			} else if(!hFile && (GetLastError() == ERROR_ACCESS_DENIED || GetLastError() == ERROR_SHARING_VIOLATION)){
 				bWriteAccess = false;
-				hFile = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+				hFile = CreateFileW(FilePath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
 									FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
 				if(!hFile && GetLastError() == ERROR_SHARING_VIOLATION){
-					LOG_VERBOSE(2, "Couldn't open file, sharing violation " << path << ".");
+					LOG_VERBOSE(2, "Couldn't open file, sharing violation " << FilePath << ".");
 					bFileExists = true;
 					bReadAccess = false;
 				} else if(!hFile && GetLastError() == ERROR_ACCESS_DENIED){
-					LOG_VERBOSE(2, "Couldn't open file, Access Denied" << path << ".");
+					LOG_VERBOSE(2, "Couldn't open file, Access Denied" << FilePath << ".");
 					bFileExists = true;
 					bReadAccess = false;
 				} else if(GetLastError() != ERROR_SUCCESS){
-					LOG_VERBOSE(2, "Couldn't open file " << path << ". (Error " << GetLastError() << ")");
+					LOG_VERBOSE(2, "Couldn't open file " << FilePath << ". (Error " << GetLastError() << ")");
 					bFileExists = true;
 					bReadAccess = false;
 				} else {
-					LOG_VERBOSE(2, "File " << path << " opened.");
+					LOG_VERBOSE(2, "File " << FilePath << " opened.");
 					bFileExists = true;
 					bReadAccess = true;
 				}
 			} else if(ERROR_SUCCESS == GetLastError()){
-				LOG_VERBOSE(2, "File " << path << " opened.");
+				LOG_VERBOSE(2, "File " << FilePath << " opened.");
 				bFileExists = true;
 				bWriteAccess = true;
 				bReadAccess = true;
 			} else{
-				LOG_VERBOSE(2, "File " << path << " failed to open with error " << GetLastError());
+				LOG_VERBOSE(2, "File " << FilePath << " failed to open with error " << GetLastError());
 				bFileExists = false;
 				bWriteAccess = false;
 				bReadAccess = false;
 			}
-			Attribs.extension = PathFindExtensionW(path.c_str());
+			Attribs.extension = PathFindExtensionW(FilePath.c_str());
 		}
 	}
 
@@ -754,14 +754,14 @@ namespace FileSystem{
 	}
 
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
-		FolderPath = path;
+		FolderPath = ExpandEnvStringsW(path);
 		std::wstring searchName = FolderPath;
 		searchName += L"\\*";
 		bFolderExists = true;
 		auto f = FindFirstFileW(searchName.c_str(), &ffd);
 		hCurFile = { f };
 		if(hCurFile == INVALID_HANDLE_VALUE) {
-			LOG_ERROR("Couldn't open folder " << path);
+			LOG_ERROR("Couldn't open folder " << FolderPath);
 			bFolderExists = false;
 		}
 		if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {

@@ -124,4 +124,20 @@ namespace Hunts {
 		reaction.EndHunt();
 		return identified;
 	}
+
+	std::vector<std::shared_ptr<Event>> HuntT1100::GetMonitoringEvents() {
+		std::vector<std::shared_ptr<Event>> events;
+
+		for (auto dir : web_directories) {
+			auto folder = FileSystem::Folder{ dir };
+			if (folder.GetFolderExists()) {
+				events.push_back(std::make_shared<FileEvent>(folder));
+				for (auto subdir : folder.GetSubdirectories()) {
+					events.push_back(std::make_shared<FileEvent>(subdir));
+				}
+			}
+		}
+
+		return events;
+	}
 }

@@ -2,6 +2,7 @@
 #include "reaction/Log.h"
 #include "util/eventlogs/EventLogs.h"
 #include "monitor/EventListener.h"
+#include "user/bluespawn.h"
 
 Event::Event(EventType type) : type(type) {}
 
@@ -9,9 +10,19 @@ void Event::AddCallback(const std::function<void()>& callback) {
 	callbacks.push_back(callback);
 }
 
-void Event::RunCallbacks() const {
-	for(auto callback : callbacks){
+std::wstring wsCallbackExceptionMessage{ L"Error occured while executing a callback for a monitor event" };
+
+void RunCallback(const HuntEnd& callback){
+	__try{
 		callback();
+	} __except(EXCEPTION_EXECUTE_HANDLER){
+		Bluespawn::io.InformUser(wsCallbackExceptionMessage, ImportanceLevel::HIGH);
+	}
+}
+
+void Event::RunCallbacks() const {
+	for(auto& callback : callbacks){
+		RunCallback(callback);
 	}
 }
 

@@ -122,7 +122,14 @@ namespace Hunts {
 			detections++;
 		}
 
-
+		// rover.dll http://www.hexacorn.com/blog/2014/05/21/beyond-good-ol-run-key-part-12/
+		RegistryKey roverkey = RegistryKey{ HKEY_CLASSES_ROOT, L"CLSID\\{16d12736-7a9e-4765-bec6-f301d679caaa}" };
+		FileSystem::File rover = FileSystem::File(L"C:\\windows\\system32\\rover.dll");
+		if (roverkey.Exists() && rover.GetFileExists()) {
+			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ roverkey, L"", L"" }));
+			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(rover));
+			detections++;
+		}
 
 		reaction.EndHunt();
 		return detections;
@@ -139,7 +146,7 @@ namespace Hunts {
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager", true, false, false));
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Command Processor", true, false, true));
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders"));
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"))
+		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"));
 
 		return events;
 	}

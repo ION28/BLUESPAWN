@@ -3,7 +3,6 @@
 
 #include "util/configurations/Registry.h"
 #include "util/log/Log.h"
-#include "util/log/HuntLogMessage.h"
 #include "util/eventlogs/EventLogs.h"
 
 #include "common/Utils.h"
