@@ -221,8 +221,8 @@ namespace FileSystem{
 		if(FilePath.at(0) == L'\\'){
 			HANDLE hFile{};
 			UNICODE_STRING UnicodeName{ 
-				static_cast<USHORT>(path.length() * 2), 
-				static_cast<USHORT>(path.length() * 2), 
+				static_cast<USHORT>(FilePath.length() * 2),
+				static_cast<USHORT>(FilePath.length() * 2),
 				const_cast<PWCHAR>(FilePath.c_str()) 
 			};
 			OBJECT_ATTRIBUTES attributes{};

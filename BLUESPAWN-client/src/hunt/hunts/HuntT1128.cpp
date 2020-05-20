@@ -33,13 +33,12 @@ namespace Hunts {
 				if (!helperDll.GetFileSigned()) {
 					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(helperDllValue));
 
-						auto& yara = YaraScanner::GetInstance();
-						YaraScanResult result = yara.ScanFile(helperDll);
+					auto& yara = YaraScanner::GetInstance();
+					YaraScanResult result = yara.ScanFile(helperDll);
 
-						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(helperDll));
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(helperDll));
 
-						detections += 2;
-					}
+					detections += 2;
 				}
 			}
 		}
