@@ -64,17 +64,21 @@ namespace Hunts {
 		
 		for(auto& key : RunKeys){
 			for (auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, key)) {
-				if (EvaluateFile(detection.ToString(), reaction)) {
+				if (EvaluateFile(std::get<std::wstring>(detection.data), reaction)) {
 					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+					detections++;
 				}
-				detections++;
 			}
 			for (auto& sub : CheckSubkeys(HKEY_LOCAL_MACHINE, key)) {
-				for (auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, sub.GetNameWithoutHive())) {
-					if (EvaluateFile(detection.ToString(), reaction)) {
-						reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+				for(auto& value : sub.EnumerateValues()){
+					auto type{ sub.GetValueType(value) };
+					if(type == RegistryType::REG_SZ_T || type == RegistryType::REG_EXPAND_SZ_T){
+						RegistryValue detection{ sub, value, *sub.GetValue<std::wstring>(value) };
+						if(EvaluateFile(std::get<std::wstring>(detection.data), reaction)){
+							reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+							detections++;
+						}
 					}
-					detections++;
 				}
 			}
 		}
@@ -82,15 +86,15 @@ namespace Hunts {
 		for (auto& detection : CheckValues(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", {
 			{ L"load", L"", false, CheckSzEmpty },
 			{ L"run", L"", false, CheckSzEmpty }
-			})) {
-			detections += EvaluateFile(detection.ToString(), reaction);
+		})) {
+			detections += EvaluateFile(std::get<std::wstring>(detection.data), reaction);
 			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
 			detections++;
 		}
 
-		for (auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager", {
-			{ L"BootExecute", {L"autocheck autochk *"}, false, CheckMultiSzSubset }
-			})) {
+		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager", {
+			{ L"BootExecute", { L"autocheck autochk *" }, false, CheckMultiSzSubset }
+		})) {
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
 				detections++;
 		}
@@ -98,28 +102,28 @@ namespace Hunts {
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Command Processor", {
 			{ L"AutoRun", L"", false, CheckSzEmpty }
 		})){
-			if (EvaluateFile(detection.ToString(), reaction)) {
+			if (EvaluateFile(std::get<std::wstring>(detection.data), reaction)) {
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+				detections++;
 			}
-			detections++;
 		}
 
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders", {
 			{ L"Startup", L"%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", false, CheckSzEqual }
 		})){
-			if (EvaluateFile(detection.ToString(), reaction)) {
+			if (EvaluateFile(std::get<std::wstring>(detection.data), reaction)) {
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+				detections++;
 			}
-			detections++;
 		}
 
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", {
 			{ L"Common Startup", L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup", false, CheckSzEqual }
 		})){
-			if (EvaluateFile(detection.ToString(), reaction)) {
+			if (EvaluateFile(std::get<std::wstring>(detection.data), reaction)) {
 				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
+				detections++;
 			}
-			detections++;
 		}
 
 		// rover.dll http://www.hexacorn.com/blog/2014/05/21/beyond-good-ol-run-key-part-12/
@@ -128,7 +132,7 @@ namespace Hunts {
 		if (roverkey.Exists() && rover.GetFileExists()) {
 			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ roverkey, L"", L"" }));
 			reaction.FileIdentified(std::make_shared<FILE_DETECTION>(rover));
-			detections++;
+			detections += 2;
 		}
 
 		reaction.EndHunt();
