@@ -753,6 +753,54 @@ namespace FileSystem{
 		return DenyPermissions(Permissions::Owner(L"Everyone"), amEveryoneDeniedAccess);
 	}
 
+	std::optional<FILETIME> File::GetCreationTime() const {
+		if (!bFileExists) {
+			LOG_ERROR("Can't get creation time of " << FilePath << ", file doesn't exist");
+			SetLastError(ERROR_FILE_NOT_FOUND);
+			return std::nullopt;
+		}
+		FILETIME fReturnInfo;
+		if (GetFileTime(hFile, &fReturnInfo, nullptr, nullptr)) {
+			return fReturnInfo;
+		}
+		else {
+			LOG_ERROR("Error getting creation time of " << FilePath << ". (Error: " << GetLastError() << ")");
+			return std::nullopt;
+		}
+	}
+
+	std::optional<FILETIME> File::GetModifiedTime() const {
+		if (!bFileExists) {
+			LOG_ERROR("Can't get last modified time of " << FilePath << ", file doesn't exist");
+			SetLastError(ERROR_FILE_NOT_FOUND);
+			return std::nullopt;
+		}
+		FILETIME fReturnInfo;
+		if (GetFileTime(hFile, nullptr, nullptr, &fReturnInfo)) {
+			return fReturnInfo;
+		}
+		else {
+			LOG_ERROR("Error getting last modified time of " << FilePath << ". (Error: " << GetLastError() << ")");
+			return std::nullopt;
+		}
+	}
+
+	std::optional<FILETIME> File::GetAccessTime() const {
+		if (!bFileExists) {
+			LOG_ERROR("Can't get last access time of " << FilePath << ", file doesn't exist");
+			SetLastError(ERROR_FILE_NOT_FOUND);
+			return std::nullopt;
+		}
+		FILETIME fReturnInfo;
+		if (GetFileTime(hFile, nullptr, &fReturnInfo, nullptr)) {
+			return fReturnInfo;
+		}
+		else {
+			LOG_ERROR("Error getting last access time of " << FilePath << ". (Error: " << GetLastError() << ")");
+			return std::nullopt;
+		}
+	}
+
 	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
 		FolderPath = ExpandEnvStringsW(path);
 		std::wstring searchName = FolderPath;
