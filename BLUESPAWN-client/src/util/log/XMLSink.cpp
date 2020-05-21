@@ -84,7 +84,7 @@ namespace Log{
 			detect->SetAttribute("type", "Process");
 			auto ProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);
 			auto Path = XMLDoc.NewElement("path");
-			auto Cmd = XMLDoc.NewElement("hash");
+			auto Cmd = XMLDoc.NewElement("cmdline");
 			auto Pid = XMLDoc.NewElement("pid");
 			Path->SetText(WidestringToString(ProcessDetection->wsImagePath).c_str());
 			Cmd->SetText(WidestringToString(ProcessDetection->wsCmdline).c_str());
