@@ -37,13 +37,17 @@ namespace Hunts {
 		}
 
 		for (auto value : ports.EnumerateValues()) {
-			auto filepath = FileSystem::File{ value };
+			auto type{ ports.GetValueType(value) };
+			if(type == RegistryType::REG_SZ_T || type == RegistryType::REG_EXPAND_SZ_T){
+				auto data{ ports.GetValue<std::wstring>(value) };
+				auto filepath = FileSystem::File{ *data };
 
-			// Regex ensures the file is an actual drive and not, say, a COM port
-			if (std::regex_match(filepath.GetFilePath(), std::wregex(L"([a-zA-z]{1}:\\\\)(.*)")) && filepath.GetFileExists() && filepath.HasReadAccess()) {
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ ports, value, ports.GetValue<std::wstring>(value).value() }));
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(filepath));
-				detections += 2;
+				// Regex ensures the file is an actual drive and not, say, a COM port
+				if(std::regex_match(filepath.GetFilePath(), std::wregex(L"([a-zA-Z]{1}:\\\\)(.*)")) && filepath.GetFileExists() && filepath.HasReadAccess()){
+					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ ports, value, ports.GetValue<std::wstring>(value).value() }));
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(filepath));
+					detections += 2;
+				}
 			}
 		}
 

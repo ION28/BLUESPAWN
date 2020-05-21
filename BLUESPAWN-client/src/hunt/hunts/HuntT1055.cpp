@@ -75,10 +75,9 @@ namespace Hunts{
 					HandleWrapper process{ OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, false, pid) };
 					if(process){
 						MemoryWrapper<> wrapper{ module->module, module->moduleSize, process };
-						return DumpBeaconInformation(wrapper);
+						DumpBeaconInformation(wrapper);
 					} else{
 						LOG_ERROR("Unable to open process with PID " << pid << " to dump cobalt strike information (error " << GetLastError() << ")");
-						return {};
 					}
 					
 				}
