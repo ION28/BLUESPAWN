@@ -324,6 +324,30 @@ namespace FileSystem {
 		* @return true if the file is quarantined, false otherwise
 		*/
 		bool Quarantine();
+
+		/**
+		* Function to get the creation time of the file
+		*
+		* @return a FILETIME struct containing the creation time of the file. If an error,
+		*     occurs the function returns std::nullopt and calls SetLastError with the error
+		*/
+		std::optional<FILETIME> GetCreationTime() const;
+
+		/**
+		* Function to get the last modified time of the file
+		*
+		* @return a FILETIME struct containing the last modified time of the file. If an error,
+		*     occurs the function returns std::nullopt and calls SetLastError with the error
+		*/
+		std::optional<FILETIME> GetModifiedTime() const;
+
+		/**
+		* Function to get the last access time of the file
+		*
+		* @return a FILETIME struct containing the last access time of the file. If an error,
+		*     occurs the function returns std::nullopt and calls SetLastError with the error
+		*/
+		std::optional<FILETIME> GetAccessTime() const;
 	};
 
 	class Folder {

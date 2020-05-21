@@ -70,16 +70,25 @@ namespace Log{
 			auto MD5 = XMLDoc.NewElement("md5");
 			auto SHA1 = XMLDoc.NewElement("sha1");
 			auto SHA256 = XMLDoc.NewElement("sha256");
+			auto Created = XMLDoc.NewElement("created");
+			auto Modified = XMLDoc.NewElement("modified");
+			auto Accessed = XMLDoc.NewElement("accessed");
 			Name->SetText(WidestringToString(FileDetection->wsFileName).c_str());
 			Path->SetText(WidestringToString(FileDetection->wsFilePath).c_str());
 			MD5->SetText(WidestringToString(FileDetection->md5).c_str());
 			SHA1->SetText(WidestringToString(FileDetection->sha1).c_str());
 			SHA256->SetText(WidestringToString(FileDetection->sha256).c_str());
+			Created->SetText(WidestringToString(FileDetection->created).c_str());
+			Modified->SetText(WidestringToString(FileDetection->modified).c_str());
+			Accessed->SetText(WidestringToString(FileDetection->accessed).c_str());
 			detect->InsertEndChild(Name);
 			detect->InsertEndChild(Path);
 			detect->InsertEndChild(MD5);
 			detect->InsertEndChild(SHA1);
 			detect->InsertEndChild(SHA256);
+			detect->InsertEndChild(Created);
+			detect->InsertEndChild(Modified);
+			detect->InsertEndChild(Accessed);
 		} else if(detection->Type == DetectionType::Process){
 			detect->SetAttribute("type", "Process");
 			auto ProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);
