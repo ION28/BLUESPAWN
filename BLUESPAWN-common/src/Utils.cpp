@@ -24,6 +24,19 @@ std::wstring FormatWindowsTime(const SYSTEMTIME st) {
 	return w.str();
 }
 
+
+std::wstring FormatWindowsTime(const FILETIME ft) {
+	SYSTEMTIME st;
+	FileTimeToSystemTime(&ft, &st);
+
+	std::wostringstream w;
+	w << std::setfill(L'0') << st.wYear << "-" << std::setw(2) << st.wMonth << "-" << std::setw(2) << st.wDay << " " <<
+		std::setw(2) << st.wHour << ":" << std::setw(2) << st.wMinute << ":" << std::setw(2) << st.wSecond << "." <<
+		st.wMilliseconds << "Z";
+	return w.str();
+}
+
+
 std::wstring FormatWindowsTime(const std::wstring& windowsTime) {
 	SYSTEMTIME st;
 	FILETIME ft;

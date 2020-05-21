@@ -14,4 +14,5 @@
 
 int64_t SystemTimeToInteger(const SYSTEMTIME st);
 std::wstring FormatWindowsTime(const SYSTEMTIME systemtime);
+std::wstring FormatWindowsTime(const FILETIME systemtime);
 std::wstring FormatWindowsTime(const std::wstring& windowsTime);

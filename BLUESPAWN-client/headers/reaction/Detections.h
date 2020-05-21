@@ -9,7 +9,8 @@
 #include "hunt/HuntInfo.h"
 #include "util/configurations/RegistryValue.h"
 #include "util/filesystem/FileSystem.h"
-#include <common\StringUtils.h>
+#include "common/StringUtils.h"
+#include "common/Utils.h"
 
 enum class DetectionType {
 	File,
@@ -31,6 +32,9 @@ struct FILE_DETECTION : public DETECTION {
 	std::wstring md5;
 	std::wstring sha1;
 	std::wstring sha256;
+	std::wstring created;
+	std::wstring modified;
+	std::wstring accessed;
 	FileSystem::File fFile;
 	FILE_DETECTION(const FileSystem::File f) : 
 		DETECTION{ DetectionType::File },
@@ -45,6 +49,15 @@ struct FILE_DETECTION : public DETECTION {
 		}
 		if (f.GetSHA256Hash()) {
 			sha256 = f.GetSHA256Hash().value();
+		}
+		if (f.GetCreationTime()) {
+			created = FormatWindowsTime(f.GetCreationTime().value());
+		}
+		if (f.GetModifiedTime()) {
+			modified = FormatWindowsTime(f.GetModifiedTime().value());
+		}
+		if (f.GetAccessTime()) {
+			accessed = FormatWindowsTime(f.GetAccessTime().value());
 		}
 	}
 };
