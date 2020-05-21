@@ -7,26 +7,9 @@
 #include "util/processes/PERemover.h"
 #include "reaction/SuspendProcess.h"
 #include "util/log/Log.h"
+#include "util/processes/ProcessUtils.h"
 
 LINK_FUNCTION(NtResumeProcess, NTDLL.DLL)
-
-DWORD GetRegionSize(const HandleWrapper& hProcess, LPVOID lpBaseAddress){
-    DWORD dwImageSize = 0;
-    ULONG_PTR address = reinterpret_cast<ULONG_PTR>(lpBaseAddress);
-
-    while(true){
-        MEMORY_BASIC_INFORMATION memory{};
-        if(VirtualQueryEx(hProcess, reinterpret_cast<LPVOID>(address), &memory, sizeof(memory))){
-            if(memory.AllocationBase == lpBaseAddress){
-                dwImageSize += memory.RegionSize;
-                address += memory.RegionSize;
-            } else break;
-        } else break;
-    }
-
-    LOG_VERBOSE(2, "Determined the size of the region to remove is " << dwImageSize);
-    return dwImageSize;
-}
 
 PERemover::PERemover(const HandleWrapper& hProcess, LPVOID lpBaseAddress, DWORD dwImageSize) : 
     hProcess{ hProcess }, 
@@ -93,7 +76,7 @@ bool PERemover::CheckThreads(){
         }
     } while(Thread32Next(hThreadSnapshot, &ThreadEntry));
 
-    return 1;
+    return true;
 }
 
 /// TODO: Actually walk the thread back instead of terminating it

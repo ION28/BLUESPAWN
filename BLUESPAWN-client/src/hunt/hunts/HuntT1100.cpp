@@ -63,21 +63,21 @@ namespace Hunts {
 				if (file_ext.compare(L".php") == 0) {
 					if (regex_search(sus_file, match_index, php_vuln_functions)) {
 						identified++;
-						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath()));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry));
 						LOG_INFO(L"Located likely web shell in file " << entry.GetFilePath() << L" in text " << sus_file.substr(match_index.position(), match_index.length()));
 					}
 				}
 				else if (file_ext.substr(0, 4).compare(L".jsp") == 0) {
 					if (regex_search(sus_file, match_index, jsp_indicators)) {
 						identified++;
-						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath()));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry));
 						LOG_INFO(L"Located likely web shell in file " << entry.GetFilePath() << L" in text " << sus_file.substr(match_index.position(), match_index.length()));
 					}
 				}
 				else if (file_ext.substr(0, 3).compare(L".as") == 0) {
 					if (regex_search(sus_file, match_index, asp_indicators)) {
 						identified++;
-						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath()));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry));
 						LOG_INFO(L"Located likely web shell in file " << entry.GetFilePath() << L" in text " << sus_file.substr(match_index.position(), match_index.length()));
 					}
 				}
@@ -89,7 +89,7 @@ namespace Hunts {
 				YaraScanResult result = yara.ScanFile(entry);
 				if (!result && result.vKnownBadRules.size() > 0) {
 					identified++;
-					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry.GetFilePath()));
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(entry));
 				}
 			}
 		}
@@ -123,5 +123,21 @@ namespace Hunts {
 		}		
 		reaction.EndHunt();
 		return identified;
+	}
+
+	std::vector<std::shared_ptr<Event>> HuntT1100::GetMonitoringEvents() {
+		std::vector<std::shared_ptr<Event>> events;
+
+		for (auto dir : web_directories) {
+			auto folder = FileSystem::Folder{ dir };
+			if (folder.GetFolderExists()) {
+				events.push_back(std::make_shared<FileEvent>(folder));
+				for (auto subdir : folder.GetSubdirectories()) {
+					events.push_back(std::make_shared<FileEvent>(subdir));
+				}
+			}
+		}
+
+		return events;
 	}
 }

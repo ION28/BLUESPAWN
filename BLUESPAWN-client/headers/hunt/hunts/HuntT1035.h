@@ -18,8 +18,8 @@ namespace Hunts {
 	 */
 	class HuntT1035 : public Hunt {
 	private:
-		std::vector<std::wstring> vSuspicious = { L"cmd.exe", L"powershell.exe", L"cscript.exe", L"wscript.exe", L"net.exe", L"net1.exe" };
-		int EvaluateService(Registry::RegistryKey key, Reaction reaction);
+
+		int EvaluateService(Registry::RegistryKey key, Reaction& reaction);
 
 	public:
 		HuntT1035();

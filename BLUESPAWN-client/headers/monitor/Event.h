@@ -9,10 +9,12 @@
 #include "util/configurations/Registry.h"
 #include "util/configurations/RegistryValue.h"
 #include "util/eventlogs/XpathQuery.h"
+#include "util/filesystem/FileSystem.h"
 
 enum class EventType {
 	EventLog,
-	Registry
+	Registry,
+	FileSystem
 };
 
 class Event {
@@ -57,34 +59,49 @@ private:
 	std::vector<EventLogs::XpathQuery> queries;
 };
 
-struct RegistryEventThreadArgs;
-
 class RegistryEvent : public Event {
+	
+	// Event that is triggered when the key changes
 	HandleWrapper hEvent;
+
+	// True if this event watches subkeys. Note that this will be unable to determine
+	// which value (or subkey) was changed.
 	bool WatchSubkeys;
 
-	static HandleWrapper hMutex;
-	static std::optional<HandleWrapper> hListener;
-	static HandleWrapper hSubscribed;
-	static std::optional<RegistryEvent> subscribe;
-	static void RegistryEventThreadFunction(RegistryEventThreadArgs* WaitObjects);
-	static void DispatchRegistryThread();
+	// The registry key being watched
+	Registry::RegistryKey key;
 
 public:
-	Registry::RegistryKey key;
 
 	RegistryEvent(const Registry::RegistryKey& key, bool WatchSubkeys = false);
 
 	const HandleWrapper& GetEvent() const;
+
+	const Registry::RegistryKey& GetKey() const;
 
 	virtual bool Subscribe();
 
 	virtual bool operator==(const Event& e) const;
 };
 
-struct RegistryEventThreadArgs {
-	HandleWrapper Notify;
-	std::optional<RegistryEvent>* Events;
+class FileEvent : public Event {
+
+	/// Directory to be watched
+	FileSystem::Folder directory;
+
+	/// Event that is triggered when the key changes
+	GenericWrapper<HANDLE> hEvent;
+
+public:
+	FileEvent(const FileSystem::Folder& file);
+
+	const GenericWrapper<HANDLE>& GetEvent() const;
+
+	const FileSystem::Folder& GetFolder() const;
+
+	virtual bool Subscribe();
+
+	virtual bool operator==(const Event& e) const;
 };
 
 namespace Registry {

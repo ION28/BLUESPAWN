@@ -9,34 +9,48 @@
 #include "reaction/SuspendProcess.h"
 #include "reaction/RemoveValue.h"
 #include "reaction/CarveMemory.h"
+#include "reaction/DeleteFile.h"
+#include "reaction/QuarantineFile.h"
+#include "util/permissions/permissions.h"
 
 #include "hunt/hunts/HuntT1004.h"
+#include "hunt/hunts/HuntT1013.h"
 #include "hunt/hunts/HuntT1015.h"
+#include "hunt/hunts/HuntT1031.h"
 #include "hunt/hunts/HuntT1035.h"
+#include "hunt/hunts/HuntT1036.h"
 #include "hunt/hunts/HuntT1037.h"
 #include "hunt/hunts/HuntT1050.h"
 #include "hunt/hunts/HuntT1053.h"
 #include "hunt/hunts/HuntT1055.h"
 #include "hunt/hunts/HuntT1060.h"
+#include "hunt/hunts/HuntT1068.h"
+#include "hunt/hunts/HuntT1089.h"
 #include "hunt/hunts/HuntT1099.h"
 #include "hunt/hunts/HuntT1100.h"
 #include "hunt/hunts/HuntT1101.h"
 #include "hunt/hunts/HuntT1103.h"
+#include "hunt/hunts/HuntT1122.h"
+#include "hunt/hunts/HuntT1128.h"
 #include "hunt/hunts/HuntT1131.h"
 #include "hunt/hunts/HuntT1136.h"
 #include "hunt/hunts/HuntT1138.h"
 #include "hunt/hunts/HuntT1182.h"
 #include "hunt/hunts/HuntT1183.h"
+#include "hunt/hunts/HuntT1198.h"
+#include "hunt/hunts/HuntT1484.h"
 
 #include "monitor/ETW_Wrapper.h"
 
 #include "mitigation/mitigations/MitigateM1025.h"
+#include "mitigation/mitigations/MitigateM1028-WFW.h"
 #include "mitigation/mitigations/MitigateM1035-RDP.h"
 #include "mitigation/mitigations/MitigateM1042-LLMNR.h"
 #include "mitigation/mitigations/MitigateM1042-NBT.h"
 #include "mitigation/mitigations/MitigateM1042-WSH.h"
 #include "mitigation/mitigations/MitigateM1047.h"
 #include "mitigation/mitigations/MitigateM1054-RDP.h"
+#include "mitigation/mitigations/MitigateM1054-WSC.h"
 #include "mitigation/mitigations/MitigateV1093.h"
 #include "mitigation/mitigations/MitigateV1153.h"
 #include "mitigation/mitigations/MitigateV3338.h"
@@ -52,6 +66,7 @@
 #include "mitigation/mitigations/MitigateV63829.h"
 #include "mitigation/mitigations/MitigateV71769.h"
 #include "mitigation/mitigations/MitigateV72753.h"
+#include "mitigation/mitigations/MitigateV73511.h"
 #include "mitigation/mitigations/MitigateV73519.h"
 #include "mitigation/mitigations/MitigateV73585.h"
 
@@ -65,6 +80,10 @@
 #pragma warning(pop)
 
 #include <iostream>
+#include <VersionHelpers.h>
+
+DEFINE_FUNCTION(BOOL, IsWow64Process2, NTAPI, HANDLE hProcess, USHORT* pProcessMachine, USHORT* pNativeMachine);
+LINK_FUNCTION(IsWow64Process2, KERNEL32.DLL);
 
 const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{ io };
@@ -73,30 +92,41 @@ MitigationRegister Bluespawn::mitigationRecord{ io };
 Bluespawn::Bluespawn(){
 
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1004>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1013>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1015>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1031>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1035>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1036>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1037>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1050>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1053>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1055>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1060>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1068>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1089>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1099>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1100>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1101>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1103>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1122>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1128>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1131>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1136>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1138>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1182>());
 	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1183>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1198>());
+	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1484>());
 
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1025>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1028WFW>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1035RDP>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042LLMNR>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042NBT>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042WSH>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1047>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1054RDP>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1054WSC>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1093>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1153>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3338>());
@@ -112,6 +142,7 @@ Bluespawn::Bluespawn(){
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV71769>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73511>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
 }
@@ -172,11 +203,32 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 	}
 }
 
-int main(int argc, char* argv[]){
+void Bluespawn::check_correct_arch() {
+	BOOL bIsWow64 = FALSE;
+	if (IsWindows10OrGreater() && Linker::IsWow64Process2) {
+		USHORT ProcessMachine;
+		USHORT NativeMachine;
 
+		Linker::IsWow64Process2(GetCurrentProcess(), &ProcessMachine, &NativeMachine);
+		if (ProcessMachine != IMAGE_FILE_MACHINE_UNKNOWN) {
+			bIsWow64 = TRUE;
+		}
+	}
+	else {
+		IsWow64Process(GetCurrentProcess(), &bIsWow64);
+	}
+	if (bIsWow64) {
+		Bluespawn::io.AlertUser(L"Running the x86 version of BLUESPAWN on an x64 system! This configuration is not fully supported, so we recommend downloading the x64 version.", 5000, ImportanceLevel::MEDIUM);
+		LOG_WARNING("Running the x86 version of BLUESPAWN on an x64 system! This configuration is not fully supported, so we recommend downloading the x64 version.");
+	}
+}
+
+int main(int argc, char* argv[]){
 	Bluespawn bluespawn{};
 
 	print_banner();
+
+	bluespawn.check_correct_arch();
 
 	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
@@ -253,6 +305,8 @@ int main(int argc, char* argv[]){
 				{"remove-value", Reactions::RemoveValueReaction{ bluespawn.io }},
 				{"suspend", Reactions::SuspendProcessReaction{ bluespawn.io }},
 				{"carve-memory", Reactions::CarveProcessReaction{ bluespawn.io }},
+				{"delete-file", Reactions::DeleteFileReaction{ bluespawn.io }},
+				{"quarantine-file", Reactions::QuarantineFileReaction{ bluespawn.io}},
 			};
 
 			auto UserReactions = result["reaction"].as<std::string>();
@@ -335,5 +389,6 @@ int main(int argc, char* argv[]){
 	catch (cxxopts::OptionParseException e1) {
 		LOG_ERROR(e1.what());
 	}
+
 	return 0;
 }

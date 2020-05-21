@@ -2,6 +2,8 @@
 #include "util/configurations/Registry.h"
 
 #include <memory>
+#include <sstream>
+#include <iomanip>
 
 namespace Registry {
 
@@ -31,6 +33,19 @@ namespace Registry {
 
 	RegistryType RegistryValue::GetType() const {
 		return type;
+	}
+
+	std::wstring RegistryValue::GetPrintableName() const {
+		std::wstringstream oss;
+		for (int i = 0; i < wValueName.length(); i++) {
+			if (wValueName[i] < 0x20 || wValueName[i] > 0x7F) {
+				oss << L"\\x" << std::hex << std::setw(2) << std::setfill(L'0') << static_cast<int>(wValueName[i]);
+			}
+			else {
+				oss << wValueName[i];
+			}
+		}
+		return oss.str();
 	}
 
 	std::wstring RegistryValue::ToString() const {

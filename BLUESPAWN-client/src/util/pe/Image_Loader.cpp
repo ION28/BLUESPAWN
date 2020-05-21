@@ -8,24 +8,25 @@ LINK_FUNCTION(NtQueryInformationProcess, NTDLL.dll);
 bool CompareStrings(const UNICODE_STRING32& s1, const HandleWrapper& process1, const UNICODE_STRING32& s2, const HandleWrapper& process2){
 	if(s1.Length != s2.Length)
 		return false;
-	return MemoryWrapper<>(reinterpret_cast<LPVOID>(s1.Buffer), s1.Length * 2 + 2, process1).ReadWstring() ==
-		MemoryWrapper<>(reinterpret_cast<LPVOID>(s2.Buffer), s2.Length * 2 + 2, process2).ReadWstring();
+	return MemoryWrapper<>(reinterpret_cast<LPVOID>(static_cast<ULONG_PTR>(s1.Buffer)), s1.Length * 2 + 2, process1).ReadWstring() ==
+		MemoryWrapper<>(reinterpret_cast<LPVOID>(static_cast<ULONG_PTR>(s1.Buffer)), s2.Length * 2 + 2, process2).ReadWstring();
 }
+
 bool CompareStrings(const UNICODE_STRING64& s1, const HandleWrapper& process1, const UNICODE_STRING64& s2, const HandleWrapper& process2){
 	if(s1.Length != s2.Length)
 		return false;
-	return MemoryWrapper<>(reinterpret_cast<LPVOID>(s1.Buffer), s1.Length * 2 + 2, process1).ReadWstring() ==
-		MemoryWrapper<>(reinterpret_cast<LPVOID>(s2.Buffer), s2.Length * 2 + 2, process2).ReadWstring();
+	return MemoryWrapper<>(reinterpret_cast<LPVOID>(static_cast<ULONG_PTR>(s1.Buffer)), s1.Length * 2 + 2, process1).ReadWstring() ==
+		MemoryWrapper<>(reinterpret_cast<LPVOID>(static_cast<ULONG_PTR>(s2.Buffer)), s2.Length * 2 + 2, process2).ReadWstring();
 }
 bool CompareStrings(const UNICODE_STRING32& s1, const HandleWrapper& process1, const std::wstring& s2){
 	if(s1.Length != s2.length())
 		return false;
-	return MemoryWrapper<>(reinterpret_cast<LPVOID>(s1.Buffer), s1.Length * 2 + 2, process1).ReadWstring() == s2;
+	return MemoryWrapper<>(reinterpret_cast<LPVOID>(static_cast<ULONG_PTR>(s1.Buffer)), s1.Length * 2 + 2, process1).ReadWstring() == s2;
 }
 bool CompareStrings(const UNICODE_STRING64& s1, const HandleWrapper& process1, const std::wstring& s2){
 	if(s1.Length != s2.length())
 		return false;
-	return MemoryWrapper<>(reinterpret_cast<LPVOID>(s1.Buffer), s1.Length * 2 + 2, process1).ReadWstring() == s2;
+	return MemoryWrapper<>(reinterpret_cast<LPVOID>(static_cast<ULONG_PTR>(s1.Buffer)), s1.Length * 2 + 2, process1).ReadWstring() == s2;
 }
 
 Loaded_Image32::Loaded_Image32(const LDR_ENTRY32& entry, const HandleWrapper& process) :
@@ -133,12 +134,13 @@ std::optional<Loaded_Image> Image_Loader::GetImageInfo(const std::wstring& wImag
 
 std::optional<Loaded_Image> Image_Loader::GetAssociatedImage(LPVOID address) const {
 	for(auto image : LoadedImages){
-		if(image.arch == x86 && reinterpret_cast<DWORD>(address) >= image.image32->ImageAddress && 
-			reinterpret_cast<DWORD>(address) < image.image32->ImageAddress + image.image32->ImageSize &&
-			reinterpret_cast<DWORD64>(address) == reinterpret_cast<DWORD>(address)){
+		auto addr{ reinterpret_cast<ULONG_PTR>(address) };
+		if(image.arch == x86 && static_cast<DWORD>(addr) >= image.image32->ImageAddress && 
+		   static_cast<DWORD>(addr) < image.image32->ImageAddress + image.image32->ImageSize &&
+		   static_cast<DWORD64>(addr) == static_cast<DWORD>(addr)){
 			return image;
-		} else if(image.arch == x64 && reinterpret_cast<DWORD64>(address) >= image.image64->ImageAddress &&
-			reinterpret_cast<DWORD64>(address) < image.image64->ImageAddress + image.image64->ImageSize){
+		} else if(image.arch == x64 && static_cast<DWORD64>(addr) >= image.image64->ImageAddress &&
+				  static_cast<DWORD64>(addr) < image.image64->ImageAddress + image.image64->ImageSize){
 			return image;
 		}
 	}

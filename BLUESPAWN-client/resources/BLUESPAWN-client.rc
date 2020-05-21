@@ -47,6 +47,44 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,4,4
+ PRODUCTVERSION 0,4,4
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "BLUESPAWN Project"
+            VALUE "FileDescription", "BLUESPAWN Active Defense & EDR Software"
+            VALUE "FileVersion", "0.4.4"
+            VALUE "InternalName", "BLUESPAWN-client.exe"
+            VALUE "LegalCopyright", "Copyright (C) 2020 BLUESPAWN"
+            VALUE "OriginalFilename", "BLUESPAWN-client.exe"
+            VALUE "ProductName", "BLUESPAWN Client"
+            VALUE "ProductVersion", "0.4.4"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // yararule
 //
 
@@ -54,6 +92,9 @@ YaraSevere              yararule                "resources\\severe"
 YaraSevere2             yararule                "resources\\severe2"
 
 YaraIndicators          yararule                "resources\\indicators"
+
+GoodSIP                 textfile                "resources\\SIP"
+GoodTrustProviders      textfile                "resources\\TrustProviders"
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,24 @@
+{% extends 'BLUESPAWN/base.html' %}
+{% block title %}About{% endblock %}
+{% block content %}
+{% load bootstrap4%}
+{% load static %}
+
+<div class="container">
+	<div class="row">
+		<div class="col-12 mb-12">
+			<h1>Current MITRE ATT&amp;CK Coverage</h1>
+			<hr>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12 d-lg-none d-xl-none">
+			<p>Please visit this site on a laptop or desktop to view BLUESPAWN's ATT&amp;CK coverage</p>
+		</div>
+		<div class="col-12 d-none d-lg-block">
+			<iframe src="https://mitre-attack.github.io/attack-navigator/enterprise/#layerURL=https%3A%2F%2Fraw%2Egithubusercontent%2Ecom%2FION28%2FBLUESPAWN%2Fdevelop%2Fdocs%2Fmedia%2Fcoverage%2Dall%2Ejson&layerURL=https%3A%2F%2Fraw%2Egithubusercontent%2Ecom%2FION28%2FBLUESPAWN%2Fdevelop%2Fdocs%2Fmedia%2Fcoverage%2Dhunts%2Ejson&layerURL=https%3A%2F%2Fraw%2Egithubusercontent%2Ecom%2FION28%2FBLUESPAWN%2Fdevelop%2Fdocs%2Fmedia%2Fcoverage%2Dmitigations%2Ejson" width="110%" height="2150"></iframe>
+			<br><br>
+		</div>
+	</div>
+</div>
+{% endblock %}

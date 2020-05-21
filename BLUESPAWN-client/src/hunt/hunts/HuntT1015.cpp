@@ -32,12 +32,12 @@ namespace Hunts {
 				LOG_INFO(detection.key.GetName() << L" is configured with a Debugger value of " << detection);
 
 				FileSystem::File file = FileSystem::File(detection.ToString());
-				YaraScanResult result = yara.ScanFile(file);
 				bool bFileSigned = file.GetFileSigned();
 
-				if(!bFileSigned || (!result && result.vKnownBadRules.size() > 0)) {
+				if(!bFileSigned) {
+					YaraScanResult result = yara.ScanFile(file);
 					detections++;
-					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 				}
 			}
 		}
@@ -58,7 +58,7 @@ namespace Hunts {
 				}
 
 				LOG_INFO(file.GetFilePath() << L" is not signed!");
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
 				detections++;
 			}
 		}

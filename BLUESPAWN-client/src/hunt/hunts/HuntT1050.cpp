@@ -2,18 +2,17 @@
 
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
-#include "util/log/HuntLogMessage.h"
 #include "util/filesystem/YaraScanner.h"
 #include "util/processes/ProcessUtils.h"
+#include "util/processes/CheckLolbin.h"
 
 #include "common/Utils.h"
 
-#include <iostream>
+#include <map>
 
 namespace Hunts {
 
 	HuntT1050::HuntT1050() : Hunt(L"T1050 - New Service") {
-		// TODO: update these categories
 		dwSupportedScans = (DWORD) Aggressiveness::Normal | (DWORD) Aggressiveness::Intensive;
 		dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Files;
 		dwSourcesInvolved = (DWORD) DataSource::Registry | (DWORD) DataSource::FileSystem;
@@ -50,44 +49,65 @@ namespace Hunts {
 		auto& yara = YaraScanner::GetInstance();
 		int detections = 0;
 		
-		for (auto result : queryResults) {
+		std::map<std::pair<std::wstring, std::wstring>, bool> findings{};
+		
+		for(auto result : queryResults){
 			auto imageName = result.GetProperty(L"Event/EventData/Data[@Name='ServiceName']");
-			auto imagePath = GetImagePathFromCommand(result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']"));
 
-			if(FileSystem::CheckFileExists(imagePath)){
-				// Look for unsigned service binaries or binaries with YARA rule hits
-				FileSystem::File file = FileSystem::File(imagePath);
-				bool bFileSigned = file.GetFileSigned();
+			auto cmd{ result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']") };
+			std::pair<std::wstring, std::wstring> pair{ imageName, cmd };
 
-				if(!bFileSigned){
-					YaraScanResult ScanResult = yara.ScanFile(file);
-					if(!bFileSigned || (!ScanResult && ScanResult.vKnownBadRules.size() > 0)) {
-						detections++;
+			if(findings.count(pair)){
+				if(findings.at(pair)){
+					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+				}
+			} else{
+				if(IsLolbinMalicious(cmd)){
+					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+					findings.emplace(pair, true);
+					detections++;
+				} else{
+					auto imagePath = GetImagePathFromCommand(cmd);
+
+					FileSystem::File file = FileSystem::File(imagePath);
+					if(file.GetFileExists() && !file.GetFileSigned()){
 						reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
-						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+
+						auto& yara = YaraScanner::GetInstance();
+						YaraScanResult result = yara.ScanFile(file);
+
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+
+						detections += 2;
+						findings.emplace(pair, true);
 					}
-				}
 
-				// Look for PSExec services
-				if(imageName.find(L"PSEXESVC") != std::wstring::npos) {
-					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
-					detections++;
-				}
+					// Look for PSExec services
+					else if(imageName.find(L"PSEXESVC") != std::wstring::npos){
+						reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+						detections++;
+						findings.emplace(pair, true);
+					}
 
-				// Look for Mimikatz Driver loading
-				if(imageName.find(L"mimikatz") != std::wstring::npos || imageName.find(L"mimidrv") != std::wstring::npos
-					|| imagePath.find(L"mimidrv.sys") != std::wstring::npos) {
-					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
-					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
-					detections++;
-				}
+					// Look for Mimikatz Driver loading
+					else if(imageName.find(L"mimikatz") != std::wstring::npos || imageName.find(L"mimidrv") != std::wstring::npos
+					   || imagePath.find(L"mimidrv.sys") != std::wstring::npos){
+						reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+						detections += 2;
+						findings.emplace(pair, true);
+					}
 
-				// Calculate entropy of service names to look for suspicious services like 
-				// the ones MSF generates https://www.offensive-security.com/metasploit-unleashed/psexec-pass-hash/
-				if(GetShannonEntropy(imageName) < 3.00 || GetShannonEntropy(imageName) > 5.00) {
-					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
-					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
-					detections++;
+					// Calculate entropy of service names to look for suspicious services like 
+					// the ones MSF generates https://www.offensive-security.com/metasploit-unleashed/psexec-pass-hash/
+					else if(false && (GetShannonEntropy(imageName) < 3.00 || GetShannonEntropy(imageName) > 5.00)){
+						reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+						detections += 2;
+						findings.emplace(pair, true);
+					} else {
+						findings.emplace(pair, false);
+					}
 				}
 			}
 		}
@@ -100,31 +120,77 @@ namespace Hunts {
 		LOG_INFO(L"Hunting for " << name << L" at level Intensive");
 		reaction.BeginHunt(GET_INFO());
 
-
 		auto queryResults = Get7045Events();
 
 		auto& yara = YaraScanner::GetInstance();
+		int detections = 0;
 
-		for (auto result : queryResults) {
-			reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+		std::map<std::pair<std::wstring, std::wstring>, bool> findings{};
 
-			auto imagePath = GetImagePathFromCommand(result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']"));
+		for(auto result : queryResults){
+			auto imageName = result.GetProperty(L"Event/EventData/Data[@Name='ServiceName']");
 
-			if(FileSystem::CheckFileExists(imagePath)){
-				FileSystem::File file = FileSystem::File(imagePath);
-				bool bFileSigned = file.GetFileSigned();
-				if(!bFileSigned){
-					YaraScanResult ScanResult = yara.ScanFile(file);
+			auto cmd{ result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']") };
+			std::pair<std::wstring, std::wstring> pair{ imageName, cmd };
 
-					if(!bFileSigned || (!ScanResult && ScanResult.vKnownBadRules.size() > 0)) {
-						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file.GetFilePath()));
+			if(findings.count(pair)){
+				if(findings.at(pair)){
+					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+				}
+			} else{
+				if(IsLolbinMalicious(cmd)){
+					reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+					findings.emplace(pair, true);
+					detections++;
+				} else{
+					auto imagePath = GetImagePathFromCommand(cmd);
+
+					FileSystem::File file = FileSystem::File(imagePath);
+					if(file.GetFileExists() && !file.GetFileSigned()){
+						reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+
+						auto& yara = YaraScanner::GetInstance();
+						YaraScanResult result = yara.ScanFile(file);
+
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+
+						detections += 2;
+						findings.emplace(pair, true);
+					}
+
+					// Look for PSExec services
+					else if(imageName.find(L"PSEXESVC") != std::wstring::npos){
+						reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+						detections++;
+						findings.emplace(pair, true);
+					}
+
+					// Look for Mimikatz Driver loading
+					else if(imageName.find(L"mimikatz") != std::wstring::npos || imageName.find(L"mimidrv") != std::wstring::npos
+							|| imagePath.find(L"mimidrv.sys") != std::wstring::npos){
+						reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+						detections += 2;
+						findings.emplace(pair, true);
+					}
+
+					// Calculate entropy of service names to look for suspicious services like 
+					// the ones MSF generates https://www.offensive-security.com/metasploit-unleashed/psexec-pass-hash/
+					else if(!file.GetFileExists() || (GetShannonEntropy(imageName) < 3.00 || GetShannonEntropy(imageName) > 5.00)){
+						reaction.EventIdentified(EventLogs::EventLogItemToDetection(result));
+						reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+						detections += 2;
+						findings.emplace(pair, true);
+					} else{
+						findings.emplace(pair, false);
 					}
 				}
 			}
 		}
 
 		reaction.EndHunt();
-		return queryResults.size();
+		return detections;
+
 	}
 
 	std::vector<std::shared_ptr<Event>> HuntT1050::GetMonitoringEvents() {

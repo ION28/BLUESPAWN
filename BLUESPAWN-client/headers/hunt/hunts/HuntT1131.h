@@ -16,8 +16,6 @@ namespace Hunts {
 	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1131 : public Hunt {
-	private:
-		int EvaluatePackages(Registry::RegistryKey key, std::vector<std::wstring> vSecPackages, std::wstring name, Reaction reaction);
 	public:
 		HuntT1131();
 

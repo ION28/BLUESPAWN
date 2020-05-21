@@ -4,8 +4,8 @@
 #include "hunt/hunts/HuntT1055.h"
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
-#include "util/log/HuntLogMessage.h"
 #include "util/processes/ProcessUtils.h"
+#include "util/processes/ParseCobalt.h"
 #include "common/wrappers.hpp"
 
 #include "pe_sieve.h"
@@ -69,7 +69,17 @@ namespace Hunts{
 
 			for(auto module : report->scan_report->module_reports){
 				if(module->status & SCAN_SUSPICIOUS){
-					reaction.ProcessIdentified(std::make_shared<PROCESS_DETECTION>(path, GetProcessCommandline(pid), pid, module->module, module->moduleSize, identifiers));
+					reaction.ProcessIdentified(std::make_shared<PROCESS_DETECTION>(path, GetProcessCommandline(pid), pid, module->module, 
+																				   static_cast<DWORD>(module->moduleSize), identifiers));
+
+					HandleWrapper process{ OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, false, pid) };
+					if(process){
+						MemoryWrapper<> wrapper{ module->module, module->moduleSize, process };
+						DumpBeaconInformation(wrapper);
+					} else{
+						LOG_ERROR("Unable to open process with PID " << pid << " to dump cobalt strike information (error " << GetLastError() << ")");
+					}
+					
 				}
 			}
 

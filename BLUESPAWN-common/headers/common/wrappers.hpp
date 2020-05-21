@@ -13,32 +13,44 @@ protected:
 	std::shared_ptr<void> ReferenceCounter;
 
 	T WrappedObject;
-	T BadValue;
+	std::optional<T> BadValue;
 
 public:
 
-	GenericWrapper(T object, std::function<void(T)> freeFunction = [](T object){ delete object; }, T BadValue = nullptr) : 
+	GenericWrapper(T object, std::function<void(T)> freeFunction = [](T object){ delete object; }, std::optional<T> BadValue = std::nullopt) : 
 		WrappedObject{ object }, 
 		BadValue{ BadValue },
 		ReferenceCounter{ nullptr, [object, BadValue, freeFunction](LPVOID memory){ 
-		    if(object != BadValue && object){ freeFunction(object); } 
+		    if((!BadValue || object != BadValue) && object){ freeFunction(object); } 
 	    }}{}
 
 	operator T() const { return WrappedObject; }
-	T* operator *(){ return WrappedObject; }
-	T operator ->(){ return WrappedObject; }
-	T& operator &(){ return &WrappedObject; }
-	bool operator ==(T object){ return WrappedObject == object; }
-	bool operator !(){ return !WrappedObject || WrappedObject == BadValue; }
-	operator bool(){ return !operator!(); }
-
+	T operator *() const{ return WrappedObject; }
+	T operator ->() const{ return WrappedObject; }
+	T* operator &() const{ return const_cast<T*>(&WrappedObject); }
+	bool operator ==(T object) const{ return WrappedObject == object; }
+	bool operator !() const{ return !WrappedObject || WrappedObject == BadValue; }
+	operator bool() const{ return !operator!(); }
+	T Release(){ auto tmp = WrappedObject; WrappedObject = BadValue; return tmp; }
 	T Get() const { return WrappedObject; }
 };
 
 class HandleWrapper : public GenericWrapper<HANDLE> {
 public:
 	HandleWrapper(HANDLE handle) :
-		GenericWrapper(handle, std::function<void(HANDLE)>(CloseHandle), INVALID_HANDLE_VALUE){};
+		GenericWrapper(handle, std::function<void(HANDLE)>(SafeCloseHandle), INVALID_HANDLE_VALUE){};
+	static void SafeCloseHandle(HANDLE handle) {
+		BY_HANDLE_FILE_INFORMATION hInfo;
+		if (GetFileInformationByHandle(handle, &hInfo)) {
+			CloseHandle(handle);
+		}
+		else {
+			HRESULT a = GetLastError();
+			if (a != ERROR_INVALID_HANDLE) {
+				CloseHandle(handle);
+			}
+		}
+	}
 };
 
 class FindWrapper : public GenericWrapper<HANDLE> {
@@ -48,22 +60,53 @@ public:
 };
 
 typedef HandleWrapper MutexType;
-class AcquireMutex : public GenericWrapper<MutexType> {
+class AcquireMutex {
+	MutexType hMutex;
+	std::shared_ptr<void> tracker;
+
 public:
-	explicit AcquireMutex(MutexType hMutex) :
-		GenericWrapper(hMutex, std::function<void(MutexType)>(ReleaseMutex), INVALID_HANDLE_VALUE){
-		WaitForSingleObject(hMutex, INFINITE);
-	};
+	explicit AcquireMutex(const MutexType& mutex) :
+		hMutex{ mutex },
+		tracker{ nullptr, [&](LPVOID nul){ ReleaseMutex(hMutex); } }{
+		::WaitForSingleObject(hMutex, INFINITE);
+	}
+};
+
+class CriticalSection {
+	CRITICAL_SECTION section;
+	std::shared_ptr<CRITICAL_SECTION> tracker;
+
+public:
+	CriticalSection() :
+		section{ nullptr, 0, 0, nullptr, nullptr, 0 },
+		tracker{ &section, [](PCRITICAL_SECTION section){ DeleteCriticalSection(section); } }{
+		InitializeCriticalSection(&section);
+	}
+
+	operator PCRITICAL_SECTION(){ return &section; }
+	operator CRITICAL_SECTION(){ return section; }
+};
+
+class BeginCriticalSection {
+	CriticalSection critsec;
+	std::shared_ptr<void> tracker;
+
+public:
+	explicit BeginCriticalSection(const CriticalSection& section) :
+		critsec{ section },
+		tracker{ nullptr, [&](LPVOID nul){ LeaveCriticalSection(critsec); } }{
+		::EnterCriticalSection(critsec);
+	}
 };
 
 class AllocationWrapper {
 	std::optional<std::shared_ptr<char[]>> Memory;
-	const PCHAR pointer;
+	PCHAR pointer;
 	SIZE_T AllocationSize;
 
 public:
 	enum AllocationFunction {
-		VIRTUAL_ALLOC, HEAP_ALLOC, MALLOC, CPP_ALLOC, CPP_ARRAY_ALLOC, STACK_ALLOC
+		VIRTUAL_ALLOC, HEAP_ALLOC, MALLOC, CPP_ALLOC, CPP_ARRAY_ALLOC, STACK_ALLOC, LOCAL_ALLOC, GLOBAL_ALLOC
 	};
 
 	AllocationWrapper(LPVOID memory, SIZE_T size, AllocationFunction AllocationType = STACK_ALLOC) :
@@ -74,13 +117,17 @@ public:
 					if(AllocationType == CPP_ALLOC)
 						delete value;
 					else if(AllocationType == CPP_ARRAY_ALLOC)
-						delete[] value; 
+						delete[] value;
 					else if(AllocationType == MALLOC)
 						free(value);
 					else if(AllocationType == HEAP_ALLOC)
 						HeapFree(GetProcessHeap(), 0, value);
 					else if(AllocationType == VIRTUAL_ALLOC)
 						VirtualFree(value, 0, MEM_RELEASE);
+					else if(AllocationType == GLOBAL_ALLOC)
+						GlobalFree(value);
+					else if(AllocationType == LOCAL_ALLOC)
+						LocalFree(value);
 				}
 			}} : std::nullopt
 	    },
@@ -162,6 +209,11 @@ public:
 		}
 		return false;
 	}
+
+	template<class T = LPVOID>
+	T* GetAsPointer(){ 
+		return reinterpret_cast<T*>(pointer); 
+	}
 };
 
 template<class T = CHAR>
@@ -181,7 +233,7 @@ public:
 			return *address;
 		} else {
 			T mem = {};
-			ReadProcessMemory(process, address, &mem, MemorySize, nullptr);
+			ReadProcessMemory(process, address, &mem, sizeof(T), nullptr);
 			return mem;
 		}
 	}
@@ -200,7 +252,7 @@ public:
 			return address;
 		} else {
 			LocalCopy = {};
-			if(ReadProcessMemory(process, address, &LocalCopy, MemorySize, nullptr)){
+			if(ReadProcessMemory(process, address, &LocalCopy, sizeof(LocalCopy), nullptr)){
 				return &LocalCopy;
 			} else {
 				return nullptr;
@@ -291,6 +343,35 @@ public:
 
 	operator bool() const { return address; }
 	bool operator !() const { return !address; }
+
+	AllocationWrapper ToAllocationWrapper(DWORD size = MemorySize){
+		size = min(size, MemorySize);
+		if(size > 0x8000){
+			AllocationWrapper wrapper{ ::VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE), size, AllocationWrapper::VIRTUAL_ALLOC };
+			if(process){
+				if(ReadProcessMemory(process, address, wrapper, size, nullptr)){
+					return wrapper;
+				} else{
+					return { nullptr, 0 };
+				}
+			} else{
+				MoveMemory(wrapper, address, size);
+				return wrapper;
+			}
+		} else{
+			AllocationWrapper wrapper{ ::HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size), size, AllocationWrapper::HEAP_ALLOC };
+			if(process){
+				if(ReadProcessMemory(process, address, wrapper, size, nullptr)){
+					return wrapper;
+				} else{
+					return { nullptr, 0 };
+				}
+			} else{
+				MoveMemory(wrapper, address, size);
+				return wrapper;
+			}
+		}
+	}
 };
 
 #define WRAP(type, name, value, function) \

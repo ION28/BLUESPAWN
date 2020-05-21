@@ -85,6 +85,19 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
+  <ItemDefinitionGroup>
+    <PreBuildEvent>
+      <Command>del $(ProjectDir)resources\severe &amp;&amp; del $(ProjectDir)resources\severe2 &amp;&amp; del $(ProjectDir)resources\indicators</Command>
+    </PreBuildEvent>
+	<PostBuildEvent>
+      <Command>cmd /c "
+$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe.yar $(ProjectDir)resources\severe &amp; 
+$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe2.yar $(ProjectDir)resources\severe2 &amp; 
+$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\indicators.yar $(ProjectDir)resources\indicators &amp; 
+exit 0
+"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -103,14 +116,6 @@
       <AdditionalDependencies>ws2_32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
-    <PostBuildEvent>
-      <Command>cmd /c "
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe.yar $(ProjectDir)resources\severe &amp; 
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe2.yar $(ProjectDir)resources\severe2 &amp; 
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\indicators.yar $(ProjectDir)resources\indicators &amp; 
-exit 0
-"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -129,14 +134,6 @@ exit 0
       <AdditionalDependencies>ws2_32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
-    <PostBuildEvent>
-      <Command>cmd /c "
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe.yar $(ProjectDir)resources\severe &amp; 
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe2.yar $(ProjectDir)resources\severe2 &amp; 
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\indicators.yar $(ProjectDir)resources\indicators &amp; 
-exit 0
-"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -157,14 +154,6 @@ exit 0
       <AdditionalDependencies>ws2_32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
-    <PostBuildEvent>
-      <Command>cmd /c "
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe.yar $(ProjectDir)resources\severe &amp; 
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe2.yar $(ProjectDir)resources\severe2 &amp; 
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\indicators.yar $(ProjectDir)resources\indicators &amp; 
-exit 0
-"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -185,14 +174,6 @@ exit 0
       <AdditionalDependencies>ws2_32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
-    <PostBuildEvent>
-      <Command>cmd /c "
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe.yar $(ProjectDir)resources\severe &amp; 
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\severe2.yar $(ProjectDir)resources\severe2 &amp; 
-$(SolutionDir)artifacts\$(PlatformTarget)\$(Configuration)\yarac.exe $(ProjectDir)resources\indicators.yar $(ProjectDir)resources\indicators &amp; 
-exit 0
-"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\yara\args.c" />

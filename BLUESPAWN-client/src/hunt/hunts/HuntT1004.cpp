@@ -3,7 +3,6 @@
 
 #include "util/configurations/Registry.h"
 #include "util/log/Log.h"
-#include "util/log/HuntLogMessage.h"
 #include "util/eventlogs/EventLogs.h"
 
 #include "common/Utils.h"
@@ -45,6 +44,13 @@ namespace Hunts {
 		for(auto& detection : notifies){
 			reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(detection));
 			detections++;
+
+			auto filename{ std::get<std::wstring>(detection.data) };
+			auto filepath{ FileSystem::SearchPathExecutable(filename) };
+			if(filepath){
+				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(FileSystem::File{ *filepath }));
+				detections++;
+			}
 		}
 
 		reaction.EndHunt();
