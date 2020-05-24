@@ -5,7 +5,15 @@
 #include <AclAPI.h>
 #include <sddl.h>
 #include <string>
+#define PSTRING __PSTRING
+#define STRING __STRING
+#define UNICODE_STRING __UNICODE_STRING
+#define PUNICODE_STRING __PUNICODE_STRING
 #include <NTSecAPI.h>
+#undef PSTRING
+#undef STRING
+#undef UNICODE_STRING
+#undef PUNICODE_STRING
 
 #include "util/log/Loggable.h"
 #include "common/wrappers.hpp"
@@ -119,13 +127,20 @@ namespace Permissions {
 	};
 
 	class Owner : public Loggable {
-		friend class LsaHandleWrapper;
-		
+		//Policy Handler for User Rights Assignment Tracking
 		static LsaHandleWrapper lPolicyHandle;
 
+		//Boolean to track if the handle wrapper is initialized
 		static bool bPolicyInitialized;
 
+		/**
+		* Function to initialize lPolicyHandle and set bPolicyInitialized
+		* to true if initialization succeeded.
+		*/
 		static void InitializePolicy();
+
+		//Let LsaHandleWrapper handle initialization tracking
+		friend void LsaHandleWrapper::SafeCloseLsaHandle(LSA_HANDLE handle);
 	protected:
 		//Whether or not this owner is on the system
 		bool bExists;
@@ -227,6 +242,15 @@ namespace Permissions {
 		 * @return The name of the owner
 		 */
 		virtual std::wstring ToString() const;
+
+		/**
+		* Function to get a list of privileges the owner has
+		*
+		* @return the list of privileges an owner explicity has, and if they 
+		* are a user, includes the privileges granted to them by the
+		* groups they're in.
+		*/
+		std::vector<LSA_UNICODE_STRING> GetPrivileges();
 	};
 
 	class User : public Owner {

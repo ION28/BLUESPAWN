@@ -1,5 +1,6 @@
 #include "util/permissions/permissions.h"
 #include "util/log/Log.h"
+#include <lm.h>
 
 namespace Permissions {
 
@@ -163,6 +164,9 @@ namespace Permissions {
 	PSID SecurityDescriptor::GetUserSID() const { return this->lpUserSID; }
 	PSID SecurityDescriptor::GetGroupSID() const { return this->lpGroupSID; }
 
+	bool Owner::bPolicyInitialized{ false };
+	LsaHandleWrapper Owner::lPolicyHandle{ nullptr };
+
 	void LsaHandleWrapper::SafeCloseLsaHandle(LSA_HANDLE handle) {
 		LsaClose(handle);
 		Owner::bPolicyInitialized = false;
@@ -170,10 +174,12 @@ namespace Permissions {
 
 	void Owner::InitializePolicy() {
 		LSA_OBJECT_ATTRIBUTES lObjectAttr;
+		memset(&lObjectAttr, 0, sizeof(LSA_OBJECT_ATTRIBUTES));
 		HRESULT hr = LsaNtStatusToWinError(LsaOpenPolicy(nullptr, &lObjectAttr, GENERIC_ALL, &lPolicyHandle));
 		if (hr != ERROR_SUCCESS) {
 			bPolicyInitialized = false;
 			LOG_ERROR("Couldn't open policy handle. (Error:" << hr << ")");
+			SetLastError(hr);
 		}
 		else {
 			bPolicyInitialized = true;
@@ -306,6 +312,58 @@ namespace Permissions {
 
 	std::wstring Owner::ToString() const {
 		return wName;
+	}
+
+	std::vector<LSA_UNICODE_STRING> Owner:: GetPrivileges() {
+		//Ensure policy handle is initialized
+		if (!bPolicyInitialized) {
+			InitializePolicy();
+			if (!bPolicyInitialized) {
+				LOG_ERROR("Error getting owner privliges, couldn't initialize policy handle.");
+				return std::vector<LSA_UNICODE_STRING>{ };
+			}
+		}
+		PLSA_UNICODE_STRING pReceivedPrivs{ nullptr };
+		ULONG uPrivCount{ 0 };
+		std::vector<LSA_UNICODE_STRING> vPrivs{ };
+		HRESULT hr = LsaNtStatusToWinError(LsaEnumerateAccountRights(lPolicyHandle, GetSID(), &pReceivedPrivs, &uPrivCount));
+		if (hr != ERROR_SUCCESS && otType != OwnerType::USER) {
+			LOG_ERROR("Error getting owner privileges. (Error: " << GetLastError() << ")");
+			SetLastError(hr);
+			return std::vector<LSA_UNICODE_STRING>{ };
+		}
+		else if (hr == ERROR_SUCCESS) {
+			for (int i = 0; i < uPrivCount; i++) {
+				vPrivs.emplace_back(pReceivedPrivs[i]);
+			}
+			LsaFreeMemory(pReceivedPrivs);
+		}
+		//Get privileges from groups that a user belongs to
+		if (otType == OwnerType::USER) {
+			PGROUP_USERS_INFO_0 pGroupInfo{ nullptr };
+			DWORD dEntriesRead{ 0 };
+			DWORD dEntriesTotal{ 0 };
+			NET_API_STATUS stat = NetUserGetLocalGroups(wDomainName.c_str(), wName.c_str(), 0, LG_INCLUDE_INDIRECT ,reinterpret_cast<LPBYTE *>(&pGroupInfo), MAX_PREFERRED_LENGTH, &dEntriesRead, &dEntriesTotal);
+			if (stat != NERR_Success) {
+				LOG_ERROR("Error getting user groups. (Net Error: " << stat << ")");
+				return vPrivs;
+			}
+			//Add all privileges from groups to list of user's privileges
+			for (int i = 0; i < dEntriesRead; i++) {
+				Owner oGroup(pGroupInfo[i].grui0_name);
+				hr = LsaNtStatusToWinError(LsaEnumerateAccountRights(lPolicyHandle, oGroup.GetSID(), &pReceivedPrivs, &uPrivCount));
+				if (hr != ERROR_SUCCESS) {
+					LOG_ERROR("Error getting group privileges. (Error: " << GetLastError() << ")");
+				}
+				else if (hr == ERROR_SUCCESS) {
+					for (int i = 0; i < uPrivCount; i++) {
+						vPrivs.emplace_back(pReceivedPrivs[i]);
+					}
+					LsaFreeMemory(pReceivedPrivs);
+				}
+			}
+		}
+		return vPrivs;
 	}
 
 	User::User(IN const std::wstring& uName) : Owner{ uName , true, OwnerType::USER} {
