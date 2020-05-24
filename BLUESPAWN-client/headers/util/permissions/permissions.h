@@ -5,6 +5,7 @@
 #include <AclAPI.h>
 #include <sddl.h>
 #include <string>
+#include <NTSecAPI.h>
 
 #include "util/log/Loggable.h"
 #include "common/wrappers.hpp"
@@ -105,12 +106,26 @@ namespace Permissions {
 		PACL GetSACL() const;
 	};
 
+	class LsaHandleWrapper : public GenericWrapper<LSA_HANDLE> {
+	public:
+		LsaHandleWrapper(LSA_HANDLE handle) :
+			GenericWrapper(handle, std::function<void(LSA_HANDLE)>(SafeCloseLsaHandle), nullptr) {};
+		static void SafeCloseLsaHandle(LSA_HANDLE handle);
+	};
+
 	/*Enum for storing type of Owner an Owner object is*/
 	enum OwnerType {
 		NONE, USER, GROUP 
 	};
 
 	class Owner : public Loggable {
+		friend class LsaHandleWrapper;
+		
+		static LsaHandleWrapper lPolicyHandle;
+
+		static bool bPolicyInitialized;
+
+		static void InitializePolicy();
 	protected:
 		//Whether or not this owner is on the system
 		bool bExists;

@@ -163,6 +163,23 @@ namespace Permissions {
 	PSID SecurityDescriptor::GetUserSID() const { return this->lpUserSID; }
 	PSID SecurityDescriptor::GetGroupSID() const { return this->lpGroupSID; }
 
+	void LsaHandleWrapper::SafeCloseLsaHandle(LSA_HANDLE handle) {
+		LsaClose(handle);
+		Owner::bPolicyInitialized = false;
+	}
+
+	void Owner::InitializePolicy() {
+		LSA_OBJECT_ATTRIBUTES lObjectAttr;
+		HRESULT hr = LsaNtStatusToWinError(LsaOpenPolicy(nullptr, &lObjectAttr, GENERIC_ALL, &lPolicyHandle));
+		if (hr != ERROR_SUCCESS) {
+			bPolicyInitialized = false;
+			LOG_ERROR("Couldn't open policy handle. (Error:" << hr << ")");
+		}
+		else {
+			bPolicyInitialized = true;
+		}
+	}
+
 	Owner::Owner(IN const std::wstring& name) : wName{ name }, bExists{ true } {
 		DWORD dwSIDLen{};
 		DWORD dwDomainLen{};
