@@ -251,6 +251,15 @@ namespace Permissions {
 		* groups they're in.
 		*/
 		std::vector<LSA_UNICODE_STRING> GetPrivileges();
+
+		/**
+		* Function to check if the owner has a certain privilege
+		*
+		* @param wPriv the name of the privilege to check for. Names should
+		*    be given as constants listed here: https://docs.microsoft.com/en-us/windows/win32/secauthz/privilege-constants
+		* @return true if the owner has the privilege, false otherwise
+		*/
+		bool HasPrivilege(std::wstring wPriv);
 	};
 
 	class User : public Owner {

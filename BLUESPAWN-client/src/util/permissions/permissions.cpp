@@ -366,6 +366,14 @@ namespace Permissions {
 		return vPrivs;
 	}
 
+	bool Owner::HasPrivilege(std::wstring wPriv) {
+		auto OwnerPrivs = GetPrivileges();
+		for (auto iter = OwnerPrivs.begin(); iter != OwnerPrivs.end(); iter++) {
+			if (wPriv.compare(iter->Buffer) == 0) return true;
+		}
+		return false;
+	}
+
 	User::User(IN const std::wstring& uName) : Owner{ uName , true, OwnerType::USER} {
 		DWORD dwSIDLen{};
 		DWORD dwDomainLen{};
