@@ -310,14 +310,6 @@ namespace Permissions {
 		*     GetLastError() will return the reason for failure.
 		*/
 		bool RemovePrivilege(IN const std::wstring& wPriv);
-
-		/**
-		* Function to delete an owner object
-		*
-		* @return true if the function succeeded, false otherwise. If the function fails,
-		*     GetlastError() will return the reason for failure. 
-		*/
-		bool DeleteOwner();
 	};
 
 	class User : public Owner {
