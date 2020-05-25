@@ -300,6 +300,24 @@ namespace Permissions {
 		*     but there were no Owners with the given privilege. 
 		*/
 		static std::vector<Owner> GetOwnersWithPrivilege(IN const std::wstring& wPriv);
+
+		/**
+		* Function to remove a privilege from an owner object
+		* 
+		* @param wPriv a wstring containing the name of the privilege to remove
+		*
+		* @return true if the function succeeded, false otherwise. If the function fails,
+		*     GetLastError() will return the reason for failure.
+		*/
+		bool RemovePrivilege(IN const std::wstring& wPriv);
+
+		/**
+		* Function to delete an owner object
+		*
+		* @return true if the function succeeded, false otherwise. If the function fails,
+		*     GetlastError() will return the reason for failure. 
+		*/
+		bool DeleteOwner();
 	};
 
 	class User : public Owner {

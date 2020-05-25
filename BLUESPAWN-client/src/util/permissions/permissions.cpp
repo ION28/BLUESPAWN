@@ -400,7 +400,7 @@ namespace Permissions {
 		if (!bPolicyInitialized) {
 			InitializePolicy();
 			if (!bPolicyInitialized) {
-				LOG_ERROR("Error getting owner privliges, couldn't initialize policy handle.");
+				LOG_ERROR("Error getting owners with privlige, couldn't initialize policy handle.");
 				return std::vector<Owner>{ };
 			}
 		}
@@ -424,6 +424,25 @@ namespace Permissions {
 		LsaFreeMemory(pOwners);
 		SetLastError(ERROR_SUCCESS);
 		return vOwners;
+	}
+
+	bool Owner::RemovePrivilege(IN const std::wstring& wPriv) {
+		//Ensure policy handle is initialized
+		if (!bPolicyInitialized) {
+			InitializePolicy();
+			if (!bPolicyInitialized) {
+				LOG_ERROR("Error removing owner privlige, couldn't initialize policy handle.");
+				return false;
+			}
+		}
+		LSA_UNICODE_STRING lPrivName = WStringToLsaUnicodeString(wPriv);
+		HRESULT hr = LsaNtStatusToWinError(LsaRemoveAccountRights(lPolicyHandle, GetSID(), false, &lPrivName, 1));
+		if (hr != ERROR_SUCCESS) {
+			LOG_ERROR("Error removing privilege from account. (Error: " << hr << ")");
+			SetLastError(hr);
+			return false;
+		}
+		return true;
 	}
 
 	User::User(IN const std::wstring& uName) : Owner{ uName , true, OwnerType::USER} {
