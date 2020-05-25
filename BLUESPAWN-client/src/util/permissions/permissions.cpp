@@ -282,6 +282,9 @@ namespace Permissions {
 			else if (SIDType == SidTypeGroup || SIDType == SidTypeWellKnownGroup || SIDType == SidTypeAlias) {
 				LOG_VERBOSE(2, "Group " << wName << " exists.");
 				otType = OwnerType::GROUP;
+				auto temp = SecurityDescriptor::CreateGroupSID(GetLengthSid(sdSID.GetUserSID()));
+				memcpy(temp.GetGroupSID(), sdSID.GetUserSID(), GetLengthSid(sdSID.GetUserSID()));
+				sdSID = temp;
 			}
 			else if (SIDType == SidTypeUser) {
 				LOG_VERBOSE(3, "User " << wName << " Exists.");
