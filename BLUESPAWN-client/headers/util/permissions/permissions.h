@@ -133,6 +133,9 @@ namespace Permissions {
 		//Boolean to track if the handle wrapper is initialized
 		static bool bPolicyInitialized;
 
+		//List of super user privileges
+		static const std::vector<std::wstring> vSuperUserPrivs;
+
 		/**
 		* Function to initialize lPolicyHandle and set bPolicyInitialized
 		* to true if initialization succeeded.
@@ -310,6 +313,21 @@ namespace Permissions {
 		*     GetLastError() will return the reason for failure.
 		*/
 		bool RemovePrivilege(IN const std::wstring& wPriv);
+
+		/**
+		* Function to check if an owner has a superuser privilege.
+		*
+		* @return true if the user has any of these privileges, false otherwise
+		*/
+		bool HasSuperUserPrivs();
+
+		/**
+		* Function to remove all super user privileges from an owner
+		*
+		* @return true if function succeeds, false otherwise. If the function
+		*     fails, GetLastError() will contain the reason for failure
+		*/
+		bool RemoveSuperUserPrivs();
 	};
 
 	class User : public Owner {

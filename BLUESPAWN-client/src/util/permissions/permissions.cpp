@@ -166,6 +166,8 @@ namespace Permissions {
 
 	bool Owner::bPolicyInitialized{ false };
 	LsaHandleWrapper Owner::lPolicyHandle{ nullptr };
+	const std::vector<std::wstring> Owner::vSuperUserPrivs{ SE_DEBUG_NAME, SE_IMPERSONATE_NAME, SE_TCB_NAME, SE_LOAD_DRIVER_NAME,
+			SE_ASSIGNPRIMARYTOKEN_NAME, SE_TAKE_OWNERSHIP_NAME };
 
 	void LsaHandleWrapper::SafeCloseLsaHandle(LSA_HANDLE handle) {
 		LsaClose(handle);
@@ -443,6 +445,35 @@ namespace Permissions {
 			return false;
 		}
 		return true;
+	}
+
+	bool Owner::HasSuperUserPrivs() {
+		auto vOwnerPrivs = GetPrivileges();
+		for (auto priv : vSuperUserPrivs) {
+			if (PrivListHasPrivilege(vOwnerPrivs, priv)) return true;
+		}
+		return false;
+	}
+
+	bool Owner::RemoveSuperUserPrivs() {
+		//Ensure policy handle is initialized
+		if (!bPolicyInitialized) {
+			InitializePolicy();
+			if (!bPolicyInitialized) {
+				LOG_ERROR("Error removing owner privlige, couldn't initialize policy handle.");
+				return false;
+			}
+		}
+		std::vector<LSA_UNICODE_STRING> lSuperUserPrivs{ };
+		for (auto priv : vSuperUserPrivs) {
+			lSuperUserPrivs.emplace_back(WStringToLsaUnicodeString(priv));
+		}
+		HRESULT hr = LsaNtStatusToWinError(LsaRemoveAccountRights(lPolicyHandle, GetSID(), false, lSuperUserPrivs.data(), lSuperUserPrivs.size()));
+		if (hr != ERROR_SUCCESS) {
+			LOG_ERROR("Error removing privilege from account. (Error: " << hr << ")");
+			SetLastError(hr);
+			return false;
+		}
 	}
 
 	User::User(IN const std::wstring& uName) : Owner{ uName , true, OwnerType::USER} {
