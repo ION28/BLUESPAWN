@@ -186,6 +186,19 @@ namespace Permissions {
 		}
 	}
 
+	LSA_UNICODE_STRING Owner::WStringToLsaUnicodeString(IN const std::wstring& str) {
+		LSA_UNICODE_STRING lsaWStr;
+		DWORD len = 0;
+
+		len = str.length();
+		LPWSTR cstr = new WCHAR[len + 1];
+		memcpy(cstr, str.c_str(), (len + 1) * sizeof(WCHAR));
+		lsaWStr.Buffer = cstr;
+		lsaWStr.Length = (USHORT)((len) * sizeof(WCHAR));
+		lsaWStr.MaximumLength = (USHORT)((len + 1) * sizeof(WCHAR));
+		return lsaWStr;
+	}
+
 	Owner::Owner(IN const std::wstring& name) : wName{ name }, bExists{ true } {
 		DWORD dwSIDLen{};
 		DWORD dwDomainLen{};
@@ -363,19 +376,51 @@ namespace Permissions {
 				}
 			}
 		}
+		SetLastError(ERROR_SUCCESS);
 		return vPrivs;
 	}
 
-	bool Owner::HasPrivilege(std::wstring wPriv) {
+	bool Owner::HasPrivilege(IN const std::wstring& wPriv) {
 		auto OwnerPrivs = GetPrivileges();
 		return PrivListHasPrivilege(OwnerPrivs, wPriv);
 	}
 
-	bool Owner::PrivListHasPrivilege(std::vector<LSA_UNICODE_STRING> vPrivList, std::wstring wPriv) {
+	bool Owner::PrivListHasPrivilege(IN const std::vector<LSA_UNICODE_STRING>& vPrivList, IN const std::wstring& wPriv) {
 		for (auto iter = vPrivList.begin(); iter != vPrivList.end(); iter++) {
 			if (wPriv.compare(iter->Buffer) == 0) return true;
 		}
 		return false;
+	}
+
+	std::vector<Owner> Owner::GetOwnersWithPrivilege(IN const std::wstring& wPriv) {
+		//Ensure policy handle is initialized
+		if (!bPolicyInitialized) {
+			InitializePolicy();
+			if (!bPolicyInitialized) {
+				LOG_ERROR("Error getting owner privliges, couldn't initialize policy handle.");
+				return std::vector<Owner>{ };
+			}
+		}
+		LSA_UNICODE_STRING lPrivName = WStringToLsaUnicodeString(wPriv);
+		PLSA_ENUMERATION_INFORMATION pOwners{ nullptr };
+		ULONG uNumOwners{ 0 };
+		HRESULT hr = LsaNtStatusToWinError(LsaEnumerateAccountsWithUserRight(lPolicyHandle, &lPrivName, reinterpret_cast<PVOID *>(&pOwners), &uNumOwners));
+		if (hr != ERROR_SUCCESS) {
+			LOG_ERROR("Error getting accounts with user privilege. (Error: " << hr << ")");
+			SetLastError(hr);
+			return std::vector<Owner>{ };
+		}
+		std::vector<Owner> vOwners;
+		for (int i = 0; i < uNumOwners; i++) {
+			DWORD dwSidLen = GetLengthSid(pOwners[i].Sid);
+			SecurityDescriptor sdSID = SecurityDescriptor::CreateUserSID(dwSidLen);
+			memcpy(sdSID.GetUserSID(), pOwners[i].Sid, dwSidLen);
+			Owner o(sdSID);
+			vOwners.emplace_back(o);
+		}
+		LsaFreeMemory(pOwners);
+		SetLastError(ERROR_SUCCESS);
+		return vOwners;
 	}
 
 	User::User(IN const std::wstring& uName) : Owner{ uName , true, OwnerType::USER} {

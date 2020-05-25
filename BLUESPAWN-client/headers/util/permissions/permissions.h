@@ -157,6 +157,15 @@ namespace Permissions {
 		//The type of the owner
 		OwnerType otType;
 
+		/**
+		* Function to convert a wstring to an LSA_UNICODE_STRING
+		* 
+		* @param str the wstring to conver
+		*
+		* @return an LSA_UNICODE_STRING corresponding to the given wstring
+		*/
+		static LSA_UNICODE_STRING Owner::WStringToLsaUnicodeString(IN const std::wstring& str);
+
 	public:
 		/**
 		* Constructor for an owner object based off name
@@ -247,8 +256,8 @@ namespace Permissions {
 		* Function to get a list of privileges the owner has
 		*
 		* @return the list of privileges an owner explicity has, and if they 
-		* are a user, includes the privileges granted to them by the
-		* groups they're in.
+		*     are a user, includes the privileges granted to them by the
+		*     groups they're in.
 		*/
 		std::vector<LSA_UNICODE_STRING> GetPrivileges();
 
@@ -260,18 +269,31 @@ namespace Permissions {
 		* 
 		* @return true if the owner has the privilege, false otherwise
 		*/
-		bool HasPrivilege(std::wstring wPriv);
+		bool HasPrivilege(IN const std::wstring& wPriv);
 
 		/**
 		* Function to check if a privilege is contained in a list of privileges
 		*
 		* @param vPrivList a vector containing the list of privileges to search through
 		* @param wPriv a wstring containing the name of the privilege to check for
-		*        Names should be from: https://docs.microsoft.com/en-us/windows/win32/secauthz/privilege-constants
+		*     Names should be from: https://docs.microsoft.com/en-us/windows/win32/secauthz/privilege-constants
 		*
 		* @return true if the privilege is is the list, false otherwise
 		*/
-		static bool PrivListHasPrivilege(std::vector<LSA_UNICODE_STRING> vPrivList, std::wstring wPriv);
+		static bool PrivListHasPrivilege(IN const std::vector<LSA_UNICODE_STRING>& vPrivList, IN const std::wstring& wPriv) ;
+
+		/**
+		* Function to enumerate all owners with a given privilege
+		* 
+		* @param wPriv a wstring containing the privilege to check for.
+		*     Names should be from: https://docs.microsoft.com/en-us/windows/win32/secauthz/privilege-constants
+		*
+		* @return a vector of Owner objects containing all owners with the given privilege.
+		*     If the function fails, the vector will be empty and GetLastError() will contain
+		*     the failure reason. If GetLastError() returns ERROR_SUCCESS, the function succeeded
+		*     but there were no Owners with the given privilege. 
+		*/
+		static std::vector<Owner> GetOwnersWithPrivilege(IN const std::wstring& wPriv);
 	};
 
 	class User : public Owner {
