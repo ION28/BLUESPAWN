@@ -257,9 +257,21 @@ namespace Permissions {
 		*
 		* @param wPriv the name of the privilege to check for. Names should
 		*    be given as constants listed here: https://docs.microsoft.com/en-us/windows/win32/secauthz/privilege-constants
+		* 
 		* @return true if the owner has the privilege, false otherwise
 		*/
 		bool HasPrivilege(std::wstring wPriv);
+
+		/**
+		* Function to check if a privilege is contained in a list of privileges
+		*
+		* @param vPrivList a vector containing the list of privileges to search through
+		* @param wPriv a wstring containing the name of the privilege to check for
+		*        Names should be from: https://docs.microsoft.com/en-us/windows/win32/secauthz/privilege-constants
+		*
+		* @return true if the privilege is is the list, false otherwise
+		*/
+		static bool PrivListHasPrivilege(std::vector<LSA_UNICODE_STRING> vPrivList, std::wstring wPriv);
 	};
 
 	class User : public Owner {

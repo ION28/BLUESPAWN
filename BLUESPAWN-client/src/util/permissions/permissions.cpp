@@ -368,7 +368,11 @@ namespace Permissions {
 
 	bool Owner::HasPrivilege(std::wstring wPriv) {
 		auto OwnerPrivs = GetPrivileges();
-		for (auto iter = OwnerPrivs.begin(); iter != OwnerPrivs.end(); iter++) {
+		return PrivListHasPrivilege(OwnerPrivs, wPriv);
+	}
+
+	bool Owner::PrivListHasPrivilege(std::vector<LSA_UNICODE_STRING> vPrivList, std::wstring wPriv) {
+		for (auto iter = vPrivList.begin(); iter != vPrivList.end(); iter++) {
 			if (wPriv.compare(iter->Buffer) == 0) return true;
 		}
 		return false;
