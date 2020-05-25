@@ -166,21 +166,6 @@ namespace Permissions {
 		*/
 		static LSA_UNICODE_STRING Owner::WStringToLsaUnicodeString(IN const std::wstring& str);
 
-	public:
-		/**
-		* Constructor for an owner object based off name
-		*
-		* @param name A wstring containing the name of an object. Other fields will
-		*	be filled in if an owner of that name exists.
-		*/
-		Owner(IN const std::wstring& name);
-		/**
-		* Constructor for an owner object based off sid
-		* 
-		* @param sid A SecurityDescriptor with lpUserSID set to the sid of the owner. Other
-		*	fields will be filled in if an owner of that sid exists. 
-		*/
-		Owner(IN const SecurityDescriptor& sid);
 		/**
 		* Constructor for an owner object that sets wName, bExists, and otOwnerType, but no other fields
 		*
@@ -189,27 +174,48 @@ namespace Permissions {
 		* @param t An OwnerType containing value to be copied to otOwnerType
 		*/
 		Owner(IN const std::wstring& name, IN const bool& exists, IN const OwnerType& t);
+
 		/**
 		* Constructor for an owner object that sets sdSID, bExists, and otOwnerType, but no other fields
 		*
-		* @param sid A SecurityDescriptor containing value to be copied to sdSID. Should have lpUserSID set 
+		* @param sid A SecurityDescriptor containing value to be copied to sdSID. Should have lpUserSID set
 		*	to valid PSID if t is USER, and lpGroupSID set to valid PSID if t is GROUP.
 		* @param exists A boolean containing value to be copied ot bExists
 		* @param t An OwnerType containing value to be copied to otOwnerType
 		*/
 		Owner(IN const SecurityDescriptor& sid, IN const bool& exists, IN const OwnerType& t);
+
 		/**
 		* Constructor for an owner object that sets all fields to given values. Performs no checking
-		* that given name and sid line up. 
+		* that given name and sid line up.
 		*
 		* @param name A wstring containing value to be copied to wName
 		* @ param domain A wstring containing value to be copied to wDomain
-		* @param sid A SecurityDescriptor containing value to be copied to sdSID. Should have lpUserSID set 
+		* @param sid A SecurityDescriptor containing value to be copied to sdSID. Should have lpUserSID set
 		*	to valid PSID if t is USER, and lpGroupSID set to valid PSID if t is GROUP.
 		* @param exists A boolean containing value to be copied ot bExists
 		* @param t An OwnerType containing value to be copied to otOwnerType
 		*/
 		Owner(IN const std::wstring& name, IN const std::wstring& domain, IN const SecurityDescriptor& sid, IN const bool& exists, IN const OwnerType& t);
+
+
+	public:
+		/**
+		* Constructor for an owner object based off name
+		*
+		* @param name A wstring containing the name of an object. Other fields will
+		*	be filled in if an owner of that name exists.
+		*/
+		Owner(IN const std::wstring& name);
+		
+		/**
+		* Constructor for an owner object based off sid
+		* 
+		* @param sid A SecurityDescriptor with lpUserSID set to the sid of the owner. Other
+		*	fields will be filled in if an owner of that sid exists. 
+		*/
+		Owner(IN const SecurityDescriptor& sid);
+		
 		/**
 		* Function to get whether or not the owner exists on the system
 		*
