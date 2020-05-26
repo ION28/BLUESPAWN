@@ -1,0 +1,5 @@
+---
+  - name: Download client binary
+    win_get_url: 
+      url: "{{ client_binary_url }}"
+      dest: "{{ client_binary_dest}}"

@@ -1,0 +1,7 @@
+--- 
+  - name: Transfer client binary
+    win_copy:
+      src: "{{ local_client_binary_path }}"
+      dest: "{{ client_binary_dest }}"
+      remote_src: no
+

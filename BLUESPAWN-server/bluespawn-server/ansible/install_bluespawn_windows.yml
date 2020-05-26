@@ -1,0 +1,45 @@
+---
+- hosts: all
+  vars:
+    transfer_over_ftp: false
+    verbose_output: false
+    is64bit: false
+    client_binary_url: ""
+    client_binary_dest: ""
+    client_install_dir: ""
+    local_client_binary_path: ""
+
+  tasks:
+    - name: Setup 
+      setup:
+    - name: Print Debug Info
+      debug: var=ansible_facts
+      when: verbose_output
+    - name: Determine arch
+      set_fact:
+        is64bit: "{{ ansible_architecture == '64-bit' }}"
+    - name: Update playbook vars
+      set_fact:
+        client_binary_url: "{{ 'https://github.com/ION28/BLUESPAWN/releases/download/v0.4.4-alpha/BLUESPAWN-client-x{}.exe'.format('64' if is64bit else '86') }}"
+        client_binary_dest: "%programfiles%/BLUESPAWN/BLUESPAWN-client.exe"
+        client_install_dir: "%programfiles%/BLUESPAWN"
+        local_client_binary_path: "{{ playbook_dir }}/{{ 'BLUESPAWN-client-' + ('x64' if is64bit else 'x86') + '.exe' }}"
+    - name: Create BLUESPAWN dir
+      win_file: path={{ client_install_dir }} state=directory  
+    - name: Fetch latest release from github
+      include_tasks: download_client_binary.yml
+      when: not transfer_over_ftp
+    - name: Deliver binary over ftp
+      include_tasks: transfer_client_binary.yml
+      when: transfer_over_ftp
+    - name: install binary as service
+      win_service:
+        description: "BLUESPAWN Network Security"
+        display_name: "BLUESPAWN Client"
+        name: "BLUESPAWN CLIENT"
+        path: "{{ client_binary_dest }}"
+        start_mode: "auto"
+    - name: start service
+      win_service:
+        name: "BLUESPAWN CLIENT"
+        state: "started"
