@@ -328,6 +328,13 @@ namespace Permissions {
 		*     fails, GetLastError() will contain the reason for failure
 		*/
 		bool RemoveSuperUserPrivs();
+
+		/**
+		* Function to delete an owner from the system
+		*
+		* @return true if the user was deleted, false otherwise
+		*/
+		bool Delete();
 	};
 
 	class User : public Owner {

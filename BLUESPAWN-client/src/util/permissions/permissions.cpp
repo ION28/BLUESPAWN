@@ -476,6 +476,29 @@ namespace Permissions {
 		}
 	}
 
+	bool Owner::Delete() {
+		if (otType == OwnerType::USER) {
+			NET_API_STATUS nStat = NetUserDel(nullptr, GetName().c_str());
+			if (nStat != NERR_Success) {
+				LOG_ERROR("Error deleting user " << GetName() << ". (Net Error: " << nStat << ")");
+				return false;
+			}
+			bExists = false;
+			return true;
+		}
+		else if (otType == OwnerType::GROUP) {
+			NET_API_STATUS nStat = NetLocalGroupDel(nullptr, GetName().c_str());
+			if (nStat != NERR_Success) {
+				LOG_ERROR("Error deleting group " << GetName() << ". (Net Error: " << nStat << ")");
+				return false;
+			}
+			bExists = false;
+			return true;
+
+		}
+		return true;
+	}
+
 	User::User(IN const std::wstring& uName) : Owner{ uName , true, OwnerType::USER} {
 		DWORD dwSIDLen{};
 		DWORD dwDomainLen{};
