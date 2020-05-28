@@ -5,84 +5,24 @@
 #include <string>
 #include <functional>
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 
-#include "hunt/HuntInfo.h"
 #include "util/configurations/RegistryValue.h"
+#include "util/configurations/Registry.h"
 #include "util/filesystem/FileSystem.h"
-#include <common\StringUtils.h>
+#include "scan/YaraScanner.h"
 
+/// Identifies the type of detection a Detection object represents
 enum class DetectionType {
-	File,
-	Registry,
-	Service,
-	Process,
-	Event,
-	Other
+	ProcessDetection,
+	RegistryDetection,
+	FileDetection,
+	ServiceDetection,
+	OtherDetection
 };
 
-class Hunt;
-
-enum class DetectionSource {
-	Association, Hunt
-};
-
-struct DETECTION {
-	DetectionType Type;
-	std::vector<DWORD> AssociatedDetections;
-	DWORD dwID;
-	DetectionSource source;
-	std::optional<std::wstring> hunt;
-	DETECTION(DetectionType Type, const std::wstring& hunt) : 
-		Type{ Type },
-		source{ DetectionSource::Hunt },
-		hunt{ hunt }{}
-
-	DETECTION(DetectionType Type) :
-		Type{ Type },
-		source{ DetectionSource::Association },
-		hunt{ std::nullopt }{}
-};
-typedef std::shared_ptr<DETECTION> Detection;
-
-/// A struct containing information about a file identified in a hunt
-/// Note that the hash will have to be manually set.
-struct FILE_DETECTION : public DETECTION {
-	std::wstring wsFileName;
-	std::wstring wsFilePath;
-	std::string hash;
-	FileSystem::File file;
-	FILE_DETECTION(const std::wstring& wsFilePath) :
-		DETECTION{ DetectionType::File },
-		wsFilePath{ wsFilePath },
-		file{ wsFilePath },
-		hash{}{
-		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
-	}
-	FILE_DETECTION(const std::wstring& wsFilePath, const std::wstring& hunt) :
-		DETECTION{ DetectionType::File, hunt },
-		wsFilePath{ wsFilePath },
-		file{ wsFilePath },
-		hash{}{
-		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
-	}
-	FILE_DETECTION(const FileSystem::File& file) :
-		DETECTION{ DetectionType::File },
-		wsFilePath{ file.GetFilePath() },
-		file{ file },
-		hash{}{
-		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
-	}
-	FILE_DETECTION(const FileSystem::File& file, const std::wstring& hunt) :
-		DETECTION{ DetectionType::File, hunt },
-		wsFilePath{ file.GetFilePath() },
-		file{ file },
-		hash{}{
-		wsFileName = ToLowerCaseW(wsFilePath.substr(wsFilePath.find_last_of(L"\\/") + 1));
-	}
-};
-typedef std::shared_ptr<FILE_DETECTION> FileDetection;
-typedef std::function<void(std::shared_ptr<FILE_DETECTION>)> DetectFile;
-
+/// Describes the type of registry entry associated with a RegistryDetectionData object
 enum class RegistryDetectionType {
 	CommandReference, // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a command used to run program
 	FileReference,    // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a file
@@ -94,115 +34,479 @@ enum class RegistryDetectionType {
 	Association       // The associated value is assumed malicious due to association with other malicious detections
 };
 
-/// A struct containing information about a registry key value identified in a hunt
-struct REGISTRY_DETECTION : public DETECTION {
-	Registry::RegistryValue value;
-	RegistryDetectionType type;
-	bool multitype;
-	REGISTRY_DETECTION(const Registry::RegistryValue& value, RegistryDetectionType type = RegistryDetectionType::Association) :
-		DETECTION{ DetectionType::Registry },
-		type{ type },
-		multitype{ false },
-		value{ value }{}
-
-	REGISTRY_DETECTION(const Registry::RegistryValue& value, const std::wstring& hunt, 
-					   RegistryDetectionType type = RegistryDetectionType::Configuration,
-					   bool multitype = false) :
-		DETECTION{ DetectionType::Registry, hunt },
-		type{ type },
-		multitype{ multitype },
-		value{ value }{}
-};
-typedef std::shared_ptr<REGISTRY_DETECTION> RegistryDetection;
-typedef std::function<void(std::shared_ptr<REGISTRY_DETECTION>)> DetectRegistry;
-
-/// A struct containing information about a service identified in a hunt
-struct SERVICE_DETECTION : public DETECTION {
-	std::wstring wsServiceName;
-	std::wstring wsServiceExecutablePath;
-	std::optional<std::wstring> wsServiceDll;
-	SERVICE_DETECTION(const std::wstring& wsServiceName, const std::wstring& wsServiceExecutablePath) :
-		DETECTION{ DetectionType::Service },
-		wsServiceName{ wsServiceName },
-		wsServiceExecutablePath{ wsServiceExecutablePath }{}
-};
-typedef std::shared_ptr<SERVICE_DETECTION> ServiceDetection;
-typedef std::function<void(std::shared_ptr<SERVICE_DETECTION>)> DetectService;
-
-enum class ProcessDetectionMethod {
-	Replaced       = 1,
-	HeaderModified = 2,
-	Detached       = 4,
-	Hooked         = 8,
-	Implanted      = 16,
-	File           = 32,
-	Other          = 64
+/// Describes the type of detection is associated with a ProcessDetectionData object
+enum class ProcessDetectionType {
+	MaliciousProcess, // Refers to the process itself rather than something within it
+	MaliciousImage,   // Refers to a specific image within the process
+	MaliciousMemory,  // Refers to a location in memory of the process
 };
 
-struct PROCESS_DETECTION : public DETECTION {
-	std::wstring wsImagePath;
-	std::wstring wsCmdline;
-	int PID;
-	DWORD method;
-	LPVOID lpAllocationBase;
-	DWORD dwAllocationSize;
-	PROCESS_DETECTION(const std::wstring& wsImagePath, const std::wstring& wsCmdLine, const int& PID,
-		const LPVOID& lpAllocationBase, const DWORD& dwAllocationSize, const DWORD& method) :
-		DETECTION{ DetectionType::Process },
-		wsImagePath{ wsImagePath },
-		wsCmdline{ wsCmdLine },
-		PID{ PID },
-		method{ method },
-		lpAllocationBase{ lpAllocationBase },
-		dwAllocationSize{ dwAllocationSize }{}
-};
-typedef std::shared_ptr<PROCESS_DETECTION> ProcessDetection;
-typedef std::function<void(std::shared_ptr<PROCESS_DETECTION>)> DetectProcess;
+/**
+ * Stores information about a process or memory location identified as possibly malicious
+ */
+struct ProcessDetectionData {
 
-enum class ServiceType {
-	kernelModeDriver,
-	userModeService
+	/// The process ID of the process
+	DWORD PID;
+
+	/// The thread IDs of the threads within the process that triggered the detection. 
+	/// This will rarely be used.
+	std::optional<DWORD> TID;
+
+	/// An open handle to the process
+	std::optional<HandleWrapper> ProcessHandle;
+
+	/// The name of the process
+	std::wstring ProcessName;
+
+	/// The path to the executable image of the process
+	std::optional<std::wstring> ProcessPath;
+
+	/// The command used to spawn the process
+	std::optional<std::wstring> ProcessCommand;
+
+	/// The parent of the process
+	std::optional<std::unique_ptr<ProcessDetectionData>> ParentProcess;
+
+	/// The base address of the potentially malicious memory segment inside the process
+	std::optional<PVOID64> BaseAddress;
+
+	/// The size of the potentially malicious memory segment
+	std::optional<DWORD> MemorySize;
+
+	/// The name of the image in memory being referenced by the detection. 
+	std::optional<std::wstring> ImageName;
+
+	/**
+	 * Instantiates a ProcessDetectionData object representing a malicious image loaded in
+	 * to a process. This constructor is intended to be used primarily when a handle to the
+	 * process is infeasible to obtain. Note that this constructor is intended to be used 
+	 * when a loaded libary is determined to be malicious, not when the library is infected,
+	 * hooked, stomped, hollowed, doppelganged, or similar. No arguments will be deduced
+	 * when using this constructor.
+	 * 
+	 * @param PID The process ID of the process
+	 * @param ProcessName The name of the process
+	 * @param ImageName The name of the image in memory being referenced by the detection
+	 * @param BaseAddress The base address of the image in memory
+	 * @param MemorySize The size of the image in memory
+	 * @param ProcessPath The path to the executable image of the process
+	 * @param ProcessCommand The command used to spawn the process
+	 * @param ParentProcess An pointer to a ProcessDetectionData struct containing information
+	 *        on the parent process.
+	 */
+	static ProcessDetectionData CreateImageDetectionData(
+		IN DWORD PID,
+		IN CONST std::wstring& ProcessName,
+		IN CONST std::wstring& ImageName,
+		IN CONST std::optional<PVOID64>& BaseAddress = std::nullopt OPTIONAL,
+		IN CONST std::optional<DWORD>& MemorySize = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
+	);
+
+	/**
+	 * Instantiates a ProcessDetectionData object representing a malicious image loaded in
+	 * to a process. This constructor is intended to be used whenever a handle is available.
+	 * Most of the arguments can be calculated, though if they are available, passing them
+	 * improves efficiency. Note that this constructor is intended to be used when a loaded
+	 * libary is determined to be malicious, not when the library is infected, hooked, stomped, 
+	 * hollowed, doppelganged, or similar.
+	 *
+	 * @param PID The process ID of the process
+	 * @param ProcessName The name of the process
+	 * @param ImageName The name of the image in memory being referenced by the detection
+	 * @param BaseAddress The base address of the image in memory. If skipped, this will be 
+     *		  automatically deduced
+	 * @param MemorySize The size of the image in memory. If skipped, this will be automatically
+     *		  deduced
+	 * @param ProcessPath The path to the executable image of the process. If skipped, this will 
+     *		  be automatically deduced
+	 * @param ProcessCommand The command used to spawn the process. If skipped, this will be 
+     *		  automatically deduced
+	 * @param ParentProcess An pointer to a ProcessDetectionData struct containing information
+	 *        on the parent process. If skipped, this will be automatically deduced
+	 */
+	static ProcessDetectionData CreateImageDetectionData(
+		IN CONST HandleWrapper& ProcessHandle,
+		IN CONST std::wstring& ProcessName,
+		IN CONST std::wstring& ImageName,
+		IN CONST std::optional<PVOID64>& BaseAddress = std::nullopt OPTIONAL,
+		IN CONST std::optional<DWORD>& MemorySize = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
+	);
+
+	/**
+	 * 
+	 * This constructor is intended to be used primarily when a handle to the process is
+	 * infeasible to obtain. This constructor generally will be used when there is little other
+	 * information available as to what specifically is malicious or when the process is
+	 * achieving a malicious purpose even though each image inside is benign (as with powershell).
+	 *
+	 * @param PID The process ID of the process
+	 * @param ProcessName The name of the process
+	 * @param ProcessPath The path to the executable image of the process
+	 * @param ProcessCommand The command used to spawn the process
+	 * @param ParentProcess An pointer to a ProcessDetectionData struct containing information
+	 *        on the parent process.
+	 */
+	static ProcessDetectionData CreateProcessDetectionData(
+		IN DWORD PID,
+		IN CONST std::wstring& ProcessName,
+		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
+	);
+
+	/**
+	 * Instantiates a ProcessDetectionData object representing a process which may be malicious. 
+	 * This constructor is intended to be used whenever a handle is available. Most of the 
+	 * arguments can be calculated, though if they are available, passing them improves efficiency. 
+	 * This constructor generally will be used when there is little other information available as 
+	 * to what specifically is malicious or when the process is achieving a malicious purpose even 
+	 * though each image inside is benign (as with powershell).
+	 *
+	 * @param PID The process ID of the process
+	 * @param ProcessName The name of the process
+	 * @param ProcessPath The path to the executable image of the process. If skipped, this will
+	 *		  be automatically deduced
+	 * @param ProcessCommand The command used to spawn the process. If skipped, this will be
+	 *		  automatically deduced
+	 * @param ParentProcess An pointer to a ProcessDetectionData struct containing information
+	 *        on the parent process. If skipped, this will be automatically deduced
+	 */
+	static ProcessDetectionData CreateProcessDetectionData(
+		IN CONST HandleWrapper& ProcessHandle,
+		IN CONST std::wstring& ProcessName,
+		IN CONST std::wstring& ImageName,
+		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
+	);
+
+	/**
+	 * Instantiates a ProcessDetectionData object representing a malicious image loaded in
+	 * to a process. This constructor is intended to be used primarily when a handle to the
+	 * process is infeasible to obtain. Note that this constructor is intended to be used
+	 * when the library is infected, hooked, stomped, hollowed, doppelganged, or similar, not 
+	 * when a loaded libary is determined to be malicious. No arguments will be deduced when
+	 * using this constructor.
+	 *
+	 * @param PID The process ID of the process
+	 * @param ProcessName The name of the process
+	 * @param BaseAddress The base address of the memory section
+	 * @param MemorySize The size of the memory section
+	 * @param ImageName The name of the image in memory being referenced by the detection
+	 * @param ProcessPath The path to the executable image of the process
+	 * @param ProcessCommand The command used to spawn the process
+	 * @param ParentProcess An pointer to a ProcessDetectionData struct containing information
+	 *        on the parent process.
+	 */
+	static ProcessDetectionData CreateMemoryDetectionData(
+		IN DWORD PID,
+		IN CONST std::wstring& ProcessName,
+		IN PVOID64 BaseAddress,
+		IN DWORD MemorySize,
+		IN CONST std::optional<std::wstring>& ImageName = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
+	);
+
+	/**
+	 * Instantiates a ProcessDetectionData object representing a malicious image loaded in
+	 * to a process. This constructor is intended to be used whenever a handle is available.
+	 * Most of the arguments can be calculated, though if they are available, passing them
+	 * improves efficiency. Note that this constructor is intended to be used when a loaded
+	 * libary is determined to be malicious, not when the library is infected, hooked, stomped,
+	 * hollowed, doppelganged, or similar.
+	 *
+	 * @param PID The process ID of the process
+	 * @param ProcessName The name of the process
+	 * @param BaseAddress The base address of the memory section
+	 * @param MemorySize The size of the memory section
+	 * @param ImageName The name of the image in memory being referenced by the detection. If 
+	 *		  skipped, this will be automatically deduced if possible.
+	 * @param ProcessPath The path to the executable image of the process. If skipped, this will
+	 *		  be automatically deduced
+	 * @param ProcessCommand The command used to spawn the process. If skipped, this will be
+	 *		  automatically deduced
+	 * @param ParentProcess An pointer to a ProcessDetectionData struct containing information
+	 *        on the parent process. If skipped, this will be automatically deduced
+	 */
+	static ProcessDetectionData CreateMemoryDetectionData(
+		IN DWORD PID,
+		IN CONST std::wstring& ProcessName,
+		IN PVOID64 BaseAddress,
+		IN DWORD MemorySize,
+		IN CONST std::optional<std::wstring>& ImageName = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
+	);
 };
 
-enum class ServiceStartType {
-	systemStart,
-	autoStart,
-	demandStart
+/**
+ * Stores information about a file identified as possibly malicious
+ */
+struct FileDetectionData {
+
+	/// Indicates whether the file was found on the filesystem
+	bool FileFound;
+
+	/// Information about the directory listing for the file
+	std::wstring FilePath;
+	std::wstring FileName;
+	std::optional<std::wstring> FileExtension;
+
+	/// The type of the file. This differs from extensions in that mutliple different
+	/// file extensions may correspond to the same filetype. 
+	std::optional<std::wstring> FileType;
+
+	/// Command run to open the file. Stored in HKCR\<File Type>\shell\open\command
+	std::optional<std::wstring> Executor;
+
+	/// A handle for the file
+	std::optional<FileSystem::File> FileHandle;
+
+	/// Hashes of the file
+	struct {
+		std::optional<std::wstring> MD5;
+		std::optional<std::wstring> SHA1;
+		std::optional<std::wstring> SHA256;
+	} HashInfo;
+
+	/// Timestamps associated with the file
+	struct {
+		std::optional<SYSTEMTIME> LastModified;
+		std::optional<SYSTEMTIME> LastOpened;
+		std::optional<SYSTEMTIME> FileCreated;
+	} TimestampInfo;
+
+	/// Information about a yara scan performed on the file
+	std::optional<YaraScanResult> yara;
+
+	/// Indicates whether the file is properly signed and the signature is trusted
+	std::optional<bool> FileSigned;
+
+	/// The title of the signer of this file, given that the file is signed
+	std::optional<std::wstring> Signer;
+
+	/**
+	 * Creates a FileDetectionData using an open handle to the file. This works under
+	 * the assumption that the detection matches the file found on disk. If generating
+	 * this detection from event logs or other records, this may not be the case. If
+	 * the file has already been scanned with yara, it is recommended that the result
+	 * be passed in to the constructor so that it doesn't have to be scanned a second time.
+	 *
+	 * @param file A File object representing the file.
+	 * @param scan The result of a yara scan performed on a file. This parameter is optional,
+	 *        but providing the result will avoid the need for the scan to be repeated.
+	 */
+	FileDetectionData(
+		IN CONST FileSystem::File& file,
+		IN CONST std::optional<YaraScanResult>& scan OPTIONAL
+	);
+
+	/**
+	 * Creates a FileDetectionData using the file's path on disk. This constructor is best
+	 * used when the file could not be found or it is infeasible to construct a File object
+	 * representing the underlying file. If a File object is available, using the other
+	 * constructor will be more efficient.
+	 *
+	 * @param FilePath The path of the file
+	 */
+	FileDetectionData(
+		IN CONST std::wstring& FilePath
+	);
 };
 
-/// A struct containing information about a event identified in a hunt
-struct EVENT_DETECTION : public DETECTION {
-	unsigned int eventID;
-	unsigned int eventRecordID;
-	std::wstring timeCreated;
-	std::wstring channel;
-	std::wstring rawXML;
-	std::unordered_map<std::wstring, std::wstring> params;
+/**
+ * Stores information about a registry entry identified as possibly malicious. This entry
+ * may be a whole registry key, a registry value, or just part of a registry value.
+ *
+ * If a registry value is detected on and it is a REG_MULTI_SZ, rather than creating one 
+ * detection for the value as a whole, create a separate detection for each potentially 
+ * malicious entry in the value as a REG_SZ.
+ */
+struct RegistryDetectionData {
+
+	/// The path of the registry key associated with the registry entry
+	std::wstring KeyPath;
+
+	/// The key associated with the registry entry.
+	Registry::RegistryKey key;
+
+	/// An optional value under the key associated with the registry entry
+	std::optional<Registry::RegistryValue> value;
+
+	/// The raw data contained in the registry entry.
+	std::optional<AllocationWrapper> data;
+
+	/**
+	 * Creates a RegistryDetectionData, referencing either a registry key, a registry value,
+	 * or part of a registry value. If a registry value is detected on and it is a REG_MULTI_SZ, 
+	 * rather than creating one detection for the value as a whole, create a separate detection 
+	 * for each potentially malicious entry in the value as a REG_SZ.
+	 *
+	 * @param key The associated with the registry entry.
+	 * @param value An optional value under the key associated with the registry entry
+	 * @param data An optional allocation wrapper storing the raw data associated with the registry 
+	 *        entry. If `value` represents only part of a registry value's data, this should not be
+	 *        set.
+	 */
+	RegistryDetectionData(
+		IN CONST Registry::RegistryKey& key,
+		IN CONST std::optional<Registry::RegistryValue>& value = std::nullopt OPTIONAL,
+		IN CONST std::optional<AllocationWrapper>& data = std::nullopt OPTIONAL
+	);
+};
+
+/**
+ * Stores information about a service identified as possibly malicious. Note that when 
+ * creating a service detection object, it is recommended that the registry keys and files
+ * associated with the service should have separate detection objects.
+ */
+struct ServiceDetectionData {
+
+	/// The name of the service
+	std::wstring ServiceName;
+
+	/// The display name of the service
+	std::optional<std::wstring> DisplayName;
+
+	/// The description of the service
+	std::optional<std::wstring> Description;
+
+	/**
+	 * Creates a ServiceDetectionData object, referencing a windows service that may be
+	 * malicious. 
+	 * 
+	 * @param ServiceName The name of the service
+	 * @param DisplayName The display name of the service
+	 * @param Description The description of the service
+	 */
+	ServiceDetectionData(
+		IN CONST std::wstring& ServiceName,
+		IN CONST std::optional<std::wstring>& DisplayName = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& Description = std::nullopt OPTIONAL
+	);
+};
+
+/**
+ * Stores information about something not covered by other detection types identified as
+ * possibly malicious. This includes things such as users, groups, shares, pipes, and more.
+ */
+struct OtherDetectionData {
 	
-	EVENT_DETECTION(unsigned int eventID, unsigned int eventRecordID, const std::wstring& timeCreated, 
-					const std::wstring& channel, const std::wstring& rawXML) :
-		DETECTION{ DetectionType::Event },
-		eventID{ eventID },
-		eventRecordID{ eventRecordID },
-		timeCreated{ timeCreated },
-		channel{ channel },
-		rawXML{ rawXML }{}
+	/// A string describing the type of detection associated with this object.
+	std::wstring DetectionType;
+
+	/// Stores data about the detection
+	std::unordered_map<std::wstring, std::wstring> DetectionProperties;
+
+	/**
+	 * Creates an OtherDetectionData object, referencing something on the system identified
+	 * as possibly malicious. OtherDetectionData objects consist of a type and a map of 
+	 * properties and their values, represented as strings.
+	 *
+	 * @param DetectionType A string describing the type of detection associated with this 
+	 *        object
+	 * @param DetectionProperties A mapping of property to value describing what's being 
+	 *        referenced by this.
+	 */
+	OtherDetectionData(
+		IN CONST std::wstring& DetectionType,
+		IN CONST std::unordered_map<std::wstring, std::wstring>& DetectionProperties
+	);
 };
-typedef std::shared_ptr<EVENT_DETECTION> EventDetection;
-typedef std::function<void(std::shared_ptr<EVENT_DETECTION>)> DetectEvent;
 
-struct OTHER_DETECTION : public DETECTION {
-	std::wstring type;
-	std::map<std::wstring, std::wstring> params;
+/// Stores contextual information around a detection
+struct DetectionContext {
+	
+	/// A set of the hunts that identified the detection
+	std::unordered_set<std::wstring> hunts;
+	
+	/// The time at which the first evidence of the detection was created
+	std::optional<SYSTEMTIME> FirstEvidenceTime;
 
-	OTHER_DETECTION(const std::wstring& type, const std::map<std::wstring, std::wstring>& params) : 
-		DETECTION{ DetectionType::Other },
-		type{ type },
-		params{ params }{}
+	/// The time at which the detection was created
+	SYSTEMTIME DetectionCreatedTime;
+
+	/**
+	 * Creates a DetectionContext for a detection. 
+	 *
+	 * @param DetectionCreatedTime The time at which the detection was created
+	 * @param hunt If the associated detection is created by a hunt, this is the hunt responsible for 
+	 *        creating it
+	 * @param FirstEvidenceTime The time at which the first evidence of this detection was created
+	 */
+	DetectionContext(
+		IN SYSTEMTIME DetectionCreatedTime,
+		IN CONST std::optional<std::wstring>& hunt = std::nullopt OPTIONAL,
+		IN CONST std::optional<SYSTEMTIME>& FirstEvidenceTime = std::nullopt OPTIONAL
+	);
 };
-typedef std::shared_ptr<OTHER_DETECTION> OtherDetection;
-typedef std::function<void(std::shared_ptr<OTHER_DETECTION>)> DetectOther;
 
+/// A container for the various type of detection data a Detection object may reference
+typedef std::variant<
+	ProcessDetectionData,
+	FileDetectionData,
+	RegistryDetectionData,
+	ServiceDetectionData,
+	OtherDetectionData
+> DetectionData;
 
-typedef std::function<void(const HuntInfo&)> HuntStart;
-typedef std::function<void()> HuntEnd;
+/**
+ * Represents something that has been identified as potentially malicious. Each detection object
+ * can be further broken down in to the types laid out in the DetectionType enum. Each type of
+ * detection then has an associated DetectionData object providing information on the details of
+ * what was detected. Each detection also may hold a remediator, which will handle the detection,
+ * either removing it, fixing it, or mitigating it. This remediator can be used by a reaction and
+ * should be set when the detection is created if possible. Finally, the the detection will hold
+ * a DetectionContext object, which holds information about the detection itself, such as the hunts
+ * that generated it, when it was generated, and when the thing being detected was first identified.
+ */
+class Detection {
+
+	/// Indicates whether the data represented by this detection is consistent with the
+	/// current state of the operating system.
+	bool DetectionStale;
+
+	/// Indicates the type of this detection
+	DetectionType type;
+
+	/// Describes what this detection object is representing
+	DetectionData data;
+
+	/// A function that when run will remediate the detection, either removing it, fixing it, or 
+	/// mitigating it.
+	std::optional<std::function<void()>> remediator;
+
+	/// Describes the context surrounding the detection such as when the first evidence of the 
+	/// detection was created, the hunts generating this detection, and the time the detection
+	/// was generated.
+	std::optional<DetectionContext> context;
+
+	/**
+	 * Creates a Detection object, given associated data, optional context, an optional remediator,
+	 * and an optional indicator as to whether the detection is stale.
+	 *
+	 * @param data The data associated with the detection to be created. The type will be deduced.
+	 * @param context The context surrounding the detection. If not provided, this will default to
+	 *        only include the time.
+	 * @param remediator A function that can be used to remediate the detection if it is determined
+	 *        to be malicious. By default, there is no remediator.
+	 * @param DetectionStale A boolean indicating whether the data represented by this detection is 
+	 *        consistent with the current state of the operating system. This defaults to false.
+	 */
+	Detection(
+		IN CONST DetectionData& data,
+		IN CONST std::optional<Detection>& context = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::function<void()>>& remediator = std::nullopt OPTIONAL,
+		IN bool DetectionStale = false OPTIONAL
+	);
+};

@@ -53,15 +53,6 @@ public:
 /// An association is the degree of certainty that two detections are related
 typedef Certainty Association;
 
-Association AddAssociation(Association a1, Association a2);
-
-/**
- * If an association is to be the composite of two associations, this function will compute the
- * resulting association. Using the numerical value of associations, the formula is
- * a1 * a2, rounded to the nearest association.
- */
-Association MultiplyAssociation(Association a1, Association a2);
-
 /// Forward declare scanners and DetectionNetwork so they can be friends
 class RegistryScanner;
 class ProcessScanner;
