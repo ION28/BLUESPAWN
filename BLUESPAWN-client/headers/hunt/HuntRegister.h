@@ -4,29 +4,33 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <type_traits>
 
 #include "Hunt.h"
 #include "Scope.h"
-#include "user/CLI.h"
 
 using namespace std;
 
 class HuntRegister {
 private:
-	vector<std::shared_ptr<Hunt>> vRegisteredHunts{};
-	const IOBase& io;
-
-	map<Tactic, vector<reference_wrapper<Hunt>>> mTactics{};
-	map<DataSource, vector<reference_wrapper<Hunt>>> mDataSources{};
-	map<Category, vector<reference_wrapper<Hunt>>> mAffectedThings{};
+	static vector<std::shared_ptr<Hunt>> vRegisteredHunts;
 
 public:
-	HuntRegister(const IOBase& oIo);
 
-	std::vector<std::shared_ptr<DETECTION>> RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope);
-	std::vector<std::shared_ptr<DETECTION>> RunHunt(Hunt& hunt, const Scope& scope);
+	/**
+	 * Runs the hunts registered with the RegisterHunt function with the given
+	 * scope.
+	 *
+	 * @param scope An optional scope object representing the limitations of the hunt
+	 * @param async A boolean indicating whether this function should wait for all hunts
+	 *        to finish before returning.
+	 */
+	static std::vector<Detection> RunHuntsAsync(
+		IN CONST Scope& scope = {} OPTIONAL, 
+		IN CONST bool async = false OPTIONAL
+	);
 
-	void SetupMonitoring();
-	void RegisterHunt(std::shared_ptr<Hunt> hunt);
+	static std::vector<Detection> RunHunt(Hunt& hunt, const Scope& scope);
+
+	static void SetupMonitoring();
+	static void RegisterHunt(const std::shared_ptr<Hunt>& hunt);
 };

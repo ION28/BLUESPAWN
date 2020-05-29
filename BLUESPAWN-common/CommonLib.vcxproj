@@ -25,18 +25,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="headers\common\DynamicLinker.h" />
+    <ClInclude Include="headers\common\Promise.h" />
     <ClInclude Include="headers\common\StringUtils.h" />
+    <ClInclude Include="headers\common\ThreadPool.h" />
     <ClInclude Include="headers\common\Utils.h" />
     <ClInclude Include="headers\common\wrappers.hpp" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DynamicLinker.cpp" />
     <ClCompile Include="src\StringUtils.cpp" />
     <ClCompile Include="src\Utils.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="CommonLib.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{25AE1D80-3E17-4E1D-BFB4-8AFB375EBAF1}</ProjectGuid>
