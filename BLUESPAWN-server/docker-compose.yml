@@ -18,22 +18,16 @@ services:
       context: ./elk/kibana
     ports:
       - "5601:5601"
-  bluespawn-server:
+  logstash:
+    depends_on:
+      - elk_base
     build:
-      context: ./management
+      context: ./elk/logstash
     ports:
-      - "3000:3000"
-    volumes:
-      - "./bluespawn-server:/bluespawn-server"
-    stdin_open: true
-    tty: true
+      - "9600:9600"
+      - "5044:5044"
   shell:
     build:
       context: ./elk/shell
     stdin_open: true
     tty: true
-
-networks:
-  default:
-    external:
-      name: elk-network

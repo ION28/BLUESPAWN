@@ -60,5 +60,19 @@ elasticsearch.username: "kibana"
 elasticsearch.password: "Chiapet1"
 elasticsearch.ssl.verificationMode: certificate
 elasticsearch.ssl.certificateAuthorities: [ "certs/ca.crt" ]
+xpack.security.encryptionKey: "some_really_long_phrase_no_one_can_guess_haha"
 '
 echo "$kibana_config" >> /opt/kibana/config/kibana.yml
+
+# Configure logstash
+openssl pkcs8 -in /certs/logstash/logstash.key -topk8 -nocrypt -out /certs/logstash/logstash.pkcs8.key
+cd /opt/logstash
+logstash_config='node.name: logstash
+xpack.monitoring.enabled: true
+xpack.monitoring.elasticsearch.username: logstash_system
+xpack.monitoring.elasticsearch.password: "Chiapet1"
+xpack.monitoring.elasticsearch.hosts: [ 'https://elasticsearch:9200' ]
+xpack.monitoring.elasticsearch.ssl.certificate_authority: /certs/ca/ca.crt
+'
+
+echo "$logstash_config" >> /opt/logstash/config/logstash.yml

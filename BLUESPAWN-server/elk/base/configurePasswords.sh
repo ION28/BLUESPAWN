@@ -1,8 +1,7 @@
 #!/bin/bash
 set -xe
 
-service elasticsearch start
-sleep 20
+/launchElastic.sh
 
 # Randomly generate passwords and store the output
 pass=$(./opt/elasticsearch/bin/elasticsearch-setup-passwords auto -b -u "https://127.0.0.1:9200")
@@ -41,11 +40,3 @@ curl --cacert /certs/ca/ca.crt -k --user elastic:"$elastic_pass" -X POST "https:
   "password" : "Chiapet1"
 }
 '
-
-kibana_config='elasticsearch.username: "kibana"
-elasticsearch.password: "Chiapet1"
-xpack.security.encryptionKey: "some_really_long_phrase_no_one_can_guess_haha"
-'
-echo "$kibana_config" >> /opt/kibana/config/kibana.yml
-
-cat /opt/kibana/config/kibana.yml
