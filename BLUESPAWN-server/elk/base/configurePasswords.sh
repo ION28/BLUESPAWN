@@ -1,7 +1,8 @@
 #!/bin/bash
 set -xe
 
-/launchElastic.sh
+service elasticsearch start
+sleep 20
 
 # Randomly generate passwords and store the output
 pass=$(./opt/elasticsearch/bin/elasticsearch-setup-passwords auto -b -u "https://127.0.0.1:9200")
@@ -40,3 +41,5 @@ curl --cacert /certs/ca/ca.crt -k --user elastic:"$elastic_pass" -X POST "https:
   "password" : "Chiapet1"
 }
 '
+
+echo "Passwords Configured"

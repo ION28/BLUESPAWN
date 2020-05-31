@@ -26,6 +26,17 @@ services:
     ports:
       - "9600:9600"
       - "5044:5044"
+    volumes:
+      - "./logs:/var/log/logstash"
+  bluespawn-server:
+    build:
+      context: ./management
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./bluespawn-server:/bluespawn-server"
+    stdin_open: true
+    tty: true
   shell:
     build:
       context: ./elk/shell
