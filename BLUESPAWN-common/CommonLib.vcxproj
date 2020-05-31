@@ -34,6 +34,7 @@
   <ItemGroup>
     <ClCompile Include="src\DynamicLinker.cpp" />
     <ClCompile Include="src\StringUtils.cpp" />
+    <ClCompile Include="src\ThreadPool.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -5,9 +5,13 @@
 ThreadPool ThreadPool::instance{};
 
 void ThreadPool::ThreadFunction(){
-	while(true){
+	while(active){
 		auto result{ WaitForSingleObject(hSemaphore, INFINITE) };
 		if(result == WAIT_OBJECT_0){
+			if(!active){
+				return;
+			}
+
 			EnterCriticalSection(hGuard);
 			auto function{ tasks.front() };
 			tasks.pop();
@@ -15,17 +19,21 @@ void ThreadPool::ThreadFunction(){
 
 			try{
 				function();
-			} catch(std::exception& e){
-				// Handle Exception
+			} catch(std::exception e){
+				auto functions{ vExceptionHandlers };
+
+				// Defer handling the exceptions until later
+				EnqueueTask([functions, e](){
+					for(auto& function : functions){
+						function(e);
+					}
+				});
 			}
 		} else{
 			if(WaitForSingleObject(hSemaphore, 0) == WAIT_FAILED){
 				// hSemaphore has become invalidated somehow. Recreate it
 				hSemaphore = CreateSemaphoreW(nullptr, 0, static_cast<LONG>(-1), nullptr);
-			} else {
-				throw std::exception(("Error " + std::to_string(GetLastError()) + " occured when waiting for semaphore").c_str());
 			}
-			// Handle exception
 		}
 	}
 }
@@ -49,6 +57,16 @@ ThreadPool::ThreadPool() :
 	}
 }
 
+ThreadPool::~ThreadPool(){
+	active = false;
+
+	ReleaseSemaphore(hSemaphore, threads.size(), nullptr);
+
+	for(auto& thread : threads){
+		thread.join();
+	}
+}
+
 void ThreadPool::EnqueueTask(IN CONST std::function<void()>& function){
 	auto lock{ BeginCriticalSection(hGuard) };
 
@@ -59,4 +77,9 @@ void ThreadPool::EnqueueTask(IN CONST std::function<void()>& function){
 
 ThreadPool& ThreadPool::GetInstance(){
 	return instance;
+}
+
+void ThreadPool::AddExceptionHandler(
+	IN CONST std::function<void(const std::exception & e)>& function){
+	vExceptionHandlers.emplace_back(function);
 }

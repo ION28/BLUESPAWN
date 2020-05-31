@@ -15,7 +15,7 @@ private:
 	/// A queue of tasks to be executed by the threadpool
 	std::queue<std::function<void()>> tasks;
 
-	/// A vector of threads 
+	/// A vector of worker threads 
 	std::vector<std::thread> threads;
 
 	/// A critical section guarding access to tasks and threads
@@ -24,21 +24,30 @@ private:
 	/// A semaphore counting the number of tasks in the queue
 	HandleWrapper hSemaphore;
 
+	/// A boolean indicating whether the threadpool is active. If false, all threads will
+	/// terminate when they finish their tasks.
+	bool active;
+
 	/// The threadpool instance
 	static ThreadPool instance;
 
 	/// Private constructor
 	ThreadPool();
 
-	/// The function that each thread runs in, for internal use only
+	/// A vector of functions to be called when an exception is raised
+	std::vector<std::function<void(const std::exception& e)>> vExceptionHandlers;
+
+	/// The function that each worker thread runs in, for internal use only
 	void ThreadFunction();
 
 public:
 
+	~ThreadPool();
+
 	/**
 	 * Returns a reference to the threadpool instance
 	 */
-	ThreadPool& GetInstance();
+	static ThreadPool& GetInstance();
 
 	// Delete the move and copy constructors; this is a singleton class
 	ThreadPool(const ThreadPool&) = delete;
@@ -76,4 +85,16 @@ public:
 		});
 		return std::move(promise);
 	}
+
+	/**
+	 * Adds a function to be called whenever a task raises an exception. This
+	 * function call will be enqueued as a separate task to the threadpool rather
+	 * than being immediately handled. 
+	 *
+	 * @param function A function to be called whenever a task raises an exception.
+	 *        The exception will be passed as an argument to the function.
+	 */
+	void AddExceptionHandler(
+		IN CONST std::function<void(const std::exception& e)>& function
+	);
 };
