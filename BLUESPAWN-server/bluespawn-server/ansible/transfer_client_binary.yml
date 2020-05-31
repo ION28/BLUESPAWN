@@ -1,4 +1,9 @@
 --- 
+  - name: Fail if binaries not present
+    fail: 
+      msg: "{{ 'Error: missing x{} client binary'.format('64' if is64bit else '86') }}"
+    when: not binary_present
+
   - name: Transfer client binary
     win_copy:
       src: "{{ local_client_binary_path }}"

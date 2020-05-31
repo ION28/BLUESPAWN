@@ -4,6 +4,9 @@
     transfer_over_ftp: false
     verbose_output: false
     is64bit: false
+    exists64bin: false
+    exists86bin: false
+    binary_present: false
     client_binary_url: ""
     client_binary_dest: ""
     client_install_dir: ""
@@ -24,6 +27,7 @@
         client_binary_dest: "%programfiles%/BLUESPAWN/BLUESPAWN-client.exe"
         client_install_dir: "%programfiles%/BLUESPAWN"
         local_client_binary_path: "{{ playbook_dir }}/{{ 'BLUESPAWN-client-' + ('x64' if is64bit else 'x86') + '.exe' }}"
+        binary_present: "{{ exists64bin if is64bit else exists86bin }}"
     - name: Create BLUESPAWN dir
       win_file: path={{ client_install_dir }} state=directory  
     - name: Fetch latest release from github
