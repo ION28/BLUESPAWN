@@ -345,6 +345,7 @@ namespace Permissions {
 		ULONG uPrivCount{ 0 };
 		std::vector<LSA_UNICODE_STRING> vPrivs{ };
 		HRESULT hr = LsaNtStatusToWinError(LsaEnumerateAccountRights(lPolicyHandle, GetSID(), &pReceivedPrivs, &uPrivCount));
+		AllocationWrapper awReceivedPrivsHandler{ pReceivedPrivs, 0, AllocationWrapper::NET_ALLOC };
 		if (hr != ERROR_SUCCESS && otType != OwnerType::USER) {
 			LOG_ERROR("Error getting owner privileges. (Error: " << GetLastError() << ")");
 			SetLastError(hr);
@@ -354,14 +355,14 @@ namespace Permissions {
 			for (int i = 0; i < uPrivCount; i++) {
 				vPrivs.emplace_back(pReceivedPrivs[i]);
 			}
-			LsaFreeMemory(pReceivedPrivs);
 		}
 		//Get privileges from groups that a user belongs to
 		if (otType == OwnerType::USER) {
 			PGROUP_USERS_INFO_0 pGroupInfo{ nullptr };
 			DWORD dEntriesRead{ 0 };
 			DWORD dEntriesTotal{ 0 };
-			NET_API_STATUS stat = NetUserGetLocalGroups(wDomainName.c_str(), wName.c_str(), 0, LG_INCLUDE_INDIRECT ,reinterpret_cast<LPBYTE *>(&pGroupInfo), MAX_PREFERRED_LENGTH, &dEntriesRead, &dEntriesTotal);
+			NET_API_STATUS stat = NetUserGetLocalGroups(wDomainName.c_str(), wName.c_str(), 0, LG_INCLUDE_INDIRECT , reinterpret_cast<LPBYTE *>(&pGroupInfo), MAX_PREFERRED_LENGTH, &dEntriesRead, &dEntriesTotal);
+			AllocationWrapper awGroupInfoHandler{ pGroupInfo, 0, AllocationWrapper::NET_ALLOC };
 			if (stat != NERR_Success) {
 				LOG_ERROR("Error getting user groups. (Net Error: " << stat << ")");
 				return vPrivs;
@@ -370,6 +371,7 @@ namespace Permissions {
 			for (int i = 0; i < dEntriesRead; i++) {
 				Owner oGroup(pGroupInfo[i].grui0_name);
 				hr = LsaNtStatusToWinError(LsaEnumerateAccountRights(lPolicyHandle, oGroup.GetSID(), &pReceivedPrivs, &uPrivCount));
+				awReceivedPrivsHandler = { pReceivedPrivs, 0, AllocationWrapper::NET_ALLOC };
 				if (hr != ERROR_SUCCESS) {
 					LOG_ERROR("Error getting group privileges. (Error: " << GetLastError() << ")");
 				}
@@ -377,7 +379,6 @@ namespace Permissions {
 					for (int i = 0; i < uPrivCount; i++) {
 						vPrivs.emplace_back(pReceivedPrivs[i]);
 					}
-					LsaFreeMemory(pReceivedPrivs);
 				}
 			}
 		}
@@ -410,6 +411,7 @@ namespace Permissions {
 		PLSA_ENUMERATION_INFORMATION pOwners{ nullptr };
 		ULONG uNumOwners{ 0 };
 		HRESULT hr = LsaNtStatusToWinError(LsaEnumerateAccountsWithUserRight(lPolicyHandle, &lPrivName, reinterpret_cast<PVOID *>(&pOwners), &uNumOwners));
+		AllocationWrapper awOwnersHandler{ pOwners, 0, AllocationWrapper::NET_ALLOC };
 		if (hr != ERROR_SUCCESS) {
 			LOG_ERROR("Error getting accounts with user privilege. (Error: " << hr << ")");
 			SetLastError(hr);
@@ -423,7 +425,6 @@ namespace Permissions {
 			Owner o(sdSID);
 			vOwners.emplace_back(o);
 		}
-		LsaFreeMemory(pOwners);
 		SetLastError(ERROR_SUCCESS);
 		return vOwners;
 	}
