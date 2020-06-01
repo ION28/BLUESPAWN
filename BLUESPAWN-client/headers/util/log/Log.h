@@ -11,31 +11,31 @@
 #include "LogSink.h"
 
 // A generic macro to log a message with a given set of sinks at a given level
-#define LOG(SINK, LEVEL, ...) \
-    Log::LogMessage(SINK, LEVEL) << __VA_ARGS__
+#define LOG(LEVEL, ...) \
+    Log::LogMessage(LEVEL) << __VA_ARGS__
 
 // A macro to log an error in the set of sinks specified by AddSink and RemoveSink
 #define LOG_ERROR(...) \
-   LOG(Log::_LogCurrentSinks, Log::LogLevel::LogError, __VA_ARGS__ << Log::endlog)
+   LOG(Log::LogLevel::LogError, __VA_ARGS__ << Log::endlog)
 
 // A macro to log a warning in the set of sinks specified by AddSink and RemoveSink
 #define LOG_WARNING(...) \
-   LOG(Log::_LogCurrentSinks, Log::LogLevel::LogWarn, __VA_ARGS__ << Log::endlog)
+   LOG(Log::LogLevel::LogWarn, __VA_ARGS__ << Log::endlog)
 
 // A macro to log information in the set of sinks specified by AddSink and RemoveSink
-#define LOG_INFO(...) \
-   LOG(Log::_LogCurrentSinks, Log::LogLevel::LogInfo, __VA_ARGS__ << Log::endlog)
+#define LOG_INFO(VERBOSITY, ...) \
+   LOG(Log::LogLevel::LogInfo##VERBOSITY, __VA_ARGS__ << Log::endlog)
 
 // A macro to log verbose information in the set of sinks specified by AddSink and RemoveSink
 // at a specified verbosity. Under current configurations, this should be between 1 and 3 inclusive.
 #define LOG_VERBOSE(VERBOSITY, ...) \
-   LOG(Log::_LogCurrentSinks, Log::LogLevel::LogVerbose##VERBOSITY, __VA_ARGS__ << Log::endlog)
+   LOG(Log::LogLevel::LogVerbose##VERBOSITY, __VA_ARGS__ << Log::endlog)
 
 namespace Log {
 
 	// A vector containing the set of sinks to be used when LOG_ERROR, LOG_WARNING, etc are used.
 	// This vector is updated by the AddSink and RemoveSink functions.
-	extern std::vector<std::shared_ptr<LogSink>> _LogCurrentSinks;
+	extern std::vector<std::unique_ptr<LogSink>> _LogSinks;
 
 	// A dummy class to indicate the termination of a log message.
 	class LogTerminator {};
@@ -50,71 +50,22 @@ namespace Log {
 	class LogMessage {
 	protected:
 		// The internal stream used to keep track of the log message
-		std::stringstream InternalStream{};
+		std::wstringstream stream{};
 		
 		// The level at which the log message is being logged.
-		LogLevel Level;
-
-		// A vector containing the sinks to which this message is being logged.
-		std::vector<std::shared_ptr<LogSink>> Sinks{};
+		LogLevel level;
 
 		/**
 		 * An internal constructor used create a log message based off of an already existing
 		 * stream.
-		 */
-		LogMessage(std::vector<std::shared_ptr<LogSink>>, LogLevel, std::stringstream);
-
-	public:
-
-		/**
-		 * Creates a log message at a given level and with a vector of sinks
 		 *
-		 * @param sinks The sinks that this message will log itself to.
 		 * @param level The log level at which this message is logged.
+		 * @param message The pre-existing contents of the message
 		 */
-		LogMessage(std::vector<std::shared_ptr<LogSink>> sinks, LogLevel level);
-
-		/**
-		 * Creates a log message at a given level and with a sink
-		 *
-		 * @param sink The sink that this message will log itself to.
-		 * @param level The log level at which this message is logged.
-		 */
-		LogMessage(const std::shared_ptr<LogSink>& sink, LogLevel level);
-
-		/**
-		 * When the LogTerminator is supplied to the stream, the stream is terminated and forwarded to
-		 * the sinks for recording. After this happens, the log message is emptied and able to be used
-		 * again.
-		 *
-		 * @param terminator An instance of the LogTerminator class used to denote the termination of a 
-		 *        message
-		 *
-		 * @return a reference to this log message.
-		 */
-		virtual LogMessage& operator<<(const LogTerminator& termiantor);
-
-		/**
-		 * StringStreams don't support wide strings, so this serves as a handler for
-		 * wide strings being logged.
-		 *
-		 * @param string The wide string to add to the message
-		 *
-		 * @return a reference to this log message.
-		 */
-		LogMessage& operator<<(const std::wstring& string);
-
-		/**
-		 * StringStreams don't support wide strings, so this serves as a handler for
-		 * wide strings being logged.
-		 *
-		 * @param string The wide string to add to the message
-		 *
-		 * @return a reference to this log message.
-		 */
-		LogMessage& operator<<(LPCWSTR pointer);
-
-	protected:
+		LogMessage(
+			IN CONST LogLevel& level,
+			IN CONST std::wstringstream& message
+		);
 
 		/**
 		 * StringStream does most of the work needed to handle a stream of values being logged
@@ -126,8 +77,11 @@ namespace Log {
 		 * @return a reference to this log message.
 		 */
 		template<class T>
-		LogMessage& InnerLog(T LogItem, std::false_type){
-			InternalStream << LogItem;
+		LogMessage& InnerLog(
+			IN CONST T LogItem, 
+			IN CONST std::false_type&
+		){
+			stream << LogItem;
 			return *this;
 		}
 
@@ -135,41 +89,66 @@ namespace Log {
 		 * At some point, it may become beneficial to log the current state of a component.
 		 * This is meant to serve as a handler for components implementing the Loggable
 		 * interface.
+		 *
+		 * @param loggable The component to log
+		 *
+		 * @return a reference to this log message.
 		 */
-		LogMessage& InnerLog(const Loggable& loggable, std::true_type){
-			return operator<<(loggable.ToString());
-		}
+		LogMessage& InnerLog(
+			IN CONST Loggable& loggable, 
+			IN CONST std::true_type&
+		);
 
-	public: 
+	public:
 
 		/**
-		 * Tag dispatcher for the InnerLog functions
+		 * Creates a log message at a given level and with a sink
+		 *
+		 * @param level The log level at which this message is logged.
+		 */
+		LogMessage(
+			IN CONST LogLevel& level
+		);
+
+		/**
+		 * When the LogTerminator is supplied to the stream, the stream is terminated and forwarded to
+		 * the sinks for recording. After this happens, the log message is emptied and able to be used
+		 * again.
+		 *
+		 * @param terminator An instance of the LogTerminator class used to denote the termination of a 
+		 *        message
+		 *
+		 * @return a reference to this log message.
+		 */
+		virtual LogMessage& operator<<(
+			IN CONST LogTerminator& termiantor
+		);
+
+		/**
+		 * Tag dispatcher for the InnerLog functions. Used to add elements to this log message
+		 *
+		 * @param LogItem Item to add to this log message
+		 *
+		 * @return a reference to this log message
 		 */
 		template<class T>
-		LogMessage& operator<<(T LogItem){
+		LogMessage& operator<<(
+			IN CONST T& LogItem
+		){
 			return InnerLog(LogItem, std::is_base_of<Loggable, T>{});
 		}
 	};
 
 	/**
-	 * Adds a sink to the vector of default sinks to be used in LOG_ERROR, LOG_WARNING, etc.
-	 * If the provided sink is equal to any sink in the vector already, this will return false
+	 * Adds a given LogSink to the specified levels as a sink for all log messages of that level.
+	 * If the provided sink is equal to any sink in the vector already, this will return false,
 	 * and the sink will not be added.
 	 *
 	 * @param sink The sink to be added
-	 *
-	 * @return A boolean indicating whether or not the sink was added
+	 * @param levels A vector of the log levels that will be logged to the sink
 	 */
-	bool AddSink(const std::shared_ptr<LogSink>& Sink);
-
-	/**
-	 * Removes a sink from the vector of default sinks to be used in LOG_ERROR, LOG_WARNING, etc.
-	 * If the provided sink is not equal to any sink in the vector already, this will return false
-	 * and nothing will happen.
-	 *
-	 * @param sink The sink to be removed
-	 *
-	 * @return A boolean indicating whether or not the sink was removed
-	 */
-	bool RemoveSink(const std::shared_ptr<LogSink>& Sink);
+	void AddSink(
+		IN std::unique_ptr<LogSink>&& sink,
+		IN CONST std::vector<std::reference_wrapper<LogLevel>>& levels
+	);
 }

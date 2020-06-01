@@ -30,8 +30,7 @@ namespace Log {
 		 * @param level The level at which to log
 		 * @param message The message to be logged
 		 */
-		virtual void LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info = std::nullopt,
-			                    const std::vector<std::shared_ptr<DETECTION>>& detections = {}) = 0;
+		virtual void LogMessage(const LogLevel& level, const std::wstring& message) = 0;
 
 		/**
 		 * This function should be implemented to determine whether two log sinks are equal.

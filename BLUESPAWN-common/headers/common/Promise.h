@@ -29,23 +29,32 @@ class Promise {
 private:
 
 	/// Indicates whether the promise is guaranteed to be fufilled
-	bool guaranteed;
-
-	/// Holds the value used to fufill the promise, if any
-	std::optional<T> value;
+	const bool guaranteed;
 
 	/// An event that will be set when the promise is either fufilled or
 	/// invalidated
-	HandleWrapper hEvent;
+	const HandleWrapper hEvent;
 
 	/// A critical section used to guard access to members of this class
-	CriticalSection hGuard;
+	const CriticalSection hGuard;
 
-	/// A vector of functions to be called when the promise is fufilled
-	std::vector<std::function<void(const T&)>> SuccessFunctions;
+	/// A struct containing members meant to be the same across all copies
+	/// of the same Promise. These will be held in a shared pointer.
+	struct Members {
+		/// Holds the value used to fufill the promise, if any
+		std::optional<T> value;
 
-	/// A vector of functions to be called when the promise is invalidated
-	std::vector<std::function<>> FailureFunctions;
+		/// A vector of functions to be called when the promise is fufilled
+		std::vector<std::function<void(const T&)>> SuccessFunctions;
+
+		/// A vector of functions to be called when the promise is invalidated
+		std::vector<std::function<>> FailureFunctions;
+	};
+
+	/// A shared pointer to members, to be shared across copies of the same 
+	/// promise.
+	std::shared_ptr<Members> members;
+
 
 public:
 
@@ -57,12 +66,10 @@ public:
 	 */
 	Promise(
 		IN bool guaranteed = false OPTIONAL
-	) : value{ std::nullopt },
-		guaranteed{ guaranteed },
+	) : guaranteed{ guaranteed },
 		hEvent{ CreateEventW(nullptr, true, false, nullptr) },
 		hGuard{}, 
-		SuccessFunctions{}, 
-		FailureFunctions{} {}
+		members{ std::make_shared<Members>() }{}
 
 
 	/**
@@ -97,7 +104,7 @@ public:
 		EnterCriticalSection(hGuard);
 
 		if(!Fufilled()){
-			SuccessFunctions.emplace_back(callback);
+			members->SuccessFunctions.emplace_back(callback);
 			LeaveCriticalSection(hGuard);
 		} else{
 			LeaveCriticalSection(hGuard);
@@ -122,7 +129,7 @@ public:
 		EnterCriticalSection(hGuard);
 
 		if(!Fufilled()){
-			SuccessFunctions.emplace_back(callback);
+			members->SuccessFunctions.emplace_back(callback);
 			LeaveCriticalSection(hGuard);
 		} else{
 			LeaveCriticalSection(hGuard);
@@ -145,13 +152,13 @@ public:
 	){
 		EnterCriticalSection(hGuard);
 
-		if(!Fufilled()){
-			this->value = value;
+		if(!Finished()){
+			members->value = value;
 
 			SetEvent(hEvent);
 			LeaveCriticalSection(hGuard);
 
-			for(const auto& func : SuccessFunctions){
+			for(const auto& func : members->SuccessFunctions){
 				func(value);
 			}
 
@@ -159,8 +166,8 @@ public:
 		} else{
 			LeaveCriticalSection(hGuard);
 			
-			return detail::has_operator_equals_impl<T>::type::value ? 
-				value == this->value : false;
+			return members->value && (detail::has_operator_equals_impl<T>::type::value ? 
+				value == members->value : false);
 		}
 	}
 
@@ -179,19 +186,19 @@ public:
 
 		EnterCriticalSection(hGuard);
 
-		if(!Fufilled()){
+		if(!Finished()){
 			SetEvent(hEvent);
 			LeaveCriticalSection(hGuard);
 
-			for(const auto& func : FailureFunctions){
-				func(value);
+			for(const auto& func : members->FailureFunctions){
+				func();
 			}
 
 			return true;
 		} else{
 			LeaveCriticalSection(hGuard);
 
-			return !value;
+			return !members->value;
 		}
 	}
 
@@ -201,7 +208,7 @@ public:
 	 * @return true if this promise has been fufilled; false otherwise.
 	 */
 	bool Fufilled(){
-		return Finished() && value;
+		return Finished() && members->value;
 	}
 
 	/**
@@ -210,7 +217,7 @@ public:
 	 * @return true if this promise has been invalidated; false otherwise.
 	 */
 	bool Invalidated(){
-		return Finished() && !value;
+		return Finished() && !members->value;
 	}
 
 	/**
@@ -255,6 +262,6 @@ public:
 			throw std::exception("Attempting to get the value of invalidated promise");
 		}
 
-		return *value;
+		return *members->value;
 	}
 };

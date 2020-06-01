@@ -34,8 +34,8 @@ namespace Log {
 			YELLOW    = 0xE,
 			WHITE     = 0xF,
 		};
-		std::string MessagePrepends[4] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]" };
-		MessageColor PrependColors[5] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, MessageColor::GREEN, MessageColor::GOLD };
+		std::wstring MessagePrepends[4] = { L"[ERROR]", L"[WARNING]", L"[INFO]", L"[VERBOSE]" };
+		MessageColor PrependColors[4] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, MessageColor::LIGHTBLUE };
 		HandleWrapper hMutex;
 
 		/**
@@ -59,8 +59,7 @@ namespace Log {
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
 		 */
-		virtual void LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info = std::nullopt,
-			                    const std::vector<std::shared_ptr<DETECTION>>& detections = {}) override;
+		virtual void LogMessage(const LogLevel& level, const std::wstring& message) override;
 
 		/**
 		 * Compares this CLISink to another LogSink. Currently, as only one console is supported,

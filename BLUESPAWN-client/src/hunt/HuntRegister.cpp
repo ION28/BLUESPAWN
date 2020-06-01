@@ -8,9 +8,7 @@
 #include "common/Utils.h"
 #include "common/ThreadPool.h"
 
-HuntRegister::HuntRegister(const IOBase& io) : io(io) {}
-
-void HuntRegister::RegisterHunt(std::shared_ptr<Hunt> hunt) {
+void HuntRegister::RegisterHunt(std::unique_ptr<Hunt>&& hunt) {
 	vRegisteredHunts.emplace_back(hunt);
 }
 
@@ -19,42 +17,31 @@ std::vector<Promise<std::vector<Detection>>> HuntRegister::RunHunts(IN CONST Sco
 	Bluespawn::io.InformUser(L"Starting a hunt for " + std::to_wstring(vRegisteredHunts.size()) + L" techniques.");
 
 	std::vector<Promise<std::vector<Detection>>> detections{};
-	for(auto name : vRegisteredHunts) {
-		ADD_ALL_VECTOR(detections, name->RunHunt(scope));
+	for(auto& name : vRegisteredHunts) {
+		detections.emplace_back(RunHunt(*name, scope));
 	}
 
-	io.InformUser(L"Successfully ran " + std::to_wstring(vRegisteredHunts.size()) + L" hunts.");
-	io.InformUser(L"Preparing to scan " + std::to_wstring(detections.size()) + L" possible detections.");
-
-	DetectionCollector collector{};
-	for(auto& detection : detections){
-		collector.AddDetection(detection);
-	}
-
-	detections = collector.GetAllDetections();
-	for(auto& detection : detections){
-		switch(detection->Type){
-		case DetectionType::Event:
-			Bluespawn::reaction.EventIdentified(static_pointer_cast<EVENT_DETECTION>(detection));
-			break;
-		case DetectionType::File:
-			Bluespawn::reaction.FileIdentified(static_pointer_cast<FILE_DETECTION>(detection));
-			break;
-		case DetectionType::Process:
-			Bluespawn::reaction.ProcessIdentified(static_pointer_cast<PROCESS_DETECTION>(detection));
-			break;
-		case DetectionType::Registry:
-			Bluespawn::reaction.RegistryKeyIdentified(static_pointer_cast<REGISTRY_DETECTION>(detection));
-			break;
-		case DetectionType::Service:
-			Bluespawn::reaction.ServiceIdentified(static_pointer_cast<SERVICE_DETECTION>(detection));
-			break;
-		case DetectionType::Other:
-			Bluespawn::reaction.OtherIdentified(static_pointer_cast<OTHER_DETECTION>(detection));
-			break;
+	if(async){
+		std::vector<HANDLE> handles{};
+		for(auto result : detections){
+			handles.emplace_back(result);
 		}
-	}
 
+		for(size_t idx{ 0 }; idx < handles.size(); idx += MAXIMUM_WAIT_OBJECTS){
+			auto count{ min(handles.size() - idx, MAXIMUM_WAIT_OBJECTS) };
+			auto result{ WaitForMultipleObjects(count, handles.data() + idx, true, INFINITE) };
+			if(result != WAIT_OBJECT_0){
+				LOG_ERROR("Failed to wait for hunts to finish (status 0x" << std::hex << result << ", error " <<
+						  std::hex << GetLastError() << ")");
+				throw std::exception("Failed to wait for hunts to finish!");
+			}
+		}
+
+		auto successes{ std::count_if(detections.begin(), detections.end(), [](auto result){ return result.Fufilled(); }) };
+
+		Bluespawn::io.InformUser(L"Successfully ran " + std::to_wstring(successes) + L" hunts.");
+	}
+	
 	return detections;
 }
 

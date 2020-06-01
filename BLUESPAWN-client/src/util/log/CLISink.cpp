@@ -13,7 +13,7 @@ namespace Log {
 
 	CLISink::CLISink() : hMutex{ CreateMutexW(nullptr, false, L"Local\\CLI-Mutex") } {}
 
-	void CLISink::LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info, const std::vector<std::shared_ptr<DETECTION>>& detections){
+	void CLISink::LogMessage(const LogLevel& level, const std::wstring& message){
 		auto mutex = AcquireMutex(hMutex);
 		if(level.Enabled()){
 			SetConsoleColor(CLISink::PrependColors[static_cast<WORD>(level.severity)]);
@@ -55,9 +55,9 @@ namespace Log {
 					std::cout << "\tAssociated Message: " << message << std::endl;
 				}
 			} else {
-				std::cout << CLISink::MessagePrepends[static_cast<WORD>(level.severity)] << " ";
+				std::wcout << CLISink::MessagePrepends[static_cast<WORD>(level.severity)] << " ";
 				SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
-				std::cout << message << std::endl;
+				std::wcout << message << std::endl;
 			}
 		}
 	}

@@ -1,4 +1,10 @@
 #pragma once
+
+#include <Windows.h>
+
+#include <string>
+#include <optional>
+
 namespace Log {
 	/**
 	 * This denotes the severity of a log message. This is intended to be used by
@@ -8,9 +14,20 @@ namespace Log {
 		LogError = 0,
 		LogWarn = 1,
 		LogInfo = 2,
-		LogOther = 3,
-		LogHunt = 4
+		LogVerbose = 3
 	};
+
+	/**
+	 * This indicates the level of detail in the log level.
+	 */
+	enum class Detail {
+		Low = 0,
+		Moderate = 1,
+		High = 2
+	};
+
+	/// Forward declare log sink
+	class LogSink;
 
 	/**
 	 * This class represents the "level" of a log message. This is similar to Severity
@@ -20,19 +37,27 @@ namespace Log {
 	 */
 	class LogLevel {
 	private:
-		// Whether or not sinks should record log messages under this level
+		
+		/// Whether or not sinks should record log messages under this level
 		bool enabled;
 
+		/// The sinks to which messages at this level will be recorded
+		std::vector<LogSink*> sinks;
+
 	public:
-		// The severity at which this log level operates
+		/// The severity at which this log level operates
 		const Severity severity;
 
-		// Default logging levels available, though custom ones can be created
+		/// The level of detail present at this logging level
+		const std::optional<Detail> detail;
+
+		/// Default logging levels available, though custom ones can be created
 		static LogLevel
-			LogHunt,     // Intended for logging hunts
 			LogError,    // Intended for logging errors
 			LogWarn,     // Intended for logging warnings
-			LogInfo,     // Intended for logging information and statuses of hunts
+			LogInfo1,    // Intended for logging high level operational information
+			LogInfo2,    // Intended for logging moderately detailed operational information
+			LogInfo3,    // Intended for logging very detailed operational information
 			LogVerbose1, // Intended for a low level of verbosity
 			LogVerbose2, // Intended for a moderate level of verbosity
 			LogVerbose3; // Intended for a high level of verbosity
@@ -41,8 +66,12 @@ namespace Log {
 		 * Creates a new log level, enabled by default, with a given severity.
 		 * 
 		 * @param severity The severity of messages under this logging level
+		 * @param detail The level of detail present at this logging level
 		 */
-		LogLevel(Severity severity);
+		LogLevel(
+			IN Severity severity,
+			IN CONST std::optional<Detail>& detail = std::nullopt OPTIONAL
+		);
 
 		/**
 		 * Creates a new log level with a given severity.
@@ -51,7 +80,11 @@ namespace Log {
 		 * @param DefaultState Indicates whether or not log messages should be recorded
 		 *        by default when logged at this logging level.
 		 */
-		LogLevel(Severity severity, bool DefaultState);
+		LogLevel(
+			IN Severity severity, 
+			IN bool DefaultState,
+			IN CONST std::optional<Detail>& detail = std::nullopt OPTIONAL
+		);
 
 		/**
 		 * Enables logging at this level
@@ -75,5 +108,24 @@ namespace Log {
 		 *       be recorded.
 		 */
 		bool Enabled() const;
+
+		/**
+		 * Adds a sink to which messages logged at this level are recorded. If the level already
+		 * is logging to the sink, this has no effect.
+		 *
+		 * @param sink The sink to add 
+		 */
+		void AddSink(
+			IN LogSink* sink
+		);
+
+		/**
+		 * Logs the given message at this level in the sinks configured for this level
+		 *
+		 * @param message The message to log
+		 */
+		void LogMessage(
+			IN CONST std::wstring& message
+		);
 	};
 }

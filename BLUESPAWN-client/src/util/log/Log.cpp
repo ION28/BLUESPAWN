@@ -1,60 +1,64 @@
 #include "util/log/Log.h"
 #include <iostream>
 
+#include "common/StringUtils.h"
+
 namespace Log {
-	std::vector<std::shared_ptr<Log::LogSink>> _LogCurrentSinks; 
+	std::vector<std::unique_ptr<Log::LogSink>> _LogSinks; 
 	LogTerminator endlog{};
 
-	LogMessage& LogMessage::operator<<(const std::wstring& message){
-		LPCWSTR lpwMessage = message.c_str();
-		LPSTR lpMessage = new CHAR[message.length() + 1]{};
-		WideCharToMultiByte(CP_ACP, 0, lpwMessage, static_cast<int>(message.length()), lpMessage, static_cast<int>(message.length()), 0, nullptr);
+	LogMessage& LogMessage::operator<<(IN CONST LogTerminator& terminator){
+		auto message{ stream.str() };
 
-		InternalStream << std::string(lpMessage);
-		return *this;
-	}
-	LogMessage& LogMessage::operator<<(PCWSTR pointer){
-		return operator<<(std::wstring(pointer));
-	}
-	LogMessage& LogMessage::operator<<(const LogTerminator& terminator){
-		std::string message = InternalStream.str();
+		stream = std::wstringstream{};
+		level.LogMessage(message);
 
-		InternalStream = std::stringstream();
-		for(int idx = 0; idx < Sinks.size(); idx++){
-			Sinks[idx]->LogMessage(Level, message);
-		}
 		return *this;
 	}
 
-	LogMessage::LogMessage(const std::shared_ptr<LogSink>& Sink, LogLevel Level) : Level{ Level } {
-		Sinks.emplace_back(Sink);
-	}
-	LogMessage::LogMessage(std::vector<std::shared_ptr<LogSink>> Sinks, LogLevel Level) : LogMessage(Sinks, Level, std::stringstream{}) {}
-	LogMessage::LogMessage(std::vector<std::shared_ptr<LogSink>> Sinks, LogLevel Level, std::stringstream Stream) : Level{ Level } {
-		this->Sinks = Sinks;
-		std::string StreamContents = Stream.str();
-		InternalStream << StreamContents;
+	LogMessage& LogMessage::InnerLog(IN CONST Loggable& loggable,
+									 IN CONST std::true_type&){
+		return operator<<(loggable.ToString());
 	}
 
-	bool AddSink(const std::shared_ptr<LogSink>& Sink){
-		for(int idx = 0; idx < _LogCurrentSinks.size(); idx++){
-			if(*_LogCurrentSinks[idx] == *Sink){
-				return false;
+	template<>
+	LogMessage& LogMessage::InnerLog(IN CONST LPCSTR& data,
+									 IN CONST std::false_type&){
+		stream << StringToWidestring(data);
+	}
+
+	template<>
+	LogMessage& LogMessage::InnerLog(IN CONST std::string& data,
+									 IN CONST std::false_type&){
+		stream << StringToWidestring(data);
+	}
+
+	LogMessage::LogMessage(IN CONST LogLevel& level) : level{ level } {}
+	LogMessage::LogMessage(IN CONST LogLevel& level,
+						   IN CONST std::wstringstream& message) :
+		level{ level },
+		stream{}{
+		stream << message.str();
+	}
+
+	void AddSink(IN std::unique_ptr<LogSink>&& sink,
+				 IN CONST std::vector<std::reference_wrapper<LogLevel>>& levels){
+		LogSink* pointer{ sink.get() };
+		bool exists{ false };
+
+		for(auto& existing : _LogSinks){
+			if(*existing == *sink){
+				pointer = existing.get();
+				exists = true;
 			}
 		}
 
-		_LogCurrentSinks.emplace_back(Sink);
-		return true;
-	}
-
-	bool RemoveSink(const std::shared_ptr<LogSink>& Sink){
-		for(int idx = 0; idx < _LogCurrentSinks.size(); idx++){
-			if(*_LogCurrentSinks[idx] == *Sink){
-				_LogCurrentSinks.erase(_LogCurrentSinks.begin() + idx);
-				return true;
-			}
+		if(!exists){
+			_LogSinks.emplace_back(std::move(sink));
 		}
 
-		return false;
+		for(auto level : levels){
+			level.get().AddSink(pointer);
+		}
 	}
 }

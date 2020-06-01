@@ -11,7 +11,7 @@ namespace Log {
 	 */
 	class DebugSink : public LogSink {
 	private:
-		std::string MessagePrepends[5] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]", "[HUNT]" };
+		std::wstring MessagePrepends[4] = { L"[ERROR]", L"[WARNING]", L"[INFO]", L"[VERBOSE]" };
 
 	public:
 
@@ -22,8 +22,7 @@ namespace Log {
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
 		 */
-		virtual void LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info = std::nullopt,
-			const std::vector<std::shared_ptr<DETECTION>>& detections = {});
+		virtual void LogMessage(const LogLevel& level, const std::wstring& message);
 
 		/**
 		 * Compares this DebugSink to another LogSink. Currently, as only one debug console is supported,

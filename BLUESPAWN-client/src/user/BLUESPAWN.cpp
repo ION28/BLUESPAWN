@@ -66,7 +66,7 @@
 #include <memory>
 
 const IOBase& Bluespawn::io = CLI::GetInstance();
-HuntRegister Bluespawn::huntRecord{ io };
+HuntRegister Bluespawn::huntRecord{};
 MitigationRegister Bluespawn::mitigationRecord{ io };
 
 std::map<std::string, std::shared_ptr<Reaction>> reactions = {
@@ -80,22 +80,22 @@ Aggressiveness Bluespawn::aggressiveness{ Aggressiveness::Normal };
 
 Bluespawn::Bluespawn(){
 
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1004>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1015>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1037>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1050>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1053>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1055>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1060>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1099>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1100>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1101>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1103>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1131>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1136>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1138>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1182>());
-	huntRecord.RegisterHunt(std::make_shared<Hunts::HuntT1183>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1004>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1015>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1037>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1050>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1053>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1055>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1060>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1099>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1100>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1101>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1103>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1131>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1136>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1138>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1182>());
+	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1183>());
 
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1025>());
 	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1035RDP>());
@@ -129,7 +129,7 @@ void Bluespawn::RunHunts() {
 	DWORD affectedThings = UINT_MAX;
 	Scope scope{};
 
-	huntRecord.RunHunts(tactics, dataSources, affectedThings, scope);
+	huntRecord.RunHunts(scope);
 }
 
 void Bluespawn::RunMitigations(bool enforce, bool force) {
@@ -198,27 +198,36 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 	}
 }
 
-void ParseLogSinks(const std::string& sinks, bool debug){
+void ParseLogSinks(const std::string& sinks){
 	std::set<std::string> sink_set;
 	for(unsigned startIdx = 0; startIdx < sinks.size();){
-		auto endIdx = min(sinks.find(',', startIdx), sinks.size());
-		auto sink = sinks.substr(startIdx, endIdx - startIdx);
+		auto endIdx{ sinks.find(',', startIdx) };
+		auto sink{ sinks.substr(startIdx, endIdx - startIdx) };
 		sink_set.emplace(sink);
 		startIdx = endIdx + 1;
 	}
+
+	std::vector<std::reference_wrapper<Log::LogLevel>> levels{
+		Log::LogLevel::LogError,
+		Log::LogLevel::LogWarn,
+		Log::LogLevel::LogInfo1,
+		Log::LogLevel::LogInfo2,
+		Log::LogLevel::LogInfo3,
+		Log::LogLevel::LogVerbose1,
+		Log::LogLevel::LogVerbose2,
+		Log::LogLevel::LogVerbose3,
+	};
+
 	for(auto sink : sink_set){
 		if(sink == "console"){
-			auto Console = std::make_shared<Log::CLISink>();
-			Log::AddHuntSink(Console);
-			if(debug) Log::AddSink(Console);
+			auto console = std::make_unique<Log::CLISink>();
+			Log::AddSink(std::move(console), levels);
 		} else if(sink == "xml"){
-			auto XMLSink = std::make_shared<Log::XMLSink>();
-			Log::AddHuntSink(XMLSink);
-			if(debug) Log::AddSink(XMLSink);
+			auto XML = std::make_unique<Log::XMLSink>();
+			Log::AddSink(std::move(XML), levels);
 		} else if(sink == "debug"){
-			auto DbgSink = std::make_shared<Log::DebugSink>();
-			Log::AddHuntSink(DbgSink);
-			if(debug) Log::AddSink(DbgSink);
+			auto debug = std::make_unique<Log::DebugSink>();
+			Log::AddSink(std::move(debug), levels);
 		} else {
 			Bluespawn::io.AlertUser(L"Unknown log sink \"" + StringToWidestring(sink) + L"\"", INFINITY, ImportanceLevel::MEDIUM);
 		}
@@ -246,17 +255,6 @@ Aggressiveness GetAggressiveness(const cxxopts::OptionValue& value){
 	return aHuntLevel;
 }
 
-#include "scan/CollectDetections.h"
-int main(int argc, char* argv[]){
-	DetectionCollector collector{};
-	Registry::RegistryKey key{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run" };
-	collector.AddDetection(std::make_shared<REGISTRY_DETECTION>(Registry::RegistryValue{
-		key, L"malware", *key.GetValue<std::wstring>(L"malware")
-	}, RegistryDetectionType::CommandReference));
-
-	return 0;
-}
-
 int main2(int argc, char* argv[]){
 
 	Bluespawn bluespawn{};
@@ -273,8 +271,8 @@ int main2(int argc, char* argv[]){
 		("help", "Help Information. You can also specify a category for help on a specific module such as hunt.", cxxopts::value<std::string>()->implicit_value("general"))
 		("log", "Specify how Bluespawn should log events. Options are console (default), xml, and debug.", cxxopts::value<std::string>()->default_value("console"))
 		("r,react", "Specifies how bluespawn should react to potential threats dicovered during hunts.", cxxopts::value<std::string>()->default_value("log"))
-		("v,verbose", "Verbosity", cxxopts::value<int>()->default_value("0"))
-		("debug", "Enable Debug Output", cxxopts::value<bool>());
+		("v,verbose", "Verbosity", cxxopts::value<int>()->default_value("1"))
+		("debug", "Enable Debug Output", cxxopts::value<int>()->default_value("0"));
 
 	options.add_options("mitigate")("force", "Use this option to forcibly apply mitigations with no prompt", cxxopts::value<bool>());
 
@@ -286,25 +284,37 @@ int main2(int argc, char* argv[]){
 			return 0;
 		}
 
-		if (result.count("verbose")) {
-			if(result["verbose"].as<int>() >= 1) {
+		if(result.count("verbose")){
+			if(result["verbose"].as<int>() >= 1){
+				Log::LogLevel::LogInfo1.Enable();
+			}
+			if(result["verbose"].as<int>() >= 2){
+				Log::LogLevel::LogInfo2.Enable();
+			}
+			if(result["verbose"].as<int>() >= 3){
+				Log::LogLevel::LogInfo3.Enable();
+			}
+		}
+
+		if(result.count("debug")){
+			if(result["debug"].as<int>() >= 1){
 				Log::LogLevel::LogVerbose1.Enable();
 			}
-			if(result["verbose"].as<int>() >= 2) {
+			if(result["debug"].as<int>() >= 2){
 				Log::LogLevel::LogVerbose2.Enable();
 			}
-			if(result["verbose"].as<int>() >= 3) {
+			if(result["debug"].as<int>() >= 3){
 				Log::LogLevel::LogVerbose3.Enable();
 			}
 		}
 
-		ParseLogSinks(result["log"].as<std::string>(), result.count("debug"));
+		ParseLogSinks(result["log"].as<std::string>());
 
 		auto UserReactions = result["react"].as<std::string>();
 		std::set<std::string> reaction_set;
 		for(unsigned startIdx = 0; startIdx < UserReactions.size();){
-			auto endIdx = min(UserReactions.find(',', startIdx), UserReactions.size());
-			auto sink = UserReactions.substr(startIdx, endIdx - startIdx);
+			auto endIdx{ UserReactions.find(',', startIdx) };
+			auto sink{ UserReactions.substr(startIdx, endIdx - startIdx) };
 			reaction_set.emplace(sink);
 			startIdx = endIdx + 1;
 		}
