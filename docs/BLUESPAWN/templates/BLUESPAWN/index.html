@@ -1,0 +1,91 @@
+{% extends 'BLUESPAWN/base.html' %} {% block content %} {% load static %} <section class="jumbotron 
+text-center jumbotron-fluid h-100"> <div class="container" id="hometext">
+	<h1 class="jumbotron-heading">An open-source, Active Defense & EDR Program</h1>
+	<p></p>
+	<p class="pb-2">
+	<a href="/quickstart" class="btn btn-lg btn-primary">Get Started with BLUESPAWN</a>
+	<a href="https://github.com/ION28/BLUESPAWN/releases" class="btn btn-lg btn-success">Download</a>
+	</p>
+	
+</div> </section> <section class="py-5">
+    <div class="container">
+		<!--<div class="row">
+			<div class="alert alert-dismissible alert-primary">
+			  <button type="button" class="close" data-dismiss="alert">&times;</button>
+			  <h4 class="alert-heading">This project is still <i>alpha</i>!</h4>
+			  <p class="mb-0">BLUESPAWN is under active alpha development, so many features may not work as expected yet and detections may be too narrow scope or generate lots of false positives.</p>
+			</div>
+		</div>
+		<br>-->
+		<div class="row">
+			<div class="col-12">
+				<h2>What is it?</h2>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-12">
+				<blockquote class="blockquote text-center">
+				  <p class="mb-0">BLUESPAWN is an <span class="text-primary">active defense and endpoint detection and response tool</span> which means it can be used by defenders to quickly <span class="text-danger">detect, identify, and eliminate</span> malicious activity and malware across a network.</p>
+				</blockquote>
+			</div>
+		</div>
+		<br>
+		<hr>
+		<br>
+		<div class="row">
+			<div class="col-12">
+				<h2>Why BLUESPAWN?</h2>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-lg-4 col-12">
+				<div class="card border-0 text-center">
+				  <i class="text-info fa fa-tachometer-alt fa-4x"></i>
+				  <h3>Move Faster</h3>
+					<div class="card-body">
+						<p class="card-text">A security analyst should be able to quickly detect, assess, and respond to any malicious activity on a live system.</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4 col-12">
+				<div class="card border-0 text-center">
+				  <i class="text-success fa fa-check-square fa-4x"></i>
+				  <h3>Know Your Coverage</h3>
+					<div class="card-body">
+						<p class="card-text">Defenders should know exactly what their tools will catch so they can better focus their efforts on specific lines of effort and have confidence in the status of others</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4 col-12">
+				<div class="card border-0 text-center">
+				  <i class="text-danger fa fa-project-diagram fa-4x"></i>
+				  <h3>Analyze the Windows Attack Surface</h3>
+					<div class="card-body">
+						<p class="card-text">Blue teams should seek to better understand their attack surface in order to defend it better.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-6 col-12">
+				<div class="card border-0 text-center">
+				  <i class="text-warning fa fa-shield-alt fa-4x"></i>
+				  <h3>Embrace Open-Source Blue Team Software</h3>
+					<div class="card-body">
+						<p class="card-text">While there are many open-source Red Team Tools out there, the vast majority of some of the best Blue Team tools are closed-source (ie, AVs, EDRs, SysInternals, etc). That makes it harder for students to learn about these.</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6 col-12">
+				<div class="card border-0 text-center">
+				  <i class="text-primary fa fa-windows fa-4x"></i>
+				  <h3>Understand more about the Windows API</h3>
+					<div class="card-body">
+						<p class="card-text">We combed through a ton of Microsoft Documentation, StackOverflow Answers, and more to create this. Hopefully others may find some of the code useful.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> </section> {% endblock %}
