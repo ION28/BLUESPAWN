@@ -9,9 +9,9 @@
 namespace Reactions {
 
 	void QuarantineFileReaction::QuarantineFileIdentified(std::shared_ptr<FILE_DETECTION> detection) {
-		if (io.GetUserConfirm(L"File " + detection->wsFilePath + L" appears to be malicious. Quarantine file?") == 1) {
+		if (io.GetUserConfirm("File " + detection->wsFilePath + " appears to be malicious. Quarantine file?") == 1) {
 			if (!detection->fFile.Quarantine()) {
-				LOG_ERROR("Unable to quarantine file " << detection->wsFilePath << ". (Error " << GetLastError() << ")");
+				LOG_ERROR("Unable to quarantine file " << detection->wsFilePath << ". (Error " << errno << ")");
 			}
 		}
 	}

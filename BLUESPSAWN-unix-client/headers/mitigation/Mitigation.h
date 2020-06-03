@@ -32,7 +32,7 @@ class MitigationRegister;
 class Mitigation {
 
 public:
-	Mitigation(const std::wstring& name, const std::wstring& description, const std::wstring& software, 
+	Mitigation(const std::string& name, const std::string& description, const std::string& software, 
 		SoftwareAffected category, MitigationSeverity severity);
 
 	// Query if the mitigation is currently enforced on the host system
@@ -43,13 +43,13 @@ public:
 
 	virtual bool MitigationApplies() = 0;
 
-	std::wstring getName();
-	std::wstring getDescription();
+	std::string getName();
+	std::string getDescription();
 
 protected:
-	std::wstring name;
-	std::wstring description;
-	std::wstring software;
+	std::string name;
+	std::string description;
+	std::string software;
 
 	SoftwareAffected category;
 	MitigationSeverity severity;

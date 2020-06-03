@@ -19,10 +19,10 @@ public:
 	virtual std::vector<HKEY> GetScopedKHEYs() const;
 	virtual std::vector<LPCSTR> GetScopedRegKeyNames() const;
 
-	virtual bool ProcessIsInScope(DWORD pid) const;
+	virtual bool ProcessIsInScope(unsigned int pid) const;
 	virtual bool ProcessIsInScope(HANDLE hProcess) const;
 	virtual std::vector<HANDLE> GetScopedProcessHandles() const;
-	virtual std::vector<DWORD> GetScopedProcessPIDs() const;
+	virtual std::vector<unsigned int> GetScopedProcessPIDs() const;
 
 	virtual bool ServiceIsInScope(LPCSTR sServiceName) const;
 	virtual bool ServiceIsInScope(SC_HANDLE hService) const;

@@ -14,7 +14,7 @@ namespace Log {
 		tinyxml2::XMLDocument XMLDoc;
 		tinyxml2::XMLElement* Root;
 
-		std::wstring wFileName;
+		std::string wFileName;
 
 		std::string MessageTags[5] = { "error", "warning", "info", "other", "hunt" };
 
@@ -33,7 +33,7 @@ namespace Log {
 		 *
 		 * @param wFileName The name of the file to save the log as.
 		 */
-		XMLSink(const std::wstring& wFileName);
+		XMLSink(const std::string& wFileName);
 
 		XMLSink operator=(const XMLSink&) = delete;
 		XMLSink operator=(XMLSink&&) = delete;

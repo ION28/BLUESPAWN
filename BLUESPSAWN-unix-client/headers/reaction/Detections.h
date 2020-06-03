@@ -52,13 +52,13 @@ struct FILE_DETECTION : public DETECTION {
 			sha256 = f.GetSHA256Hash().value();
 		}
 		if (f.GetCreationTime()) {
-			created = FormatWindowsTime(f.GetCreationTime().value()); //TODO: work on filetime conversion
+			created = FormatStatTime(f.GetCreationTime().value()); //TODO: work on filetime conversion
 		}
 		if (f.GetModifiedTime()) {
-			modified = FormatWindowsTime(f.GetModifiedTime().value());
+			modified = FormatStatTime(f.GetModifiedTime().value());
 		}
 		if (f.GetAccessTime()) {
-			accessed = FormatWindowsTime(f.GetAccessTime().value());
+			accessed = FormatStatTime(f.GetAccessTime().value());
 		}
 	}
 };
@@ -93,12 +93,12 @@ struct PROCESS_DETECTION : public DETECTION {
 	std::string wsImagePath;
 	std::string wsCmdline;
 	int PID;
-	DWORD method;
-	LPVOID lpAllocationBase;
-	DWORD dwAllocationSize;
-	BYTE AllocationStart[512];      // This member is intended to be used for signaturing purposes
+	unsigned int method;
+	void* lpAllocationBase;
+	unsigned int dwAllocationSize;
+	char AllocationStart[512];      // This member is intended to be used for signaturing purposes
 	PROCESS_DETECTION(const std::string& wsImagePath, const std::string& wsCmdLine, const int& PID,
-		const LPVOID& lpAllocationBase, const DWORD& dwAllocationSize, const DWORD& method) :
+		const void*& lpAllocationBase, const unsigned int& dwAllocationSize, const unsigned int& method) :
 		DETECTION{ DetectionType::Process },
 		wsImagePath{ wsImagePath },
 		wsCmdline{ wsCmdLine },
@@ -126,9 +126,9 @@ enum class ServiceStartType {
 struct EVENT_DETECTION : public DETECTION {
 	unsigned int eventID;
 	unsigned int eventRecordID;
-	std::wstring timeCreated;
-	std::wstring channel;
-	std::wstring rawXML;
+	std::string timeCreated;
+	std::string channel;
+	std::string rawXML;
 	std::unordered_map<std::string, std::string> params;
 	
 	EVENT_DETECTION(unsigned int eventID, unsigned int eventRecordID, std::string timeCreated, std::string channel, std::string rawXML) :

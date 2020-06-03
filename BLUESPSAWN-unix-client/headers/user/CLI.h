@@ -19,6 +19,8 @@ private:
 	 */
 	CLI();
 
+	~CLI();
+
 	static const CLI instance;
 
 public:
@@ -38,7 +40,7 @@ public:
 	 * @return The option that the user chose, or an empty wstring if no options were provided.
 	 */
 	virtual std::string GetUserSelection(const std::string& prompt, const std::vector<std::string>& options,
-		DWORD dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const;
+		unsigned int dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const;
 
 	/**
 	 * This method displays a message to the user. No action is required for this function to return.
@@ -57,7 +59,7 @@ public:
 	 *
 	 * @return True if the user acknowledged the message, false otherwise.
 	 */
-	virtual bool AlertUser(const std::string& information, DWORD dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const;
+	virtual bool AlertUser(const std::string& information, unsigned int dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const;
 
 	/**
 	 * This method displays a confirmation message to the user. This will display the prompt and three options:
@@ -71,27 +73,37 @@ public:
 	 * @return If a timeout occurs or the user chooses cancel, -1 will be returned. If the user responds no, 0 is
 	 * returned. If the user responds yes, 1 is returned.
 	 */
-	virtual DWORD GetUserConfirm(const std::string& prompt, DWORD dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const;
+	virtual unsigned int GetUserConfirm(const std::string& prompt, unsigned int dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const;
 
 	const pthread_mutex_t& GetMutex() const;
 };
-enum class MessageColor {
-	BLACK = 0x0,
-	DARKBLUE = 0x1,
-	DARKGREEN = 0x2,
-	CYAN = 0x3,
-	DARKRED = 0x4,
-	DARKPINK = 0x5,
-	GOLD = 0x6,
-	LIGHTGRAY = 0x7,
-	DARKGREY = 0x8,
-	BLUE = 0x9,
-	GREEN = 0xA,
-	LIGHTBLUE = 0xB,
-	RED = 0xC,
-	PINK = 0xD,
-	YELLOW = 0xE,
-	WHITE = 0xF
+
+enum class MessageColor{
+	RESET = 0,
+	BLACK,
+	RED,
+	GREEN,
+	YELLOW,
+	BLUE,
+	MAGENTA,
+	CYAN,
+	WHITE,
+	BOLDBLACK,
+	BOLDRED,
+	BOLDGREEN,
+	BOLDYELLOW,
+	BOLDBLUE,
+	BOLDMAGENTA,
+	BOLDCYAN,
+	BOLDWHITE
 };
+
+
+/**
+ * Converts an enum MessageColor to a string that contains a color code
+ * @param enum MessageColor for color
+ * @return the resulting color string
+ */ 
+std::string GetColorStr(const enum MessageColor color);
 
 

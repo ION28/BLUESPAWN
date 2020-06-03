@@ -2,8 +2,8 @@
 
 namespace EventLogs {
 
-	std::wstring EventLogItem::GetProperty(std::wstring prop) const {
-		std::wstring val;
+	std::string EventLogItem::GetProperty(std::string prop) const {
+		std::string val;
 
 		auto it = this->props.find(prop);
 		if (it != this->props.end())
@@ -11,16 +11,16 @@ namespace EventLogs {
 
 		return val;
 	}
-	std::unordered_map<std::wstring, std::wstring> EventLogItem::GetProperties() const {
+	std::unordered_map<std::string, std::string> EventLogItem::GetProperties() const {
 		return this->props;
 	}
-	std::wstring EventLogItem::GetChannel() const {
+	std::string EventLogItem::GetChannel() const {
 		return this->channel;
 	}
-	std::wstring EventLogItem::GetTimeCreated() const {
+	std::string EventLogItem::GetTimeCreated() const {
 		return this->timeCreated;
 	}
-	std::wstring EventLogItem::GetXML() const {
+	std::string EventLogItem::GetXML() const {
 		return this->rawXML;
 	}
 	unsigned int EventLogItem::GetEventID() const {
@@ -30,20 +30,20 @@ namespace EventLogs {
 		return this->eventRecordID;
 	}
 
-	void EventLogItem::SetProperty(std::wstring& prop, std::wstring& value) {
+	void EventLogItem::SetProperty(std::string& prop, std::string& value) {
 		auto it = this->props.find(prop);
 		if (it != this->props.end())
 			this->props.erase(it);
 
 		this->props.insert(std::make_pair(prop, value));
 	}
-	void EventLogItem::SetChannel(std::wstring& channel) {
+	void EventLogItem::SetChannel(std::string& channel) {
 		this->channel = channel;
 	}
-	void EventLogItem::SetTimeCreated(std::wstring& time) {
+	void EventLogItem::SetTimeCreated(std::string& time) {
 		this->timeCreated = time;
 	}
-	void EventLogItem::SetXML(std::wstring& xml) {
+	void EventLogItem::SetXML(std::string& xml) {
 		this->rawXML = xml;
 	}
 	void EventLogItem::SetEventID(unsigned int id) {

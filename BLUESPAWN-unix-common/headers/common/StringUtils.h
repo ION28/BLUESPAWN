@@ -10,7 +10,7 @@
 *
 * @return A double storing the Shannon Entropy of the string
 */
-double GetShannonEntropy(const std::wstring& in);
+double GetShannonEntropy(const std::string& in);
 
 /**
  * Converts a wide-string to a UTF-8 encoded string
@@ -37,7 +37,7 @@ std::wstring StringToWidestring(const std::string& in);
  *
  * @return The string with all environment strings expanded.
  */
-std::wstring ExpandEnvStringsW(const std::wstring& in);
+std::wstring GetEnvStringW(const std::wstring& in);
 
 /**
  * Expands all enviroment strings present in the input
@@ -46,7 +46,7 @@ std::wstring ExpandEnvStringsW(const std::wstring& in);
  *
  * @return The string with all environment strings expanded.
  */
-std::string ExpandEnvStringsA(const std::string& in);
+std::string GetEnvStringA(const std::string& in);
 
 /**
  * Convert a string or wstring to uppercase. Note that the only

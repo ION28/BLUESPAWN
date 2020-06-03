@@ -7,8 +7,8 @@
 
 const YaraScanner YaraScanner::instance{};
 
-AllocationWrapper GetResourceRule(DWORD identifier){
-	auto hRsrcInfo = FindResourceW(nullptr, MAKEINTRESOURCE(identifier), L"yararule");
+AllocationWrapper GetResourceRule(unsigned int identifier){
+	auto hRsrcInfo = FindResourceW(nullptr, MAKEINTRESOURCE(identifier), "yararule");
 	if(!hRsrcInfo){
 		return { nullptr, 0 };
 	}
@@ -55,11 +55,11 @@ struct AllocationWrapperStream {
 	size_t offset;
 };
 
-size_t ReadAllocationWrapper(LPVOID dest, size_t size, size_t count, AllocationWrapperStream* data){
+size_t ReadAllocationWrapper(void* dest, size_t size, size_t count, AllocationWrapperStream* data){
 	size_t desired_amnt = size * count;
 	size_t actual_amnt = min(desired_amnt, data->wrapper.GetSize() - data->offset);
 
-	CopyMemory(dest, reinterpret_cast<PCHAR>((LPVOID) data->wrapper) + data->offset, actual_amnt);
+	CopyMemory(dest, reinterpret_cast<PCHAR>((void*) data->wrapper) + data->offset, actual_amnt);
 
 	data->offset += actual_amnt;
 	return actual_amnt / size;
@@ -147,7 +147,7 @@ struct YaraScanArg {
 	} type;
 };
 
-int YaraCallbackFunction(int message, LPVOID lpMessageData, YaraScanArg* arg){
+int YaraCallbackFunction(int message, void* lpMessageData, YaraScanArg* arg){
 	if(message == CALLBACK_MSG_RULE_MATCHING){
 		auto rule = reinterpret_cast<YR_RULE*>(lpMessageData);
 		if(arg->type == arg->Severe){
@@ -175,28 +175,28 @@ YaraScanResult YaraScanner::ScanFile(const FileSystem::File& file) const {
 	}
 
 	arg.type = arg.Severe;
-	auto status = yr_rules_scan_mem(KnownBad, reinterpret_cast<const uint8_t*>((LPVOID) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
+	auto status = yr_rules_scan_mem(KnownBad, reinterpret_cast<const uint8_t*>((void*) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
 	if(status != ERROR_SUCCESS){
 		arg.result.status = YaraStatus::Failure;
 	}
 	
 	arg.type = arg.Severe;
-	status = yr_rules_scan_mem(KnownBad2, reinterpret_cast<const uint8_t*>((LPVOID) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
+	status = yr_rules_scan_mem(KnownBad2, reinterpret_cast<const uint8_t*>((void*) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
 	if(status != ERROR_SUCCESS){
 		arg.result.status = YaraStatus::Failure;
 	}
 
 	arg.type = arg.Indicator;
-	status = yr_rules_scan_mem(Indicators, reinterpret_cast<const uint8_t*>((LPVOID) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
+	status = yr_rules_scan_mem(Indicators, reinterpret_cast<const uint8_t*>((void*) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
 	if(status != ERROR_SUCCESS){
 		arg.result.status = YaraStatus::Failure;
 	}
 
 	for (auto identifier : arg.result.vKnownBadRules) {
-		LOG_INFO(file.GetFilePath() << L" matches known malicious identifier " << StringToWidestring(identifier));
+		LOG_INFO(file.GetFilePath() << " matches known malicious identifier " << StringToWidestring(identifier));
 	}
 	for (auto identifier : arg.result.vIndicatorRules) {
-		LOG_INFO(file.GetFilePath() << L" matches known indicator identifier " << StringToWidestring(identifier));
+		LOG_INFO(file.GetFilePath() << " matches known indicator identifier " << StringToWidestring(identifier));
 	}
 
 	return arg.result;

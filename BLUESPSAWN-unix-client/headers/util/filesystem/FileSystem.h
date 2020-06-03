@@ -73,7 +73,7 @@ namespace FileSystem {
 		 * helper function to check for masks on a file
 		 * @return true if the user would be able to access the file with one of the three masks provided
 		 */ 
-		bool HasPermHelper(const Permissions::Owner &user, DWORD userMask, DWORD groupMask, DWORD otherMask);
+		bool HasPermHelper(const Permissions::Owner &user, unsigned int userMask, unsigned int groupMask, unsigned int otherMask);
 
 	public:
 
@@ -144,7 +144,7 @@ namespace FileSystem {
 		* @return a FILETIME struct containing the creation time of the file. If an error,
 		*     occurs the function returns std::nullopt and calls SetLastError with the error
 		*/
-		std::optional<FILETIME> GetCreationTime() const;
+		std::optional<struct statx_timestamp> GetCreationTime() const;
 
 		/**
 		* Function to get the last modified time of the file
@@ -152,7 +152,7 @@ namespace FileSystem {
 		* @return a FILETIME struct containing the last modified time of the file. If an error,
 		*     occurs the function returns std::nullopt and calls SetLastError with the error
 		*/
-		std::optional<FILETIME> GetModifiedTime() const;
+		std::optional<struct statx_timestamp> GetModifiedTime() const;
 
 		/**
 		* Function to get the last access time of the file
@@ -160,7 +160,7 @@ namespace FileSystem {
 		* @return a FILETIME struct containing the last access time of the file. If an error,
 		*     occurs the function returns std::nullopt and calls SetLastError with the error
 		*/
-		std::optional<FILETIME> GetAccessTime() const;
+		std::optional<struct statx_timestamp> GetAccessTime() const;
 
 		/**
 		* Function to grant certain permissions to certain user or group
@@ -268,7 +268,7 @@ namespace FileSystem {
 		 *Sets the position of the file to pos if it exists 
 		 * return true if worked, false otherwise
 		 */
-		bool SetFilePointer(DWORD pos) const;
+		bool SetFilePointer(unsigned int pos) const;
 
 		/**
 		* Function to write to arbitrary offset in the file
@@ -280,7 +280,7 @@ namespace FileSystem {
 		*
 		* @return true if write successful, false if write unsuccessful
 		*/
-		bool Write(const LPVOID value, const long offset, const unsigned long length, const bool truncate = false, 
+		bool Write(const void* value, const long offset, const unsigned long length, const bool truncate = false, 
 			const bool insert = false) const;
 
 		/**
@@ -293,7 +293,7 @@ namespace FileSystem {
 		*
 		* @return true if read successful, false if read unsuccessful
 		*/
-		bool Read(LPVOID buffer, const unsigned long amount = -1, const long offset = 0, PDWORD amountRead = nullptr) const;
+		bool Read(void* buffer, const unsigned long amount = -1, const long offset = 0, Punsigned int amountRead = nullptr) const;
 
 		/**
 		* Function to read from arbitrary offset in the file
@@ -305,7 +305,7 @@ namespace FileSystem {
 		*
 		* @return true if read successful, false if read unsuccessful
 		*/
-		AllocationWrapper Read(unsigned long amount = -1, long offset = 0, PDWORD amountRead = nullptr) const;
+		AllocationWrapper Read(unsigned long amount = -1, long offset = 0, Punsigned int amountRead = nullptr) const;
 
 		/**
 		* Function to compute the MD5 hash of the file
@@ -379,7 +379,7 @@ namespace FileSystem {
 		 *
 		 * @return The size of the referenced file
 		 */
-		DWORD64 GetFileSize() const;
+		unsigned int64 GetFileSize() const;
 
 		/**
 		 * Gets the file path (and thus its name)

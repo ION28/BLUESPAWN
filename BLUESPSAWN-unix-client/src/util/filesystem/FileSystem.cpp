@@ -251,7 +251,7 @@ namespace FileSystem{
 			return bReadAccess;
 	}
 
-	bool File::SetFilePointer(DWORD pos) const{
+	bool File::SetFilePointer(unsigned int pos) const{
 		if(!bFileExists){
 			LOG_ERROR("Cant set position of a nonexistant file");
 			return false;
@@ -260,11 +260,11 @@ namespace FileSystem{
 		return lseek(hFile, pos, SEEK_SET);
 	}
 
-	bool File::Write(const LPVOID value, const long offset, const unsigned long length, const bool truncate, const bool insert) const {
+	bool File::Write(const void* value, const long offset, const unsigned long length, const bool truncate, const bool insert) const {
 		SCOPE_LOCK(this->SetFilePointer(0), ResetFilePointer); //TODO: not sure how to fix this yet - SetFilePointer(0) should be lseek(hFile, 0L, SEEK_SET)
 		LOG_VERBOSE(2, "Writing to file " << FilePath << " at " << offset << ". Insert = " << insert);
 
-		DWORD dwBytesIO{};
+		unsigned int dwBytesIO{};
 
 		if(!bFileExists) {
 			LOG_ERROR("Can't write to file " << FilePath << ". File doesn't exist");
@@ -332,7 +332,7 @@ namespace FileSystem{
 		return true;
 	}
 
-	bool File::Read(LPVOID buffer, const unsigned long amount, const long offset, PDWORD amountRead) const {
+	bool File::Read(void* buffer, const unsigned long amount, const long offset, Punsigned int amountRead) const {
 		SCOPE_LOCK(this->SetFilePointer(0), ResetFilePointer); //TODO: again - fix this
 		LOG_VERBOSE(2, "Attempting to read " << amount << " bytes from " << FilePath << " at offset " << offset);
 		if(!bFileExists) {
@@ -365,7 +365,7 @@ namespace FileSystem{
 		return true;
 	}
 
-	AllocationWrapper File::Read(unsigned long amount, long offset, PDWORD amountRead) const {
+	AllocationWrapper File::Read(unsigned long amount, long offset, Punsigned int amountRead) const {
 		if(amount == -1){
 			amount = GetFileSize();
 		}
@@ -438,10 +438,10 @@ namespace FileSystem{
 		return false;
 	}
 
-	std::optional<std::wstring> GetCertificateIssuer(const std::wstring& wsFilePath){
-		/*DWORD dwEncoding{};
-		DWORD dwContentType{};
-		DWORD dwFormatType{};
+	std::optional<std::string> GetCertificateIssuer(const std::string& wsFilePath){
+		/*unsigned int dwEncoding{};
+		unsigned int dwContentType{};
+		unsigned int dwFormatType{};
 		GenericWrapper<HCERTSTORE> hStore{ nullptr, [](HCERTSTORE store){ CertCloseStore(store, 0); }, INVALID_HANDLE_VALUE };
 		GenericWrapper<HCRYPTMSG> hMsg{ nullptr, CryptMsgClose, INVALID_HANDLE_VALUE };
 		auto status{ CryptQueryObject(CERT_QUERY_OBJECT_FILE, wsFilePath.c_str(), CERT_QUERY_CONTENT_FLAG_PKCS7_SIGNED_EMBED,
@@ -451,7 +451,7 @@ namespace FileSystem{
 			return std::nullopt;
 		}
 
-		DWORD dwSignerInfoSize{};
+		unsigned int dwSignerInfoSize{};
 		status = CryptMsgGetParam(hMsg, CMSG_SIGNER_INFO_PARAM, 0, nullptr, &dwSignerInfoSize);
 		if(!status){
 			LOG_ERROR("Failed to query signer information size for " << wsFilePath << ": " << SYSTEM_ERROR);
@@ -466,12 +466,12 @@ namespace FileSystem{
 		}
 		
 		auto signer{ reinterpret_cast<PCMSG_SIGNER_INFO>(info.data())->Issuer };
-		DWORD dwSize = CertNameToStrW(X509_ASN_ENCODING, &signer, CERT_SIMPLE_NAME_STR, nullptr, 0);
+		unsigned int dwSize = CertNameToStrW(X509_ASN_ENCODING, &signer, CERT_SIMPLE_NAME_STR, nullptr, 0);
 
 		std::vector<WCHAR> buffer(dwSize);
 		CertNameToStrW(X509_ASN_ENCODING, &signer, CERT_SIMPLE_NAME_STR, buffer.data(), dwSize);
 
-		return std::wstring{ buffer.data(), dwSize };*/
+		return std::string{ buffer.data(), dwSize };*/
 		return std::nullopt;
 	}
 
@@ -498,7 +498,7 @@ namespace FileSystem{
 			if(catalog){
 				auto signer{ GetCertificateIssuer(*catalog) };
 				if(signer){
-					return ToLowerCaseW(*signer).find(L"microsoft") != std::wstring::npos;
+					return ToLowerCaseW(*signer).find("microsoft") != std::string::npos;
 				} else{
 					LOG_ERROR("Unable to get the certificate issuer for " << *catalog << ": " << SYSTEM_ERROR);
 				}
@@ -508,7 +508,7 @@ namespace FileSystem{
 		} else{
 			auto signer{ GetCertificateIssuer(FilePath) };
 			if(signer){
-				return ToLowerCaseW(*signer).find(L"microsoft") != std::wstring::npos;
+				return ToLowerCaseW(*signer).find("microsoft") != std::string::npos;
 			} else{
 				LOG_ERROR("Unable to get the certificate issuer for " << FilePath << ": " << SYSTEM_ERROR);
 			}
@@ -577,7 +577,7 @@ namespace FileSystem{
 		return ftruncate(hFile, length) == 0;
 	}
 
-	DWORD64 File::GetFileSize() const {
+	unsigned int64 File::GetFileSize() const {
 		if(!bFileExists)
 		    return 0;
 		loff_t size = lseek64(hFile, 0L, SEEK_END);
@@ -871,7 +871,7 @@ namespace FileSystem{
 	}
 
 	//NOTE: Make some sort of class heirarchy so that I dont have to reuse this method
-	bool FileObject::HasPermHelper(const Permissions::Owner &user, DWORD userMask, DWORD groupMask, DWORD otherMask){
+	bool FileObject::HasPermHelper(const Permissions::Owner &user, unsigned int userMask, unsigned int groupMask, unsigned int otherMask){
 		if(!bFileExists)
 		    return false;
 		std::optional<ACCESS_MASK> permissions = GetPermissions();
@@ -978,7 +978,7 @@ namespace FileSystem{
 		return std::nullopt;
 	}
 
-	std::optional<FILETIME> FileObject::GetCreationTime() const {
+	std::optional<struct statx_timestamp> FileObject::GetCreationTime() const {
 		if (!bFileExists) {
 			LOG_ERROR("Can't get creation time of " << FilePath << ", file doesn't exist");
 			errno = ENOENT;
@@ -993,7 +993,7 @@ namespace FileSystem{
 		}
 	}
 
-	std::optional<FILETIME> FileObject::GetModifiedTime() const {
+	std::optional<struct statx_timestamp> FileObject::GetModifiedTime() const {
 		if (!bFileExists) {
 			LOG_ERROR("Can't get modification time of " << FilePath << ", file doesn't exist");
 			errno = ENOENT;
@@ -1008,7 +1008,7 @@ namespace FileSystem{
 		}
 	}
 
-	std::optional<FILETIME> FileObject::GetAccessTime() const {
+	std::optional<struct statx_timestamp> FileObject::GetAccessTime() const {
 		if (!bFileExists) {
 			LOG_ERROR("Can't get access time of " << FilePath << ", file doesn't exist");
 			errno = ENOENT;

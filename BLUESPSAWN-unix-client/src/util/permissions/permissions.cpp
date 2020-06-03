@@ -78,23 +78,23 @@ namespace Permissions {
 		return false;
 	}
 
-	void AccessAddAll(DWORD& access) {
+	void AccessAddAll(unsigned int& access) {
 		access |= S_IRWXU | S_IRWXG | S_IRWXO;
 	}
 
-	void AccessAddWrite(DWORD& access, const OwnerType type) {
+	void AccessAddWrite(unsigned int& access, const OwnerType type) {
 		access |= type == USER ? S_IWUSR : type == GROUP ? S_IWGRP : S_IWOTH;
 	}
 
-	void AccessAddRead(DWORD& access, const OwnerType type) {
+	void AccessAddRead(unsigned int& access, const OwnerType type) {
 		access |= type == USER ? S_IRUSR : type == GROUP ? S_IRGRP : S_IROTH;
 	}
 
-	void AccessAddExecute(DWORD& access, const OwnerType type) {
+	void AccessAddExecute(unsigned int& access, const OwnerType type) {
 		access |= type == USER ? S_IXUSR : type == GROUP ? S_IXGRP : S_IXOTH;
 	}
 
-	void AccessAddWriteOwner(DWORD& access, const OwnerType type) {
+	void AccessAddWriteOwner(unsigned int& access, const OwnerType type) {
 		AccessAddWrite(access, type);
 	}
 

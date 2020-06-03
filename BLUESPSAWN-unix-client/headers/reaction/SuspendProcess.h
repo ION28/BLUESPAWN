@@ -15,7 +15,7 @@ namespace Reactions{
 	private:
 		const IOBase& io;
 
-		bool CheckModules(const HandleWrapper& process, const std::wstring& file) const;
+		bool CheckModules(const HandleWrapper& process, const std::string& file) const;
 
 		/// Handlers for detections that log the detection
 		void SuspendFileIdentified(std::shared_ptr<FILE_DETECTION> detection);

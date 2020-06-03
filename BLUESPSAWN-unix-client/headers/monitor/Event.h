@@ -37,11 +37,11 @@ protected:
 
 class EventLogEvent : public Event {
 public:
-	EventLogEvent(const std::wstring & channel, int eventID, const std::vector<EventLogs::XpathQuery>& queries = {});
+	EventLogEvent(const std::string & channel, int eventID, const std::vector<EventLogs::XpathQuery>& queries = {});
 
 	std::function<void(EventLogs::EventLogItem)> eventLogTrigger;
 
-	std::wstring GetChannel() const;
+	std::string GetChannel() const;
 	int GetEventID() const;
 	std::vector<EventLogs::XpathQuery> GetQueries() const;
 
@@ -51,7 +51,7 @@ public:
 
 private:
 	std::optional<EventSubscription> eventSub;
-	std::wstring channel;
+	std::string channel;
 	int eventID;
 	std::vector<EventLogs::XpathQuery> queries;
 };

@@ -2,7 +2,7 @@
 #include "mitigation/MitigationRegister.h"
 #include "reaction/Reaction.h"
 
-Mitigation::Mitigation(const std::wstring& name, const std::wstring& description, const std::wstring& software,
+Mitigation::Mitigation(const std::string& name, const std::string& description, const std::string& software,
 	SoftwareAffected category, MitigationSeverity severity) :
 	name{ name },
 	description{ description },
@@ -11,10 +11,10 @@ Mitigation::Mitigation(const std::wstring& name, const std::wstring& description
 	severity{ severity } {
 }
 
-std::wstring Mitigation::getName() {
+std::string Mitigation::getName() {
 	return this->name;
 }
 
-std::wstring Mitigation::getDescription() {
+std::string Mitigation::getDescription() {
 	return this->description;
 }

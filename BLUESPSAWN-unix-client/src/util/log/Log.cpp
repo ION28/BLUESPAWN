@@ -5,7 +5,7 @@ namespace Log {
 	std::vector<std::shared_ptr<Log::LogSink>> _LogCurrentSinks; 
 	LogTerminator endlog{};
 
-	LogMessage& LogMessage::operator<<(const std::wstring& message){
+	LogMessage& LogMessage::operator<<(const std::string& message){
 		LPCWSTR lpwMessage = message.c_str();
 		LPSTR lpMessage = new CHAR[message.length() + 1]{};
 		WideCharToMultiByte(CP_ACP, 0, lpwMessage, static_cast<int>(message.length()), lpMessage, static_cast<int>(message.length()), 0, nullptr);
@@ -14,7 +14,7 @@ namespace Log {
 		return *this;
 	}
 	LogMessage& LogMessage::operator<<(PCWSTR pointer){
-		return operator<<(std::wstring(pointer));
+		return operator<<(std::string(pointer));
 	}
 	LogMessage& LogMessage::operator<<(const LogTerminator& terminator){
 		std::string message = InternalStream.str();
@@ -58,7 +58,7 @@ namespace Log {
 		return false;
 	}
 
-	std::wstring FormatErrorMessage(DWORD dwErrorCode) {
+	std::string FormatErrorMessage(unsigned int dwErrorCode) {
 		//https://stackoverflow.com/a/45565001/3302799
 		LPWSTR psz{ nullptr };
 		auto cchMsg = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM
@@ -73,11 +73,11 @@ namespace Log {
 		if (cchMsg) {
 			auto delfunc{ [](void* p) { ::LocalFree(p); } };
 			std::unique_ptr<WCHAR, decltype(delfunc)> ptrBuffer(psz, delfunc);
-			return std::wstring(ptrBuffer.get(), cchMsg);
+			return std::string(ptrBuffer.get(), cchMsg);
 		}
 		else {
-			auto error_code{ ::GetLastError() };
-			return L"Unable to format error message!";
+			auto error_code{ ::errno };
+			return "Unable to format error message!";
 		}
 	}
 }

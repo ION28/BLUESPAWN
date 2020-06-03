@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-auto _NtQueryInformationProcess = (NTSTATUS(NTAPI*)(HANDLE, PROCESSINFOCLASS, LPVOID, ULONG, PULONG)) GetProcAddress(LoadLibraryA("ntdll.dll"), "NtQueryInformationProcess");
+auto _NtQueryInformationProcess = (NTSTATUS(NTAPI*)(HANDLE, PROCESSINFOCLASS, void*, ULONG, PULONG)) GetProcAddress(LoadLibraryA("ntdll.dll"), "NtQueryInformationProcess");
 
 STATUS Analyzer::ValidateProcess(HANDLE hProcess){
 	//std::cout << "Validating process with PID " << GetProcessId(hProcess) << std::endl;
@@ -46,9 +46,9 @@ STATUS Analyzer::ValidateThread(HANDLE hThread, HANDLE hProcess){
 	stack.AddrStack.Offset = context.Rsp;
 	stack.AddrFrame.Offset = context.Rbp;
 
-	FAIL_IF_NOT_SUCCESS(ValidateAddress(hProcess, (LPVOID) context.Rip))
+	FAIL_IF_NOT_SUCCESS(ValidateAddress(hProcess, (void*) context.Rip))
 
-	DWORD dwMachineType = IMAGE_FILE_MACHINE_AMD64;
+	unsigned int dwMachineType = IMAGE_FILE_MACHINE_AMD64;
 	BOOL wow64 = false;
 	IsWow64Process(hProcess, &wow64);
 	if(wow64){
@@ -59,22 +59,22 @@ STATUS Analyzer::ValidateThread(HANDLE hThread, HANDLE hProcess){
 	stack.AddrStack.Offset = context.Esp;
 	stack.AddrFrame.Offset = context.Ebp;
 
-	FAIL_IF_FALSE(ValidateAddress(hProcess, (LPVOID) context.Eip))
+	FAIL_IF_FALSE(ValidateAddress(hProcess, (void*) context.Eip))
 
-	DWORD dwMachineType = IMAGE_FILE_MACHINE_I386;
+	unsigned int dwMachineType = IMAGE_FILE_MACHINE_I386;
 #endif
 
 	while(StackWalk64(dwMachineType, hProcess, hThread, &stack, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr)){
-		FAIL_IF_NOT_SUCCESS(ValidateAddress(hProcess, (LPVOID) stack.AddrPC.Offset));
+		FAIL_IF_NOT_SUCCESS(ValidateAddress(hProcess, (void*) stack.AddrPC.Offset));
 	}
 
 	return ERROR_SUCCESS;
 }
 
-STATUS Analyzer::ValidateAddress(HANDLE hProcess, LPVOID lpAddress){
+STATUS Analyzer::ValidateAddress(HANDLE hProcess, void* lpAddress){
 	//std::cout << "Validating address " << lpAddress << std::endl;
 
-	LPVOID lpBaseAddress{};
+	void* lpBaseAddress{};
 	FAIL_IF_NOT_SUCCESS(ValidateAddressInImage(hProcess, lpAddress, &lpBaseAddress));
 	//std::cout << "Address is in image" << std::endl;
 
@@ -100,7 +100,7 @@ STATUS Analyzer::ValidateAddress(HANDLE hProcess, LPVOID lpAddress){
 	return ERROR_SUCCESS;
 }
 
-STATUS Analyzer::ValidateAddressInImage(HANDLE hProcess, LPVOID lpAddress, LPVOID* lpBaseAddress){
+STATUS Analyzer::ValidateAddressInImage(HANDLE hProcess, void* lpAddress, void** lpBaseAddress){
 	PROCESS_BASIC_INFORMATION pbi{};
 
 	FAIL_IF_NOT_SUCCESS(_NtQueryInformationProcess(hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), nullptr));
@@ -129,12 +129,12 @@ STATUS Analyzer::ValidateAddressInImage(HANDLE hProcess, LPVOID lpAddress, LPVOI
 	return ADDRESS_NOT_IN_IMAGE_SECTION;
 }
 
-STATUS Analyzer::ValidateTextExecution(HANDLE hProcess, LPVOID lpAddress, LPVOID lpBaseAddress){
+STATUS Analyzer::ValidateTextExecution(HANDLE hProcess, void* lpAddress, void* lpBaseAddress){
 	IMAGE_DOS_HEADER DOSHeader{};
 	FAIL_IF_FALSE(ReadProcessMemory(hProcess, lpBaseAddress, &DOSHeader, sizeof(DOSHeader), nullptr));
 
 	IMAGE_NT_HEADERS NTHeaders{};
-	FAIL_IF_FALSE(ReadProcessMemory(hProcess, (LPVOID)((SIZE_T) lpBaseAddress + DOSHeader.e_lfanew),
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, (void*)((SIZE_T) lpBaseAddress + DOSHeader.e_lfanew),
 		                            &NTHeaders, sizeof(NTHeaders), nullptr));
 
 	PIMAGE_SECTION_HEADER sections = (PIMAGE_SECTION_HEADER)((SIZE_T) lpBaseAddress + DOSHeader.e_lfanew +
@@ -159,7 +159,7 @@ STATUS Analyzer::ValidateTextExecution(HANDLE hProcess, LPVOID lpAddress, LPVOID
 	return ERROR_NOT_FOUND;
 }
 
-STATUS Analyzer::ValidateImageSection(HANDLE hProcess, LPVOID lpBaseAddress, PHANDLE hFile){
+STATUS Analyzer::ValidateImageSection(HANDLE hProcess, void* lpBaseAddress, PHANDLE hFile){
 	char lpFileName[256]{};
 	if(!GetMappedFileNameA(hProcess, lpBaseAddress, lpFileName, 256)){
 		return ADDRESS_NOT_IN_IMAGE_SECTION;
@@ -178,11 +178,11 @@ STATUS Analyzer::ValidateImageSection(HANDLE hProcess, LPVOID lpBaseAddress, PHA
 	return ERROR_SUCCESS;
 }
 
-STATUS Analyzer::ValidateMatchesFile(HANDLE hProcess, HANDLE hFile, LPVOID lpBaseAddress){
+STATUS Analyzer::ValidateMatchesFile(HANDLE hProcess, HANDLE hFile, void* lpBaseAddress){
 	//For now, just do the text section and headers. In the future, roll back the relocations
 	//and imports, then compare everything to the file
 
-	DWORD dwFileSize = GetFileSize(hFile, nullptr);
+	unsigned int dwFileSize = GetFileSize(hFile, nullptr);
 	FAIL_IF_FALSE(dwFileSize);
 
 	ALLOCATE(lpFileContents, dwFileSize);
@@ -199,7 +199,7 @@ STATUS Analyzer::ValidateMatchesFile(HANDLE hProcess, HANDLE hFile, LPVOID lpBas
 	FAIL_IF_FALSE(ReadProcessMemory(hProcess, lpBaseAddress, &RemoteDOSHeader, sizeof(RemoteDOSHeader), nullptr));
 
 	IMAGE_NT_HEADERS RemoteNTHeaders;
-	FAIL_IF_FALSE(ReadProcessMemory(hProcess, (LPVOID) ((SIZE_T) lpBaseAddress + RemoteDOSHeader.e_lfanew),
+	FAIL_IF_FALSE(ReadProcessMemory(hProcess, (void*) ((SIZE_T) lpBaseAddress + RemoteDOSHeader.e_lfanew),
 		&RemoteNTHeaders, sizeof(RemoteNTHeaders), nullptr));
 
 	ALLOCATE(lpRemoteImage, RemoteNTHeaders.OptionalHeader.SizeOfImage);
@@ -216,8 +216,8 @@ STATUS Analyzer::ValidateMatchesFile(HANDLE hProcess, HANDLE hFile, LPVOID lpBas
 	for(int i = 0; i < pFileNtHeader->FileHeader.NumberOfSections; i++){
 		std::cout << "Reading section " << (char*) sections[i].Name << std::endl;
 		if(!strcmp((char*) sections[i].Name, ".text")){
-			LPVOID lpFileTextSection = (LPVOID) ((SIZE_T) lpFileContents + sections[i].PointerToRawData);
-			LPVOID lpRemoteTextSection = (LPVOID) ((SIZE_T) lpRemoteImage + sections[i].VirtualAddress);
+			void* lpFileTextSection = (void*) ((SIZE_T) lpFileContents + sections[i].PointerToRawData);
+			void* lpRemoteTextSection = (void*) ((SIZE_T) lpRemoteImage + sections[i].VirtualAddress);
 			if(memcmp(lpFileTextSection, lpRemoteTextSection, sections[i].SizeOfRawData)){
 				return IMAGE_DOES_NOT_MATCH_FILE;
 			}
@@ -263,7 +263,7 @@ STATUS Analyzer::ValidateFile(HANDLE hFile){
 	return ERROR_SUCCESS;
 }
 
-STATUS Analyzer::ValidateLoader(HANDLE hProcess, LPVOID lpBaseAddress, HANDLE hFile){
+STATUS Analyzer::ValidateLoader(HANDLE hProcess, void* lpBaseAddress, HANDLE hFile){
 	PROCESS_BASIC_INFORMATION pbi;
 
 	FAIL_IF_NOT_SUCCESS(_NtQueryInformationProcess(hProcess, ProcessBasicInformation, &pbi, sizeof(pbi), nullptr));

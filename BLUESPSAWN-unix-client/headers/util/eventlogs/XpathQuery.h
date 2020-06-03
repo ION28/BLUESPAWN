@@ -7,19 +7,19 @@
 namespace EventLogs {
 
 	// Duplicate typedef as in EventLogs.h because including EventLogs.h breaks everything
-	typedef std::vector<std::pair<std::wstring, std::wstring>> ParamList;
+	typedef std::vector<std::pair<std::string, std::string>> ParamList;
 
 	class XpathQuery {
 		public:
-			XpathQuery(const std::wstring& path, const ParamList attributes, std::optional<std::wstring> value = std::optional<std::wstring>());
-			std::wstring ToString();
+			XpathQuery(const std::string& path, const ParamList attributes, std::optional<std::string> value = std::optional<std::string>());
+			std::string ToString();
 			bool SearchesByValue();
 		private:
-			std::wstring generateQuery();
-			std::wstring query;
-			std::wstring path;
+			std::string generateQuery();
+			std::string query;
+			std::string path;
 			const ParamList attributes;
-			std::optional<std::wstring> value;
+			std::optional<std::string> value;
 	};
 
 }

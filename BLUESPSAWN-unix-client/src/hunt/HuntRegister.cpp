@@ -14,7 +14,7 @@ void HuntRegister::RegisterHunt(std::shared_ptr<Hunt> hunt) {
 	// the copy in vRegisteredHunts and not the argument to this function.
 	vRegisteredHunts.emplace_back(hunt);
 
-	/*for(DWORD i = 1; i != 0; i <<= 1){
+	/*for(unsigned int i = 1; i != 0; i <<= 1){
 		if(hunt->UsesTactics(i)){
 			mTactics[(Tactic::Tactic) i].emplace_back(hunt);
 		}
@@ -58,9 +58,9 @@ bool CallFunctionSafe(const std::function<void()>& func){
 	}
 }
 
-void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction, vector<string> vExcludedHunts, vector<string>vIncludedHunts){
-	io.InformUser(L"Starting a hunt for " + std::to_wstring(vRegisteredHunts.size()) + L" techniques.");
-	DWORD huntsRan = 0;
+void HuntRegister::RunHunts(unsigned int dwTactics, unsigned int dwDataSource, unsigned int dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction, vector<string> vExcludedHunts, vector<string>vIncludedHunts){
+	io.InformUser("Starting a hunt for " + std::to_string(vRegisteredHunts.size()) + " techniques.");
+	unsigned int huntsRan = 0;
 
   for (auto name : vRegisteredHunts) {
 	  if (HuntShouldRun(*name, vExcludedHunts, vIncludedHunts)) {
@@ -71,22 +71,22 @@ void HuntRegister::RunHunts(DWORD dwTactics, DWORD dwDataSource, DWORD dwAffecte
 		  status |= level == Aggressiveness::Normal && CallFunctionSafe([&](){ huntRunStatus = name->ScanNormal(scope, reaction); });
 		  status |= level == Aggressiveness::Intensive && CallFunctionSafe([&](){ huntRunStatus = name->ScanIntensive(scope, reaction); });
 		  if(!status){
-			  Bluespawn::io.InformUser(L"An issue occured in hunt " + name->GetName() + L", preventing it from being run", ImportanceLevel::HIGH);
+			  Bluespawn::io.InformUser("An issue occured in hunt " + name->GetName() + ", preventing it from being run", ImportanceLevel::HIGH);
 		  } else if(huntRunStatus != -1){
 			  huntsRan++;
 		  }
 	  }
 	}
 	if (huntsRan != vRegisteredHunts.size()) {
-		io.InformUser(L"Successfully ran " + std::to_wstring(huntsRan) + L" hunts. There were no scans available for " + std::to_wstring(vRegisteredHunts.size() - huntsRan) + L" of the techniques.");
+		io.InformUser("Successfully ran " + std::to_string(huntsRan) + " hunts. There were no scans available for " + std::to_string(vRegisteredHunts.size() - huntsRan) + " of the techniques.");
 	}
 	else {
-		io.InformUser(L"Successfully ran " + std::to_wstring(huntsRan) + L" hunts.");
+		io.InformUser("Successfully ran " + std::to_string(huntsRan) + " hunts.");
 	}
 }
 
 void HuntRegister::RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction){
-	io.InformUser(L"Starting scan for " + hunt.GetName());
+	io.InformUser("Starting scan for " + hunt.GetName());
 	int huntRunStatus = 0;
 
 	auto level = getLevelForHunt(hunt, aggressiveness);
@@ -103,10 +103,10 @@ void HuntRegister::RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggres
 	}
 
 	if (huntRunStatus == -1) {
-		io.InformUser(L"No scans for this level available for " + hunt.GetName());
+		io.InformUser("No scans for this level available for " + hunt.GetName());
 	}
 	else {
-		io.InformUser(L"Successfully scanned for " + hunt.GetName());
+		io.InformUser("Successfully scanned for " + hunt.GetName());
 	}
 }
 
@@ -115,7 +115,7 @@ void HuntRegister::SetupMonitoring(Aggressiveness aggressiveness, const Reaction
 	for (auto name : vRegisteredHunts) {
 		auto level = getLevelForHunt(*name, aggressiveness);
 		if(name->SupportsScan(level)) {
-			io.InformUser(L"Setting up monitoring for " + name->GetName());
+			io.InformUser("Setting up monitoring for " + name->GetName());
 			for(auto event : name->GetMonitoringEvents()) {
 
 				std::function<void()> callback;
@@ -133,9 +133,9 @@ void HuntRegister::SetupMonitoring(Aggressiveness aggressiveness, const Reaction
 				}
 
 				if(name->SupportsScan(level)) {
-					DWORD status = EvtManager.SubscribeToEvent(event, callback);
+					unsigned int status = EvtManager.SubscribeToEvent(event, callback);
 					if(status != ERROR_SUCCESS){
-						LOG_ERROR(L"Monitoring for " << name->GetName() << L" failed with error code " << status);
+						LOG_ERROR("Monitoring for " << name->GetName() << " failed with error code " << status);
 					}
 				}
 			}

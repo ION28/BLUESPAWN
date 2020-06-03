@@ -24,7 +24,7 @@
    LOG(Log::_LogCurrentSinks, Log::LogLevel::LogError, "System Error Code 0x" << std::uppercase << std::hex << ERROR_ID << ": " << Log::FormatErrorMessage(ERROR_ID) << Log::endlog);
 
 #define SYSTEM_ERROR \
-	"System Error Code 0x" << std::uppercase << std::hex << GetLastError() << ": " << Log::FormatErrorMessage(GetLastError())
+	"System Error Code 0x" << std::uppercase << std::hex << errno  << ": " << Log::FormatErrorMessage(errno)
 
 // A macro to log a warning in the set of sinks specified by AddSink and RemoveSink
 #define LOG_WARNING(...) \
@@ -110,7 +110,7 @@ namespace Log {
 		 *
 		 * @return a reference to this log message.
 		 */
-		LogMessage& operator<<(const std::wstring& string);
+		LogMessage& operator<<(const std::string& string);
 
 		/**
 		 * StringStreams don't support wide strings, so this serves as a handler for
@@ -120,7 +120,7 @@ namespace Log {
 		 *
 		 * @return a reference to this log message.
 		 */
-		LogMessage& operator<<(LPCWSTR pointer);
+		LogMessage& operator<<(LPCSTR pointer);
 
 	protected:
 
@@ -184,9 +184,9 @@ namespace Log {
 	/**
 	* Gets a System Error Message's Description given the error code
 	* 
-	* @param DWORD returned from GetLastError()
+	* @param unsigned int returned from errno
 	*
-	* @return A std::wstring containing the System Error Message Description
+	* @return A std::string containing the System Error Message Description
 	*/
-	std::wstring FormatErrorMessage(DWORD dwNum);
+	std::string FormatErrorMessage(unsigned int dwNum);
 }

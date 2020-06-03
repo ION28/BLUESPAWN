@@ -4,12 +4,12 @@
 
 namespace EventLogs {
 
-	XpathQuery::XpathQuery(const std::wstring& path, const ParamList attributes, std::optional<std::wstring> value) :
+	XpathQuery::XpathQuery(const std::string& path, const ParamList attributes, std::optional<std::string> value) :
 		path(path), attributes(attributes), value(value) {
 		this->query = generateQuery();
 	}
 
-	std::wstring XpathQuery::ToString() {
+	std::string XpathQuery::ToString() {
 		return query;
 	}
 
@@ -17,39 +17,39 @@ namespace EventLogs {
 		return value.has_value();
 	}
 
-	std::wstring XpathQuery::generateQuery() {
+	std::string XpathQuery::generateQuery() {
 		// Replace last '/' of the path with '[' unless there are attributes
 		// and no value (aka, a query for the existance of an attribute)
-		std::wstring query;
+		std::string query;
 
 		if (value || attributes.size() == 0) {
-			std::size_t found = path.find_last_of(L"/");
-			query = path.substr(0, found) + L"[" + path.substr(found + 1);
+			std::size_t found = path.find_last_of("/");
+			query = path.substr(0, found) + "[" + path.substr(found + 1);
 		}
 		else
 			query = path;
 
 		if (attributes.size() > 0) {
-			query += L"[";
+			query += "[";
 
 			// Add attributes seperated by ' and '
 			auto it = attributes.begin();
-			query += L"@" + it->first + L"=" + it->second;
+			query += "@" + it->first + "=" + it->second;
 			it++;
 			for (; it != attributes.end(); it++)
-				query += L" and @" + it->first + L"=" + it->second;
+				query += " and @" + it->first + "=" + it->second;
 
-			query += L"]";
+			query += "]";
 		}
 
 		// Add the value if it exists
 		if (value)
-			query += L"=" + value.value();
+			query += "=" + value.value();
 
 		// Close the upper path if the last '/' of the path was
 		// replaced with '['
 		if (value || attributes.size() == 0)
-			query += L"]";
+			query += "]";
 
 		return query;
 	}

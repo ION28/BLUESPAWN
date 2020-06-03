@@ -46,7 +46,7 @@ public:
 	~YaraScanner();
 
 	YaraScanResult ScanFile(const FileSystem::File& file) const;
-	YaraScanResult ScanMemory(LPVOID location, DWORD size) const;
+	YaraScanResult ScanMemory(void* location, unsigned int size) const;
 	YaraScanResult ScanMemory(const AllocationWrapper& allocation) const;
 	YaraScanResult ScanMemory(const MemoryWrapper<>& memory) const;
 

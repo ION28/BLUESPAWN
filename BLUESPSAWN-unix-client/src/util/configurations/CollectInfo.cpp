@@ -16,13 +16,13 @@ void OutputComputerInformation() {
 	LOG_INFO("Current User: " << GetCurrentUser());
 }
 
-std::wstring GetOSVersion() {
-	return *Registry::RegistryKey(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\WIndows NT\\CurrentVersion").GetValue<std::wstring>(L"ProductName");
+std::string GetOSVersion() {
+	return *Registry::RegistryKey(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\WIndows NT\\CurrentVersion").GetValue<std::string>("ProductName");
 }
 
-std::wstring GetComputerDNSName() {
+std::string GetComputerDNSName() {
 	LPWSTR buffer = new WCHAR[256];
-	DWORD dwSize = sizeof(buffer);
+	unsigned int dwSize = sizeof(buffer);
 
 	//enum info: https://docs.microsoft.com/en-us/windows/desktop/api/sysinfoapi/ne-sysinfoapi-_computer_name_format
 	bool status = GetComputerNameEx(ComputerNamePhysicalDnsHostname, buffer, &dwSize);
@@ -30,30 +30,30 @@ std::wstring GetComputerDNSName() {
 	return buffer;
 }
 
-std::wstring GetDomain() {
+std::string GetDomain() {
 	LPWSTR buffer = new WCHAR[256];
-	DWORD dwSize = sizeof(buffer);
+	unsigned int dwSize = sizeof(buffer);
 
 	//enum info: https://docs.microsoft.com/en-us/windows/desktop/api/sysinfoapi/ne-sysinfoapi-_computer_name_format
 	GetComputerNameEx(ComputerNamePhysicalDnsDomain, buffer, &dwSize);
 
-	std::wstring name = *buffer ? buffer : L"WORKGROUP";
+	std::string name = *buffer ? buffer : "WORKGROUP";
 	return name;
 }
 
-std::wstring GetFQDN() {
+std::string GetFQDN() {
 	LPWSTR buffer = new WCHAR[256];
-	DWORD dwSize = sizeof(buffer);
+	unsigned int dwSize = sizeof(buffer);
 
 	//enum info: https://docs.microsoft.com/en-us/windows/desktop/api/sysinfoapi/ne-sysinfoapi-_computer_name_format
 	GetComputerNameEx(ComputerNamePhysicalDnsFullyQualified, buffer, &dwSize);
 
-	return std::wstring(L"\\\\") + buffer;
+	return std::string("\\\\") + buffer;
 }
 
-std::wstring GetCurrentUser() {
+std::string GetCurrentUser() {
 	LPWSTR buffer = new WCHAR[512];
-	DWORD dwSize = sizeof(buffer);
+	unsigned int dwSize = sizeof(buffer);
 
 	//enum info: https://docs.microsoft.com/en-us/windows/desktop/api/secext/ne-secext-extended_name_format
 	GetUserNameEx(NameSamCompatible, buffer, &dwSize);

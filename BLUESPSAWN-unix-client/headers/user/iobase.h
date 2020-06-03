@@ -35,8 +35,8 @@ public:
 	 *
 	 * @return The option that the user chose, or an empty string if no options were provided.
 	 */
-	virtual std::wstring GetUserSelection(const std::string& prompt, const std::vector<std::string>& options, 
-		DWORD dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const = 0;
+	virtual std::string GetUserSelection(const std::string& prompt, const std::vector<std::string>& options, 
+		unsigned int dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const = 0;
 
 	/**
 	 * This method displays a message to the user. No action is required for this function to return.
@@ -55,7 +55,7 @@ public:
 	 *
 	 * @return True if the user acknowledged the message, false otherwise.
 	 */
-	virtual bool AlertUser(const std::string& information, DWORD dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const = 0;
+	virtual bool AlertUser(const std::string& information, unsigned int dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const = 0;
 
 	/**
 	 * This method displays a confirmation message to the user. This will display the prompt and three options:
@@ -69,5 +69,5 @@ public:
 	 * @return If a timeout occurs or the user chooses cancel, -1 will be returned. If the user responds no, 0 is 
 	 * returned. If the user responds yes, 1 is returned.
 	 */
-	virtual DWORD GetUserConfirm(const std::string& prompt, DWORD dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const = 0;
+	virtual unsigned int GetUserConfirm(const std::string& prompt, unsigned int dwMaximumDelay = -1, ImportanceLevel level = ImportanceLevel::LOW) const = 0;
 };

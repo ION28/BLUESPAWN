@@ -2,7 +2,7 @@
 #include "hunt/HuntRegister.h"
 #include "reaction/Reaction.h"
 
-HuntInfo::HuntInfo(const std::wstring& HuntName, Aggressiveness HuntAggressiveness, DWORD HuntTactics, DWORD HuntCategories, DWORD HuntDatasources) :
+HuntInfo::HuntInfo(const std::string& HuntName, Aggressiveness HuntAggressiveness, unsigned int HuntTactics, unsigned int HuntCategories, unsigned int HuntDatasources) :
 	HuntName{ HuntName },
 	HuntAggressiveness{ HuntAggressiveness },
 	HuntTactics{ HuntTactics },
@@ -11,7 +11,7 @@ HuntInfo::HuntInfo(const std::wstring& HuntName, Aggressiveness HuntAggressivene
 	GetSystemTime(&HuntStartTime);
 }
 
-Hunt::Hunt(const std::wstring& name) : 
+Hunt::Hunt(const std::string& name) : 
 	name{ name }{
 	dwTacticsUsed = 0;
 	dwSourcesInvolved = 0;
@@ -19,26 +19,26 @@ Hunt::Hunt(const std::wstring& name) :
 	dwSupportedScans = 0;
 }
 
-std::wstring Hunt::GetName() {
+std::string Hunt::GetName() {
 	return name;
 }
 
 int Hunt::ScanCursory(const Scope& scope, Reaction reaction){
-	if(!(dwSupportedScans & (DWORD) Aggressiveness::Cursory)){
+	if(!(dwSupportedScans & (unsigned int) Aggressiveness::Cursory)){
 		return -1;
 	}
 	return 0;
 }
 
 int Hunt::ScanNormal(const Scope& scope, Reaction reaction){
-	if(!(dwSupportedScans & (DWORD) Aggressiveness::Normal)){
+	if(!(dwSupportedScans & (unsigned int) Aggressiveness::Normal)){
 		return -1;
 	}
 	return 0;
 }
 
 int Hunt::ScanIntensive(const Scope& scope, Reaction reaction){
-	if(!(dwSupportedScans & (DWORD) Aggressiveness::Intensive)){
+	if(!(dwSupportedScans & (unsigned int) Aggressiveness::Intensive)){
 		return -1;
 	}
 	return 0;
@@ -48,18 +48,18 @@ std::vector<std::shared_ptr<Event>> Hunt::GetMonitoringEvents() {
 	return std::vector<std::shared_ptr<Event>>();
 }
 
-bool Hunt::AffectsCategory(DWORD dwStuff){
+bool Hunt::AffectsCategory(unsigned int dwStuff){
 	return (dwStuff && dwCategoriesAffected) == dwStuff;
 }
 
-bool Hunt::UsesTactics(DWORD dwTactics){
+bool Hunt::UsesTactics(unsigned int dwTactics){
 	return (dwTactics && dwTacticsUsed) == dwTactics;
 }
 
-bool Hunt::UsesSources(DWORD dwSources){
+bool Hunt::UsesSources(unsigned int dwSources){
 	return (dwSources && dwSourcesInvolved) == dwSources;
 }
 
 bool Hunt::SupportsScan(Aggressiveness aggressiveness){
-	return ((DWORD) aggressiveness & dwSupportedScans) == (DWORD) aggressiveness;
+	return ((unsigned int) aggressiveness & dwSupportedScans) == (unsigned int) aggressiveness;
 }

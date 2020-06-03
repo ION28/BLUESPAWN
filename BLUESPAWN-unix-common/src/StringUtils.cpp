@@ -7,7 +7,7 @@
 #include <map>
 #include <cmath>
 
-double GetShannonEntropy(const std::wstring& str) {
+double GetShannonEntropy(const std::string& str) {
 	// Code from https://rosettacode.org/wiki/Entropy#C.2B.2B
 	std::map<char, int> frequencies;
 	for (char c : str)
@@ -32,36 +32,12 @@ std::string WidestringToString(const std::wstring& wstr){
 	return s;
 }
 
-std::wstring ExpandEnvStringsW(const std::wstring& in){
-	WCHAR* expanded = new WCHAR[MAX_PATH];
-	auto result = ExpandEnvironmentStringsW(in.c_str(), expanded, MAX_PATH);
-	if(result > MAX_PATH){
-		delete[] expanded;
-		expanded = new WCHAR[result];
-		result = ExpandEnvironmentStringsW(in.c_str(), expanded, result);
-	}
-
-	std::wstring str{ expanded };
-
-	delete[] expanded;
-
-	return str;
+std::wstring GetEnvStringW(const std::wstring& in){
+	return StringToWidestring(getenv(WidestringToString(in).c_str()));
 }
 
-std::string ExpandEnvStringsA(const std::string& in){
-	CHAR* expanded = new CHAR[MAX_PATH];
-	auto result = ExpandEnvironmentStringsA(in.c_str(), expanded, MAX_PATH);
-	if(result > MAX_PATH){
-		delete[] expanded;
-		expanded = new CHAR[result];
-		result = ExpandEnvironmentStringsA(in.c_str(), expanded, result);
-	}
-
-	std::string str{ expanded };
-
-	delete[] expanded;
-
-	return str;
+std::string GetEnvStringA(const std::string& in){
+	return std::string(getenv(in.c_str()));
 }
 
 template<class T>

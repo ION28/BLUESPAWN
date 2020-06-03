@@ -21,7 +21,7 @@ public:
 	GenericWrapper(T object, std::function<void(T)> freeFunction = [](T object){ delete object; }, std::optional<T> BadValue = std::nullopt) : 
 		WrappedObject{ object }, 
 		BadValue{ BadValue },
-		ReferenceCounter{ nullptr, [object, BadValue, freeFunction](LPVOID memory){ 
+		ReferenceCounter{ nullptr, [object, BadValue, freeFunction](void* memory){ 
 		    if((!BadValue || object != BadValue) && object){ freeFunction(object); } 
 	    }}{}
 
@@ -50,7 +50,7 @@ class AcquireMutex {
 public:
 	explicit AcquireMutex(const MutexType& mutex) :
 		hMutex{ mutex },
-		tracker{ nullptr, [&](LPVOID nul){ pthread_mutex_unlock(hMutex); } }{
+		tracker{ nullptr, [&](void* nul){ pthread_mutex_unlock(hMutex); } }{
 		pthread_mutex_lock(hMutex);
 	}
 };
@@ -65,7 +65,7 @@ public:
 		MALLOC, CPP_ALLOC, CPP_ARRAY_ALLOC, STACK_ALLOC
 	};
 
-	AllocationWrapper(LPVOID memory, SIZE_T size, AllocationFunction AllocationType = STACK_ALLOC) :
+	AllocationWrapper(void* memory, SIZE_T size, AllocationFunction AllocationType = STACK_ALLOC) :
 		pointer{ reinterpret_cast<PCHAR>(memory) },
 		Memory{ 
 			size && memory ? std::optional<std::shared_ptr<char[]>>{{
@@ -89,11 +89,11 @@ public:
 		return Memory.has_value();
 	}
 
-	operator LPVOID() const {
+	operator void*() const {
 		return pointer;
 	}
 
-	DWORD GetSize() const {
+	unsigned int GetSize() const {
 		return Memory.has_value() ? AllocationSize : 0;
 	}
 
@@ -158,7 +158,7 @@ public:
 		return false;
 	}
 
-	template<class T = LPVOID>
+	template<class T = void*>
 	T* GetAsPointer(){ 
 		return reinterpret_cast<T*>(pointer); 
 	}
@@ -173,7 +173,7 @@ public:
 	pid_t process;
 	SIZE_T MemorySize;
 
-	MemoryWrapper(LPVOID lpMemoryBase, SIZE_T size = sizeof(T), pid_t process = getpid())
+	MemoryWrapper(void* lpMemoryBase, SIZE_T size = sizeof(T), pid_t process = getpid())
 		: address{ reinterpret_cast<T*>(lpMemoryBase) }, process{ process }, MemorySize{ size } {}
 
 	T Dereference() const {
@@ -227,7 +227,7 @@ public:
 		return !memcmp(&data1, &data2, min(memory.MemorySize, MemorySize));
 	}
 
-	bool Protect(DWORD protections, SIZE_T size = -1){
+	bool Protect(unsigned int protections, SIZE_T size = -1){
 		if(size == -1) size = MemorySize;
 		if(!process){
 			return mprotect(address, size, protections); //TODO: not really sure what their intention with the whole having the process argument is.
@@ -291,7 +291,7 @@ public:
 	operator bool() const { return address; }
 	bool operator !() const { return !address; }
 
-	AllocationWrapper ToAllocationWrapper(DWORD size = MemorySize){
+	AllocationWrapper ToAllocationWrapper(unsigned int size = MemorySize){
 		size = min(size, MemorySize);
 		if(size > 0x8000){
 			AllocationWrapper wrapper{ ::VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE), size, AllocationWrapper::VIRTUAL_ALLOC };
@@ -325,4 +325,4 @@ public:
     GenericWrapper<type> name = {value, [&](type data){ function; }}
 
 #define SCOPE_LOCK(function, name) \
-    GenericWrapper<DWORD> __##name = { 1, [&](DWORD data){ function; }, 0 }
+    GenericWrapper<unsigned int> __##name = { 1, [&](unsigned int data){ function; }, 0 }

@@ -20,7 +20,7 @@ class EventSubscription {
 		* The function called by the underlying Windows OS as a callback.
 		* In turn calls reaction->EventIdentified
 		*/
-		DWORD WINAPI SubscriptionCallback(EVT_SUBSCRIBE_NOTIFY_ACTION action, EVT_HANDLE hEvent);
+		unsigned int WINAPI SubscriptionCallback(EVT_SUBSCRIBE_NOTIFY_ACTION action, EVT_HANDLE hEvent);
 
 		/**
 		* Set the event handle so it can be closed when this object is deleted

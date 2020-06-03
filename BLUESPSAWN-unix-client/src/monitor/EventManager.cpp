@@ -11,8 +11,8 @@ EventManager& EventManager::GetInstance(){
 	return manager;
 }
 
-DWORD EventManager::SubscribeToEvent(const std::shared_ptr<Event>& e, const std::function<void()>& callback) {
-	DWORD status = ERROR_SUCCESS;
+unsigned int EventManager::SubscribeToEvent(const std::shared_ptr<Event>& e, const std::function<void()>& callback) {
+	unsigned int status = ERROR_SUCCESS;
 
 	for(auto evt : vEventList){
 		if(*evt == *e){

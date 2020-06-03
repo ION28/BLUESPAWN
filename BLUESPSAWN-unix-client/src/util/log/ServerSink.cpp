@@ -13,15 +13,15 @@ namespace Log {
 		return gpb::Aggressiveness();
 	}
 
-	std::vector<gpb::Tactic> ServerSink::HuntTacticsToGPB(DWORD info) {
+	std::vector<gpb::Tactic> ServerSink::HuntTacticsToGPB(unsigned int info) {
 		return std::vector<gpb::Tactic>();
 	}
 
-	std::vector<gpb::Category> ServerSink::HuntCategoriesToGPB(DWORD info) {
+	std::vector<gpb::Category> ServerSink::HuntCategoriesToGPB(unsigned int info) {
 		return std::vector<gpb::Category>();
 	}
 
-	std::vector<gpb::DataSource> ServerSink::HuntDatasourcesToGPB(DWORD info) {
+	std::vector<gpb::DataSource> ServerSink::HuntDatasourcesToGPB(unsigned int info) {
 		return std::vector<gpb::DataSource>();
 	}
 

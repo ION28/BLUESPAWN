@@ -27,7 +27,7 @@ private:
 	class SubEventListener {
 
 		/// Indicates the number of events that can be added before maximum capacity is reached
-		DWORD dwSlotsFree;
+		unsigned int dwSlotsFree;
 
 		/// Stores the event handles being waited on
 		std::vector<HANDLE> events;
@@ -54,7 +54,7 @@ private:
 		std::thread hThread;
 
 		/// Keeps track of the number of consecutive wait failures
-		DWORD dwFailureCount;
+		unsigned int dwFailureCount;
 
 		/// Terminates the thread next time hManager is signaled if true
 		bool terminate;

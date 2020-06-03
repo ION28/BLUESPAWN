@@ -53,7 +53,7 @@ void EventListener::SubEventListener::ListenForEvents(){
         }
 
         else {
-            LOG_ERROR("Failed to wait on events with status " << std::hex << status << "; Error code " << GetLastError());
+            LOG_ERROR("Failed to wait on events with status " << std::hex << status << "; Error code " << errno);
             dwFailureCount++;
             if(dwFailureCount >= 5){
                 LOG_ERROR("Five consecutive errors have occured in a SubEventListener; Abandoning " << slots - 1 << " events");
@@ -168,7 +168,7 @@ bool EventListener::SubEventListener::TryAddCallback(
 }
 
 // Function adopted from https://stackoverflow.com/questions/20833453/comparing-stdfunctions-for-equality
-LPVOID getAddress(std::function<void()> f){
+void* getAddress(std::function<void()> f){
     return *(f.template target<void(*)()>());
 }
 

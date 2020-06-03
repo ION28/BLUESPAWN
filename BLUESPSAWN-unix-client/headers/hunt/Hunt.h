@@ -18,21 +18,21 @@ class HuntRegister;
 
 class Hunt {
 protected:
-	DWORD dwTacticsUsed;
-	DWORD dwSourcesInvolved;
-	DWORD dwCategoriesAffected;
-	DWORD dwSupportedScans;
+	unsigned int dwTacticsUsed;
+	unsigned int dwSourcesInvolved;
+	unsigned int dwCategoriesAffected;
+	unsigned int dwSupportedScans;
 
-	std::wstring name;
+	std::string name;
 
 public:
-	Hunt(const std::wstring& name);
+	Hunt(const std::string& name);
 
-	std::wstring GetName();
+	std::string GetName();
 
-	bool UsesTactics(DWORD tactics);
-	bool UsesSources(DWORD sources);
-	bool AffectsCategory(DWORD category);
+	bool UsesTactics(unsigned int tactics);
+	bool UsesSources(unsigned int sources);
+	bool AffectsCategory(unsigned int category);
 	bool SupportsScan(Aggressiveness scan);
 
 	virtual int ScanCursory(const Scope& scope, Reaction reaction);

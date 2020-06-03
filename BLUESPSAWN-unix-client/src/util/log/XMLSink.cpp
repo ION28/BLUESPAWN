@@ -7,16 +7,16 @@
 
 namespace Log{
 
-	std::wstring ToWstringPad(DWORD value, size_t length=2){
+	std::wstring ToWstringPad(unsigned int value, size_t length=2){
 		wchar_t* buf = new wchar_t[length + 1];
-		swprintf(buf, (L"%0" + std::to_wstring(length) + L"d").c_str(), value);
+		swprintf(buf, ("%0" + std::to_string(length) + "d").c_str(), value);
 		std::wstring str = buf;
 		delete[] buf;
 		return str;
 	}
 
 	void UpdateLog(XMLSink* sink){
-		HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, L"Local\\FlushLogs") };
+		HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, "Local\\FlushLogs") };
 		while(true){
 			WaitForSingleObject(hRecordEvent, INFINITE);
 			sink->Flush();
@@ -29,13 +29,13 @@ namespace Log{
 		thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr) }{
 		SYSTEMTIME time{};
 		GetLocalTime(&time);
-		wFileName = L"bluespawn-" + ToWstringPad(time.wMonth) + L"-" + ToWstringPad(time.wDay) + L"-" + ToWstringPad(time.wYear, 4) + L"-"
-			+ ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + L"-" + ToWstringPad(time.wSecond) + L".xml";
+		wFileName = "bluespawn-" + ToWstringPad(time.wMonth) + "-" + ToWstringPad(time.wDay) + "-" + ToWstringPad(time.wYear, 4) + "-"
+			+ ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + "-" + ToWstringPad(time.wSecond) + ".xml";
 		XMLDoc.InsertEndChild(Root);
 		ResumeThread(thread);
 	}
 
-	XMLSink::XMLSink(const std::wstring& wFileName) :
+	XMLSink::XMLSink(const std::string& wFileName) :
 		hMutex{ CreateMutexW(nullptr, false, nullptr) },
 		Root { XMLDoc.NewElement("bluespawn") },
 		wFileName{ wFileName },
@@ -172,7 +172,7 @@ namespace Log{
 
 			Root->InsertEndChild(hunt);
 		} else if(level.Enabled()) {
-			auto msg = XMLDoc.NewElement(MessageTags[static_cast<DWORD>(level.severity)].c_str());
+			auto msg = XMLDoc.NewElement(MessageTags[static_cast<unsigned int>(level.severity)].c_str());
 			SYSTEMTIME st;
 			GetSystemTime(&st);
 			msg->SetAttribute("time", SystemTimeToInteger(st));

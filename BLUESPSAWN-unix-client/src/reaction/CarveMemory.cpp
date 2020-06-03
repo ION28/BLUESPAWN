@@ -8,8 +8,8 @@
 namespace Reactions {
 
 	void CarveProcessReaction::CarveProcessIdentified(std::shared_ptr<PROCESS_DETECTION> detection){
-		if(io.GetUserConfirm(detection->wsImagePath + L" (PID " + std::to_wstring(detection->PID) + L") appears to be infected. Carve out and terminate malicious memory section?") == 1){
-			auto remover = PERemover{ static_cast<DWORD>(detection->PID), detection->lpAllocationBase, detection->dwAllocationSize };
+		if(io.GetUserConfirm(detection->wsImagePath + " (PID " + std::to_string(detection->PID) + ") appears to be infected. Carve out and terminate malicious memory section?") == 1){
+			auto remover = PERemover{ static_cast<unsigned int>(detection->PID), detection->lpAllocationBase, detection->dwAllocationSize };
 			remover.RemoveImage();
 		}
 	}

@@ -26,9 +26,9 @@ namespace Log {
 
 		// Converting HuntInfo to gpb::HuntInfo
 		gpb::Aggressiveness HuntAggressivenessToGPB(const Aggressiveness& info);
-		std::vector<gpb::Tactic> HuntTacticsToGPB(DWORD info);
-		std::vector<gpb::Category> HuntCategoriesToGPB(DWORD info);
-		std::vector<gpb::DataSource> HuntDatasourcesToGPB(DWORD info);
+		std::vector<gpb::Tactic> HuntTacticsToGPB(unsigned int info);
+		std::vector<gpb::Category> HuntCategoriesToGPB(unsigned int info);
+		std::vector<gpb::DataSource> HuntDatasourcesToGPB(unsigned int info);
 		gpb::HuntInfo HuntInfoToGPB(const HuntInfo& info);
 
 		std::vector<gpb::FileReactionData> GetFileReactions(const std::vector<std::shared_ptr<DETECTION>>& detections);

@@ -26,8 +26,8 @@ namespace Reactions {
 		if(HuntBegun){
 			_HuntLogMessage->AddDetection(std::static_pointer_cast<DETECTION>(detection));
 		} else {
-			LOG_ERROR(L"\tPotentially malicious registry key detected outside of a hunt - " << detection->value.key
-				<< L": " << detection->value.GetPrintableName() << L" with data " << detection->value);
+			LOG_ERROR("\tPotentially malicious registry key detected outside of a hunt - " << detection->value.key
+				<< ": " << detection->value.GetPrintableName() << " with data " << detection->value);
 		}
 	}
 	void LogReaction::LogProcessIdentified(std::shared_ptr<PROCESS_DETECTION> detection){

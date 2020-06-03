@@ -20,11 +20,11 @@ std::optional<AllocationWrapper> FindBeaconInfoQuick(const MemoryWrapper<>& memo
 
 	auto section{ memory.GetOffset(offset + sizeof(IMAGE_NT_HEADERS)).Convert<IMAGE_SECTION_HEADER>() };
 	while(section->Name){
-		if(*reinterpret_cast<PDWORD64>(section->Name) == *reinterpret_cast<PDWORD64>(".data\0\0")){
-			DWORD dwRawDword{ *memory.GetOffset(section->PointerToRawData + 0x30).Convert<DWORD>() ^ 0x01000100 };
-			DWORD dwVirDword{ *memory.GetOffset(section->VirtualAddress + 0x30).Convert<DWORD>() ^ 0x01000100 };
+		if(*reinterpret_cast<Punsigned int64>(section->Name) == *reinterpret_cast<Punsigned int64>(".data\0\0")){
+			unsigned int dwRawDword{ *memory.GetOffset(section->PointerToRawData + 0x30).Convert<unsigned int>() ^ 0x01000100 };
+			unsigned int dwVirDword{ *memory.GetOffset(section->VirtualAddress + 0x30).Convert<unsigned int>() ^ 0x01000100 };
 			if(dwRawDword == 0x2E2E2E2E || dwRawDword == 0x69696969){
-				auto wrapper{ memory.GetOffset(section->PointerToRawData + 0x30).Convert<DWORD>().ToAllocationWrapper(4096) };
+				auto wrapper{ memory.GetOffset(section->PointerToRawData + 0x30).Convert<unsigned int>().ToAllocationWrapper(4096) };
 				if(!wrapper){
 				}
 				for(size_t idx1 = 0; idx1 < wrapper.GetSize(); idx1++){
@@ -36,7 +36,7 @@ std::optional<AllocationWrapper> FindBeaconInfoQuick(const MemoryWrapper<>& memo
 				}
 				return wrapper;
 			} else if(dwRawDword == 0x2E2E2E2E || dwRawDword == 0x69696969){
-				auto wrapper{ memory.GetOffset(section->PointerToRawData + 0x30).Convert<DWORD>().ToAllocationWrapper(4096) };
+				auto wrapper{ memory.GetOffset(section->PointerToRawData + 0x30).Convert<unsigned int>().ToAllocationWrapper(4096) };
 				for(size_t idx1 = 0; idx1 < wrapper.GetSize(); idx1++){
 					if(dwRawDword == 0x69696969){
 						wrapper.SetByte(idx1, wrapper[idx1] ^ 0x69);
@@ -63,11 +63,11 @@ std::optional<AllocationWrapper> FindBeaconInfo(const MemoryWrapper<>& memory){
 		return quick;
 	}
 
-	DWORD64 start{ 0x020001000100 };
-	DWORD64 xor3{ 0x696969696969 };
-	DWORD64 xor4{ 0x2E2E2E2E2E2E };
+	unsigned int64 start{ 0x020001000100 };
+	unsigned int64 xor3{ 0x696969696969 };
+	unsigned int64 xor4{ 0x2E2E2E2E2E2E };
 	for(size_t idx = 0; idx < memory.MemorySize - 8; idx++){
-		auto pattern{ (*memory.GetOffset(idx).Convert<DWORD64>() & 0xFFFFFFFFFFFF) ^ start };
+		auto pattern{ (*memory.GetOffset(idx).Convert<unsigned int64>() & 0xFFFFFFFFFFFF) ^ start };
 		if(pattern == xor3 || pattern == xor4){
 			LOG_VERBOSE(2, "Beacon magic bytes found in memory");
 			auto wrapper{ memory.GetOffset(idx).ToAllocationWrapper(4096) };
@@ -85,16 +85,16 @@ std::optional<AllocationWrapper> FindBeaconInfo(const MemoryWrapper<>& memory){
 	return std::nullopt;
 }
 
-std::wstring ToWstringPad(DWORD value, size_t length = 2){
+std::wstring ToWstringPad(unsigned int value, size_t length = 2){
 	wchar_t* buf = new wchar_t[length + 1];
-	swprintf(buf, (L"%0" + std::to_wstring(length) + L"d").c_str(), value);
+	swprintf(buf, ("%0" + std::to_string(length) + "d").c_str(), value);
 	std::wstring str = buf;
 	delete[] buf;
 	return str;
 }
 
 // From https://github.com/Sentinel-One/CobaltStrikeParser/blob/master/parse_beacon_config.py
-std::map<DWORD, std::string> names{
+std::map<unsigned int, std::string> names{
 	{ 1, "BeaconType" },
 	{ 2, "Port" },
 	{ 3, "SleepTime" },
@@ -141,7 +141,7 @@ std::map<DWORD, std::string> names{
 	{ 54, "HostHeader" },
 };
 
-std::map<DWORD, std::map<DWORD, std::string>> enums{
+std::map<unsigned int, std::map<unsigned int, std::string>> enums{
 	{1, {
 		{ 0x0, "HTTP"},
 		{ 0x1, "Hybrid HTTP DNS" },
@@ -152,7 +152,7 @@ std::map<DWORD, std::map<DWORD, std::string>> enums{
 	}},
 };
 
-std::string PrintHex(PUCHAR lpAddress, DWORD dwSize){
+std::string PrintHex(PUCHAR lpAddress, unsigned int dwSize){
 	std::string string = "";
 	for(auto i = 0; i < dwSize; i++){
 		char buf[3];
@@ -163,7 +163,7 @@ std::string PrintHex(PUCHAR lpAddress, DWORD dwSize){
 	return string;
 }
 
-std::string PrettyPrintConfiguration(PCHAR address, DWORD dwOffset){
+std::string PrettyPrintConfiguration(PCHAR address, unsigned int dwOffset){
 	USHORT setting{ *reinterpret_cast<PUSHORT>(address + dwOffset) };
 	USHORT type{ *reinterpret_cast<PUSHORT>(address + dwOffset + 2) };
 	USHORT size{ *reinterpret_cast<PUSHORT>(address + dwOffset + 4) };
@@ -182,7 +182,7 @@ std::string PrettyPrintConfiguration(PCHAR address, DWORD dwOffset){
 		}
 		return name + ": " + std::to_string(data);
 	} else if(type == 0x0002){ // TYPE_INT
-		DWORD data{ *reinterpret_cast<PDWORD>(address + dwOffset + 6) };
+		unsigned int data{ *reinterpret_cast<Punsigned int>(address + dwOffset + 6) };
 		data = ((data & 0xFF) << 24) | ((data & 0xFF00) << 8) | ((data & 0xFF0000) >> 8) | (data >> 24);
 		if(enums.count(setting) && enums.at(setting).count(data)){
 			return name + ": " + enums.at(setting).at(data);
@@ -218,19 +218,19 @@ bool DumpBeaconInformation(const MemoryWrapper<>& memory){
 		SYSTEMTIME time{};
 		GetLocalTime(&time);
 		auto pid{ GetProcessId(memory.process) };
-		auto wFileName{ L"bluespawn-" + ToWstringPad(time.wMonth) + L"-" + ToWstringPad(time.wDay) + L"-" + ToWstringPad(time.wYear, 4) + L"-"
-			+ ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + L"-" + ToWstringPad(time.wSecond) + L"-PID-" + ToWstringPad(pid, 5) };
+		auto wFileName{ "bluespawn-" + ToWstringPad(time.wMonth) + "-" + ToWstringPad(time.wDay) + "-" + ToWstringPad(time.wYear, 4) + "-"
+			+ ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + "-" + ToWstringPad(time.wSecond) + "-PID-" + ToWstringPad(pid, 5) };
 		auto num = 0ul;
-		while(FileSystem::CheckFileExists(wFileName + L"-" + std::to_wstring(num))){
+		while(FileSystem::CheckFileExists(wFileName + "-" + std::to_string(num))){
 			num++;
 		}
 
-		FileSystem::File file{ wFileName + L"-" + std::to_wstring(num) };
+		FileSystem::File file{ wFileName + "-" + std::to_string(num) };
 		file.Create();
 
 		std::string output{};
 		PCHAR memory{ info->GetAsPointer<CHAR>() };
-		DWORD dwOffset{ 0 };
+		unsigned int dwOffset{ 0 };
 		while(dwOffset < info->GetSize()){
 			output += PrettyPrintConfiguration(memory, dwOffset) + "\n";
 			auto size{ *reinterpret_cast<PUSHORT>(memory + dwOffset + 4) };

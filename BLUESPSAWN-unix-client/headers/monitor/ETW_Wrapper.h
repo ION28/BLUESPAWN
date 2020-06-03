@@ -12,9 +12,9 @@ or Powershell: Get-NetEventProvider -ShowInstalled | Select-Object Name,Guid | s
 */
 /*
 namespace etw_guid {
-	static krabs::guid powershell = krabs::guid(L"{A0C1853B-5C40-4B15-8766-3CF1C58F985A}");
-	static krabs::guid firewall = krabs::guid(L"{E595F735-B42A-494B-AFCD-B68666945CD3}");
-	static krabs::guid groupPolicy = krabs::guid(L"{AEA1B4FA-97D1-45F2-A64C-4D69FFFD92C9}");
+	static krabs::guid powershell = krabs::guid("{A0C1853B-5C40-4B15-8766-3CF1C58F985A}");
+	static krabs::guid firewall = krabs::guid("{E595F735-B42A-494B-AFCD-B68666945CD3}");
+	static krabs::guid groupPolicy = krabs::guid("{AEA1B4FA-97D1-45F2-A64C-4D69FFFD92C9}");
 }
 
 class ETW_Wrapper {

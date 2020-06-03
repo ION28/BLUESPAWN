@@ -34,12 +34,12 @@ namespace Permissions{
 	*
 	* @param access - the access mask to be changed
 	*/
-	void AccessAddAll(DWORD &access);
-	void AccessAddWrite(DWORD& access, const OwnerType type);
-	void AccessAddRead(DWORD& access, const OwnerType type);
-	void AccessAddExecute(DWORD& access, const OwnerType type);
-	void AccessAddWriteOwner(DWORD& access, const OwnerType type);
-	void AccessAddDelete(DWORD& access, const OwnerType type);
+	void AccessAddAll(unsigned int &access);
+	void AccessAddWrite(unsigned int& access, const OwnerType type);
+	void AccessAddRead(unsigned int& access, const OwnerType type);
+	void AccessAddExecute(unsigned int& access, const OwnerType type);
+	void AccessAddWriteOwner(unsigned int& access, const OwnerType type);
+	void AccessAddDelete(unsigned int& access, const OwnerType type);
 
 	/*Enum for storing type of Owner an Owner object is*/
 	enum OwnerType {

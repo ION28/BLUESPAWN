@@ -16,11 +16,7 @@ void Reaction::FileIdentified(std::shared_ptr<FILE_DETECTION> info){
 		reaction(info);
 	}
 }
-void Reaction::RegistryKeyIdentified(std::shared_ptr<REGISTRY_DETECTION> info){
-	for(auto reaction : vRegistryReactions){
-		reaction(info);
-	}
-}
+
 void Reaction::ProcessIdentified(std::shared_ptr<PROCESS_DETECTION> info){
 	for(auto reaction : vProcessReactions){
 		reaction(info);
@@ -47,9 +43,7 @@ void Reaction::AddHuntEnd(HuntEnd end){
 void Reaction::AddFileReaction(DetectFile handler){
 	vFileReactions.emplace_back(handler);
 }
-void Reaction::AddRegistryReaction(DetectRegistry handler){
-	vRegistryReactions.emplace_back(handler);
-}
+
 void Reaction::AddProcessReaction(DetectProcess handler){
 	vProcessReactions.emplace_back(handler);
 }
@@ -68,8 +62,6 @@ Reaction& Reaction::Combine(const Reaction& reaction){
 		vEndHuntProcs.emplace_back(function);
 	for(auto function : reaction.vFileReactions)
 		vFileReactions.emplace_back(function);
-	for(auto function : reaction.vRegistryReactions)
-		vRegistryReactions.emplace_back(function);
 	for(auto function : reaction.vProcessReactions)
 		vProcessReactions.emplace_back(function);
 	for(auto function : reaction.vServiceReactions)
@@ -88,8 +80,6 @@ Reaction& Reaction::Combine(Reaction&& reaction){
 		vEndHuntProcs.emplace_back(function);
 	for(auto function : reaction.vFileReactions)
 		vFileReactions.emplace_back(function);
-	for(auto function : reaction.vRegistryReactions)
-		vRegistryReactions.emplace_back(function);
 	for(auto function : reaction.vProcessReactions)
 		vProcessReactions.emplace_back(function);
 	for(auto function : reaction.vServiceReactions)

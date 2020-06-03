@@ -15,28 +15,28 @@ namespace EventLogs {
 
 	class EventLogItem {
 		public:
-			std::wstring GetProperty(std::wstring prop) const;
-			std::unordered_map<std::wstring, std::wstring> GetProperties() const;
-			std::wstring GetChannel() const;
-			std::wstring GetTimeCreated() const;
-			std::wstring GetXML() const;
+			std::string GetProperty(std::string prop) const;
+			std::unordered_map<std::string, std::string> GetProperties() const;
+			std::string GetChannel() const;
+			std::string GetTimeCreated() const;
+			std::string GetXML() const;
 			unsigned int GetEventID() const;
 			unsigned int GetEventRecordID() const;
 
-			void SetProperty(std::wstring& property, std::wstring& value);
-			void SetChannel(std::wstring& channel);
-			void SetTimeCreated(std::wstring& time);
-			void SetXML(std::wstring& xml);
+			void SetProperty(std::string& property, std::string& value);
+			void SetChannel(std::string& channel);
+			void SetTimeCreated(std::string& time);
+			void SetXML(std::string& xml);
 			void SetEventID(unsigned int id);
 			void SetEventRecordID(unsigned int id);
 
 		private:
 			unsigned int eventID;
 			unsigned int eventRecordID;
-			std::wstring timeCreated;
-			std::wstring channel;
-			std::wstring rawXML;
-			std::unordered_map<std::wstring, std::wstring> props;
+			std::string timeCreated;
+			std::string channel;
+			std::string rawXML;
+			std::unordered_map<std::string, std::string> props;
 	};
 
 }

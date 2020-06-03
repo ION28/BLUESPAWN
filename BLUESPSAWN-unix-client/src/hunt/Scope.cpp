@@ -17,7 +17,7 @@ bool Scope::RegistryKeyIsInScope(LPCSTR pid) const {
 	return true;
 }
 
-bool Scope::ProcessIsInScope(DWORD sProcessName) const {
+bool Scope::ProcessIsInScope(unsigned int sProcessName) const {
 	return true;
 }
 bool Scope::ProcessIsInScope(HANDLE hProcess) const {
@@ -26,8 +26,8 @@ bool Scope::ProcessIsInScope(HANDLE hProcess) const {
 std::vector<HANDLE> Scope::GetScopedProcessHandles() const {
 	return std::vector<HANDLE>();
 }
-std::vector<DWORD> Scope::GetScopedProcessPIDs() const {
-	return std::vector<DWORD>();
+std::vector<unsigned int> Scope::GetScopedProcessPIDs() const {
+	return std::vector<unsigned int>();
 }
 
 bool Scope::ServiceIsInScope(LPCSTR sServiceName) const {
