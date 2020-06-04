@@ -1,80 +1,90 @@
 #include <string>
 #include <iostream>
+#include <libgen.h>
+#include <signal.h>
 
 #include "reaction/SuspendProcess.h"
 #include "common/wrappers.hpp"
 #include "util/log/Log.h"
-
-#include <psapi.h>
-
-LINK_FUNCTION(NtSuspendProcess, NTDLL.DLL)
+#include "util/processes/Process.h"
+#include "util/filesystem/FileSystem.h"
+#include "common/StringUtils.h"
 
 namespace Reactions{
-	bool SuspendProcessReaction::CheckModules(const HandleWrapper& process, const std::string& file) const {
-        HMODULE hMods[1024];
-        unsigned int cbNeeded = 0;
-        if(EnumProcessModules(process, hMods, sizeof(hMods), &cbNeeded)){
-            for(unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++){
-                WCHAR szModName[MAX_PATH];
-                if(GetModuleFileNameExW(process, hMods[i], szModName, sizeof(szModName) / sizeof(WCHAR))){
-					if(file == szModName){
-						return true;
+	//TODO: Suspend any children processes as well.
+	std::vector<pid_t> SuspendProcessReaction::GetProcessesWithExe(const std::string& file) const {
+		std::vector<pid_t> pids = std::vector<pid_t>();
+		FileSystem::Folder procfs = FileSystem::Folder("/proc");
+		if(procfs.GetFileExists()){ //procfs should never be empty
+			do{
+				if(!procfs.GetCurIsFile()){
+					std::optional<FileSystem::Folder> proc = procfs.EnterDir();
+					if(proc.has_value()){
+						FileSystem::Folder procfolder = proc.value();
+						if(procfolder.GetFileExists()){
+							char path[PATH_MAX + 1];
+							strncpy(path, procfolder.GetFilePath().c_str(), PATH_MAX + 1);
+							char * base = basename(path);
+							if(StringIsNumber(std::string(base))){
+								pid_t pid = std::atoi(base);
+								Process::ProcessInfo procInfo = Process::ProcessInfo(pid);
+								if(procInfo.Error() || !procInfo.Exists()){
+									LOG_ERROR("An error occurred while getting info for " << std::to_string(pid) << ".");
+								}else{
+									if(file == procInfo.GetProcessExecutable()){
+										procfolder.Close();
+										pids.emplace_back(pid);
+									}
+								}
+							}
+						}
+
+						procfolder.Close();
 					}
 				}
-            }
-        }
-		return false;
+			}while(procfs.MoveToNextFile());
+		}else{
+			LOG_ERROR("Unable to open /proc - may not have permission");
+		}
+
+		procfs.Close();
+		return pids;
 	}
 
 	void SuspendProcessReaction::SuspendFileIdentified(std::shared_ptr<FILE_DETECTION> detection){
 		auto ext = detection->wsFileName.substr(detection->wsFileName.size() - 4);
-		if(ext != ".exe" && ext != ".dll"){
-			return;
-		}
 
 		if(io.GetUserConfirm(detection->wsFileName + " appears to be a malicious file. Suspend related processes?") == 1){
-			unsigned int processes[1024];
-			unsigned int ProcessCount = 0;
-			ZeroMemory(processes, sizeof(processes));
-			auto success = EnumProcesses(processes, sizeof(processes), &ProcessCount);
-			if(success){
-				ProcessCount /= sizeof(unsigned int);
-				for(int i = 0; i < ProcessCount; i++){
-					HandleWrapper process = OpenProcess(PROCESS_SUSPEND_RESUME | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, false, processes[i]);
-					if(process){
-						if(CheckModules(process, detection->wsFilePath)){
-							Linker::NtSuspendProcess(process);
-							io.InformUser("Process with PID " + std::to_string(processes[i]) + " was suspended.");
-						}
-					} else {
-						LOG_WARNING("Unable to open process " << processes[i] << ".");
-					}
+			std::vector<pid_t> processes = GetProcessesWithExe(detection->wsFilePath);
+
+			for(auto pid : processes){
+				if(kill(pid, SIGSTOP) != 0){
+					LOG_ERROR("Unable to kill process " << std::to_string(pid) << ".");
 				}
-			} else {
-				LOG_ERROR("Unable to enumerate processes - Unable to detect if malicious file is loaded.");
+
+				LOG_VERBOSE(2, "Suspended process " << std::to_string(pid) << ".");
 			}
 		}
 	}
 
 	void SuspendProcessReaction::SuspendProcessIdentified(std::shared_ptr<PROCESS_DETECTION> detection){
-		HandleWrapper process = OpenProcess(PROCESS_SUSPEND_RESUME, false, detection->PID);
-		if(process){
-			if(io.GetUserConfirm(detection->wsCmdline + " appears to be infected. Suspend process?") == 1){
-				Linker::NtSuspendProcess(process);
+		//NOTE: we dont check if it exists here
+		if(io.GetUserConfirm(detection->wsCmdline + " appears to be infected.  Suspend process?") == 1){
+			if(kill(detection->PID, SIGSTOP) != 0){
+				LOG_ERROR("Unable to suspend process " << std::to_string(detection->PID) << ".");
+			}else{
+				LOG_VERBOSE(2, "Suspended process");
 			}
-		} else {
-			LOG_ERROR("Unable to open potentially infected process " << detection->PID);
 		}
 	}
 
 	void SuspendProcessReaction::SuspendServiceIdentified(std::shared_ptr<SERVICE_DETECTION> detection){
-		HandleWrapper process = OpenProcess(PROCESS_SUSPEND_RESUME, false, detection->ServicePID);
-		if(process){
-			if(io.GetUserConfirm("Service " + detection->wsServiceName + " appears to be infected. Suspend process?") == 1){
-				Linker::NtSuspendProcess(process);
+		if(io.GetUserConfirm("Service " + detection->wsServiceName + " appears to be infected. Suspend process?") == 1){
+			if(kill(detection->ServicePID, SIGSTOP) != 0){
+				LOG_ERROR("Unable to suspend process " << std::to_string(detection->ServicePID) << ".");
+			}else{
+				LOG_VERBOSE(2, "Suspended process");
 			}
-		} else {
-			LOG_ERROR("Unable to open potentially infected process " << detection->ServicePID);
 		}
 	}
 

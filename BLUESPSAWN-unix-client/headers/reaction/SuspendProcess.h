@@ -7,15 +7,13 @@
 
 #include <optional>
 
-DEFINE_FUNCTION(NTSTATUS, NtSuspendProcess, NTAPI, IN HANDLE ProcessHandle);
-
 namespace Reactions{
 
 	class SuspendProcessReaction : public Reaction {
 	private:
 		const IOBase& io;
 
-		bool CheckModules(const HandleWrapper& process, const std::string& file) const;
+		std::vector<pid_t> GetProcessesWithExe(const std::string& file) const;
 
 		/// Handlers for detections that log the detection
 		void SuspendFileIdentified(std::shared_ptr<FILE_DETECTION> detection);

@@ -55,12 +55,19 @@ void Print(const std::string& wMessage, MessageColor color = TEXT_COLOR, bool ne
 std::optional<std::string> GetInput(unsigned int dwMaximumDelay){
 	std::string output{};
 	struct timeval time;
-	time.tv_sec = dwMaximumDelay;
-	time.tv_usec = 0;
+
 	fd_set rfds;
 	FD_ZERO(&rfds);
 	FD_SET(STDIN_FILENO, &rfds);
-	if(select(STDIN_FILENO + 1, &rfds, NULL, NULL, &time) == 1){
+	struct timeval * ptr = NULL;
+
+	if(dwMaximumDelay != -1){
+		time.tv_sec = dwMaximumDelay;
+		time.tv_usec = 0;
+		ptr = &time;
+	}
+	
+	if(select(STDIN_FILENO + 1, &rfds, NULL, NULL, ptr) == 1){
 		std::string input{};
 		std::getline(std::cin, input);
 		return input;
@@ -126,6 +133,7 @@ bool CLI::AlertUser(const std::string& information, unsigned int dwMaximumDelay,
 	return GetInput(dwMaximumDelay).has_value();
 }
 
+//TODO: Fix timeout in GetInput
 unsigned int CLI::GetUserConfirm(const std::string& prompt, unsigned int dwMaximumDelay, ImportanceLevel level) const {
 	auto mutex = AcquireMutex(hMutex);
 	Print(CONFIRM_ID, ID_COLOR, false);

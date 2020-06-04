@@ -84,3 +84,9 @@ std::vector<std::basic_string<T>> SplitString(const std::basic_string<T>& in, co
 
 template std::vector<std::wstring> SplitString(const std::wstring& in, const std::wstring& delimiter);
 template std::vector<std::string> SplitString(const std::string& in, const std::string& delimiter);
+
+bool StringIsNumber(std::string str){
+    std::string::const_iterator it = str.begin();
+    while (it != str.end() && std::isdigit(*it)) ++it;
+    return !str.empty() && it == str.end();
+}

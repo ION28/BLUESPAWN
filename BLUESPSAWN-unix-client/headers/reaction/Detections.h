@@ -69,9 +69,9 @@ struct SERVICE_DETECTION : public DETECTION {
 	std::string wsServiceName;
 	std::string wsServiceExecutablePath;
 	std::string wsServiceDll;
-	int ServicePID;
+	const pid_t ServicePID;
 	SERVICE_DETECTION(const std::string& wsServiceName, const std::string& wsServiceExecutablePath, 
-		const std::string& wsServiceDll, const int& ServicePID) :
+		const std::string& wsServiceDll, const pid_t& ServicePID) :
 		DETECTION{ DetectionType::Service },
 		wsServiceName{ wsServiceName },
 		wsServiceExecutablePath{ wsServiceExecutablePath },
@@ -92,12 +92,12 @@ enum class ProcessDetectionMethod {
 struct PROCESS_DETECTION : public DETECTION {
 	std::string wsImagePath;
 	std::string wsCmdline;
-	int PID;
+	pid_t PID;
 	unsigned int method;
-	void* lpAllocationBase;
+	const void* lpAllocationBase;
 	unsigned int dwAllocationSize;
 	char AllocationStart[512];      // This member is intended to be used for signaturing purposes
-	PROCESS_DETECTION(const std::string& wsImagePath, const std::string& wsCmdLine, const int& PID,
+	PROCESS_DETECTION(const std::string& wsImagePath, const std::string& wsCmdLine, const pid_t& PID,
 		const void*& lpAllocationBase, const unsigned int& dwAllocationSize, const unsigned int& method) :
 		DETECTION{ DetectionType::Process },
 		wsImagePath{ wsImagePath },

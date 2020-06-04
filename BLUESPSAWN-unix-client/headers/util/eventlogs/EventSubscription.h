@@ -2,7 +2,6 @@
 
 #include ""
 #include <stdio.h>
-#include <winevt.h>
 #include <functional>
 #include "reaction/Detections.h"
 #include "util/eventlogs/EventLogItem.h"

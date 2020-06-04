@@ -3,7 +3,6 @@
 
 #include "reaction/CarveMemory.h"
 #include "util/log/Log.h"
-#include "util/processes/PERemover.h"
 
 namespace Reactions {
 

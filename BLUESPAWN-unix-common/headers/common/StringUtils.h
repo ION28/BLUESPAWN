@@ -101,3 +101,6 @@ template<class T>
 std::vector<std::basic_string<T>> SplitString(const std::basic_string<T>& in, const std::basic_string<T>& delimiter);
 #define SplitStringA SplitString<CHAR>
 #define SplitStringW SplitString<WCHAR>
+
+
+bool StringIsNumber(std::string str);

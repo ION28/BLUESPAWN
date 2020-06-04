@@ -1,44 +1,34 @@
 #include "hunt/Scope.h"
+#include <string>
 
-bool Scope::FileIsInScope(LPCSTR sFileName) const {
+bool Scope::FileIsInScope(std::string sFileName) const {
 	return true;
 }
-bool Scope::FileIsInScope(HANDLE hFile) const {
+bool Scope::FileIsInScope(int hFile) const {
 	return true;
 }
-std::vector<HANDLE> Scope::GetScopedFileHandles() const {
-	return std::vector<HANDLE>();
+std::vector<int> Scope::GetScopedFileHandles() const {
+	return std::vector<int>();
 }
-std::vector<LPCSTR> Scope::GetScopedFileNames() const {
-	return std::vector<LPCSTR>();
-}
-
-bool Scope::RegistryKeyIsInScope(LPCSTR pid) const {
-	return true;
+std::vector<std::string> Scope::GetScopedFileNames() const {
+	return std::vector<std::string>();
 }
 
-bool Scope::ProcessIsInScope(unsigned int sProcessName) const {
+bool Scope::ProcessIsInScope(std::string sProcessName) const {
 	return true;
 }
-bool Scope::ProcessIsInScope(HANDLE hProcess) const {
+bool Scope::ProcessIsInScope(pid_t hProcess) const {
 	return true;
-}
-std::vector<HANDLE> Scope::GetScopedProcessHandles() const {
-	return std::vector<HANDLE>();
-}
-std::vector<unsigned int> Scope::GetScopedProcessPIDs() const {
-	return std::vector<unsigned int>();
 }
 
-bool Scope::ServiceIsInScope(LPCSTR sServiceName) const {
+std::vector<pid_t> Scope::GetScopedProcessPIDs() const {
+	return std::vector<pid_t>();
+}
+
+bool Scope::ServiceIsInScope(std::string sServiceName) const {
 	return true;
 }
-bool Scope::ServiceIsInScope(SC_HANDLE hService) const {
-	return true;
-}
-std::vector<SC_HANDLE> Scope::GetScopedServiceHandles() const {
-	return std::vector<SC_HANDLE>();
-}
-std::vector<LPCSTR> Scope::GetScopedServiceNames() const {
-	return std::vector<LPCSTR>();
+
+std::vector<std::string> Scope::GetScopedServiceNames() const {
+	return std::vector<std::string>();
 }
