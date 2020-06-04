@@ -3,26 +3,28 @@
 #include <iostream>
 
 #include "util/log/CLISink.h"
+#include "user/CLI.h"
 
 namespace Log {
 
-	void CLISink::SetConsoleColor(CLISink::MessageColor color){
-		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(hConsole, static_cast<WORD>(color));
+	void CLISink::SetConsoleColor(const MessageColor color){
+		printf("%s", GetColorStr(color));
 	}
 
-	CLISink::CLISink() : hMutex{ CreateMutexW(nullptr, false, "Local\\CLI-Mutex") } {}
+	CLISink::CLISink(){
+		pthread_mutex_init(&hMutex, NULL);
+	}
 
 	void CLISink::LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info, const std::vector<std::shared_ptr<DETECTION>>& detections){
 		auto mutex = AcquireMutex(hMutex);
 		if(level.Enabled()){
-			SetConsoleColor(CLISink::PrependColors[static_cast<WORD>(level.severity)]);
+			SetConsoleColor(CLISink::PrependColors[static_cast<int>(level.severity)]);
 
 			if(level.severity == Severity::LogHunt){
 				std::string aggressiveness = info->HuntAggressiveness == Aggressiveness::Intensive ? "Intensive" :
 					info->HuntAggressiveness == Aggressiveness::Normal ? "Normal" : "Cursory";
 				std::cout << "[" << info->HuntName << ": " << aggressiveness << "] ";
-				SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
+				SetConsoleColor(MessageColor::BOLDWHITE);
 				std::cout << " - " << detections.size() << " detection" << (detections.size() == 1 ? "" : "s") << "!" << std::endl;
 				for(auto detection : detections){
 					if(detection->Type == DetectionType::File){
@@ -53,10 +55,12 @@ namespace Log {
 					std::cout << "\tAssociated Message: " << message << std::endl;
 				}
 			} else {
-				std::cout << CLISink::MessagePrepends[static_cast<WORD>(level.severity)] << " ";
-				SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
+				std::cout << CLISink::MessagePrepends[static_cast<int>(level.severity)] << " ";
+				SetConsoleColor(MessageColor::BOLDWHITE);
 				std::cout << message << std::endl;
 			}
+
+			SetConsoleColor(MessageColor::RESET);
 		}
 	}
 

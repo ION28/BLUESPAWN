@@ -9,7 +9,6 @@
 
 #include "util/log/Log.h"
 #include "util/log/CLISink.h"
-#include "util/configurations/Registry.h"
 
 #include "hunt/Hunt.h"
 #include "hunt/HuntRegister.h"

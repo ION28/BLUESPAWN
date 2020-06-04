@@ -2,11 +2,10 @@
 #include "../resources/resource.h"
 #include "common/wrappers.hpp"
 #include "util/log/Log.h"
-
 #include <zip.h>
 
 const YaraScanner YaraScanner::instance{};
-
+//TODO: port this - no resources on linux
 AllocationWrapper GetResourceRule(unsigned int identifier){
 	auto hRsrcInfo = FindResourceW(nullptr, MAKEINTRESOURCE(identifier), "yararule");
 	if(!hRsrcInfo){
@@ -29,7 +28,7 @@ AllocationWrapper GetResourceRule(unsigned int identifier){
 				if(-1 != zip_stat(zip, "data", ZIP_STAT_SIZE, &stats)){
 
 					if(-1 != stats.size){
-						AllocationWrapper data{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, static_cast<SIZE_T>(stats.size)), static_cast<SIZE_T>(stats.size), AllocationWrapper::HEAP_ALLOC };
+						AllocationWrapper data{ malloc(static_cast<size_t>(stats.size)), static_cast<size_t>(stats.size), AllocationWrapper::MALLOC };
 						if(-1 != zip_fread(fdRules, data, stats.size)){
 							zip_fclose(fdRules);
 							zip_close(zip);
@@ -58,8 +57,7 @@ struct AllocationWrapperStream {
 size_t ReadAllocationWrapper(void* dest, size_t size, size_t count, AllocationWrapperStream* data){
 	size_t desired_amnt = size * count;
 	size_t actual_amnt = min(desired_amnt, data->wrapper.GetSize() - data->offset);
-
-	CopyMemory(dest, reinterpret_cast<PCHAR>((void*) data->wrapper) + data->offset, actual_amnt);
+	memcpy(dest, ((void*) data->wrapper, actual_amnt);
 
 	data->offset += actual_amnt;
 	return actual_amnt / size;

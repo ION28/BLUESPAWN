@@ -1,10 +1,7 @@
 #pragma once   
 
-#include ""
 #include <string>
-#include <sddl.h>
 #include <stdio.h>
-#include <winevt.h>
 #include "reaction/Reaction.h"
 #include <vector>
 #include "util/eventlogs/EventSubscription.h"
@@ -12,7 +9,6 @@
 #include "common/wrappers.hpp"
 #include "XpathQuery.h"
 
-#pragma comment(lib, "wevtapi.lib")
 
 namespace EventLogs {
 

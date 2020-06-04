@@ -59,25 +59,6 @@ namespace Log {
 	}
 
 	std::string FormatErrorMessage(unsigned int dwErrorCode) {
-		//https://stackoverflow.com/a/45565001/3302799
-		LPWSTR psz{ nullptr };
-		auto cchMsg = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM
-			| FORMAT_MESSAGE_IGNORE_INSERTS
-			| FORMAT_MESSAGE_ALLOCATE_BUFFER,
-			nullptr,
-			dwErrorCode,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			reinterpret_cast<LPTSTR>(&psz),
-			0,
-			nullptr);
-		if (cchMsg) {
-			auto delfunc{ [](void* p) { ::LocalFree(p); } };
-			std::unique_ptr<WCHAR, decltype(delfunc)> ptrBuffer(psz, delfunc);
-			return std::string(ptrBuffer.get(), cchMsg);
-		}
-		else {
-			auto error_code{ ::errno };
-			return "Unable to format error message!";
-		}
+		return std::string(strerror(dwErrorCode));
 	}
 }

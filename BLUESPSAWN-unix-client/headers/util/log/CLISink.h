@@ -1,6 +1,8 @@
 #pragma once
 
 #include <map>
+#include <pthread.h>
+#include "user/CLI.h"
 
 #include "LogSink.h"
 #include "LogLevel.h"
@@ -16,27 +18,9 @@ namespace Log {
 	 */
 	class CLISink : public LogSink {
 	private:
-		enum class MessageColor {
-			BLACK     = 0x0,
-			DARKBLUE  = 0x1,
-			DARKGREEN = 0x2,
-			CYAN      = 0x3,
-			DARKRED   = 0x4,
-			DARKPINK  = 0x5,
-			GOLD      = 0x6,
-			LIGHTGREY = 0x7,
-			DARKGREY  = 0x8,
-			BLUE      = 0x9,
-			GREEN     = 0xA,
-			LIGHTBLUE = 0xB,
-			RED       = 0xC,
-			PINK      = 0xD,
-			YELLOW    = 0xE,
-			WHITE     = 0xF,
-		};
 		std::string MessagePrepends[4] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]" };
-		MessageColor PrependColors[5] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, MessageColor::GREEN, MessageColor::GOLD };
-		HandleWrapper hMutex;
+		MessageColor PrependColors[5] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, MessageColor::GREEN, MessageColor::CYAN }; //TODO: change other color?
+		pthread_mutex_t hMutex;
 
 		/**
 		 * Sets the color of text written to the console. The low order nibble is the color

@@ -1,11 +1,9 @@
 
 
-#define SECURITY_WIN32
-#include <Security.h>
-
 #include "util/configurations/CollectInfo.h"
-#include "util/configurations/Registry.h"
 #include "util/log/Log.h"
+#include "util/permissions/permissions.h"
+#include <sys/utsname.h>
 
 void OutputComputerInformation() {
 	LOG_INFO("Computer Information\n");
@@ -17,46 +15,47 @@ void OutputComputerInformation() {
 }
 
 std::string GetOSVersion() {
-	return *Registry::RegistryKey(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\WIndows NT\\CurrentVersion").GetValue<std::string>("ProductName");
+	struct utsname name;
+	uname(&name); //only way this doesnt work is if its not valid
+	return std::string(name.sysname) + " " + std::string(name.release) + " " + std::string(name.machine);
 }
 
 std::string GetComputerDNSName() {
-	LPWSTR buffer = new WCHAR[256];
+	/*LPWSTR buffer = new WCHAR[256];
 	unsigned int dwSize = sizeof(buffer);
 
 	//enum info: https://docs.microsoft.com/en-us/windows/desktop/api/sysinfoapi/ne-sysinfoapi-_computer_name_format
 	bool status = GetComputerNameEx(ComputerNamePhysicalDnsHostname, buffer, &dwSize);
 
-	return buffer;
+	return buffer;*/
+	//TODO
+	return std::string();
 }
 
 std::string GetDomain() {
-	LPWSTR buffer = new WCHAR[256];
+	/*LPWSTR buffer = new WCHAR[256];
 	unsigned int dwSize = sizeof(buffer);
 
 	//enum info: https://docs.microsoft.com/en-us/windows/desktop/api/sysinfoapi/ne-sysinfoapi-_computer_name_format
 	GetComputerNameEx(ComputerNamePhysicalDnsDomain, buffer, &dwSize);
 
 	std::string name = *buffer ? buffer : "WORKGROUP";
-	return name;
+	return name;*/
+	return std::string();
 }
 
 std::string GetFQDN() {
-	LPWSTR buffer = new WCHAR[256];
+	/*LPWSTR buffer = new WCHAR[256];
 	unsigned int dwSize = sizeof(buffer);
 
 	//enum info: https://docs.microsoft.com/en-us/windows/desktop/api/sysinfoapi/ne-sysinfoapi-_computer_name_format
 	GetComputerNameEx(ComputerNamePhysicalDnsFullyQualified, buffer, &dwSize);
 
-	return std::string("\\\\") + buffer;
+	return std::string("\\\\") + buffer;*/
+	//TODO
+	return std::string();
 }
 
 std::string GetCurrentUser() {
-	LPWSTR buffer = new WCHAR[512];
-	unsigned int dwSize = sizeof(buffer);
-
-	//enum info: https://docs.microsoft.com/en-us/windows/desktop/api/secext/ne-secext-extended_name_format
-	GetUserNameEx(NameSamCompatible, buffer, &dwSize);
-
-	return buffer;
+	return Permissions::GetProcessOwner().value().GetName();
 }

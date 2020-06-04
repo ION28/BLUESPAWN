@@ -7,10 +7,12 @@
 namespace Reactions {
 
 	void CarveProcessReaction::CarveProcessIdentified(std::shared_ptr<PROCESS_DETECTION> detection){
-		if(io.GetUserConfirm(detection->wsImagePath + " (PID " + std::to_string(detection->PID) + ") appears to be infected. Carve out and terminate malicious memory section?") == 1){
+		/*if(io.GetUserConfirm(detection->wsImagePath + " (PID " + std::to_string(detection->PID) + ") appears to be infected. Carve out and terminate malicious memory section?") == 1){
 			auto remover = PERemover{ static_cast<unsigned int>(detection->PID), detection->lpAllocationBase, detection->dwAllocationSize };
 			remover.RemoveImage();
-		}
+		}*/
+
+		//NOTE: I dont think its really possible to inject portable executables in memory and execute them like it is easily in windows.
 	}
 
 	CarveProcessReaction::CarveProcessReaction(const IOBase& io) : io{ io }{

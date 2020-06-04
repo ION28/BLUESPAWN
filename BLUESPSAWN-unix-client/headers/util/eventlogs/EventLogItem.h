@@ -2,7 +2,6 @@
 #include <string>
 #include <unordered_map>
 
-#include <winevt.h>
 #include "common/wrappers.hpp"
 
 namespace EventLogs {
