@@ -5,8 +5,7 @@
 #include <string>
 
 #include "hunt/HuntInfo.h"
-
-#include "Detections.h"
+#include "scan/Detections.h"
 
 /**
  * A container class for handling reactions to various types of detections.

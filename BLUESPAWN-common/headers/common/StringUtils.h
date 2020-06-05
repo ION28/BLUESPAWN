@@ -86,3 +86,17 @@ template<class T>
 bool CompareIgnoreCase(const T& in1, const T& in2);
 #define CompareIgnoreCaseA CompareIgnoreCase<std::string>
 #define CompareIgnoreCaseW CompareIgnoreCase<std::wstring>
+
+/**
+ * Replaces all instances of a substring found inside of a string
+ *
+ * @param string The string to modify
+ * @param search The substring to be replaced
+ * @param replacement The replacement for the substring
+ *
+ * @return A string with the replacements applied.
+ */
+template<class T>
+T StringReplace(const T& string, const T& search, const T& replacement);
+#define StringReplaceA StringReplace<std::string>
+#define StringReplaceW StringReplace<std::wstring>

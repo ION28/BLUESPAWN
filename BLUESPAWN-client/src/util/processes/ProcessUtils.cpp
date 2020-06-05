@@ -4,6 +4,7 @@
 
 #include "util/filesystem/FileSystem.h"
 #include "shlwapi.h"
+#include "common/StringUtils.h"
 
 #include "util/log/Log.h"
 
@@ -142,7 +143,7 @@ std::wstring GetProcessImage(const HandleWrapper& process){
             return {};
         }
     } else {
-        LOG_ERROR("Unable to get command line of invalid process");
+        LOG_ERROR("Unable to get image path of invalid process");
         return {};
     }
 }
@@ -192,7 +193,7 @@ std::wstring GetImagePathFromCommand(std::wstring wsCmd){
 }
 
 std::wstring GetProcessImage(DWORD dwPID){
-    HandleWrapper process{ OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, false, dwPID) };
+    HandleWrapper process{ OpenProcess(PROCESS_QUERY_INFORMATION, false, dwPID) };
     if(process){
         return GetProcessImage(process);
     } else {

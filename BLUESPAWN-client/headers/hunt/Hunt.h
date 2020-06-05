@@ -19,7 +19,7 @@ class HuntRegister;
 #define HUNT_INIT() \
 	LOG_INFO("Hunting for " << name);          \
     LOG_HUNT_BEGIN();                          \
-    std::vector<std::shared_ptr<DETECTION>> detections{};
+    std::vector<Detection> detections{};
 
 #define REGISTRY_DETECTION(value) \
     detections.emplace_back(std::static_pointer_cast<DETECTION>(std::make_shared<REGISTRY_DETECTION>(value)));
@@ -61,7 +61,7 @@ public:
 	bool UsesSources(DWORD sources);
 	bool AffectsCategory(DWORD category);
 
-	virtual std::vector<std::shared_ptr<DETECTION>> RunHunt(const Scope& scope);
+	virtual std::vector<Detection> RunHunt(const Scope& scope);
 
-	virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents();
+	virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents();
 };

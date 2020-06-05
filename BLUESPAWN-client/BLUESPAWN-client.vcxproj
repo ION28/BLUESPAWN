@@ -78,12 +78,13 @@
     </ClInclude>
     <ClInclude Include="headers\monitor\Event.h" />
     <ClInclude Include="headers\monitor\EventManager.h" />
-    <ClInclude Include="headers\scan\CollectDetections.h" />
+    <ClInclude Include="headers\scan\DetectionRegister.h" />
+    <ClInclude Include="headers\scan\Detections.h" />
     <ClInclude Include="headers\scan\FileScanner.h" />
     <ClInclude Include="headers\scan\ProcessScanner.h" />
     <ClInclude Include="headers\scan\RegistryScanner.h" />
     <ClInclude Include="headers\scan\Scanner.h" />
-    <ClInclude Include="headers\scan\ScanNode.h" />
+    <ClInclude Include="headers\scan\ScanInfo.h" />
     <ClInclude Include="headers\user\banners.h" />
     <ClInclude Include="headers\user\bluespawn.h" />
     <ClInclude Include="headers\user\CLI.h" />
@@ -107,6 +108,7 @@
     <ClInclude Include="headers\util\log\LogSink.h" />
     <ClInclude Include="headers\util\log\ServerSink.h" />
     <ClInclude Include="headers\util\log\XMLSink.h" />
+    <ClInclude Include="headers\util\permissions\Permissions.h" />
     <ClInclude Include="headers\util\pe\Export_Section.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -145,7 +147,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="headers\util\processes\Analyzer.h" />
-    <ClInclude Include="headers\reaction\Detections.h" />
     <ClInclude Include="headers\reaction\Log.h" />
     <ClInclude Include="headers\reaction\Reaction.h" />
     <ClInclude Include="headers\util\processes\PERemover.h" />
@@ -173,6 +174,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
     <ClCompile Include="src\reaction\CarveMemory.cpp" />
+    <ClCompile Include="src\reaction\Detection.cpp" />
     <ClCompile Include="src\reaction\RemoveValue.cpp" />
     <ClCompile Include="src\reaction\SuspendProcess.cpp" />
     <ClCompile Include="src\hunt\RegistryHunt.cpp" />
@@ -229,11 +231,11 @@
     <ClCompile Include="src\scan\YaraScanner.cpp" />
     <ClCompile Include="src\util\log\CLISink.cpp" />
     <ClCompile Include="src\util\log\DebugSink.cpp" />
-    <ClCompile Include="src\util\log\HuntLogMessage.cpp" />
     <ClCompile Include="src\util\log\Log.cpp" />
     <ClCompile Include="src\util\log\LogLevel.cpp" />
     <ClCompile Include="src\util\log\ServerSink.cpp" />
     <ClCompile Include="src\util\log\XMLSink.cpp" />
+    <ClCompile Include="src\util\permissions\Permissions.cpp" />
     <ClCompile Include="src\util\pe\Export_Section.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

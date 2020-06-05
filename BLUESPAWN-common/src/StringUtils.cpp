@@ -92,3 +92,12 @@ bool CompareIgnoreCase(const T& in1, const T& in2){
 
 template bool CompareIgnoreCase(const std::wstring& in1, const std::wstring& in2);
 template bool CompareIgnoreCase(const std::string& in, const std::string& in2);
+
+template<class T>
+T StringReplace(const T& string, const T& search, const T& replacement){
+	auto copy{ string };
+	for(auto find{ copy.find(search) }; find != std::string::npos; find = copy.find(search, find + replacement.size())){
+		copy.replace(copy.begin() + find, copy.begin() + find + search.length(), replacement);
+	}
+	return copy
+}

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "reaction/Detections.h"
-
 #include <memory>
 #include <vector>
 #include <map>
@@ -57,7 +55,6 @@ typedef Certainty Association;
 class RegistryScanner;
 class ProcessScanner;
 class FileScanner; 
-class DetectionNetwork;
 
 /**
  * A ScanNode is the core unit of BLUESPAWN's scan functionality. Each detection is converted to a 
@@ -65,15 +62,10 @@ class DetectionNetwork;
  * detections and associations between them will form a web/graph of detections, which is used to
  * identify as much malicious activity as possible.
  */
-class ScanNode {
+class ScanInfo {
 
-	static std::atomic<DWORD> IDCounter;
-
-	/// A mapping of scan nodes to their association with the current node.
-	std::map<std::shared_ptr<ScanNode>, Association> associations;
-
-	/// The detection referenced by the scan node
-	Detection detection;
+	/// A mapping of detections to their association with the current node.
+	std::unordered_map<std::reference_wrapper<Detection>, Association> associations;
 
 	/// The degree of certainty that the detection referenced by this scan node is malicious
 	/// Note that this ignores all associations
@@ -86,51 +78,19 @@ class ScanNode {
 	/// Indicates whether cAssociativeCertainty has gone stale and must be recalculated
 	bool bAssociativeStale;
 
-	/// A unique identifier for this node
-	DWORD dwID;
-
 	/// Allow RegistryScanner, FileScanner, ProcessScanner, and DetectionNetwork access to private variables
 	friend class RegistryScanner;
 	friend class FileScanner;
 	friend class ProcessScanner;
-	friend class DetectionNetwork;
 
-	void AddAssociation(const std::shared_ptr<ScanNode>& node, Association strength);
+	void AddAssociation(const Detection& node, Association strength);
 
 public:
-	ScanNode(const Detection& detection);
+	ScanInfo();
 
-	static const std::map<std::shared_ptr<ScanNode>, Association>& GetAssociations(const std::shared_ptr<ScanNode>& node);
+	const std::unordered_map<std::reference_wrapper<Detection>, Association>& GetAssociations();
 
 	Certainty GetCertainty();
-	DWORD GetID();
-
-
-	bool operator==(const ScanNode& node) const;
-	bool operator<(const ScanNode& node) const;
-};
-
-// Forward declare DetectionCollector so that it can be a friend;
-class DetectionCollector;
-
-/**
- * Represents a network of related ScanNode objects
- */
-class DetectionNetwork {
-private:
 	
-	std::vector<std::shared_ptr<ScanNode>> nodes;
-
-	void GrowNetwork();
-
-	friend class DetectionCollector;
-
-	DetectionNetwork(std::vector<std::shared_ptr<ScanNode>>&& nodes);
-
-public:
-	DetectionNetwork(const std::shared_ptr<ScanNode>& node);
-
-	bool IntersectsNetwork(const DetectionNetwork& network);
-
-	DetectionNetwork MergeNetworks(const DetectionNetwork& network) const;
+	DWORD GetID();
 };

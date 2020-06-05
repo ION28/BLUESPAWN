@@ -7,11 +7,13 @@
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
+#include <atomic>
 
 #include "util/configurations/RegistryValue.h"
 #include "util/configurations/Registry.h"
 #include "util/filesystem/FileSystem.h"
 #include "scan/YaraScanner.h"
+#include "scan/ScanInfo.h"
 
 /// Identifies the type of detection a Detection object represents
 enum class DetectionType {
@@ -45,6 +47,9 @@ enum class ProcessDetectionType {
  * Stores information about a process or memory location identified as possibly malicious
  */
 struct ProcessDetectionData {
+
+	/// Describes the type of detection is associated with this
+	ProcessDetectionType type;
 
 	/// The process ID of the process
 	DWORD PID;
@@ -181,7 +186,6 @@ struct ProcessDetectionData {
 	static ProcessDetectionData CreateProcessDetectionData(
 		IN CONST HandleWrapper& ProcessHandle,
 		IN CONST std::wstring& ProcessName,
-		IN CONST std::wstring& ImageName,
 		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
 		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
 		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
@@ -224,7 +228,7 @@ struct ProcessDetectionData {
 	 * libary is determined to be malicious, not when the library is infected, hooked, stomped,
 	 * hollowed, doppelganged, or similar.
 	 *
-	 * @param PID The process ID of the process
+	 * @param ProcessHandle An open handle to the process
 	 * @param ProcessName The name of the process
 	 * @param BaseAddress The base address of the memory section
 	 * @param MemorySize The size of the memory section
@@ -238,7 +242,7 @@ struct ProcessDetectionData {
 	 *        on the parent process. If skipped, this will be automatically deduced
 	 */
 	static ProcessDetectionData CreateMemoryDetectionData(
-		IN DWORD PID,
+		IN CONST HandleWrapper& ProcessHandle,
 		IN CONST std::wstring& ProcessName,
 		IN PVOID64 BaseAddress,
 		IN DWORD MemorySize,
@@ -247,6 +251,15 @@ struct ProcessDetectionData {
 		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
 		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
 	);
+
+	/**
+	 * Serialize the detection data in to a mapping of values. Note this should not
+	 * include any internal representations but rather only include values that have
+	 * meaning outside of BLUESPAWN's running.
+	 *
+	 * @return A mapping of properties to human-readable values
+	 */
+	std::map<std::wstring, std::wstring> operator*();
 };
 
 /**
@@ -281,9 +294,8 @@ struct FileDetectionData {
 
 	/// Timestamps associated with the file
 	struct {
-		std::optional<SYSTEMTIME> LastModified;
-		std::optional<SYSTEMTIME> LastOpened;
-		std::optional<SYSTEMTIME> FileCreated;
+		std::optional<FILETIME> LastOpened;
+		std::optional<FILETIME> FileCreated;
 	} TimestampInfo;
 
 	/// Information about a yara scan performed on the file
@@ -308,7 +320,7 @@ struct FileDetectionData {
 	 */
 	FileDetectionData(
 		IN CONST FileSystem::File& file,
-		IN CONST std::optional<YaraScanResult>& scan OPTIONAL
+		IN CONST std::optional<YaraScanResult>& scan = std::nullopt OPTIONAL
 	);
 
 	/**
@@ -322,6 +334,15 @@ struct FileDetectionData {
 	FileDetectionData(
 		IN CONST std::wstring& FilePath
 	);
+
+	/**
+	 * Serialize the detection data in to a mapping of values. Note this should not
+	 * include any internal representations but rather only include values that have
+	 * meaning outside of BLUESPAWN's running.
+	 *
+	 * @return A mapping of properties to human-readable values
+	 */
+	std::map<std::wstring, std::wstring> operator*();
 };
 
 /**
@@ -363,6 +384,15 @@ struct RegistryDetectionData {
 		IN CONST std::optional<Registry::RegistryValue>& value = std::nullopt OPTIONAL,
 		IN CONST std::optional<AllocationWrapper>& data = std::nullopt OPTIONAL
 	);
+
+	/**
+	 * Serialize the detection data in to a mapping of values. Note this should not
+	 * include any internal representations but rather only include values that have
+	 * meaning outside of BLUESPAWN's running.
+	 *
+	 * @return A mapping of properties to human-readable values
+	 */
+	std::map<std::wstring, std::wstring> operator*();
 };
 
 /**
@@ -394,6 +424,15 @@ struct ServiceDetectionData {
 		IN CONST std::optional<std::wstring>& DisplayName = std::nullopt OPTIONAL,
 		IN CONST std::optional<std::wstring>& Description = std::nullopt OPTIONAL
 	);
+
+	/**
+	 * Serialize the detection data in to a mapping of values. Note this should not
+	 * include any internal representations but rather only include values that have
+	 * meaning outside of BLUESPAWN's running.
+	 *
+	 * @return A mapping of properties to human-readable values
+	 */
+	std::map<std::wstring, std::wstring> operator*();
 };
 
 /**
@@ -422,6 +461,15 @@ struct OtherDetectionData {
 		IN CONST std::wstring& DetectionType,
 		IN CONST std::unordered_map<std::wstring, std::wstring>& DetectionProperties
 	);
+
+	/**
+	 * Serialize the detection data in to a mapping of values. Note this should not
+	 * include any internal representations but rather only include values that have
+	 * meaning outside of BLUESPAWN's running.
+	 *
+	 * @return A mapping of properties to human-readable values
+	 */
+	std::map<std::wstring, std::wstring> operator*();
 };
 
 /// Stores contextual information around a detection
@@ -431,10 +479,13 @@ struct DetectionContext {
 	std::unordered_set<std::wstring> hunts;
 	
 	/// The time at which the first evidence of the detection was created
-	std::optional<SYSTEMTIME> FirstEvidenceTime;
+	std::optional<FILETIME> FirstEvidenceTime;
 
 	/// The time at which the detection was created
-	SYSTEMTIME DetectionCreatedTime;
+	FILETIME DetectionCreatedTime;
+
+	/// An optional note describing why this detection was marked as potentially malicious
+	std::optional<std::wstring> note;
 
 	/**
 	 * Creates a DetectionContext for a detection. 
@@ -445,9 +496,9 @@ struct DetectionContext {
 	 * @param FirstEvidenceTime The time at which the first evidence of this detection was created
 	 */
 	DetectionContext(
-		IN SYSTEMTIME DetectionCreatedTime,
+		IN FILETIME DetectionCreatedTime,
 		IN CONST std::optional<std::wstring>& hunt = std::nullopt OPTIONAL,
-		IN CONST std::optional<SYSTEMTIME>& FirstEvidenceTime = std::nullopt OPTIONAL
+		IN CONST std::optional<FILETIME>& FirstEvidenceTime = std::nullopt OPTIONAL
 	);
 };
 
@@ -472,6 +523,14 @@ typedef std::variant<
  */
 class Detection {
 
+	/// A shared counter to keep track of detection IDs and ensure each new detection gets assigned
+	/// a unique identifier.
+	static volatile std::atomic<DWORD> IDCounter;
+public:
+
+	/// A unique identifier for this detection
+	DWORD dwID;
+
 	/// Indicates whether the data represented by this detection is consistent with the
 	/// current state of the operating system.
 	bool DetectionStale;
@@ -481,6 +540,9 @@ class Detection {
 
 	/// Describes what this detection object is representing
 	DetectionData data;
+
+	/// Information related to the scans performed on this detection
+	ScanInfo info;
 
 	/// A function that when run will remediate the detection, either removing it, fixing it, or 
 	/// mitigating it.
