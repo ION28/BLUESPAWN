@@ -9,7 +9,7 @@ HuntInfo::HuntInfo(const std::wstring& HuntName, DWORD HuntTactics, DWORD HuntCa
 	HuntDatasources{ HuntDatasources },
 	HuntStartTime{ HuntStartTime }{}
 
-Hunt::Hunt(const std::wstring& name) : 
+Hunt::Hunt(IN CONST std::wstring& name) : 
 	name{ name }{
 	dwTacticsUsed = 0;
 	dwSourcesInvolved = 0;
@@ -20,22 +20,22 @@ std::wstring Hunt::GetName() {
 	return name;
 }
 
-std::vector<Detection> Hunt::RunHunt(const Scope& scope){
+std::vector<std::reference_wrapper<Detection>> Hunt::RunHunt(IN CONST Scope& scope){
 	return {};
 }
 
-std::vector<std::shared_ptr<Event>> Hunt::GetMonitoringEvents() {
-	return std::vector<std::shared_ptr<Event>>();
+std::vector<std::unique_ptr<Event>> Hunt::GetMonitoringEvents() {
+	return std::vector<std::unique_ptr<Event>>();
 }
 
-bool Hunt::AffectsCategory(DWORD dwStuff){
+bool Hunt::AffectsCategory(IN DWORD dwStuff){
 	return (dwStuff && dwCategoriesAffected) == dwStuff;
 }
 
-bool Hunt::UsesTactics(DWORD dwTactics){
+bool Hunt::UsesTactics(IN DWORD dwTactics){
 	return (dwTactics && dwTacticsUsed) == dwTactics;
 }
 
-bool Hunt::UsesSources(DWORD dwSources){
+bool Hunt::UsesSources(IN DWORD dwSources){
 	return (dwSources && dwSourcesInvolved) == dwSources;
 }

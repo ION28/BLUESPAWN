@@ -14,6 +14,9 @@
 
 #include "hunt/Hunt.h"
 #include "hunt/HuntRegister.h"
+
+#include "scan/DetectionRegister.h"
+
 #include "reaction/Reaction.h"
 
 #include "mitigation/Mitigation.h"
@@ -44,6 +47,7 @@ class Bluespawn {
 		static HuntRegister huntRecord;
 		static MitigationRegister mitigationRecord;
 		static Aggressiveness aggressiveness;
+		static DetectionRegister detections;
 
 		static Reaction reaction;
 		static const IOBase& io;

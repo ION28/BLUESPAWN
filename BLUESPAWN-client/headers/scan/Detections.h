@@ -496,9 +496,10 @@ struct DetectionContext {
 	 * @param FirstEvidenceTime The time at which the first evidence of this detection was created
 	 */
 	DetectionContext(
-		IN FILETIME DetectionCreatedTime,
+		IN CONST std::optional<FILETIME>& DetectionCreatedTime = std::nullopt OPTIONAL,
 		IN CONST std::optional<std::wstring>& hunt = std::nullopt OPTIONAL,
-		IN CONST std::optional<FILETIME>& FirstEvidenceTime = std::nullopt OPTIONAL
+		IN CONST std::optional<FILETIME>& FirstEvidenceTime = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& note = std::nullopt OPTIONAL
 	);
 };
 
@@ -567,7 +568,7 @@ public:
 	 */
 	Detection(
 		IN CONST DetectionData& data,
-		IN CONST std::optional<Detection>& context = std::nullopt OPTIONAL,
+		IN CONST std::optional<DetectionContext>& context = std::nullopt OPTIONAL,
 		IN CONST std::optional<std::function<void()>>& remediator = std::nullopt OPTIONAL,
 		IN bool DetectionStale = false OPTIONAL
 	);

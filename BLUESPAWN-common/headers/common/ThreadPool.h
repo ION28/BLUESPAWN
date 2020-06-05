@@ -72,18 +72,18 @@ public:
 	 * instead.
 	 */
 	template<class T>
-	std::unique_ptr<Promise<T>> RequestPromise(
+	Promise<T> RequestPromise(
 		IN CONST std::function<T()>& function
 	){
-		auto promise{ std::make_unique<Promise<T>>(false) };
+		Promise<T> promise{ false };
 		EnqueueTask([promise](){
 			try {
-				promise->Fufill(function());
+				promise.Fufill(function());
 			} catch(...){
-				promise->Invalidate();
+				promise.Invalidate();
 			}
 		});
-		return std::move(promise);
+		return promise;
 	}
 
 	/**

@@ -6,7 +6,10 @@
 #include "util/log/HuntLogMessage.h"
 #include "util/eventlogs/EventLogs.h"
 
+#include "user/bluespawn.h"
+
 #include "common/Utils.h"
+#include "common/ThreadPool.h"
 
 #include <algorithm>
 
@@ -20,7 +23,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	std::vector<std::shared_ptr<DETECTION>> HuntT1004::RunHunt(const Scope& scope){
+	std::vector<std::reference_wrapper<Detection>> HuntT1004::RunHunt(IN CONST Scope& scope){
 		HUNT_INIT();
 
 		std::vector<RegistryValue> winlogons{ CheckValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", {
@@ -28,7 +31,15 @@ namespace Hunts {
 			{ L"UserInit", L"(C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\)?(U|u)(SERINIT|serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch }
 		}, true, true) };
 		for(auto& detection : winlogons){
-			REGISTRY_DETECTION(detection);
+			detections.emplace_back(
+				ThreadPool::GetInstance().RequestPromise<std::reference_wrapper<Detection>>(
+					std::bind(&DetectionRegister::AddDetection, Bluespawn::detections, Detection{
+								  RegistryDetectionData{ detection.key, detection, 
+								      detection.key.GetRawValue(detection.wValueName) },
+								  DetectionContext{ std::nullopt, GetName() }
+							  }, Certainty::Strong)
+					)
+			);
 		}
 
 		std::vector<RegistryValue> notifies{ CheckKeyValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify", true, true) };
@@ -38,14 +49,22 @@ namespace Hunts {
 			}
 		}
 		for(auto& detection : notifies){
-			REGISTRY_DETECTION(detection);
+			detections.emplace_back(
+				ThreadPool::GetInstance().RequestPromise<std::reference_wrapper<Detection>>(
+					std::bind(&DetectionRegister::AddDetection, Bluespawn::detections, Detection{
+								  RegistryDetectionData{ detection.key, detection,
+									  detection.key.GetRawValue(detection.wValueName) },
+								  DetectionContext{ std::nullopt, GetName() }
+							  }, Certainty::Moderate)
+					)
+			);
 		}
 
 		HUNT_END();
 	}
 
-	std::vector<std::shared_ptr<Event>> HuntT1004::GetMonitoringEvents() {
-		std::vector<std::shared_ptr<Event>> events{};
+	std::vector<std::unique_ptr<Event>> HuntT1004::GetMonitoringEvents() {
+		std::vector<std::unique_ptr<Event>> events{};
 
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon"));
 		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Notify", true, true, true));

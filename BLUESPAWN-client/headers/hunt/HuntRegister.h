@@ -34,7 +34,7 @@ public:
 	 *
 	 * @return A vector of possibly malicious items. 
 	 */
-	static std::vector<Promise<std::vector<Detection>>> RunHunts(
+	static std::vector<Promise<std::vector<std::reference_wrapper<Detection>>>> RunHunts(
 		IN CONST Scope& scope = {} OPTIONAL, 
 		IN CONST bool async = false OPTIONAL
 	);
@@ -42,7 +42,7 @@ public:
 	/**
 	 * Runs a specified hunt, returning a promise for its result
 	 */
-	static Promise<std::vector<Detection>> RunHunt(
+	static Promise<std::vector<std::reference_wrapper<Detection>>> RunHunt(
 		IN Hunt& hunt, 
 		IN CONST Scope& scope = {} OPTIONAL
 	);

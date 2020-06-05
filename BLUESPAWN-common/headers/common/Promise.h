@@ -53,7 +53,7 @@ private:
 
 	/// A shared pointer to members, to be shared across copies of the same 
 	/// promise.
-	volatile std::shared_ptr<Members> members;
+	std::shared_ptr<Members> members;
 
 
 public:

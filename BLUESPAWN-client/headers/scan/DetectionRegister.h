@@ -38,7 +38,7 @@ public:
 	 * @param level The degree of certainty that this detection is malicious. By default, this is 
 	 *              Certainty::None
 	 */
-	void AddDetection(
+	std::reference_wrapper<Detection> AddDetection(
 		IN CONST Detection& detection, 
 		IN CONST Certainty& level = Certainty::None OPTIONAL
 	);

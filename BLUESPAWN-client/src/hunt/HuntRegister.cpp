@@ -4,28 +4,25 @@
 #include "monitor/EventManager.h"
 #include "util/log/Log.h"
 #include "user/bluespawn.h"
-#include "scan/CollectDetections.h"
 #include "common/Utils.h"
 #include "common/ThreadPool.h"
+#include "common/Promise.h"
 
 void HuntRegister::RegisterHunt(std::unique_ptr<Hunt>&& hunt) {
 	vRegisteredHunts.emplace_back(hunt);
 }
 
-std::vector<Promise<std::vector<Detection>>> HuntRegister::RunHunts(IN CONST Scope& scope OPTIONAL, 
-													                IN CONST bool async OPTIONAL){
+std::vector<Promise<std::vector<std::reference_wrapper<Detection>>>>
+HuntRegister::RunHunts(IN CONST Scope& scope OPTIONAL, IN CONST bool async OPTIONAL){
 	Bluespawn::io.InformUser(L"Starting a hunt for " + std::to_wstring(vRegisteredHunts.size()) + L" techniques.");
 
-	std::vector<Promise<std::vector<Detection>>> detections{};
+	std::vector<Promise<std::vector<std::reference_wrapper<Detection>>>> detections{};
 	for(auto& name : vRegisteredHunts) {
 		detections.emplace_back(RunHunt(*name, scope));
 	}
 
 	if(async){
-		std::vector<HANDLE> handles{};
-		for(auto result : detections){
-			handles.emplace_back(result);
-		}
+		std::vector<HANDLE> handles(detections.begin(), detections.end());
 
 		for(size_t idx{ 0 }; idx < handles.size(); idx += MAXIMUM_WAIT_OBJECTS){
 			auto count{ min(handles.size() - idx, MAXIMUM_WAIT_OBJECTS) };
@@ -37,7 +34,8 @@ std::vector<Promise<std::vector<Detection>>> HuntRegister::RunHunts(IN CONST Sco
 			}
 		}
 
-		auto successes{ std::count_if(detections.begin(), detections.end(), [](auto result){ return result.Fufilled(); }) };
+		auto successes{ std::count_if(detections.begin(), detections.end(), 
+									  [](auto result){ return result.Fufilled(); }) };
 
 		Bluespawn::io.InformUser(L"Successfully ran " + std::to_wstring(successes) + L" hunts.");
 	}
@@ -45,19 +43,21 @@ std::vector<Promise<std::vector<Detection>>> HuntRegister::RunHunts(IN CONST Sco
 	return detections;
 }
 
-Promise<std::vector<Detection>> HuntRegister::RunHunt(IN Hunt& hunt, IN CONST Scope& scope OPTIONAL){
+Promise<std::vector<std::reference_wrapper<Detection>>> HuntRegister::RunHunt(IN Hunt& hunt, 
+																			  IN CONST Scope& scope OPTIONAL){
 	Bluespawn::io.InformUser(L"Starting scan for " + hunt.GetName());
 
-	return ThreadPool::GetInstance().RequestPromise<std::vector<Detection>>(std::bind(&Hunt::RunHunt, hunt, scope));
+	return ThreadPool::GetInstance()
+		.RequestPromise<std::vector<std::reference_wrapper<Detection>>>(std::bind(&Hunt::RunHunt, hunt, scope));
 }
 
-void HuntRegister::SetupMonitoring() {
-	auto& EvtManager = EventManager::GetInstance();
+void HuntRegister::SetupMonitoring(){
+	auto& EvtManager{ EventManager::GetInstance() };
 	for (auto& name : vRegisteredHunts) {
 		Bluespawn::io.InformUser(L"Setting up monitoring for " + name->GetName());
-		for(auto event : name->GetMonitoringEvents()) {
+		for(auto& event : name->GetMonitoringEvents()) {
 			std::function<void()> callback{ std::bind(&Hunt::RunHunt, name.get(), Scope{}) };
-			DWORD status = EvtManager.SubscribeToEvent(event, callback);
+			DWORD status{ EvtManager.SubscribeToEvent(std::move(event), callback) };
 			if(status != ERROR_SUCCESS){
 				LOG_ERROR(L"Monitoring for " << name->GetName() << L" failed with error code " << status);
 			}
