@@ -1,9 +1,9 @@
 #include "util/processes/ParseCobalt.h"
 
 
-
 #include <optional>
 #include <map>
+#include <stdint.h>
 
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
@@ -12,7 +12,7 @@
 #include "common/StringUtils.h"
 
 std::optional<AllocationWrapper> FindBeaconInfoQuick(const MemoryWrapper<>& memory){
-	IMAGE_DOS_HEADER hdr{};
+	/*IMAGE_DOS_HEADER hdr{};
 	auto offset{ memory.Convert<IMAGE_DOS_HEADER>()->e_lfanew };
 	if(memory.Convert<IMAGE_DOS_HEADER>()->e_magic != 0x5D4A){
 		return std::nullopt;
@@ -50,7 +50,7 @@ std::optional<AllocationWrapper> FindBeaconInfoQuick(const MemoryWrapper<>& memo
 			}
 		}
 		section = section.GetOffset(sizeof(IMAGE_SECTION_HEADER));
-	}
+	}*/
 	return std::nullopt;
 }
 

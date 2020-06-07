@@ -5,9 +5,7 @@
 #include <set>
 #include <map>
 
-#include "util/processes/ProcessUtils.h"
 #include "util/filesystem/FileSystem.h"
-#include "util/processes/CommandParser.h"
 #include "util/log/Log.h"
 
 //TODO: fill
@@ -45,7 +43,7 @@ bool IsLolbin(const FileSystem::File& file){
 }
 
 bool IsLolbinMalicious(const std::string& command){
-	std::string executable{ GetImagePathFromCommand(command) };
+	/*std::string executable{ GetImagePathFromCommand(command) };
 
 	LOG_VERBOSE(1, "Checking if " << command << " will execute a lolbin maliciously");
 	
@@ -121,5 +119,7 @@ bool IsLolbinMalicious(const std::string& command){
 			}
 		}
 		return false;
-	} else return true;
+	} else return true;*/
+
+	return true;
 }

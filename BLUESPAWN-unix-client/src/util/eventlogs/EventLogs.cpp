@@ -9,16 +9,8 @@ const int ARRAY_SIZE = 10;
 
 namespace EventLogs {
 
-	/**
-	 * The callback function directly called by event subscriptions.
-	 * In turn it calls the EventSubscription::SubscriptionCallback of a specific class instance.
-	 */
-	unsigned int WINAPI CallbackWrapper(EVT_SUBSCRIBE_NOTIFY_ACTION Action, PVOID UserContext, EVT_HANDLE Event) {
-		return reinterpret_cast<EventSubscription*>(UserContext)->SubscriptionCallback(Action, Event);
-	}
-
 	std::optional<std::string> EventLogs::GetEventParam(const EventWrapper& hEvent, const std::string& param) {
-		auto queryParam = param.c_str();
+		/*auto queryParam = param.c_str();
 		EventWrapper hContext = EvtCreateRenderContext(1, &queryParam, EvtRenderContextValues);
 		if (!hContext){
 			LOG_ERROR("EventLogs::GetEventParam: EvtCreateRenderContext failed with " + std::to_string(errno));
@@ -28,13 +20,14 @@ namespace EventLogs {
 		unsigned int dwBufferSize{};
 		if(!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, nullptr, &dwBufferSize, nullptr)){
 			if(ERROR_INSUFFICIENT_BUFFER == errno){
-				auto pRenderedValues = AllocationWrapper{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwBufferSize), dwBufferSize, AllocationWrapper::HEAP_ALLOC };
+				auto pRenderedValues = AllocationWrapper{ malloc(dwBufferSize), dwBufferSize, AllocationWrapper::MALLOC };
 				if(pRenderedValues){
-					if(EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferSize, nullptr)){
+					if(EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferSize, nullptr)){*/
 						/*
 						Table of variant members found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ns-winevt-evt_variant
 						Table of type values found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ne-winevt-evt_variant_type
 						*/
+		/*
 						PEVT_VARIANT result = reinterpret_cast<PEVT_VARIANT>((void*) pRenderedValues);
 						if(result->Type == EvtVarTypeString)
 							return std::string(result->StringVal);
@@ -56,29 +49,29 @@ namespace EventLogs {
 					}
 				}
 			}
-		}
+		}*/
 		return std::nullopt;
 	}
 
 	std::optional<std::string> EventLogs::GetEventXML(const EventWrapper& hEvent){
-		unsigned int dwBufferSize = 0;
+		/*unsigned int dwBufferSize = 0;
 		if(!EvtRender(NULL, hEvent, EvtRenderEventXml, dwBufferSize, nullptr, &dwBufferSize, nullptr)){
 			if (ERROR_INSUFFICIENT_BUFFER == errno){
 				auto pRenderedContent = AllocationWrapper{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwBufferSize), dwBufferSize, AllocationWrapper::HEAP_ALLOC };
 				if (pRenderedContent){
 					if(EvtRender(NULL, hEvent, EvtRenderEventXml, dwBufferSize, pRenderedContent, &dwBufferSize, nullptr)){
-						return reinterpret_cast<LPCWSTR>((void*)pRenderedContent);
+						return reinterpret_cast<char*>((void*)pRenderedContent);
 					}
 				}
 			}
-		}
+		}*/
 
 		return std::nullopt;
 	}
 
 	// Enumerate all the events in the result set. 
 	std::vector<EventLogItem> EventLogs::ProcessResults(const EventWrapper& hResults, const std::vector<XpathQuery>& filters) {
-		EVT_HANDLE hEvents[ARRAY_SIZE];
+		/*EVT_HANDLE hEvents[ARRAY_SIZE];
 
 		std::vector<EventLogItem> results;
 		std::vector<std::string> params;
@@ -112,11 +105,12 @@ namespace EventLogs {
 			LOG_ERROR("EventLogs::ProcessResults: EvtNext failed with " << errno);
 		}
 
-		return results;
+		return results;*/
+		return std::vector<EventLogItem>();
 	}
 
 	std::optional<EventLogItem> EventToEventLogItem(const EventWrapper& hEvent, const std::vector<std::string>& params){
-		unsigned int status = ERROR_SUCCESS;
+		/*unsigned int status = ERROR_SUCCESS;
 
 		std::optional<std::string> eventIDStr, eventRecordIDStr, timeCreated, channel, rawXML;
 
@@ -149,12 +143,13 @@ namespace EventLogs {
 		pItem.SetChannel(*channel);
 		pItem.SetXML(*rawXML);
 
-		return pItem;
+		return pItem;*/
+		return std::nullopt;
 	}
 
 	std::vector<EventLogItem> EventLogs::QueryEvents(const std::string& channel, unsigned int id, const std::vector<XpathQuery>& filters) {
 
-		std::vector<EventLogItem> items;
+		/*std::vector<EventLogItem> items;
 
 		auto query = std::string("Event/System[EventID=") + std::to_string(id) + std::string("]");
 		for (auto param : filters)
@@ -173,14 +168,15 @@ namespace EventLogs {
 			items = ProcessResults(hResults, filters);
 		}
 
-		return items;
+		return items;*/
+		return std::vector<EventLogItem>();
 	}
 
 	std::vector<EventSubscription> subscriptions = {};
 
 	std::optional<std::reference_wrapper<EventSubscription>> EventLogs::SubscribeToEvent(const std::string& pwsPath, 
 		unsigned int id, const std::function<void(EventLogItem)>& callback, const std::vector<XpathQuery>& filters){
-		auto query = std::string("Event/System[EventID=") + std::to_string(id) + std::string("]");
+		/*auto query = std::string("Event/System[EventID=") + std::to_string(id) + std::string("]");
 		for (auto param : filters)
 			query += " and " + param.ToString();
 
@@ -202,7 +198,8 @@ namespace EventLogs {
 			return std::nullopt;
 		}
 
-		return eventSub;
+		return eventSub;*/
+		return std::nullopt;
 	}
 
 	std::shared_ptr<EVENT_DETECTION> EventLogs::EventLogItemToDetection(const EventLogItem& pItem) {
@@ -219,7 +216,7 @@ namespace EventLogs {
 	}
 
 	bool IsChannelOpen(const std::string& channel) {
-		EVT_HANDLE hChannel = NULL;
+		/*EVT_HANDLE hChannel = NULL;
 		unsigned int status = ERROR_SUCCESS;
 		PEVT_VARIANT pProperty = NULL;  
 		PEVT_VARIANT pTemp = NULL;
@@ -265,11 +262,12 @@ namespace EventLogs {
 		if (pProperty)
 			free(pProperty);
 
-		return pProperty->BooleanVal;
+		return pProperty->BooleanVal;*/
+		return true;
 	}
 
 	bool OpenChannel(const std::string& channel) {
-		EVT_HANDLE hChannel = NULL;
+		/*EVT_HANDLE hChannel = NULL;
 		unsigned int status = ERROR_SUCCESS;
 		EVT_VARIANT ChannelProperty;
 		unsigned int dwBufferSize = sizeof(EVT_VARIANT);
@@ -294,7 +292,7 @@ namespace EventLogs {
 		{
 			LOG_ERROR("EventLogs::OpenChannel: EvtSaveChannelConfig failed with " + std::to_string(errno) + " for channel " + channel);
 			return false;
-		}
+		}*/
 
 		return true;
 	}

@@ -1,6 +1,3 @@
-#include "util/processes/ProcessUtils.h"
-#include "util/processes/CommandParser.h"
-
 #include <string>
 
 #include "common/StringUtils.h"
@@ -9,7 +6,7 @@
 #include "util/log/Log.h"
 
 std::string GetImagePathFromCommand(std::string wsCmd){
-    if(wsCmd.substr(0, 11) == "\\SystemRoot"){
+    /*if(wsCmd.substr(0, 11) == "\\SystemRoot"){
         wsCmd = "%SYSTEMROOT%" + wsCmd.substr(11);
     }
 
@@ -49,13 +46,14 @@ std::string GetImagePathFromCommand(std::string wsCmd){
         }
 
         return wsCmd.substr(start, wsCmd.find_first_of(" \t\n\r", start) - start);
-    }
+    }*/
+    return std::string();
 }
 
 std::vector<std::string> TokenizeCommand(const std::string& command){
     std::vector<std::string> tokens{};
 
-    std::vector<std::string> words{ SplitStringW(command, " ") };
+    std::vector<std::string> words{ SplitStringA(command, " ") };
 
     std::string quoted{};
 

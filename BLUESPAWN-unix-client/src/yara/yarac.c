@@ -27,19 +27,10 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _WIN32
-
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <time.h>
-
-#else
-
-
-
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,6 +48,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MAX_PATH
 #define MAX_PATH 256
 #endif
+
+#define ERROR_SUCCESS 0
+#define ERROR_FAILURE -1
 
 #define MAX_ARGS_EXT_VAR   32
 
@@ -318,7 +312,7 @@ int main(
               }
               zip_source_close(source);
               zip_close(zip);
-              MoveFileExA(name.c_str(), argv[argc - 1], MOVEFILE_REPLACE_EXISTING);
+              rename(name.c_str(), argv[argc - 1]);
           }
           if(!source){
               zip_close(zip);

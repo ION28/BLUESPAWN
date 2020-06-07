@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+
 /**
 * Gets the Shannon Entropy of a string
 * 
@@ -99,8 +100,8 @@ bool CompareIgnoreCase(const T& in1, const T& in2);
  */
 template<class T>
 std::vector<std::basic_string<T>> SplitString(const std::basic_string<T>& in, const std::basic_string<T>& delimiter);
-#define SplitStringA SplitString<CHAR>
-#define SplitStringW SplitString<WCHAR>
+#define SplitStringA SplitString<char>
+#define SplitStringW SplitString<wchar_t>
 
 
 bool StringIsNumber(std::string str);
