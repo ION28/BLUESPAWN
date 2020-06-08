@@ -6,7 +6,7 @@
 
 namespace EventLogs {
 
-	class EventWrapper : public GenericWrapper<EVT_HANDLE> {
+	/*class EventWrapper : public GenericWrapper<EVT_HANDLE> {
 	public:
 		EventWrapper(EVT_HANDLE handle) :
 			GenericWrapper(handle, std::function<void(EVT_HANDLE)>(EvtClose), INVALID_HANDLE_VALUE){};
@@ -37,5 +37,6 @@ namespace EventLogs {
 			std::string rawXML;
 			std::unordered_map<std::string, std::string> props;
 	};
+	*/
 
 }

@@ -2,7 +2,8 @@
 
 #include "common/wrappers.hpp"
 #include "util/log/Log.h"
-
+/*
+//TODO: Linuxize
 void EventListener::SubEventListener::HandleEventNotify(HANDLE hEvent){
     if(map.find(hEvent) != map.end()){
         for(auto& func : map.at(hEvent)){
@@ -349,3 +350,4 @@ bool EventListener::Unsubscribe(
     LOG_ERROR("Unable to unsubscribe from event; Event may not have a subscription.");
     return false;
 }
+*/

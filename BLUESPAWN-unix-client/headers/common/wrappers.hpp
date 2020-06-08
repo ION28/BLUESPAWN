@@ -36,40 +36,40 @@ public:
 	T Get() const { return WrappedObject; }
 };
 
-class FindWrapper : public GenericWrapper<HANDLE> {
+//NOTE: Temporarily removed - find linux equiv
+/*class FindWrapper : public GenericWrapper<HANDLE> {
 public:
 	FindWrapper(HANDLE handle) :
 		GenericWrapper(handle, std::function<void(HANDLE)>(FindClose), INVALID_HANDLE_VALUE){};
-};
+};*/
 
-typedef pthread_mutex_t MutexType;
 class AcquireMutex {
-	MutexType &hMutex;
+	const pthread_mutex_t &hMutex;
 	std::shared_ptr<void> tracker;
 
 public:
-	explicit AcquireMutex(const MutexType& mutex) :
+	explicit AcquireMutex(const pthread_mutex_t& mutex) :
 		hMutex{ mutex },
-		tracker{ nullptr, [&](void* nul){ pthread_mutex_unlock(hMutex); } }{
-		pthread_mutex_lock(hMutex);
+		tracker{ nullptr, [&](void* nul){ pthread_mutex_unlock(const_cast<pthread_mutex_t*>(&hMutex)); } }{
+		pthread_mutex_lock(const_cast<pthread_mutex_t*>(&hMutex));
 	}
 };
 
 class AllocationWrapper {
 	std::optional<std::shared_ptr<char[]>> Memory;
-	PCHAR pointer;
-	SIZE_T AllocationSize;
+	char* pointer;
+	size_t AllocationSize;
 
 public:
 	enum AllocationFunction {
 		MALLOC, CPP_ALLOC, CPP_ARRAY_ALLOC, STACK_ALLOC
 	};
 
-	AllocationWrapper(void* memory, SIZE_T size, AllocationFunction AllocationType = STACK_ALLOC) :
-		pointer{ reinterpret_cast<PCHAR>(memory) },
+	AllocationWrapper(void* memory, size_t size, AllocationFunction AllocationType = STACK_ALLOC) :
+		pointer{ reinterpret_cast<char*>(memory) },
 		Memory{ 
 			size && memory ? std::optional<std::shared_ptr<char[]>>{{
-				reinterpret_cast<PCHAR>(memory), [AllocationType](char* value){
+				reinterpret_cast<char*>(memory), [AllocationType](char* value){
 					if(AllocationType == CPP_ALLOC)
 						delete value;
 					else if(AllocationType == CPP_ARRAY_ALLOC)
@@ -81,7 +81,7 @@ public:
 	    },
 		AllocationSize{ size }{}
 
-	CHAR operator[](int i) const {
+	char operator[](int i) const {
 		return Memory && i < AllocationSize ? pointer[i] : 0;
 	}
 
@@ -113,9 +113,9 @@ public:
 
 	std::optional<std::wstring> ReadWString() const {
 		if(Memory.has_value()){
-			SIZE_T size = wcsnlen(reinterpret_cast<PWCHAR>(pointer), AllocationSize / 2);
-			PWCHAR buffer = new WCHAR[size + 1];
-			CopyMemory(buffer, pointer, size * 2);
+			size_t size = wcsnlen(reinterpret_cast<wchar_t*>(pointer), AllocationSize / 2);
+			wchar_t * buffer = new wchar_t[size + 1];
+			memcpy(buffer, pointer, size * 2);
 			buffer[size] = 0;
 			auto str = std::wstring{ buffer };
 			delete[] buffer;
@@ -125,9 +125,9 @@ public:
 
 	std::optional<std::string> ReadString() const {
 		if(Memory.has_value()){
-			SIZE_T size = strnlen(reinterpret_cast<PCHAR>(pointer), AllocationSize);
-			PCHAR buffer = new CHAR[size + 1];
-			CopyMemory(buffer, pointer, size);
+			size_t size = strnlen(reinterpret_cast<char*>(pointer), AllocationSize);
+			char* buffer = new char[size + 1];
+			memcpy(buffer, pointer, size);
 			buffer[size] = 0;
 			auto str = std::string{ buffer };
 			delete[] buffer;
@@ -150,7 +150,7 @@ public:
 		}
 	}
 
-	bool SetByte(SIZE_T offset, char value){
+	bool SetByte(size_t offset, char value){
 		if(offset < AllocationSize){
 			pointer[offset] = value;
 			return true;
@@ -164,16 +164,17 @@ public:
 	}
 };
 
-template<class T = CHAR>
+template<class T = char>
 class MemoryWrapper {
 	T LocalCopy{};
 
 public:
+    //TODO: remove references to processes? unless want to include ptrace?
 	T* address;
 	pid_t process;
-	SIZE_T MemorySize;
+	size_t MemorySize;
 
-	MemoryWrapper(void* lpMemoryBase, SIZE_T size = sizeof(T), pid_t process = getpid())
+	MemoryWrapper(void* lpMemoryBase, size_t size = sizeof(T), pid_t process = getpid())
 		: address{ reinterpret_cast<T*>(lpMemoryBase) }, process{ process }, MemorySize{ size } {}
 
 	T Dereference() const {
@@ -213,7 +214,7 @@ public:
 		return { reinterpret_cast<V*>(address), MemorySize, process };
 	}
 
-	MemoryWrapper<T> GetOffset(SIZE_T offset) const {
+	MemoryWrapper<T> GetOffset(size_t offset) const {
 		if(offset > MemorySize){
 			return { nullptr, 0, process };
 		} else {
@@ -227,13 +228,10 @@ public:
 		return !memcmp(&data1, &data2, min(memory.MemorySize, MemorySize));
 	}
 
-	bool Protect(unsigned int protections, SIZE_T size = -1){
+	bool Protect(unsigned int protections, size_t size = -1){
 		if(size == -1) size = MemorySize;
-		if(!process){
-			return mprotect(address, size, protections); //TODO: not really sure what their intention with the whole having the process argument is.
-		} else {
-			return mprotect(address, size, protections);
-		}
+
+		return mprotect(address, size, protections);
 	}
 
 	std::string ReadString(){
@@ -264,13 +262,13 @@ public:
 
 	std::wstring ReadWstring(){
 		if(!process){
-			return std::wstring{ reinterpret_cast<WCHAR*>(address) };
+			return std::wstring{ reinterpret_cast<wchar_t*>(address) };
 		} else {
 			int idx = 0;
 			int maxIdx = 10;
 			wchar_t* memory = new wchar_t[maxIdx * 2];
 			bool valid = false;
-			while(!valid && !ReadProcessMemory(process, address, memory, (maxIdx = min(maxIdx * 2, MemorySize / sizeof(WCHAR))) * sizeof(WCHAR), nullptr)){
+			while(!valid && !ReadProcessMemory(process, address, memory, (maxIdx = min(maxIdx * 2, MemorySize / sizeof(wchar_t))) * sizeof(wchar_t), nullptr)){
 				for(; idx < maxIdx; idx++){
 					if(memory[idx] == 0){
 						valid = true;
@@ -293,31 +291,9 @@ public:
 
 	AllocationWrapper ToAllocationWrapper(unsigned int size = MemorySize){
 		size = min(size, MemorySize);
-		if(size > 0x8000){
-			AllocationWrapper wrapper{ ::VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE), size, AllocationWrapper::VIRTUAL_ALLOC };
-			if(process){
-				if(ReadProcessMemory(process, address, wrapper, size, nullptr)){
-					return wrapper;
-				} else{
-					return { nullptr, 0 };
-				}
-			} else{
-				memmove(wrapper, address, size);
-				return wrapper;
-			}
-		} else{
-			AllocationWrapper wrapper{ ::HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size), size, AllocationWrapper::HEAP_ALLOC };
-			if(process){
-				if(ReadProcessMemory(process, address, wrapper, size, nullptr)){
-					return wrapper;
-				} else{
-					return { nullptr, 0 };
-				}
-			} else{
-				memmove(wrapper, address, size);
-				return wrapper;
-			}
-		}
+		AllocationWrapper wrapper{ malloc(size), size, AllocationWrapper::MALLOC };
+		memmove(wrapper, address, size);
+		return wrapper;
 	}
 };
 

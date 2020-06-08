@@ -1,32 +1,33 @@
 #pragma once   
 
-#include ""
 #include <stdio.h>
 #include <functional>
 #include "reaction/Detections.h"
 #include "util/eventlogs/EventLogItem.h"
 
-#pragma comment(lib, "wevtapi.lib")
 
 /**
 * A class used to connect a HuntTriggerReaction to the Windows async call when an event is generated
 */
+/*
 class EventSubscription {
 	public:
 		EventSubscription(std::function<void(EventLogs::EventLogItem)> callback);
-
+*/
 		/**
 		* The function called by the underlying Windows OS as a callback.
 		* In turn calls reaction->EventIdentified
 		*/
-		unsigned int WINAPI SubscriptionCallback(EVT_SUBSCRIBE_NOTIFY_ACTION action, EVT_HANDLE hEvent);
+//		unsigned int WINAPI SubscriptionCallback(EVT_SUBSCRIBE_NOTIFY_ACTION action, EVT_HANDLE hEvent);
 
 		/**
 		* Set the event handle so it can be closed when this object is deleted
 		*/
-		void setSubHandle(const EventLogs::EventWrapper& hSubscription);
+//		void setSubHandle(const EventLogs::EventWrapper& hSubscription);
 
-	private:
+/*	private:
 		std::function<void(EventLogs::EventLogItem)> callback;
 		EventLogs::EventWrapper hSubscription;
 };
+
+*/

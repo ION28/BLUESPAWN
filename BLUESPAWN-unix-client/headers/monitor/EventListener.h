@@ -13,9 +13,10 @@
  * due to the internal structure of the class, it is more efficient the more events there are
  * being subscribed to. For these reasons, EventListener is a singleton class.
  */
+/*
 class EventListener {
 private:
-
+*/
 	/**
 	 * By default, the maximum number of events that can be waited on by WaitForMultipleObjects is
 	 * 64, and it's quite possible that BLUESPAWN will need to be able to wait for more than 64
@@ -24,6 +25,7 @@ private:
 	 *
 	 * This class is meant for internal usage within EventListener
 	 */
+/*
 	class SubEventListener {
 
 		/// Indicates the number of events that can be added before maximum capacity is reached
@@ -66,11 +68,12 @@ private:
 		void ListenForEvents();
 
 	public:
-
+*/
 		/**
 		 * Creates the listener, the thread, and the mutex needed to manage the event listening.
 		 * The thread will be started in ListenForEvents immediately.
 		 */
+/*
 		SubEventListener();
 		~SubEventListener();
 
@@ -81,6 +84,7 @@ private:
 		/// Move constructor is deleted. Since the thread references `this`, it is very difficult to change.
 		SubEventListener(SubEventListener&&) = delete;
 		SubEventListener operator=(SubEventListener&&) = delete;
+*/
 
 		/** 
 		 * Tries to subscribe to an event. This function will fail if there is no room in this SubEventListener.
@@ -93,10 +97,13 @@ private:
 		 *
 		 * @return True if the function completed successfully; false if hEvent couldn't be subscribed to.
 		 */
+
+/*
 		bool TrySubscribe(
 			IN const HANDLE& hEvent, 
 			IN const std::vector<std::function<void()>>& callbacks
 		);
+*/
 
 		/**
 		 * Checks if this SubEventListener has already subscribed to the given event. If so, this will return
@@ -107,9 +114,12 @@ private:
 		 *
 		 * @return An optional containing the callbacks for the event if present; otherwise std::nullopt
 		 */
+/*
 		std::optional<std::vector<std::function<void()>>> GetSubscription(
 			IN const HANDLE& hEvent
 		) const;
+
+*/
 
 		/**
 		 * Tries to add a callback to an event. This function will fail if there is this SubEventListener isn't
@@ -121,10 +131,12 @@ private:
 		 *
 		 * @return True if the function completed successfully; false if hEvent wasn't subscribed to
 		 */
+/*
 		bool TryAddCallback(
 			IN const HANDLE& hEvent,
 			IN const std::function<void()>& callback
 		);
+*/
 
 		/**
 		 * Tries to remove a callback from an event. This function will fail if there is this SubEventListener isn't
@@ -138,10 +150,12 @@ private:
 		 *
 		 * @return True if the function is no longer in the subscription to hEvent; false if hEvent wasn't subscribed to
 		 */
+/*
 		bool TryRemoveCallback(
 			IN const HANDLE& hEvent,
 			IN const std::function<void()>& callback
 		);
+*/
 
 		/**
 		 * Tries to remove the subscription for an event. This function will fail if this SubEventListener isn't
@@ -151,10 +165,13 @@ private:
 		 *
 		 * @return True if the function completed successfully; false if the function failed
 		 */
+/*
 		bool TryUnsubscribe(
 			IN const HANDLE& hEvent
 		);
 	};
+
+
 
 	/// A vector for internal use containing the SubEventListeners.
 	std::vector<std::unique_ptr<SubEventListener>> subeventlisteners;
@@ -168,14 +185,14 @@ private:
 	EventListener();
 
 public:
-
+*/
 	/**
 	 * Returns a reference to an EventListener instance. Since EventListener is a singleton class, this is
 	 * the method used to obtain an instance.
 	 *
 	 * @return A reference to an EventListener instance.
 	 */
-	static EventListener& GetInstance();
+	//static EventListener& GetInstance();
 
 	/**
 	 * Tries to subscribe to an event. This function will fail if there is no room in this SubEventListener.
@@ -190,10 +207,10 @@ public:
 	 *
 	 * @return True if the function completed successfully; false if hEvent couldn't be subscribed to.
 	 */
-	bool Subscribe(
+	/*bool Subscribe(
 		const HANDLE& hEvent,
 		const std::vector<std::function<void()>>& callbacks
-	);
+	);*/
 
 	/**
 	 * Checks if this EventListener has already subscribed to the given event. If so, this will return
@@ -204,9 +221,9 @@ public:
 	 *
 	 * @return An optional containing the callbacks for the event if present; otherwise std::nullopt
 	 */
-	std::optional<std::vector<std::function<void()>>> GetSubscription(
+	/*std::optional<std::vector<std::function<void()>>> GetSubscription(
 		IN const HANDLE& hEvent
-	) const;
+	) const;*/
 
 	/**
 	 * Tries to add a callback to an event. This function will fail if this EventListener is not
@@ -220,10 +237,10 @@ public:
 	 *
 	 * @return True if the function completed successfully; false if hEvent wasn't subscribed to
 	 */
-	bool AddCallback(
+	/*bool AddCallback(
 		IN const HANDLE& hEvent,
 		IN const std::function<void()>& callback
-	);
+	);*/
 
 	/**
 	 * Tries to remove a callback from an event. This function will fail if there is this EventListener isn't
@@ -238,10 +255,10 @@ public:
 	 *
 	 * @return True if the function is no longer in the subscription to hEvent; false if hEvent wasn't subscribed to
 	 */
-	bool RemoveCallback(
+	/*bool RemoveCallback(
 		IN const HANDLE& hEvent,
 		IN const std::function<void()>& callback
-	);
+	);*/
 
 	/**
 	 * Tries to remove the subscription for an event. This function will fail if this SubEventListener isn't
@@ -251,7 +268,8 @@ public:
 	 *
 	 * @return True if the function completed successfully; false if the function failed
 	 */
-	bool Unsubscribe(
+	/*bool Unsubscribe(
 		IN const HANDLE& hEvent
 	);
 };
+*/

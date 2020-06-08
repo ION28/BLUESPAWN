@@ -32,7 +32,7 @@ void HuntRegister::RegisterHunt(std::shared_ptr<Hunt> hunt) {
 bool HuntRegister::HuntShouldRun(Hunt& hunt, vector<string> vExcludedHunts, vector<string> vIncludedHunts) {
 	if (vExcludedHunts.size() != 0) {
 		for (auto name : vExcludedHunts) {
-			if (hunt.GetName().find(StringToWidestring(name)) != wstring::npos) {
+			if (hunt.GetName().find(name) != string::npos) {
 				return false;
 			}
 		}
@@ -40,7 +40,7 @@ bool HuntRegister::HuntShouldRun(Hunt& hunt, vector<string> vExcludedHunts, vect
 	}
 	if(vIncludedHunts.size() != 0) {
 		for (auto name : vIncludedHunts) {
-			if (hunt.GetName().find(StringToWidestring(name)) != wstring::npos) {
+			if (hunt.GetName().find(name) != string::npos) {
 				return true;
 			}
 		}
@@ -50,12 +50,14 @@ bool HuntRegister::HuntShouldRun(Hunt& hunt, vector<string> vExcludedHunts, vect
 }
 
 bool CallFunctionSafe(const std::function<void()>& func){
-	__try{
+	/*__try{
 		func();
 		return true;
 	} __except(EXCEPTION_EXECUTE_HANDLER){
 		return false;
-	}
+	}*/
+	//TODO: Purpose of this?
+	return true;
 }
 
 void HuntRegister::RunHunts(unsigned int dwTactics, unsigned int dwDataSource, unsigned int dwAffectedThings, const Scope& scope, Aggressiveness aggressiveness, const Reaction& reaction, vector<string> vExcludedHunts, vector<string>vIncludedHunts){
@@ -134,7 +136,7 @@ void HuntRegister::SetupMonitoring(Aggressiveness aggressiveness, const Reaction
 
 				if(name->SupportsScan(level)) {
 					unsigned int status = EvtManager.SubscribeToEvent(event, callback);
-					if(status != ERROR_SUCCESS){
+					if(status != 0){
 						LOG_ERROR("Monitoring for " << name->GetName() << " failed with error code " << status);
 					}
 				}

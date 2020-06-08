@@ -14,6 +14,9 @@
 
 #include "monitor/ETW_Wrapper.h"
 
+#include <sys/auxv.h>
+#include <sys/utsname.h>
+
 #pragma warning(push)
 
 #pragma warning(disable : 26451)
@@ -24,9 +27,6 @@
 #pragma warning(pop)
 
 #include <iostream>
-
-DEFINE_FUNCTION(BOOL, IsWow64Process2, NTAPI, HANDLE hProcess, USHORT* pProcessMachine, USHORT* pNativeMachine);
-LINK_FUNCTION(IsWow64Process2, KERNEL32.DLL);
 
 const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{ io };
@@ -91,23 +91,27 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 	}
 }
 
+#define X64_IDENT "x86_64"
+#define X32_IDENT "i686"
+/**
+ * NOTE: might need above for better accuracy
+ * since x64 cant run on 32 bit if the hardware identifiers arent equal unless its not x32 or x86_64 system (check later)
+ * then its a 32 bit running on 64 bit hardware
+ * 
+ * While currently there is no reason this will not work, it is highly likely 32 bit in general will not be supported due to process and kernel level checks
+ * at least until i am able to figure out x32 kernel level things
+ */
 void Bluespawn::check_correct_arch() {
-	BOOL bIsWow64 = FALSE;
-	if (IsWindows10OrGreater() && Linker::IsWow64Process2) {
-		USHORT ProcessMachine;
-		USHORT NativeMachine;
-
-		Linker::IsWow64Process2(GetCurrentProcess(), &ProcessMachine, &NativeMachine);
-		if (ProcessMachine != IMAGE_FILE_MACHINE_UNKNOWN) {
-			bIsWow64 = TRUE;
+    unsigned long atr = getauxval(AT_PLATFORM);
+	struct utsname name;
+	int ures = uname(&name);
+	if(!atr || ures != 0){
+		LOG_ERROR("Unable to get hardware specifications");
+	}else{
+		if(std::string((char*)atr) != std::string(name.machine)){
+			Bluespawn::io.AlertUser("Running the x86 version of BLUESPAWN on an x64 system! This configuration is not fully supported, so we recommend downloading the x64 version.", 5000, ImportanceLevel::MEDIUM);
+			LOG_WARNING("Running the x86 version of BLUESPAWN on an x64 system! This configuration is not fully supported, so we recommend downloading the x64 version.");
 		}
-	}
-	else {
-		IsWow64Process(GetCurrentProcess(), &bIsWow64);
-	}
-	if (bIsWow64) {
-		Bluespawn::io.AlertUser("Running the x86 version of BLUESPAWN on an x64 system! This configuration is not fully supported, so we recommend downloading the x64 version.", 5000, ImportanceLevel::MEDIUM);
-		LOG_WARNING("Running the x86 version of BLUESPAWN on an x64 system! This configuration is not fully supported, so we recommend downloading the x64 version.");
 	}
 }
 
@@ -118,7 +122,7 @@ int main(int argc, char* argv[]){
 
 	bluespawn.check_correct_arch();
 
-	cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
+	cxxopts::Options options("BLUESPAWN", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
 
 	options.add_options()
 		("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
@@ -190,7 +194,6 @@ int main(int argc, char* argv[]){
 		else if (result.count("hunt") || result.count("monitor")) {
 			std::map<std::string, Reaction> reactions = {
 				{"log", Reactions::LogReaction{}},
-				{"remove-value", Reactions::RemoveValueReaction{ bluespawn.io }},
 				{"suspend", Reactions::SuspendProcessReaction{ bluespawn.io }},
 				{"carve-memory", Reactions::CarveProcessReaction{ bluespawn.io }},
 				{"delete-file", Reactions::DeleteFileReaction{ bluespawn.io }},
