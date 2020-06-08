@@ -5,7 +5,7 @@
 #include <map>
 #include <thread>
 
-#include "Common/wrappers.hpp"
+#include "common/wrappers.hpp"
 
 /**
  * An event manager for seemlessly subscribing and unsubscribing to and from events. Since this
