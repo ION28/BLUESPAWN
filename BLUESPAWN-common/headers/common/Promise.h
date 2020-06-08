@@ -71,6 +71,19 @@ public:
 		hGuard{}, 
 		members{ std::make_shared<Members>() }{}
 
+	/**
+	 * Instantiates a promise already fufilled.
+	 *
+	 * @param guaranteed Indicates whether this promise is guaranteed not to be
+	 *        invalidated.
+	 */
+	Promise(
+		IN CONST T& value
+	) : guaranteed{ true },
+		hEvent{ CreateEventW(nullptr, true, true, nullptr) },
+		hGuard{},
+		members{ std::make_shared<Members>(value) }{}
+
 
 	/**
 	 * Waits for the promise to be either fufilled or invalidated, and then

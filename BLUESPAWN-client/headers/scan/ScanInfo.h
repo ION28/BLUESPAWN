@@ -5,6 +5,8 @@
 #include <map>
 #include <atomic>
 
+#include "scan/Scanner.h"
+
 /// Represents the degree of certainty that a detection is malicious
 class Certainty {
 	double confidence;
@@ -51,11 +53,6 @@ public:
 /// An association is the degree of certainty that two detections are related
 typedef Certainty Association;
 
-/// Forward declare scanners and DetectionNetwork so they can be friends
-class RegistryScanner;
-class ProcessScanner;
-class FileScanner; 
-
 /**
  * A ScanNode is the core unit of BLUESPAWN's scan functionality. Each detection is converted to a 
  * ScanNode. From there, each scan node identifies other detections related to its detection. These
@@ -78,19 +75,62 @@ class ScanInfo {
 	/// Indicates whether cAssociativeCertainty has gone stale and must be recalculated
 	bool bAssociativeStale;
 
-	/// Allow RegistryScanner, FileScanner, ProcessScanner, and DetectionNetwork access to private variables
-	friend class RegistryScanner;
-	friend class FileScanner;
-	friend class ProcessScanner;
+	/// Allow scanners and the detection register access to private variables
+	friend class Scanner;
+	friend class DetectionRegister;
 
-	void AddAssociation(const Detection& node, Association strength);
+	/**
+	 * Adds an association between this node and the given node with the given strength. Note that
+	 * this only adds the association one way; node->AddAssociation(*this) must be called separately
+	 * for the association to be bidirectional (as all associations should be).
+	 *
+	 * @param node The node to add an association to. 
+	 * @param strength The strength of the association between the two nodes
+	 */
+	void AddAssociation(
+		IN CONST std::reference_wrapper<Detection>& node, 
+		IN CONST Association& strength
+	);
 
 public:
+
+	/**
+	 * Constructs a new ScanInfo object
+	 */
 	ScanInfo();
 
+	/**
+	 * Gets a reference to the the associations this node has
+	 *
+	 * @return A reference to the the associations this node has
+	 */
 	const std::unordered_map<std::reference_wrapper<Detection>, Association>& GetAssociations();
 
+	/**
+	 * Retrieves the certainty that the detection this is a part of is malicious. If any association has
+	 * been added since the last call to GetCertainty, the associative certainty will be recalculated.
+	 *
+	 * @return The certainty that the detection this is a part of is malicious
+	 */
 	Certainty GetCertainty();
-	
-	DWORD GetID();
+
+	/**
+	 * Sets the degree of certainty that the detection referenced by this scan node is malicious. This does
+	 * not affect the associative certainty of this ScanNode.
+	 *
+	 * @param certainty The value of certainty to be set
+	 */
+	void SetCertainty(
+		IN CONST Certainty& certainty
+	);
+
+	/**
+	 * Adds to the degree of certainty that the detection referenced by this scan node is malicious. This does
+	 * not affect the associative certainty of this ScanNode.
+	 *
+	 * @param certainty The value of certainty to be added
+	 */
+	void AddCertainty(
+		IN CONST Certainty& certainty
+	);
 };

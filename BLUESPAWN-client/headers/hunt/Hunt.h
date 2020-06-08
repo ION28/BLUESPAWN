@@ -16,25 +16,6 @@ class HuntRegister;
     HuntInfo{ this->name, this->dwTacticsUsed, this->dwCategoriesAffected, this->dwSourcesInvolved,                                    \
               (long) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() }
 
-#define HUNT_INIT()                      \
-	LOG_INFO(1, "Hunting for " << name); \
-    std::vector<std::reference_wrapper<Detection>> detections{};
-
-#define REGISTRY_DETECTION(value) \
-    detections.emplace_back(std::static_pointer_cast<DETECTION>(std::make_shared<REGISTRY_DETECTION>(value)));
-
-#define FILE_DETECTION(value) \
-    detections.emplace_back(std::static_pointer_cast<DETECTION>(std::make_shared<FILE_DETECTION>(value)));
-
-#define SERVICE_DETECTION(name, path) \
-    detections.emplace_back(std::static_pointer_cast<DETECTION>(std::make_shared<SERVICE_DETECTION>(name, path)));
-
-#define EVENT_DETECTION(log) \
-    detections.emplace_back(std::static_pointer_cast<DETECTION>(EventLogs::EventLogItemToDetection(log)));
-
-#define PROCESS_DETECTION(path, cmdline, pid, module, dwModuleSize, identifiers) \
-    detections.emplace_back(std::static_pointer_cast<DETECTION>(std::make_shared<PROCESS_DETECTION>(path, cmdline, pid, module, dwModuleSize, identifiers)));
-
 #define HUNT_END()                             \
     LOG_INFO(2, "Finished hunt for " << name); \
 	return detections;
@@ -107,9 +88,22 @@ public:
         IN DWORD categories
     );
 
+    /**
+     * Runs the hunt, returning references to the detections found.
+     *
+     * @param scope The scope of the hunt
+     *
+     * @return A vector of references to the detections identified.
+     */
 	virtual std::vector<std::reference_wrapper<Detection>> RunHunt(
         IN CONST Scope& scope
     );
 
+    /**
+     * Retrieves a vector of events to be signalled when the hunt should be rerun. This should only
+     * be called once, as the events will be duplicated if called multiple times.
+     *
+     * @return a vector of event pointers
+     */
 	virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents();
 };

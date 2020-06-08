@@ -82,8 +82,8 @@ public:
 		InitializeCriticalSection(&section);
 	}
 
-	operator PCRITICAL_SECTION(){ return &section; }
-	operator CRITICAL_SECTION(){ return section; }
+	operator PCRITICAL_SECTION() const { return &section; }
+	operator CRITICAL_SECTION() const { return section; }
 };
 
 class BeginCriticalSection {

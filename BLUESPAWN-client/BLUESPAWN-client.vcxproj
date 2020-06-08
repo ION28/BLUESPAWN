@@ -212,11 +212,12 @@
     </ClCompile>
     <ClCompile Include="src\monitor\Event.cpp" />
     <ClCompile Include="src\monitor\EventManager.cpp" />
-    <ClCompile Include="src\scan\CollectDetections.cpp" />
+    <ClCompile Include="src\scan\DetectionRegister.cpp" />
     <ClCompile Include="src\scan\FileScanner.cpp" />
     <ClCompile Include="src\scan\ProcessScanner.cpp" />
     <ClCompile Include="src\scan\RegistryScanner.cpp" />
-    <ClCompile Include="src\scan\ScanNode.cpp" />
+    <ClCompile Include="src\scan\Scanner.cpp" />
+    <ClCompile Include="src\scan\ScanInfo.cpp" />
     <ClCompile Include="src\user\banners.cpp" />
     <ClCompile Include="src\user\BLUESPAWN.cpp" />
     <ClCompile Include="src\user\CLI.cpp" />

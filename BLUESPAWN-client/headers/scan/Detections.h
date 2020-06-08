@@ -71,7 +71,7 @@ struct ProcessDetectionData {
 	std::optional<std::wstring> ProcessCommand;
 
 	/// The parent of the process
-	std::optional<std::unique_ptr<ProcessDetectionData>> ParentProcess;
+	std::optional<std::shared_ptr<ProcessDetectionData>> ParentProcess;
 
 	/// The base address of the potentially malicious memory segment inside the process
 	std::optional<PVOID64> BaseAddress;
@@ -554,6 +554,9 @@ public:
 	/// was generated.
 	std::optional<DetectionContext> context;
 
+	/// A critical section guarding access to members of this class
+	CriticalSection hGuard;
+
 	/**
 	 * Creates a Detection object, given associated data, optional context, an optional remediator,
 	 * and an optional indicator as to whether the detection is stale.
@@ -572,4 +575,22 @@ public:
 		IN CONST std::optional<std::function<void()>>& remediator = std::nullopt OPTIONAL,
 		IN bool DetectionStale = false OPTIONAL
 	);
+
+	/// Overload comparison operator. Checks if the DetectionData is the same, regardless of context
+	bool operator==(const Detection& detection) const;
+
+	/// Implicit cast to CriticalSection support so users can say EnterCriticalSection(Detection)
+	operator LPCRITICAL_SECTION();
+};
+
+template<>
+class std::hash<Detection> {
+
+	size_t operator()(const Detection& detection) const;
+};
+
+template<>
+class std::hash<std::reference_wrapper<Detection>> {
+
+	size_t operator()(const std::reference_wrapper<Detection>& detection) const;
 };

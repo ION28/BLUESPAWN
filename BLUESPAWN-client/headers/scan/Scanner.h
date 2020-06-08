@@ -7,6 +7,9 @@
 class Scanner {
 public:
 
+	/// A static vector of publically accessible scanners
+	static std::vector<Scanner> scanners;
+
 	/**
 	 * Gets a vector of detections associated with the provided detection
 	 * 
@@ -14,7 +17,7 @@ public:
 	 *
 	 * @return A vector of detections associated with the provided detection
 	 */
-	virtual std::vector<Detection> GetAssociatedDetections(
+	virtual std::unordered_map<Detection, Association> GetAssociatedDetections(
 		IN CONST Detection& detection
 	);
 

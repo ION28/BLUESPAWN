@@ -1,4 +1,4 @@
-#include "reaction/Detections.h"
+#include "scan/Detections.h"
 
 #include "util/processes/ProcessUtils.h"
 
