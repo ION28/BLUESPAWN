@@ -3,6 +3,7 @@
 #include <Windows.h>
 
 #include <vector>
+#include <string>
 
 #define ADD_ALL_VECTOR(v1, v2)  \
     {                           \

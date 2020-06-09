@@ -4,21 +4,50 @@
 #include "reaction/RemoveValue.h"
 #include "util/configurations/Registry.h"
 #include "common/wrappers.hpp"
-
+#include "user/bluespawn.h"
 #include "util/log/Log.h"
 
 namespace Reactions{
 
-	void RemoveValueReaction::RemoveRegistryIdentified(std::shared_ptr<REGISTRY_DETECTION> detection){
-		if(io.GetUserConfirm(L"Registry key " + detection->value.key.ToString() + L" contains potentially malicious value "
-			+ detection->value.wValueName + L" with data " + detection->value.ToString() + L". Remove value?") == 1){
-			if(!detection->value.key.RemoveValue(detection->value.wValueName)){
-				LOG_ERROR("Unable to remove registry value " << detection->value.key.ToString() << ": " << detection->value.wValueName << " (Error " << GetLastError() << ")");
+	void RemoveValueReaction::React(IN Detection& detection){
+		auto& data{ std::get<RegistryDetectionData>(detection.data) };
+		if(data.value){
+			if(Bluespawn::io.GetUserConfirm(L"Registry key `" + data.key.ToString() + L"` contains potentially "
+											"malicious value `" + data.value->wValueName + L"` with data `" + 
+											data.value->ToString() + L"`. Remove this value?") == 1){
+				auto type{ data.key.GetValueType(data.value->wValueName) };
+				if(data.key.GetValueType(data.value->wValueName) == data.value->GetType()){
+					if(!data.key.RemoveValue(data.value->wValueName)){
+						LOG_ERROR("Unable to remove registry value `" << data.value->ToString() << "`: `" <<
+								  data.value->wValueName << "` (Error " << GetLastError() << ")");
+					} else{
+						detection.DetectionStale = true;
+					}
+				} else{
+					if(type == RegistryType::REG_MULTI_SZ_T){
+						auto val{ *data.key.GetValue<std::vector<std::wstring>>(data.value->wValueName) };
+						for(size_t idx{ 0 }; idx < val.size(); idx++){
+							if(val[idx] == std::get<std::wstring>(data.value->data)){
+								val.erase(val.begin() + idx);
+								idx--;
+							}
+						}
+						if(!data.key.SetValue<std::vector<std::wstring>>(data.value->wValueName, val)){
+							LOG_ERROR("Unable to remove registry value `" << data.value->ToString() << "`: `" <<
+									  data.value->wValueName << "` (Error " << GetLastError() << ")");
+						} else{
+							detection.DetectionStale = true;
+						}
+					} else{
+						LOG_ERROR("Unable to remove registry value `" << data.value->ToString() << "` from `" <<
+								  data.value->wValueName << "` (Error " << GetLastError() << ")");
+					}
+				}
 			}
 		}
 	}
 
-	RemoveValueReaction::RemoveValueReaction(const IOBase& io) : io{ io }{
-		vRegistryReactions.emplace_back(std::bind(&RemoveValueReaction::RemoveRegistryIdentified, this, std::placeholders::_1));
+	bool RemoveValueReaction::Applies(IN CONST Detection& detection){
+		return !detection.DetectionStale && detection.type == DetectionType::RegistryDetection;
 	}
 }

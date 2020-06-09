@@ -3,6 +3,7 @@
 #include "util/processes/ProcessUtils.h"
 
 #include "common/StringUtils.h"
+#include "common/Utils.h"
 
 ProcessDetectionData ProcessDetectionData::CreateImageDetectionData(
 	IN DWORD PID,
@@ -175,7 +176,7 @@ ProcessDetectionData ProcessDetectionData::CreateMemoryDetectionData(
 	};
 }
 
-std::map<std::wstring, std::wstring> ProcessDetectionData::operator*(){
+std::map<std::wstring, std::wstring> ProcessDetectionData::operator*() CONST {
 	std::map<std::wstring, std::wstring> properties{
 		{ L"Type", type == ProcessDetectionType::MaliciousImage ? L"Image" :
 				   type == ProcessDetectionType::MaliciousMemory ? L"Memory" : L"Process"},
@@ -190,6 +191,20 @@ std::map<std::wstring, std::wstring> ProcessDetectionData::operator*(){
 	if(MemorySize) properties.emplace(L"Memory Size", *MemorySize);
 	if(ImageName) properties.emplace(L"Image Name", *ImageName);
 	return properties;
+}
+
+size_t ProcessDetectionData::operator~() CONST {
+	if(type == ProcessDetectionType::MaliciousProcess){
+		return (static_cast<size_t>(PID) << 8) ^ std::hash<std::wstring>{}(ProcessName) ^
+			(ProcessCommand ? std::hash<std::wstring>{}(*ProcessCommand) : 0) ^
+			(ProcessPath ? std::hash<std::wstring>{}(*ProcessPath) : 0);
+	} else{
+		return (static_cast<size_t>(PID) << 8) ^ std::hash<std::wstring>{}(ProcessName) ^
+			(ProcessCommand ? std::hash<std::wstring>{}(*ProcessCommand) : 0) ^
+			(ProcessPath ? std::hash<std::wstring>{}(*ProcessPath) : 0) ^
+			(BaseAddress ? reinterpret_cast<DWORD64>(*BaseAddress) * 75 + 0x12345: 0) ^
+			(MemorySize ? *MemorySize * 75 + 0x98765 : 0);
+	}
 }
 
 FileDetectionData::FileDetectionData(
@@ -235,8 +250,37 @@ FileDetectionData::FileDetectionData(
 	IN CONST std::wstring& path
 ) : FileDetectionData(FileSystem::File{ path }, std::nullopt){}
 
-std::map<std::wstring, std::wstring> FileDetectionData::operator*(){
-
+std::map<std::wstring, std::wstring> FileDetectionData::operator*() CONST {
+	std::map<std::wstring, std::wstring> properties{
+		{ L"Path", FilePath },
+		{ L"Name", FileName },
+		{ L"Exists", FileFound ? L"true" : L"false" },
+	};
+	if(FileExtension) properties.emplace(L"Extension", *FileExtension);
+	if(FileType) properties.emplace(L"File Type", *FileType);
+	if(Executor) properties.emplace(L"File Executor", *Executor);
+	if(HashInfo.MD5) properties.emplace(L"MD5 Hash", *HashInfo.MD5);
+	if(HashInfo.SHA1) properties.emplace(L"SHA1 Hash", *HashInfo.SHA1);
+	if(HashInfo.SHA256) properties.emplace(L"SHA256 Hash", *HashInfo.SHA256);
+	if(TimestampInfo.LastOpened) properties.emplace(L"Last Opened", FormatWindowsTime(*TimestampInfo.LastOpened));
+	if(TimestampInfo.FileCreated) properties.emplace(L"Date Created", FormatWindowsTime(*TimestampInfo.FileCreated));
+	if(yara){
+		std::wstring malicious{};
+		for(auto& mal : yara->vKnownBadRules){
+			if(malicious.length()) malicious += L", ";
+			malicious += mal;
+		}
+		std::wstring identifier{};
+		for(auto& id : yara->vKnownBadRules){
+			if(identifier.length()) identifier += L", ";
+			identifier += id;
+		}
+		properties.emplace(L"Malicious Yara Rules", malicious);
+		properties.emplace(L"Other Yara Rules", identifier);
+	}
+	if(FileSigned) properties.emplace(L"Signed", *FileSigned ? true : false);
+	if(Signer) properties.emplace(L"Signer", *Signer);
+	return properties;
 }
 
 RegistryDetectionData::RegistryDetectionData(

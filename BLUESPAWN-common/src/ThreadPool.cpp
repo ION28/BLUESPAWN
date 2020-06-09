@@ -53,7 +53,7 @@ ThreadPool::ThreadPool() :
 	auto count{ std::thread::hardware_concurrency() };
 
 	for(unsigned int idx = 0; idx < count; idx++){
-		threads.emplace_back(std::thread{ &ThreadFunction, this });
+		threads.emplace_back(std::thread{ &ThreadPool::ThreadFunction, this });
 	}
 }
 

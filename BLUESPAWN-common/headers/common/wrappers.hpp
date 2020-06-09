@@ -82,7 +82,7 @@ public:
 		InitializeCriticalSection(&section);
 	}
 
-	operator PCRITICAL_SECTION() const { return &section; }
+	operator PCRITICAL_SECTION() const { return const_cast<LPCRITICAL_SECTION>(&section); }
 	operator CRITICAL_SECTION() const { return section; }
 };
 
@@ -344,7 +344,7 @@ public:
 	operator bool() const{ return address; }
 	bool operator !() const{ return !address; }
 
-	AllocationWrapper ToAllocationWrapper(DWORD size = MemorySize){
+	AllocationWrapper ToAllocationWrapper(DWORD size = MemorySize) const {
 		size = min(size, MemorySize);
 		if(size > 0x8000){
 			AllocationWrapper wrapper{ ::VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE), size, AllocationWrapper::VIRTUAL_ALLOC };

@@ -5,7 +5,7 @@
 #include <map>
 #include <atomic>
 
-#include "scan/Scanner.h"
+class Detection;
 
 /// Represents the degree of certainty that a detection is malicious
 class Certainty {
@@ -75,8 +75,6 @@ class ScanInfo {
 	/// Indicates whether cAssociativeCertainty has gone stale and must be recalculated
 	bool bAssociativeStale;
 
-	/// Allow scanners and the detection register access to private variables
-	friend class Scanner;
 	friend class DetectionRegister;
 
 	/**

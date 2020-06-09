@@ -15,16 +15,16 @@ enum class YaraStatus {
 };
 
 struct YaraScanResult {
-	std::vector<std::string> vKnownBadRules;
-	std::vector<std::string> vIndicatorRules;
+	std::vector<std::wstring> vKnownBadRules;
+	std::vector<std::wstring> vIndicatorRules;
 
 	YaraStatus status;
 
 	operator bool();
 	bool operator!();
 
-	void AddBadRule(const char* identifier);
-	void AddIndicatorRule(const char* identifier);
+	void AddBadRule(IN CONST std::wstring& identifier);
+	void AddIndicatorRule(IN CONST std::wstring& identifier);
 };
 
 class YaraScanner {

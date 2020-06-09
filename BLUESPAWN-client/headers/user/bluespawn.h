@@ -17,7 +17,7 @@
 
 #include "scan/DetectionRegister.h"
 
-#include "reaction/Reaction.h"
+#include "reaction/ReactionManager.h"
 
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
@@ -49,6 +49,6 @@ class Bluespawn {
 		static Aggressiveness aggressiveness;
 		static DetectionRegister detections;
 
-		static Reaction reaction;
+		static ReactionManager reaction;
 		static const IOBase& io;
 };

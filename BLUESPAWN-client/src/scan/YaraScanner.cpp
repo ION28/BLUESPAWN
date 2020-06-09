@@ -1,6 +1,7 @@
 #include "scan/YaraScanner.h"
 #include "../resources/resource.h"
 #include "common/wrappers.hpp"
+#include "common/StringUtils.h"
 #include "util/log/Log.h"
 
 #include <zip.h>
@@ -151,9 +152,9 @@ int YaraCallbackFunction(int message, LPVOID lpMessageData, YaraScanArg* arg){
 	if(message == CALLBACK_MSG_RULE_MATCHING){
 		auto rule = reinterpret_cast<YR_RULE*>(lpMessageData);
 		if(arg->type == arg->Severe){
-			arg->result.AddBadRule(rule->identifier);
+			arg->result.AddBadRule(StringToWidestring(rule->identifier));
 		} else if(arg->type == arg->Indicator){
-			arg->result.AddIndicatorRule(rule->identifier);
+			arg->result.AddIndicatorRule(StringToWidestring(rule->identifier));
 		}
 	}
 	return CALLBACK_CONTINUE;
@@ -175,10 +176,10 @@ YaraScanResult YaraScanner::ScanFile(const FileSystem::File& file) const{
 	auto result{ ScanMemory(memory) };
 
 	for(auto identifier : result.vKnownBadRules){
-		LOG_INFO(file.GetFilePath() << L" matches known malicious identifier " << StringToWidestring(identifier));
+		LOG_INFO(1, file.GetFilePath() << L" matches known malicious identifier " << identifier);
 	}
 	for(auto identifier : result.vIndicatorRules){
-		LOG_INFO(file.GetFilePath() << L" matches known indicator identifier " << StringToWidestring(identifier));
+		LOG_INFO(2, file.GetFilePath() << L" matches known indicator identifier " << identifier);
 	}
 
 	return result;
@@ -213,14 +214,14 @@ YaraScanResult YaraScanner::ScanMemory(LPVOID memory, DWORD dwSize) const{
 }
 
 YaraScanResult YaraScanner::ScanMemory(const MemoryWrapper<>& memory) const {
-	return ScanMemory(memory.Read());
+	return ScanMemory(memory.ToAllocationWrapper());
 }
 
-void YaraScanResult::AddBadRule(const char* identifier){
+void YaraScanResult::AddBadRule(const std::wstring& identifier){
 	vKnownBadRules.emplace_back(identifier);
 }
 
-void YaraScanResult::AddIndicatorRule(const char* identifier){
+void YaraScanResult::AddIndicatorRule(const std::wstring& identifier){
 	vIndicatorRules.emplace_back(identifier);
 }
 

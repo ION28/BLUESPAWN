@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "scan/Detections.h"
+#include "scan/ScanInfo.h"
 
 class Scanner {
 public:

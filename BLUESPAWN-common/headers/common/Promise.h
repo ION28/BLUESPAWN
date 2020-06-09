@@ -48,7 +48,7 @@ private:
 		std::vector<std::function<void(const T&)>> SuccessFunctions;
 
 		/// A vector of functions to be called when the promise is invalidated
-		std::vector<std::function<>> FailureFunctions;
+		std::vector<std::function<void()>> FailureFunctions;
 	};
 
 	/// A shared pointer to members, to be shared across copies of the same 

@@ -259,7 +259,14 @@ struct ProcessDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::map<std::wstring, std::wstring> operator*();
+	std::map<std::wstring, std::wstring> operator*() CONST;
+
+	/**
+	 * Compute a hash for this detection data
+	 *
+	 * @return A hash for this detection data
+	 */
+	size_t operator~() CONST;
 };
 
 /**
@@ -313,7 +320,7 @@ struct FileDetectionData {
 	 * this detection from event logs or other records, this may not be the case. If
 	 * the file has already been scanned with yara, it is recommended that the result
 	 * be passed in to the constructor so that it doesn't have to be scanned a second time.
-	 *
+	 * 
 	 * @param file A File object representing the file.
 	 * @param scan The result of a yara scan performed on a file. This parameter is optional,
 	 *        but providing the result will avoid the need for the scan to be repeated.
@@ -342,7 +349,14 @@ struct FileDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::map<std::wstring, std::wstring> operator*();
+	std::map<std::wstring, std::wstring> operator*() CONST;
+
+	/**
+	 * Compute a hash for this detection data
+	 *
+	 * @return A hash for this detection data
+	 */
+	size_t operator~() CONST;
 };
 
 /**
@@ -392,7 +406,14 @@ struct RegistryDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::map<std::wstring, std::wstring> operator*();
+	std::map<std::wstring, std::wstring> operator*() CONST;
+
+	/**
+	 * Compute a hash for this detection data
+	 *
+	 * @return A hash for this detection data
+	 */
+	size_t operator~() CONST;
 };
 
 /**
@@ -432,7 +453,14 @@ struct ServiceDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::map<std::wstring, std::wstring> operator*();
+	std::map<std::wstring, std::wstring> operator*() CONST;
+
+	/**
+	 * Compute a hash for this detection data
+	 *
+	 * @return A hash for this detection data
+	 */
+	size_t operator~() CONST;
 };
 
 /**
@@ -470,6 +498,13 @@ struct OtherDetectionData {
 	 * @return A mapping of properties to human-readable values
 	 */
 	std::map<std::wstring, std::wstring> operator*();
+
+	/**
+	 * Compute a hash for this detection data
+	 *
+	 * @return A hash for this detection data
+	 */
+	size_t operator~();
 };
 
 /// Stores contextual information around a detection
@@ -547,7 +582,7 @@ public:
 
 	/// A function that when run will remediate the detection, either removing it, fixing it, or 
 	/// mitigating it.
-	std::optional<std::function<void()>> remediator;
+	std::optional<std::function<void(Detection& detection)>> remediator;
 
 	/// Describes the context surrounding the detection such as when the first evidence of the 
 	/// detection was created, the hunts generating this detection, and the time the detection
@@ -587,10 +622,4 @@ template<>
 class std::hash<Detection> {
 
 	size_t operator()(const Detection& detection) const;
-};
-
-template<>
-class std::hash<std::reference_wrapper<Detection>> {
-
-	size_t operator()(const std::reference_wrapper<Detection>& detection) const;
 };

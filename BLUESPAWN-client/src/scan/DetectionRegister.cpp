@@ -1,5 +1,6 @@
 #include "scan/DetectionRegister.h"
 #include "scan/Scanner.h"
+#include "user/bluespawn.h"
 
 #include <unordered_set>
 
@@ -36,6 +37,8 @@ void DetectionRegister::AddDetectionAsync(
         SetEvent(hEvent);
     }
     LeaveCriticalSection(hQueueGuard);
+
+    Bluespawn::reaction.React(detection.get());
 }
 
 std::reference_wrapper<Detection> DetectionRegister::AddDetection(IN Detection&& detection, 

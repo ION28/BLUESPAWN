@@ -174,7 +174,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
     <ClCompile Include="src\reaction\CarveMemory.cpp" />
-    <ClCompile Include="src\reaction\Detection.cpp" />
+    <ClCompile Include="src\scan\Detection.cpp" />
     <ClCompile Include="src\reaction\RemoveValue.cpp" />
     <ClCompile Include="src\reaction\SuspendProcess.cpp" />
     <ClCompile Include="src\hunt\RegistryHunt.cpp" />

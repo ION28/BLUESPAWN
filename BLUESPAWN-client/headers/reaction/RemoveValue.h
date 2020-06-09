@@ -10,14 +10,27 @@
 namespace Reactions{
 
 	class RemoveValueReaction : public Reaction {
-	private:
-		const IOBase& io;
 
-		/// Handlers for detections that log the detection
-		void RemoveRegistryIdentified(std::shared_ptr<REGISTRY_DETECTION> detection);
+		/**
+		 * Reacts to a registry detection by removing it from the registry
+		 *
+		 * @param detection The detection to which the reaction will be applied.
+		 */
+		virtual void React(
+			IN Detection& detection
+		);
 
-	public:
-		RemoveValueReaction(const IOBase& io);
+		/**
+		 * Function to determine if this reaction applies to a detection. This ensures that
+		 * the detection is not stale and that it references a registry value.
+		 *
+		 * @param detection The detection to check
+		 *
+		 * @return True if this reaction applies; false otherwise
+		 */
+		virtual bool Applies(
+			IN CONST Detection& detection
+		);
 	};
 }
 
