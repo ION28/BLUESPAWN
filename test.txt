@@ -4,8 +4,8 @@
 [submodule "BLUESPAWN-unix-client/external/yara"]
 	path = BLUESPAWN-unix-client/external/yara
 	url = https://github.com/VirusTotal/yara
-[submodule "BLUESPAWN-unix-client/external/rules"]
-	path = BLUESPAWN-unix-client/external/rules
+[submodule "BLUESPAWN-unix-client/external/yara-rules"]
+	path = BLUESPAWN-unix-client/external/yara-rules
 	url = https://github.com/Yara-Rules/rules.git
 [submodule "BLUESPAWN-unix-client/external/tinyxml2"]
 	path = BLUESPAWN-unix-client/external/tinyxml2
