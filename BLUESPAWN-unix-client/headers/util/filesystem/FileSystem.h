@@ -12,6 +12,7 @@
 #include "util/linuxcompat.h"
 
 #include <dirent.h>
+#include <stdint.h>
 
 #define BUFSIZE 1024
 #define MD5LEN  16
@@ -82,6 +83,7 @@ namespace FileSystem {
 		 */ 
 	    ~FileObject();
 
+		//NOTE: user refers to user or group
 	    /**
 		 * @return can the user execute file
 		 */
@@ -96,6 +98,11 @@ namespace FileSystem {
 		 *@return can the file be written to by user
 		 */ 
 		bool CanWrite(const Permissions::Owner &user);
+
+		/**
+		 * @return can the file be written and read by the user
+		 */
+		bool CanReadWrite(const Permissions::Owner &user);
 
 		/**
 		 * @return can the file be deleted by user
@@ -293,7 +300,7 @@ namespace FileSystem {
 		*
 		* @return true if read successful, false if read unsuccessful
 		*/
-		bool Read(void* buffer, const unsigned long amount = -1, const long offset = 0, Punsigned int amountRead = nullptr) const;
+		bool Read(void* buffer, const unsigned long amount = -1, const long offset = 0, unsigned int * amountRead = nullptr) const;
 
 		/**
 		* Function to read from arbitrary offset in the file
@@ -305,7 +312,7 @@ namespace FileSystem {
 		*
 		* @return true if read successful, false if read unsuccessful
 		*/
-		AllocationWrapper Read(unsigned long amount = -1, long offset = 0, Punsigned int amountRead = nullptr) const;
+		AllocationWrapper Read(unsigned long amount = -1, long offset = 0, unsigned int * amountRead = nullptr) const;
 
 		/**
 		* Function to compute the MD5 hash of the file
@@ -379,8 +386,8 @@ namespace FileSystem {
 		 *
 		 * @return The size of the referenced file
 		 */
-		unsigned int64 GetFileSize() const;
-
+		unsigned __int64 GetFileSize() const;
+		
 		/**
 		 * Gets the file path (and thus its name)
 		 *

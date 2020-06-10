@@ -1,6 +1,9 @@
 #include "util/permissions/permissions.h"
 #include "util/log/Log.h"
 
+#include <shadow.h>
+#include <paths.h>
+
 namespace Permissions {
 
 	bool AccessIncludesAll(FileSystem::File& file) {
@@ -204,7 +207,55 @@ namespace Permissions {
 		wName = std::string(user->pw_name);
 		id = user->pw_uid;
 		gid = user->pw_gid;
+		homeDir = std::string(user->pw_dir);
 		bExists = true;
+	}
+
+	bool User::Delete() const{
+		/**
+		 * Essentially an implementation of userdel.  Likely not going to work as coded but just a "sketch"
+		 */
+
+		if(this->GetId() == 0){
+			LOG_ERROR("Cannot delete " << this->GetName() << ": User is root");
+			return false;
+		}else if(this->GetId() < 1000){
+			//TODO: Ask the user if they actually want to delete this user
+			//UIDS below 1000 are usually reserved for system use
+			if(true){
+				return false;
+			}
+		}
+
+		//now attempt to open the needed files
+		lckpwdf();
+		FileSystem::File shadow = FileSystem::File(_PATH_SHADOW);
+		FileSystem::File group = FileSystem::File("/etc/group"); 
+		FileSystem::File passwd = FileSystem::File("/etc/passwd");
+
+		if(!shadow.GetFileExists() || !group.GetFileExists() || !passwd.GetFileExists()){
+			LOG_ERROR("Error deleting user " << this->GetName() << ": Unable to find important files");
+			ulckpwdf();
+			return false;
+		}
+
+		if(!shadow.CanReadWrite(GetProcessOwner().value()) 
+			|| !passwd.CanReadWrite(GetProcessOwner().value()) 
+			|| !group.CanReadWrite(GetProcessOwner().value())){
+				LOG_ERROR("Unable to write or read to needed files.");
+				ulckpwdf();
+				return false;
+		}
+
+		
+
+
+		ulckpwdf();
+		return true;
+	}
+
+	std::string User::GetHomeDir() const{
+		return this->homeDir;
 	}
 
 	Group::Group(const std::string& name) {
@@ -253,6 +304,10 @@ namespace Permissions {
 			members.emplace_back(std::string(group->gr_mem[index]));
 			index++;
 		}
+	}
+
+	bool Group::Delete() const{
+
 	}
 
 	std::optional<Owner> GetProcessOwner() {

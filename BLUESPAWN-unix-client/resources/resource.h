@@ -1,21 +1,15 @@
-//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by BLUESPAWN-client.rc
-//
-#define YaraSevere                      6
-#define YaraSevere2                     7
-#define YaraIndicators                  8
-#define GoodSIP                         9
-#define GoodTrustProviders              10
-#define IDR_YARARULE2                   101
+#pragma once
+#include <stdint.h>
 
-// Next default values for new objects
-// 
-#ifdef APSTUDIO_INVOKED
-#ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        103
-#define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1001
-#define _APS_NEXT_SYMED_VALUE           101
-#endif
-#endif
+extern uint8_t indicators_data[];
+
+extern uint8_t indicators_data_size[];
+
+extern uint8_t indicators_data_end[];
+
+extern uint8_t severe_data[];
+
+extern uint8_t severe_data_size[];
+
+extern uint8_t severe_data_end[];
+

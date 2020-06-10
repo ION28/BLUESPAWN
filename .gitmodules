@@ -1,24 +1,15 @@
-[submodule "BLUESPAWN-client/external/cxxopts"]
-	path = BLUESPAWN-client/external/cxxopts
+[submodule "BLUESPAWN-unix-client/external/cxxopts"]
+	path = BLUESPAWN-unix-client/external/cxxopts
 	url = https://github.com/jarro2783/cxxopts
-[submodule "BLUESPAWN-client/external/krabsetw"]
-	path = BLUESPAWN-client/external/krabsetw
-	url = https://github.com/microsoft/krabsetw
-[submodule "BLUESPAWN-client/external/pe-sieve"]
-	path = BLUESPAWN-client/external/pe-sieve
-	url = https://github.com/hasherezade/pe-sieve
-[submodule "BLUESPAWN-client/external/yara"]
-	path = BLUESPAWN-client/external/yara
+[submodule "BLUESPAWN-unix-client/external/yara"]
+	path = BLUESPAWN-unix-client/external/yara
 	url = https://github.com/VirusTotal/yara
-[submodule "BLUESPAWN-client/external/yara-rules"]
-	path = BLUESPAWN-client/external/yara-rules
+[submodule "BLUESPAWN-unix-client/external/yara-rules"]
+	path = BLUESPAWN-unix-client/external/yara-rules
 	url = https://github.com/Yara-Rules/rules.git
-[submodule "BLUESPAWN-client/external/tinyxml2"]
-	path = BLUESPAWN-client/external/tinyxml2
+[submodule "BLUESPAWN-unix-client/external/tinyxml2"]
+	path = BLUESPAWN-unix-client/external/tinyxml2
 	url = https://github.com/leethomason/tinyxml2
-[submodule "vcpkg"]
-	path = vcpkg
-	url = https://github.com/Microsoft/vcpkg.git
-[submodule "BLUESPAWN-client/external/signature-base"]
-	path = BLUESPAWN-client/external/signature-base
+[submodule "BLUESPAWN-unix-client/external/signature-base"]
+	path = BLUESPAWN-unix-client/external/signature-base
 	url = https://github.com/Neo23x0/signature-base

@@ -332,7 +332,7 @@ namespace FileSystem{
 		return true;
 	}
 
-	bool File::Read(void* buffer, const unsigned long amount, const long offset, Punsigned int amountRead) const {
+	bool File::Read(void* buffer, const unsigned long amount, const long offset, unsigned int * amountRead) const {
 		SCOPE_LOCK(this->SetFilePointer(0), ResetFilePointer); //TODO: again - fix this
 		LOG_VERBOSE(2, "Attempting to read " << amount << " bytes from " << FilePath << " at offset " << offset);
 		if(!bFileExists) {
@@ -365,9 +365,9 @@ namespace FileSystem{
 		return true;
 	}
 
-	AllocationWrapper File::Read(unsigned long amount, long offset, Punsigned int amountRead) const {
+	AllocationWrapper File::Read(unsigned long amount, long offset, unsigned int * amountRead) const {
 		if(amount == -1){
-			amount = GetFileSize();
+			amount = this->GetFileSize();
 		}
 		AllocationWrapper memory = { malloc(amount + 1), amount + 1, AllocationWrapper::MALLOC };
 		bool success = Read(memory.GetAsPointer(), amount, offset, amountRead);
@@ -573,7 +573,6 @@ namespace FileSystem{
 	}
 
 	bool FileSystem::File::ChangeFileLength(const long length) const {
-		
 		return ftruncate(hFile, length) == 0;
 	}
 
@@ -928,6 +927,10 @@ namespace FileSystem{
 		}
 
 		return GetDirectory().value().CanDeleteContents(user);
+	}
+
+	bool FileObject::CanReadWrite(const Permissions::Owner &user){
+		return CanRead(user) && CanWrite(user);
 	}
 
 	std::optional<Folder> FileObject::GetDirectory() const{

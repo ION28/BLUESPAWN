@@ -142,11 +142,14 @@ namespace Permissions{
 		 * @return The name of the owner
 		 */
 		virtual std::string ToString() const;
+
+		virtual bool Delete() const;
 	};
 
 	class User : public Owner {
 	private:
 	    gid_t gid; //Id of the group the user belongs to
+		std::string homeDir;
 		void SetupClass(const struct passwd * user);
 	public: 
 
@@ -171,6 +174,10 @@ namespace Permissions{
 		 * @return the group of the user
 		 */
 		gid_t GetGroup() const;
+
+		virtual bool Delete() const;
+
+		std::string GetHomeDir() const;
 	};
 
 	class Group : public Owner {
@@ -200,6 +207,8 @@ namespace Permissions{
 		 * @return a list of the members of the group
 		 */ 
 		std::vector<std::string> GetMembers() const;
+
+		virtual bool Delete() const;
 	};
 
 	/**

@@ -174,19 +174,19 @@ YaraScanResult YaraScanner::ScanFile(const FileSystem::File& file) const {
 
 	arg.type = arg.Severe;
 	auto status = yr_rules_scan_mem(KnownBad, reinterpret_cast<const uint8_t*>((void*) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
-	if(status != ERROR_SUCCESS){
+	if(status != 0){
 		arg.result.status = YaraStatus::Failure;
 	}
 	
 	arg.type = arg.Severe;
 	status = yr_rules_scan_mem(KnownBad2, reinterpret_cast<const uint8_t*>((void*) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
-	if(status != ERROR_SUCCESS){
+	if(status != 0){
 		arg.result.status = YaraStatus::Failure;
 	}
 
 	arg.type = arg.Indicator;
 	status = yr_rules_scan_mem(Indicators, reinterpret_cast<const uint8_t*>((void*) memory), memory.GetSize(), 0, YR_CALLBACK_FUNC(YaraCallbackFunction), &arg, 0);
-	if(status != ERROR_SUCCESS){
+	if(status != 0){
 		arg.result.status = YaraStatus::Failure;
 	}
 
