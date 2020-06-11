@@ -33,16 +33,22 @@ ScanInfo::ScanInfo() :
 	associations{},
 	bAssociativeStale{ true }{}
 
-const std::unordered_map<std::reference_wrapper<Detection>, Association>& ScanInfo::GetAssociations(){
-	return associations;
+std::unordered_map<std::reference_wrapper<Detection>, Association> ScanInfo::GetAssociations(){
+	EnterCriticalSection(hGuard);
+	auto copy{ associations };
+	LeaveCriticalSection(hGuard);
+	return copy;
 }
 
 Certainty ScanInfo::GetCertainty(){ 
 	if(bAssociativeStale){
 		cAssociativeCertainty = Certainty::None;
+		
+		EnterCriticalSection(hGuard);
 		for(auto& pair : associations){
 			cAssociativeCertainty = cAssociativeCertainty + (pair.first.get().info.certainty * pair.second);
 		}
+		LeaveCriticalSection(hGuard);
 
 		bAssociativeStale = false;
 	}
@@ -50,6 +56,7 @@ Certainty ScanInfo::GetCertainty(){
 };
 
 void ScanInfo::AddAssociation(IN CONST std::reference_wrapper<Detection>& node, IN CONST Association& a){
+	EnterCriticalSection(hGuard);
 	bAssociativeStale = true;
 	if(associations.find(node) == associations.end()){
 		associations.emplace(node, a);
@@ -57,6 +64,7 @@ void ScanInfo::AddAssociation(IN CONST std::reference_wrapper<Detection>& node, 
 		auto& assoc{ associations.at(node) };
 		assoc = assoc + a;
 	}
+	LeaveCriticalSection(hGuard);
 }
 
 void ScanInfo::SetCertainty(IN CONST Certainty& certainty){
@@ -65,4 +73,8 @@ void ScanInfo::SetCertainty(IN CONST Certainty& certainty){
 
 void ScanInfo::AddCertainty(IN CONST Certainty& certainty){
 	this->certainty = this->certainty + certainty;
+}
+
+ScanInfo::operator LPCRITICAL_SECTION() const {
+	return hGuard;
 }

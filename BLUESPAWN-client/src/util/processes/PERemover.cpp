@@ -29,12 +29,12 @@ PERemover::PERemover(DWORD dwPID, const std::wstring& wsImageName) :
 
 bool PERemover::RemoveImage(){
     Linker::NtSuspendProcess(hProcess);
-    LOG_VERBOSE(1, "Suspended process with PID " << GetProcessId(hProcess) << " to remove image at " << lpBaseAddress);
+    LOG_VERBOSE(2, "Suspended process with PID " << GetProcessId(hProcess) << " to remove image at " << lpBaseAddress);
 
     SCOPE_LOCK(Linker::NtResumeProcess(hProcess), RESUME_PROCESS);
 
     if(CheckThreads() && AdjustPointers() && WipeMemory()){
-        LOG_INFO("Successfully removed image at " << lpBaseAddress << " from process with PID " << GetProcessId(hProcess));
+        LOG_INFO(2, "Successfully removed image at " << lpBaseAddress << " from process with PID " << GetProcessId(hProcess));
         return true;
     }
 
@@ -108,7 +108,7 @@ bool PERemover::WalkThreadBack(const HandleWrapper& hThread, DWORD dwTID){
 
     if(AddressIsInRegion(reinterpret_cast<LPVOID>(context.Rip))){
         if(TerminateThread(hThread, 0)){
-            LOG_INFO("Thread with TID " << dwTID << " was executing malicious code at " << reinterpret_cast<LPVOID>(context.Rip) << " and was terminated");
+            LOG_INFO(1, "Thread with TID " << dwTID << " was executing malicious code at " << reinterpret_cast<LPVOID>(context.Rip) << " and was terminated");
             return true;
         } else {
             LOG_ERROR("Thread with TID " << dwTID << " was executing malicious code at " << reinterpret_cast<LPVOID>(context.Rip) << " but couldn't terminated" << " (Error " << GetLastError() << ")");
@@ -136,7 +136,7 @@ bool PERemover::WalkThreadBack(const HandleWrapper& hThread, DWORD dwTID){
     while(StackWalk64(dwMachineType, hProcess , hThread, &stack, &context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr)){
         if(AddressIsInRegion(reinterpret_cast<LPVOID>(stack.AddrPC.Offset))){
             if(TerminateThread(hThread, 0)){
-                LOG_INFO("Thread with TID " << dwTID << " was executing malicious code at " << reinterpret_cast<LPVOID>(stack.AddrPC.Offset) << " and was terminated");
+                LOG_INFO(1, "Thread with TID " << dwTID << " was executing malicious code at " << reinterpret_cast<LPVOID>(stack.AddrPC.Offset) << " and was terminated");
                 return true;
             } else {
                 LOG_ERROR("Thread with TID " << dwTID << " was executing malicious code at " << reinterpret_cast<LPVOID>(stack.AddrPC.Offset) << " but couldn't terminated" << " (Error " << GetLastError() << ")");

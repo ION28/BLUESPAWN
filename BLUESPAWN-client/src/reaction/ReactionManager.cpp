@@ -15,6 +15,6 @@ void ReactionManager::React(IN Detection& detection) CONST {
 	LeaveCriticalSection(detection.hGuard);
 }
 
-void ReactionManager::AddHandler(IN CONST Reaction& reaction){
-	reactions.emplace_back(std::make_unique<Reaction>(reaction));
+void ReactionManager::AddHandler(IN std::unique_ptr<Reaction>&& reaction){
+	reactions.emplace_back(std::move(reaction));
 }

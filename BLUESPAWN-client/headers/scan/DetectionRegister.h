@@ -43,6 +43,12 @@ class DetectionRegister {
 		IN CONST Certainty& level = Certainty::None OPTIONAL
 	);
 
+	/// Used to update the certainty of a detection, possibly triggering assocation scans
+	void UpdateDetectionCertainty(
+		IN CONST std::reference_wrapper<Detection>& detection,
+		IN CONST Certainty& level = Certainty::None OPTIONAL
+	);
+
 public:
 
 	/**

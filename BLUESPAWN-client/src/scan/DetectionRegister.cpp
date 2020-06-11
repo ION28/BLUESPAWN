@@ -20,8 +20,8 @@ void DetectionRegister::AddDetectionAsync(
     if(detection.get().info.GetCertainty() >= threshold){
         for(auto& scan : Scanner::scanners){
             for(auto& pair : scan.GetAssociatedDetections(detection.get())){
-                Detection copy{ pair.first };
-                detection.get().info.AddAssociation(AddDetection(std::move(copy), Certainty::None), pair.second);
+                detection.get().info.AddAssociation(pair.first, pair.second);
+                pair.first.get().info.AddAssociation(detection.get(), pair.second);
             }
         }
     }
@@ -41,6 +41,47 @@ void DetectionRegister::AddDetectionAsync(
     Bluespawn::reaction.React(detection.get());
 }
 
+void DetectionRegister::UpdateDetectionCertainty(
+    IN CONST std::reference_wrapper<Detection>& detection, IN CONST Certainty& certainty){
+
+    EnterCriticalSection(detection.get());
+
+    // if the detection is queued and we can enter its critical section, it hasn't been scanned yet
+    bool queued{ false };
+    EnterCriticalSection(hQueueGuard);
+    if(queue.find(detection) != queue.end){
+        detection.get().info.AddCertainty(certainty);
+        queued = true;
+    }
+    LeaveCriticalSection(hQueueGuard);
+
+    // The detection has been scanned
+    if(!queued){
+        bool below{ !(detection.get().info.GetCertainty() >= threshold) };
+
+        detection.get().info.AddCertainty(certainty);
+        
+        // This update caused it to pass the threshold, so scan for assocations
+        if(below && detection.get().info.GetCertainty() >= threshold){
+            for(auto& scan : Scanner::scanners){
+                for(auto& pair : scan.GetAssociatedDetections(detection.get())){
+                    Detection copy{ pair.first };
+                    detection.get().info.AddAssociation(AddDetection(std::move(copy), Certainty::None), pair.second);
+                }
+            }
+        } 
+
+        // Existing associations' associativity scores are now stale
+        else{
+            for(auto& pair : detection.get().info.associations){
+                pair.first.get().info.bAssociativeStale = true;
+            }
+        }
+    }
+
+    LeaveCriticalSection(detection.get());
+}
+
 std::reference_wrapper<Detection> DetectionRegister::AddDetection(IN Detection&& detection, 
                                                                   IN CONST Certainty& certainty){
     EnterCriticalSection(hScannedGuard);
@@ -48,10 +89,9 @@ std::reference_wrapper<Detection> DetectionRegister::AddDetection(IN Detection&&
     if(itr != scanned.end()){
         LeaveCriticalSection(hScannedGuard);
         auto ref{ *itr };
-        EnterCriticalSection(ref.get());
-        ref.get().info.AddCertainty(certainty);
-        LeaveCriticalSection(ref.get());
-        return std::reference_wrapper<Detection>{ ref };
+        ThreadPool::GetInstance().EnqueueTask(std::bind(&DetectionRegister::UpdateDetectionCertainty, this, ref, 
+                                                        certainty));
+        return ref;
     }
     LeaveCriticalSection(hScannedGuard);
 
@@ -60,9 +100,8 @@ std::reference_wrapper<Detection> DetectionRegister::AddDetection(IN Detection&&
     if(itr != queue.end()){
         LeaveCriticalSection(hQueueGuard);
         auto ref{ *itr };
-        EnterCriticalSection(ref.get());
-        ref.get().info.AddCertainty(certainty);
-        LeaveCriticalSection(ref.get());
+        ThreadPool::GetInstance().EnqueueTask(std::bind(&DetectionRegister::UpdateDetectionCertainty, this, ref,
+                                                        certainty));
         return ref;
     }
     LeaveCriticalSection(hQueueGuard);

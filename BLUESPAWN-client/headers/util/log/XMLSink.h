@@ -49,8 +49,7 @@ namespace Log {
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
 		 */
-		virtual void LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info = std::nullopt,
-			const std::vector<std::shared_ptr<DETECTION>>& detections = {});
+		virtual void LogMessage(const LogLevel& level, const std::wstring& message);
 
 		/**
 		 * Compares this DebugSink to another LogSink. Currently, as only one debug console is supported,

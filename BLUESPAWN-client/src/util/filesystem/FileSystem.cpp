@@ -579,7 +579,7 @@ namespace FileSystem{
 		if(File::GetFileInSystemCatalogs()){
 			auto catalog{ GetCatalog(hFile) };
 			if(catalog){
-				auto signer{ GetCertificateIssuer(*catalog) };
+				auto signer{ File{ *catalog }.GetCertificateIssuer() };
 				if(signer){
 					return ToLowerCaseW(*signer).find(L"microsoft") != std::wstring::npos;
 				} else{
@@ -589,7 +589,7 @@ namespace FileSystem{
 				LOG_ERROR("Unable to get the catalog for " << FilePath << ": " << SYSTEM_ERROR);
 			}
 		} else{
-			auto signer{ GetCertificateIssuer(FilePath) };
+			auto signer{ GetCertificateIssuer() };
 			if(signer){
 				return ToLowerCaseW(*signer).find(L"microsoft") != std::wstring::npos;
 			} else{

@@ -35,6 +35,6 @@ public:
 	 * @param handler A reaction to be added to the manager's list of reactions
 	 */
 	void AddHandler(
-		IN CONST Reaction& reaction
+		IN std::unique_ptr<Reaction>&& reaction
 	);
 };

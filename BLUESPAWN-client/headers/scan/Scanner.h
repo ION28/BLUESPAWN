@@ -18,7 +18,7 @@ public:
 	 *
 	 * @return A vector of detections associated with the provided detection
 	 */
-	virtual std::unordered_map<Detection, Association> GetAssociatedDetections(
+	virtual std::unordered_map<std::reference_wrapper<Detection>, Association> GetAssociatedDetections(
 		IN CONST Detection& detection
 	);
 

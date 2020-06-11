@@ -6,15 +6,31 @@
 
 namespace Reactions{
 
-	class CarveProcessReaction : public Reaction {
-	private:
-		const IOBase& io;
+	class CarveMemoryReaction : public Reaction {
 
-		/// Handlers for detections that log the detection
-		void CarveProcessIdentified(std::shared_ptr<PROCESS_DETECTION> detection);
+		/**
+		 * Reacts to a registry detection by carving infected memory sections from a process
+		 * Note that this will cause a crash if function pointers are stored to the infected
+		 * memory for functions with more than four arguments in x64 or any arguments with 
+		 * stdcall functions in x86.
+		 *
+		 * @param detection The detection to which the reaction will be applied.
+		 */
+		virtual void React(
+			IN Detection& detection
+		);
 
-	public:
-		CarveProcessReaction(const IOBase& io);
+		/**
+		 * Function to determine if this reaction applies to a detection. This ensures that
+		 * the detection is not stale and that it references a registry value.
+		 *
+		 * @param detection The detection to check
+		 *
+		 * @return True if this reaction applies; false otherwise
+		 */
+		virtual bool Applies(
+			IN CONST Detection& detection
+		);
 	};
 }
 

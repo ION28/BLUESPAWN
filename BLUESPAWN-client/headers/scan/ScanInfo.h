@@ -1,11 +1,16 @@
 #pragma once
 
+#include <windows.h>
+
 #include <memory>
 #include <vector>
 #include <map>
 #include <atomic>
 
+#include "common/wrappers.hpp"
+
 class Detection;
+class Scanner;
 
 /// Represents the degree of certainty that a detection is malicious
 class Certainty {
@@ -54,14 +59,12 @@ public:
 typedef Certainty Association;
 
 /**
- * A ScanNode is the core unit of BLUESPAWN's scan functionality. Each detection is converted to a 
- * ScanNode. From there, each scan node identifies other detections related to its detection. These
- * detections and associations between them will form a web/graph of detections, which is used to
- * identify as much malicious activity as possible.
+ * A ScanInfo is the core unit of BLUESPAWN's scan functionality. This records information
+ * such as associations, resulting certainty from scans, and associative certainty.
  */
 class ScanInfo {
 
-	/// A mapping of detections to their association with the current node.
+	/// A mapping of detections to their association strength with the current node.
 	std::unordered_map<std::reference_wrapper<Detection>, Association> associations;
 
 	/// The degree of certainty that the detection referenced by this scan node is malicious
@@ -75,7 +78,11 @@ class ScanInfo {
 	/// Indicates whether cAssociativeCertainty has gone stale and must be recalculated
 	bool bAssociativeStale;
 
+	/// Guards access to `associations`
+	CriticalSection hGuard;
+
 	friend class DetectionRegister;
+	friend class Scanner;
 
 	/**
 	 * Adds an association between this node and the given node with the given strength. Note that
@@ -98,11 +105,11 @@ public:
 	ScanInfo();
 
 	/**
-	 * Gets a reference to the the associations this node has
+	 * Gets a map of the associations of this node. Acquire hGuard before reading from the map.
 	 *
-	 * @return A reference to the the associations this node has
+	 * @return The associations of this node
 	 */
-	const std::unordered_map<std::reference_wrapper<Detection>, Association>& GetAssociations();
+	std::unordered_map<std::reference_wrapper<Detection>, Association> GetAssociations();
 
 	/**
 	 * Retrieves the certainty that the detection this is a part of is malicious. If any association has
@@ -131,4 +138,11 @@ public:
 	void AddCertainty(
 		IN CONST Certainty& certainty
 	);
+
+	/**
+	 * Implicit cast to a CRITICAL_SECTION pointer for use in synchronization functions
+	 *
+	 * @return hGuard
+	 */
+	operator LPCRITICAL_SECTION() const;
 };

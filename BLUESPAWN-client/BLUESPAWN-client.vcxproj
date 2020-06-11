@@ -41,6 +41,7 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h" />
     <ClInclude Include="headers\reaction\CarveMemory.h" />
+    <ClInclude Include="headers\reaction\Reaction.h" />
     <ClInclude Include="headers\reaction\RemoveValue.h" />
     <ClInclude Include="headers\reaction\SuspendProcess.h" />
     <ClInclude Include="headers\hunt\RegistryHunt.h" />
@@ -147,8 +148,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="headers\util\processes\Analyzer.h" />
-    <ClInclude Include="headers\reaction\Log.h" />
-    <ClInclude Include="headers\reaction\Reaction.h" />
+    <ClInclude Include="headers\reaction\ReactionManager.h" />
     <ClInclude Include="headers\util\processes\PERemover.h" />
     <ClInclude Include="headers\util\processes\ProcessChecker.h" />
     <ClInclude Include="headers\util\processes\ProcessUtils.h" />
@@ -275,8 +275,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\util\processes\Analyzer.cpp" />
-    <ClCompile Include="src\reaction\ReactLog.cpp" />
-    <ClCompile Include="src\reaction\Reaction.cpp" />
+    <ClCompile Include="src\reaction\ReactionManager.cpp" />
     <ClCompile Include="src\util\processes\PERemover.cpp" />
     <ClCompile Include="src\util\processes\ProcessUtils.cpp" />
     <ClInclude Include="resources\resource.h" />

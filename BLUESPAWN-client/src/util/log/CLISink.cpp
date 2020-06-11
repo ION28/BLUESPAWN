@@ -52,7 +52,7 @@ namespace Log {
 					}
 				}
 				if(message.size() > 0){
-					std::cout << "\tAssociated Message: " << message << std::endl;
+					std::wcout << L"\tAssociated Message: " << message << std::endl;
 				}
 			} else {
 				std::wcout << CLISink::MessagePrepends[static_cast<WORD>(level.severity)] << " ";

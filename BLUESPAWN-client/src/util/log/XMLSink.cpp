@@ -123,7 +123,7 @@ namespace Log{
 		return detect;
 	}
 
-	void XMLSink::LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info, const std::vector<std::shared_ptr<DETECTION>>& detections){
+	void XMLSink::LogMessage(const LogLevel& level, const std::wstring& message){
 		auto mutex = AcquireMutex(hMutex);
 		if(level.Enabled() && level.severity == Severity::LogHunt && info){
 			auto hunt = XMLDoc.NewElement("hunt");

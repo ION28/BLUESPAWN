@@ -12,18 +12,28 @@ DEFINE_FUNCTION(NTSTATUS, NtSuspendProcess, NTAPI, IN HANDLE ProcessHandle);
 namespace Reactions{
 
 	class SuspendProcessReaction : public Reaction {
-	private:
-		const IOBase& io;
 
-		bool CheckModules(const HandleWrapper& process, const std::wstring& file) const;
+		/**
+		 * Reacts to a process detection by suspeding the process
+		 *
+		 * @param detection The detection to which the reaction will be applied.
+		 */
+		virtual void React(
+			IN Detection& detection
+		);
 
-		/// Handlers for detections that log the detection
-		void SuspendFileIdentified(std::shared_ptr<FILE_DETECTION> detection);
-		void SuspendProcessIdentified(std::shared_ptr<PROCESS_DETECTION> detection);
-		void SuspendServiceIdentified(std::shared_ptr<SERVICE_DETECTION> detection);
-
-	public:
-		SuspendProcessReaction(const IOBase& io);
+		/**
+		 * Function to determine if this reaction applies to a detection. This ensures that
+		 * the detection is not stale and that it references a process.
+		 *
+		 * @param detection The detection to check
+		 *
+		 * @return True if this reaction applies; false otherwise
+		 */
+		virtual bool Applies(
+			IN CONST Detection& detection
+		);
 	};
 }
+
 
