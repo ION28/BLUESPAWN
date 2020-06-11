@@ -8,7 +8,9 @@ HuntInfo::HuntInfo(const std::string& HuntName, Aggressiveness HuntAggressivenes
 	HuntTactics{ HuntTactics },
 	HuntCategories{ HuntCategories },
 	HuntDatasources{ HuntDatasources }{
-	GetSystemTime(&HuntStartTime);
+	time_t t = time(NULL);
+	struct tm * times = localtime(&t);
+	memcpy(&HuntStartTime, times, sizeof(struct tm));
 }
 
 Hunt::Hunt(const std::string& name) : 

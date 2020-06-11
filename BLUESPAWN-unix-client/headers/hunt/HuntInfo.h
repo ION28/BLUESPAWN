@@ -1,4 +1,5 @@
 #pragma once
+#include <time.h>
 
 enum class Tactic {
 	InitialAccess = 1,
@@ -51,6 +52,6 @@ struct HuntInfo {
 	unsigned int HuntTactics;
 	unsigned int HuntCategories;
 	unsigned int HuntDatasources;
-	SYSTEMTIME HuntStartTime;
+	struct tm HuntStartTime;
 	HuntInfo(const std::string& HuntName, Aggressiveness HuntAggressiveness, unsigned int HuntTactics, unsigned int HuntCategories, unsigned int HuntDatasources);
 };

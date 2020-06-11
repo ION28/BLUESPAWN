@@ -15,7 +15,7 @@ enum class EventType {
 };
 
 class Event {
-public:
+/*public:
 	EventType type;
 
 	void AddCallback(const std::function<void()>& callback);
@@ -74,4 +74,5 @@ public:
 	virtual bool Subscribe();
 
 	virtual bool operator==(const Event& e) const;
+	*/
 };

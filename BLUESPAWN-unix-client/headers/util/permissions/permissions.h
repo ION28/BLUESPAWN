@@ -15,19 +15,11 @@
 typedef mode_t ACCESS_MASK;
 namespace Permissions{
 
-	/**
-	* Functions to check if an access mask includes a permission
-	* 
-	* @param file - the file to check
-	* @param user - the user or group to check for
-	* @return true if the access mask includes the permission or ALL, false otherwise
-	*/
-	bool AccessIncludesAll(FileSystem::File &file);
-	bool AccessIncludesWrite(FileSystem::File &file, const Owner& user);
-	bool AccessIncludesRead(FileSystem::File &file, const Owner& user);
-	bool AccessIncludesExecute(FileSystem::File& file, const Owner& user);
-	bool AccessIncludesWriteOwner(FileSystem::File& file, const OwnerType type);
-	bool AccessIncludesDelete(FileSystem::File&, const Owner& user);
+
+	/*Enum for storing type of Owner an Owner object is*/
+	enum OwnerType {
+		NONE, USER, GROUP 
+	};
 
 	/**
 	* Function to add an access to an access mask
@@ -41,10 +33,6 @@ namespace Permissions{
 	void AccessAddWriteOwner(unsigned int& access, const OwnerType type);
 	void AccessAddDelete(unsigned int& access, const OwnerType type);
 
-	/*Enum for storing type of Owner an Owner object is*/
-	enum OwnerType {
-		NONE, USER, GROUP 
-	};
 
 	class Owner : public Loggable {
 	protected:

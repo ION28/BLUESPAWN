@@ -28,7 +28,13 @@ enum class HashType {
 
 //TODO: Make sure all files are closed, or delete is called.
 //NOTES: Linux filesystem api v1, in next iteration use fds when getting files from dirs
-namespace FileSystem {	
+namespace FileSystem {
+	//Just some forward declarations	
+	class FileObject;
+	class File;
+	class Folder;
+
+
 	/**
 	* Function to check if a file path is valid
 	*

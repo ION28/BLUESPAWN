@@ -7,6 +7,16 @@
 #include <memory>
 #include <optional>
 #include <functional>
+#include <sys/types.h>
+#include <unistd.h>
+
+#ifndef min
+#define min(x, y)  ((x < y) ? (x) : (y))
+#endif
+
+#ifndef max
+#define max(x, y)  ((x > y) ? (x) : (y))
+#endif
 
 template<class T>
 class GenericWrapper {
@@ -98,17 +108,17 @@ public:
 	}
 
 	template<class T>
-	std::optional<T> operator*() const {
-		return Dereference();
-	}
-
-	template<class T>
 	std::optional<T> Dereference() const {
 		if(AllocationSize < sizeof(T) || !Memory.has_value()){
 			return std::nullopt;
 		} else {
 			return *reinterpret_cast<T*>(pointer);
 		}
+	}
+
+	template<class T>
+	std::optional<T> operator*() const {
+		return Dereference();
 	}
 
 	std::optional<std::wstring> ReadWString() const {

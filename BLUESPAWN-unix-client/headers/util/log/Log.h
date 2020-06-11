@@ -120,7 +120,7 @@ namespace Log {
 		 *
 		 * @return a reference to this log message.
 		 */
-		LogMessage& operator<<(LPCSTR pointer);
+		LogMessage& operator<<(char* pointer);
 
 	protected:
 

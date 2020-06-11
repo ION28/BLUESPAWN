@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <string>
+#include <sys/types.h>
 
 /**
  * Used to define the scope of a hunt. Currently, this operates by requiring the programmer to

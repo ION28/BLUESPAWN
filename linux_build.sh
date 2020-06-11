@@ -56,7 +56,7 @@ create_resources()
 {
     cd BLUESPAWN-unix-client
     zip resources/indicators.bin resources/indicators.yar
-    zip resources/severe.bin resources/severe2.yar resrouces/severe.yar
+    zip resources/severe.bin resources/severe2.yar resources/severe.yar
 
     objcopy -I binary -O elf64-x86-64 resources/indicators.bin resources/indicators.o
     objcopy -I binary -O elf64-x86-64 resources/severe.bin resources/severe.o
@@ -83,7 +83,7 @@ compile_external()
     ./configure --enable-static
     make
     cp libyara/.libs/libyara.a $orig_dir/build/libyara.a
-    cd ../..
+    cd ../../..
 }
 
 cleanup_stuff()
