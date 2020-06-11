@@ -221,7 +221,7 @@ public:
 		if(offset > MemorySize){
 			return { nullptr, 0, process };
 		} else {
-			return { reinterpret_cast<T*>(PCHAR(address) + offset), MemorySize - offset, process };
+			return { reinterpret_cast<T*>(reinterpret_cast<char*>(address) + offset), MemorySize - offset, process };
 		}
 	}
 

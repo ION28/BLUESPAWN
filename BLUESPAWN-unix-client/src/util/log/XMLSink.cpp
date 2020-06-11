@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include "common/Utils.h"
+#include <pthread.h>
 
 namespace Log{
 
@@ -36,16 +37,16 @@ namespace Log{
 	}
 
 	XMLSink::XMLSink(const std::string& wFileName) :
-		hMutex{ CreateMutexW(nullptr, false, nullptr) },
 		Root { XMLDoc.NewElement("bluespawn") },
-		wFileName{ wFileName },
-		thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr) }{
+		wFileName{ wFileName }{
+		pthread_mutex_init(&hMutex, NULL);
+		//TODO: init thread here
 		XMLDoc.InsertEndChild(Root);
 	}
 
 	XMLSink::~XMLSink(){
-		XMLDoc.SaveFile(WidestringToString(wFileName).c_str());
-		TerminateThread(thread, 0);
+		XMLDoc.SaveFile(wFileName.c_str());
+		//TerminateThread(thread, 0);
 	}
 
 	tinyxml2::XMLElement* CreateDetctionXML(const std::shared_ptr<DETECTION>& detection, tinyxml2::XMLDocument& XMLDoc){

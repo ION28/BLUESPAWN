@@ -237,7 +237,7 @@ namespace Permissions {
 	}
 
 	bool Group::Delete() const{
-
+		return false;
 	}
 
 	std::optional<Owner> GetProcessOwner() {
