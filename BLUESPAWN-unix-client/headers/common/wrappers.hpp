@@ -9,14 +9,7 @@
 #include <functional>
 #include <sys/types.h>
 #include <unistd.h>
-
-#ifndef min
-#define min(x, y)  ((x < y) ? (x) : (y))
-#endif
-
-#ifndef max
-#define max(x, y)  ((x > y) ? (x) : (y))
-#endif
+#include <algorithm>
 
 template<class T>
 class GenericWrapper {
@@ -118,7 +111,7 @@ public:
 
 	template<class T>
 	std::optional<T> operator*() const {
-		return Dereference();
+		return Dereference<T>();
 	}
 
 	std::optional<std::wstring> ReadWString() const {
@@ -235,7 +228,7 @@ public:
 	bool CompareMemory(MemoryWrapper<T> memory) const {
 		auto data1 = Dereference();
 		auto data2 = memory.Dereference();
-		return !memcmp(&data1, &data2, min(memory.MemorySize, MemorySize));
+		return !memcmp(&data1, &data2, std::min(memory.MemorySize, MemorySize));
 	}
 
 	bool Protect(unsigned int protections, size_t size = -1){
@@ -252,7 +245,7 @@ public:
 			int maxIdx = 10;
 			char* memory = new char[maxIdx * 2];
 			bool valid = false;
-			while(!valid && !ReadProcessMemory(process, address, memory, maxIdx = min(maxIdx * 2, MemorySize), nullptr)){
+			while(!valid && !ReadProcessMemory(process, address, memory, maxIdx = std::min(reinterpret_cast<size_t>(maxIdx * 2), MemorySize), nullptr)){
 				for(; idx < maxIdx; idx++){
 					if(memory[idx] == 0){
 						valid = true;
@@ -278,7 +271,7 @@ public:
 			int maxIdx = 10;
 			wchar_t* memory = new wchar_t[maxIdx * 2];
 			bool valid = false;
-			while(!valid && !ReadProcessMemory(process, address, memory, (maxIdx = min(maxIdx * 2, MemorySize / sizeof(wchar_t))) * sizeof(wchar_t), nullptr)){
+			while(!valid && !ReadProcessMemory(process, address, memory, (maxIdx = std::min(reinterpret_cast<size_t>(maxIdx * 2), MemorySize / sizeof(wchar_t))) * sizeof(wchar_t), nullptr)){
 				for(; idx < maxIdx; idx++){
 					if(memory[idx] == 0){
 						valid = true;
@@ -299,8 +292,9 @@ public:
 	operator bool() const { return address; }
 	bool operator !() const { return !address; }
 
-	AllocationWrapper ToAllocationWrapper(unsigned int size = MemorySize){
-		size = min(size, MemorySize);
+	AllocationWrapper ToAllocationWrapper(unsigned int size = -1){
+		if(size == -1) size = MemorySize;
+		size = std::min(reinterpret_cast<size_t>(size), MemorySize);
 		AllocationWrapper wrapper{ malloc(size), size, AllocationWrapper::MALLOC };
 		memmove(wrapper, address, size);
 		return wrapper;

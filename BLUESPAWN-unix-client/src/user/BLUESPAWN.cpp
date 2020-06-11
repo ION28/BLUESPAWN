@@ -11,6 +11,7 @@
 #include "reaction/DeleteFile.h"
 #include "reaction/QuarantineFile.h"
 #include "util/permissions/permissions.h"
+#include "reaction/Log.h"
 
 #include "monitor/ETW_Wrapper.h"
 
@@ -27,6 +28,7 @@
 #pragma warning(pop)
 
 #include <iostream>
+#include <cmath>
 
 const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{ io };
@@ -65,11 +67,12 @@ void Bluespawn::monitor_system(Aggressiveness aHuntLevel) {
 	Bluespawn::io.InformUser("Monitoring the system");
 	huntRecord.SetupMonitoring(aHuntLevel, reaction);
 
-	HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, "Local\\FlushLogs") };
+	/*HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, "Local\\FlushLogs") };
 	while (true) {
 		SetEvent(hRecordEvent);
 		Sleep(5000);
-	}
+	}*/
+	//TODO: port above
 }
 
 void Bluespawn::SetReaction(const Reaction& reaction){
@@ -183,7 +186,7 @@ int main(int argc, char* argv[]){
 				Log::AddHuntSink(DbgSink);
 				if(result.count("debug")) Log::AddSink(DbgSink);
 			} else {
-				bluespawn.io.AlertUser("Unknown log sink \"" + StringToWidestring(sink) + "\"", INFINITY, ImportanceLevel::MEDIUM);
+				bluespawn.io.AlertUser("Unknown log sink \"" + sink + "\"", -1, ImportanceLevel::MEDIUM);
 			}
 		}
 
@@ -214,7 +217,7 @@ int main(int argc, char* argv[]){
 				if(reactions.find(reaction) != reactions.end()){
 					combined.Combine(reactions[reaction]);
 				} else {
-					bluespawn.io.AlertUser("Unknown reaction \"" + StringToWidestring(reaction) + "\"", INFINITY, ImportanceLevel::MEDIUM);
+					bluespawn.io.AlertUser("Unknown reaction \"" + reaction + "\"", -1, ImportanceLevel::MEDIUM);
 				}
 			}
 
@@ -240,7 +243,7 @@ int main(int argc, char* argv[]){
 			else {
 				LOG_ERROR("Error " << sHuntLevelFlag << " - Unknown level. Please specify either Cursory, Normal, or Intensive");
 				LOG_ERROR("Will default to Cursory for this run.");
-				Bluespawn::io.InformUser("Error " + StringToWidestring(sHuntLevelFlag) + " - Unknown level. Please specify either Cursory, Normal, or Intensive");
+				Bluespawn::io.InformUser("Error " + sHuntLevelFlag + " - Unknown level. Please specify either Cursory, Normal, or Intensive");
 				Bluespawn::io.InformUser("Will default to Cursory.");
 				aHuntLevel = Aggressiveness::Cursory;
 			}

@@ -2,7 +2,7 @@
 
 namespace EventLogs {
 
-	std::string EventLogItem::GetProperty(std::string prop) const {
+	/*std::string EventLogItem::GetProperty(std::string prop) const {
 		std::string val;
 
 		auto it = this->props.find(prop);
@@ -51,6 +51,6 @@ namespace EventLogs {
 	}
 	void EventLogItem::SetEventRecordID(unsigned int id) {
 		this->eventRecordID = id;
-	}
+	}*/
 
 }

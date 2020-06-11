@@ -10,7 +10,6 @@
 #include "util/linuxcompat.h"
 #include "util/log/Loggable.h"
 #include "common/wrappers.hpp"
-#include "util/filesystem/FileSystem.h"
 
 typedef mode_t ACCESS_MASK;
 namespace Permissions{
@@ -204,6 +203,7 @@ namespace Permissions{
 	*
 	* @return An Owner object representing the owner of the Bluespawn process, 
 	*	or std::nullopt if the function failed
+	*   NOTE: wont ever fail - update
 	*/
 	std::optional<Owner> GetProcessOwner();
 

@@ -12,7 +12,7 @@ EventManager& EventManager::GetInstance(){
 }
 
 unsigned int EventManager::SubscribeToEvent(const std::shared_ptr<Event>& e, const std::function<void()>& callback) {
-	unsigned int status = ERROR_SUCCESS;
+	/*unsigned int status = ERROR_SUCCESS;
 
 	for(auto evt : vEventList){
 		if(*evt == *e){
@@ -27,5 +27,7 @@ unsigned int EventManager::SubscribeToEvent(const std::shared_ptr<Event>& e, con
 
 	vEventList.push_back(evt);
 
-	return status;
+	return status;*/
+
+	return 0;
 }

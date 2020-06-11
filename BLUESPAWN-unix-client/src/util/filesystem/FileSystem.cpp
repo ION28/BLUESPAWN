@@ -572,11 +572,11 @@ namespace FileSystem{
 		return true;
 	}
 
-	bool FileSystem::File::ChangeFileLength(const long length) const {
+	bool File::ChangeFileLength(const long length) const {
 		return ftruncate(hFile, length) == 0;
 	}
 
-	unsigned int64 File::GetFileSize() const {
+	uint64_t File::GetFileSize() const {
 		if(!bFileExists)
 		    return 0;
 		loff_t size = lseek64(hFile, 0L, SEEK_END);

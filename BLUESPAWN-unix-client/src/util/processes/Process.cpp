@@ -27,7 +27,7 @@ namespace Process{
             }
         }
 
-        strncat(path, "/exe", PATH_MAX + 1);
+        strncat(path, "/exe", PATH_MAX);
         char linkbuf[PATH_MAX + 1];
         if(readlink(path, linkbuf, PATH_MAX + 1) < 0){
             LOG_ERROR("Unable to read " << std::string(path) << ".");

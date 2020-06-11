@@ -63,11 +63,11 @@ std::optional<AllocationWrapper> FindBeaconInfo(const MemoryWrapper<>& memory){
 		return quick;
 	}
 
-	unsigned int64 start{ 0x020001000100 };
-	unsigned int64 xor3{ 0x696969696969 };
-	unsigned int64 xor4{ 0x2E2E2E2E2E2E };
+	uint64_t start{ 0x020001000100 };
+	uint64_t xor3{ 0x696969696969 };
+	uint64_t xor4{ 0x2E2E2E2E2E2E };
 	for(size_t idx = 0; idx < memory.MemorySize - 8; idx++){
-		auto pattern{ (*memory.GetOffset(idx).Convert<unsigned int64>() & 0xFFFFFFFFFFFF) ^ start };
+		auto pattern{ (*memory.GetOffset(idx).Convert<uint64_t>() & 0xFFFFFFFFFFFF) ^ start };
 		if(pattern == xor3 || pattern == xor4){
 			LOG_VERBOSE(2, "Beacon magic bytes found in memory");
 			auto wrapper{ memory.GetOffset(idx).ToAllocationWrapper(4096) };
@@ -87,8 +87,16 @@ std::optional<AllocationWrapper> FindBeaconInfo(const MemoryWrapper<>& memory){
 
 std::wstring ToWstringPad(unsigned int value, size_t length = 2){
 	wchar_t* buf = new wchar_t[length + 1];
-	swprintf(buf, ("%0" + std::to_string(length) + "d").c_str(), value);
+	swprintf(buf, length + 1, (L"%0" + std::to_wstring(length) + L"d").c_str(), value);
 	std::wstring str = buf;
+	delete[] buf;
+	return str;
+}
+
+std::string ToStringPad(unsigned int value, size_t length = 2){
+	char* buf = new char[length + 1];
+	snprintf(buf, length + 1, ("%0" + std::to_string(length) + "d").c_str(), value);
+	std::string str = buf;
 	delete[] buf;
 	return str;
 }
@@ -152,7 +160,7 @@ std::map<unsigned int, std::map<unsigned int, std::string>> enums{
 	}},
 };
 
-std::string PrintHex(PUCHAR lpAddress, unsigned int dwSize){
+std::string PrintHex(unsigned char * lpAddress, unsigned int dwSize){
 	std::string string = "";
 	for(auto i = 0; i < dwSize; i++){
 		char buf[3];
@@ -163,10 +171,10 @@ std::string PrintHex(PUCHAR lpAddress, unsigned int dwSize){
 	return string;
 }
 
-std::string PrettyPrintConfiguration(PCHAR address, unsigned int dwOffset){
-	USHORT setting{ *reinterpret_cast<PUSHORT>(address + dwOffset) };
-	USHORT type{ *reinterpret_cast<PUSHORT>(address + dwOffset + 2) };
-	USHORT size{ *reinterpret_cast<PUSHORT>(address + dwOffset + 4) };
+std::string PrettyPrintConfiguration(unsigned char * address, unsigned int dwOffset){
+	ushort setting{ *reinterpret_cast<unsigned short *>(address + dwOffset) };
+	ushort type{ *reinterpret_cast<unsigned short *>(address + dwOffset + 2) };
+	ushort size{ *reinterpret_cast<unsigned short *>(address + dwOffset + 4) };
 
 	// Swap endianness
 	setting = ((setting & 0xFF) << 8) | (setting >> 8);
@@ -175,24 +183,24 @@ std::string PrettyPrintConfiguration(PCHAR address, unsigned int dwOffset){
 
 	std::string name{ names.count(setting) ? names.at(setting) : ("Unknown Setting " + std::to_string(setting)) };
 	if(type == 0x0001){ // TYPE_SHORT
-		USHORT data{ *reinterpret_cast<PUSHORT>(address + dwOffset + 6) };
+		ushort data{ *reinterpret_cast<ushort *>(address + dwOffset + 6) };
 		data = ((data & 0xFF) << 8) | (data >> 8);
 		if(enums.count(setting) && enums.at(setting).count(data)){
 			return name + ": " + enums.at(setting).at(data);
 		}
 		return name + ": " + std::to_string(data);
 	} else if(type == 0x0002){ // TYPE_INT
-		unsigned int data{ *reinterpret_cast<Punsigned int>(address + dwOffset + 6) };
+		unsigned int data{ *reinterpret_cast<uint *>(address + dwOffset + 6) };
 		data = ((data & 0xFF) << 24) | ((data & 0xFF00) << 8) | ((data & 0xFF0000) >> 8) | (data >> 24);
 		if(enums.count(setting) && enums.at(setting).count(data)){
 			return name + ": " + enums.at(setting).at(data);
 		}
 		return name + ": " + std::to_string(data);
 	} else if(type == 0x0003){
-		PUCHAR data{ reinterpret_cast<PUCHAR>(address + dwOffset + 6) };
+		unsigned char * data{ reinterpret_cast<unsigned char *>(address + dwOffset + 6) };
 		bool binary = false;
 		bool ended = false;
-		for(USHORT idx = 0; idx < size && !ended && !binary; idx++){
+		for(ushort idx = 0; idx < size && !ended && !binary; idx++){
 			if(data[idx] == '\0'){
 				ended = true;
 			} else if(data[idx] > 0x7F || data[idx] < 0x20){
@@ -201,7 +209,7 @@ std::string PrettyPrintConfiguration(PCHAR address, unsigned int dwOffset){
 		}
 
 		if(!binary){
-			return name + ": " + std::string{ reinterpret_cast<PCHAR>(data) };
+			return name + ": " + std::string{ reinterpret_cast<char*>(data) };
 		} else{
 			return name + ": " + PrintHex(data, size);
 		}
@@ -215,11 +223,11 @@ bool DumpBeaconInformation(const MemoryWrapper<>& memory){
 	auto info{ FindBeaconInfo(memory) };
 	if(info){
 		// Beacon found; create file to dump to
-		SYSTEMTIME time{};
-		GetLocalTime(&time);
-		auto pid{ GetProcessId(memory.process) };
-		auto wFileName{ "bluespawn-" + ToWstringPad(time.wMonth) + "-" + ToWstringPad(time.wDay) + "-" + ToWstringPad(time.wYear, 4) + "-"
-			+ ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + "-" + ToWstringPad(time.wSecond) + "-PID-" + ToWstringPad(pid, 5) };
+		time_t t = time(NULL);
+		struct tm * time = localtime(&t);
+		auto pid{ memory.process };
+		auto wFileName{ "bluespawn-" + ToStringPad(time->tm_mon) + "-" + ToStringPad(time->tm_mday) + "-" + ToStringPad(time->tm_year, 4) + "-"
+			+ ToStringPad(time->tm_hour) + ToStringPad(time->tm_min) + "-" + ToStringPad(time->tm_sec) + "-PID-" + ToStringPad(pid, 5) };
 		auto num = 0ul;
 		while(FileSystem::CheckFileExists(wFileName + "-" + std::to_string(num))){
 			num++;
@@ -229,11 +237,11 @@ bool DumpBeaconInformation(const MemoryWrapper<>& memory){
 		file.Create();
 
 		std::string output{};
-		PCHAR memory{ info->GetAsPointer<CHAR>() };
+		char* memory{ info->GetAsPointer<char>() };
 		unsigned int dwOffset{ 0 };
 		while(dwOffset < info->GetSize()){
-			output += PrettyPrintConfiguration(memory, dwOffset) + "\n";
-			auto size{ *reinterpret_cast<PUSHORT>(memory + dwOffset + 4) };
+			output += PrettyPrintConfiguration(reinterpret_cast<unsigned char*>(memory), dwOffset) + "\n";
+			auto size{ *reinterpret_cast<ushort*>(memory + dwOffset + 4) };
 			size = ((size & 0xFF) << 8) | (size >> 8);
 			dwOffset += size + 6;
 		}

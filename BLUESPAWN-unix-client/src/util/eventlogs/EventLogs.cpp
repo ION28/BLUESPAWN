@@ -8,9 +8,9 @@ const int SIZE_DATA = 4096;
 const int ARRAY_SIZE = 10;
 
 namespace EventLogs {
-
+/*
 	std::optional<std::string> EventLogs::GetEventParam(const EventWrapper& hEvent, const std::string& param) {
-		/*auto queryParam = param.c_str();
+		auto queryParam = param.c_str();
 		EventWrapper hContext = EvtCreateRenderContext(1, &queryParam, EvtRenderContextValues);
 		if (!hContext){
 			LOG_ERROR("EventLogs::GetEventParam: EvtCreateRenderContext failed with " + std::to_string(errno));
@@ -23,11 +23,12 @@ namespace EventLogs {
 				auto pRenderedValues = AllocationWrapper{ malloc(dwBufferSize), dwBufferSize, AllocationWrapper::MALLOC };
 				if(pRenderedValues){
 					if(EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferSize, nullptr)){*/
+						
 						/*
 						Table of variant members found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ns-winevt-evt_variant
 						Table of type values found here: https://docs.microsoft.com/en-us/windows/win32/api/winevt/ne-winevt-evt_variant_type
 						*/
-		/*
+/*
 						PEVT_VARIANT result = reinterpret_cast<PEVT_VARIANT>((void*) pRenderedValues);
 						if(result->Type == EvtVarTypeString)
 							return std::string(result->StringVal);
@@ -49,12 +50,12 @@ namespace EventLogs {
 					}
 				}
 			}
-		}*/
+		}
 		return std::nullopt;
 	}
 
 	std::optional<std::string> EventLogs::GetEventXML(const EventWrapper& hEvent){
-		/*unsigned int dwBufferSize = 0;
+		unsigned int dwBufferSize = 0;
 		if(!EvtRender(NULL, hEvent, EvtRenderEventXml, dwBufferSize, nullptr, &dwBufferSize, nullptr)){
 			if (ERROR_INSUFFICIENT_BUFFER == errno){
 				auto pRenderedContent = AllocationWrapper{ HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwBufferSize), dwBufferSize, AllocationWrapper::HEAP_ALLOC };
@@ -64,14 +65,14 @@ namespace EventLogs {
 					}
 				}
 			}
-		}*/
+		}
 
 		return std::nullopt;
 	}
 
 	// Enumerate all the events in the result set. 
 	std::vector<EventLogItem> EventLogs::ProcessResults(const EventWrapper& hResults, const std::vector<XpathQuery>& filters) {
-		/*EVT_HANDLE hEvents[ARRAY_SIZE];
+		EVT_HANDLE hEvents[ARRAY_SIZE];
 
 		std::vector<EventLogItem> results;
 		std::vector<std::string> params;
@@ -105,12 +106,11 @@ namespace EventLogs {
 			LOG_ERROR("EventLogs::ProcessResults: EvtNext failed with " << errno);
 		}
 
-		return results;*/
-		return std::vector<EventLogItem>();
+		return results;
 	}
 
 	std::optional<EventLogItem> EventToEventLogItem(const EventWrapper& hEvent, const std::vector<std::string>& params){
-		/*unsigned int status = ERROR_SUCCESS;
+		unsigned int status = ERROR_SUCCESS;
 
 		std::optional<std::string> eventIDStr, eventRecordIDStr, timeCreated, channel, rawXML;
 
@@ -143,13 +143,12 @@ namespace EventLogs {
 		pItem.SetChannel(*channel);
 		pItem.SetXML(*rawXML);
 
-		return pItem;*/
-		return std::nullopt;
+		return pItem;
 	}
 
 	std::vector<EventLogItem> EventLogs::QueryEvents(const std::string& channel, unsigned int id, const std::vector<XpathQuery>& filters) {
 
-		/*std::vector<EventLogItem> items;
+		std::vector<EventLogItem> items;
 
 		auto query = std::string("Event/System[EventID=") + std::to_string(id) + std::string("]");
 		for (auto param : filters)
@@ -168,15 +167,14 @@ namespace EventLogs {
 			items = ProcessResults(hResults, filters);
 		}
 
-		return items;*/
-		return std::vector<EventLogItem>();
+		return items;
 	}
 
 	std::vector<EventSubscription> subscriptions = {};
 
 	std::optional<std::reference_wrapper<EventSubscription>> EventLogs::SubscribeToEvent(const std::string& pwsPath, 
 		unsigned int id, const std::function<void(EventLogItem)>& callback, const std::vector<XpathQuery>& filters){
-		/*auto query = std::string("Event/System[EventID=") + std::to_string(id) + std::string("]");
+		auto query = std::string("Event/System[EventID=") + std::to_string(id) + std::string("]");
 		for (auto param : filters)
 			query += " and " + param.ToString();
 
@@ -198,8 +196,7 @@ namespace EventLogs {
 			return std::nullopt;
 		}
 
-		return eventSub;*/
-		return std::nullopt;
+		return eventSub;
 	}
 
 	std::shared_ptr<EVENT_DETECTION> EventLogs::EventLogItemToDetection(const EventLogItem& pItem) {
@@ -216,7 +213,7 @@ namespace EventLogs {
 	}
 
 	bool IsChannelOpen(const std::string& channel) {
-		/*EVT_HANDLE hChannel = NULL;
+		EVT_HANDLE hChannel = NULL;
 		unsigned int status = ERROR_SUCCESS;
 		PEVT_VARIANT pProperty = NULL;  
 		PEVT_VARIANT pTemp = NULL;
@@ -262,12 +259,11 @@ namespace EventLogs {
 		if (pProperty)
 			free(pProperty);
 
-		return pProperty->BooleanVal;*/
-		return true;
+		return pProperty->BooleanVal;
 	}
 
 	bool OpenChannel(const std::string& channel) {
-		/*EVT_HANDLE hChannel = NULL;
+		EVT_HANDLE hChannel = NULL;
 		unsigned int status = ERROR_SUCCESS;
 		EVT_VARIANT ChannelProperty;
 		unsigned int dwBufferSize = sizeof(EVT_VARIANT);
@@ -292,9 +288,9 @@ namespace EventLogs {
 		{
 			LOG_ERROR("EventLogs::OpenChannel: EvtSaveChannelConfig failed with " + std::to_string(errno) + " for channel " + channel);
 			return false;
-		}*/
+		}
 
 		return true;
 	}
-
+*/
 }

@@ -22,14 +22,7 @@ namespace Reactions {
 			LOG_ERROR("Potentially malicious file " << detection->wsFilePath << " detected outside of a hunt!");
 		}
 	}
-	void LogReaction::LogRegistryKeyIdentified(std::shared_ptr<REGISTRY_DETECTION> detection){
-		if(HuntBegun){
-			_HuntLogMessage->AddDetection(std::static_pointer_cast<DETECTION>(detection));
-		} else {
-			LOG_ERROR("\tPotentially malicious registry key detected outside of a hunt - " << detection->value.key
-				<< ": " << detection->value.GetPrintableName() << " with data " << detection->value);
-		}
-	}
+
 	void LogReaction::LogProcessIdentified(std::shared_ptr<PROCESS_DETECTION> detection){
 		if(HuntBegun){
 			_HuntLogMessage->AddDetection(std::static_pointer_cast<DETECTION>(detection));
@@ -58,7 +51,6 @@ namespace Reactions {
 		_HuntLogMessage{ std::nullopt }{
 		vStartHuntProcs.emplace_back(   std::bind(&LogReaction::LogBeginHunt,             this, std::placeholders::_1));
 		vEndHuntProcs.emplace_back(     std::bind(&LogReaction::LogEndHunt,               this                       ));
-		vRegistryReactions.emplace_back(std::bind(&LogReaction::LogRegistryKeyIdentified, this, std::placeholders::_1));
 		vFileReactions.emplace_back(    std::bind(&LogReaction::LogFileIdentified,        this, std::placeholders::_1));
 		vProcessReactions.emplace_back( std::bind(&LogReaction::LogProcessIdentified,     this, std::placeholders::_1));
 		vServiceReactions.emplace_back( std::bind(&LogReaction::LogServiceIdentified,     this, std::placeholders::_1));

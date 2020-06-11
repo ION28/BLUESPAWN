@@ -9,7 +9,7 @@ namespace Log {
 	 * XMLSink provides a sink for the logger that saves log messages to an XML file.
 	 */
 	class XMLSink : public LogSink {
-		HandleWrapper hMutex;
+		pthread_mutex_t hMutex;
 
 		tinyxml2::XMLDocument XMLDoc;
 		tinyxml2::XMLElement* Root;
@@ -18,7 +18,7 @@ namespace Log {
 
 		std::string MessageTags[5] = { "error", "warning", "info", "other", "hunt" };
 
-		HandleWrapper thread;
+		pthread_t thread;
 
 	public:
 

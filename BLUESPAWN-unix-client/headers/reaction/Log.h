@@ -2,7 +2,7 @@
 #include "Reaction.h"
 
 #include "hunt/HuntInfo.h"
-#include "util/log/huntlogmessage.h"
+#include "util/log/HuntLogMessage.h"
 
 #include <optional>
 

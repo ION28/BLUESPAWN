@@ -1,5 +1,3 @@
-#pragma once
-
 #include "util/eventlogs/XpathQuery.h"
 
 namespace EventLogs {

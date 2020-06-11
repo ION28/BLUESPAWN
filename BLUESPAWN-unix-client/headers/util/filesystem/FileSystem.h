@@ -392,7 +392,7 @@ namespace FileSystem {
 		 *
 		 * @return The size of the referenced file
 		 */
-		unsigned __int64 GetFileSize() const;
+		uint64_t GetFileSize() const;
 		
 		/**
 		 * Gets the file path (and thus its name)
