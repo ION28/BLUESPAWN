@@ -25,12 +25,14 @@ namespace Log {
 	LogMessage& LogMessage::InnerLog(IN CONST LPCSTR& data,
 									 IN CONST std::false_type&){
 		stream << StringToWidestring(data);
+		return *this;
 	}
 
 	template<>
 	LogMessage& LogMessage::InnerLog(IN CONST std::string& data,
 									 IN CONST std::false_type&){
 		stream << StringToWidestring(data);
+		return *this;
 	}
 
 	LogMessage::LogMessage(IN CONST LogLevel& level) : level{ level } {}

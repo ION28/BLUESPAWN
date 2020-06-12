@@ -1,6 +1,7 @@
 #include "scan/DetectionRegister.h"
 #include "scan/Scanner.h"
 #include "user/bluespawn.h"
+#include "common/ThreadPool.h"
 
 #include <unordered_set>
 
@@ -49,7 +50,7 @@ void DetectionRegister::UpdateDetectionCertainty(
     // if the detection is queued and we can enter its critical section, it hasn't been scanned yet
     bool queued{ false };
     EnterCriticalSection(hQueueGuard);
-    if(queue.find(detection) != queue.end){
+    if(queue.find(detection) != queue.end()){
         detection.get().info.AddCertainty(certainty);
         queued = true;
     }

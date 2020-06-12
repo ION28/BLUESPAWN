@@ -102,7 +102,7 @@
     <ClInclude Include="headers\scan\YaraScanner.h" />
     <ClInclude Include="headers\util\log\CLISink.h" />
     <ClInclude Include="headers\util\log\DebugSink.h" />
-    <ClInclude Include="headers\util\log\HuntLogMessage.h" />
+    <ClInclude Include="headers\util\log\DetectionSink.h" />
     <ClInclude Include="headers\util\log\Log.h" />
     <ClInclude Include="headers\util\log\Loggable.h" />
     <ClInclude Include="headers\util\log\LogLevel.h" />

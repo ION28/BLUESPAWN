@@ -31,7 +31,6 @@ protected:
 	Event(EventType type);
 
 	std::vector<std::function<void()>> callbacks;
-	Reaction reaction;
 	std::optional<Scope> scope;
 
 };

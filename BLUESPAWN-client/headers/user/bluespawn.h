@@ -48,6 +48,7 @@ class Bluespawn {
 		static MitigationRegister mitigationRecord;
 		static Aggressiveness aggressiveness;
 		static DetectionRegister detections;
+		static bool EnablePreScanDetections;
 
 		static ReactionManager reaction;
 		static const IOBase& io;

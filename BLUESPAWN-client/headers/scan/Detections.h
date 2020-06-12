@@ -259,14 +259,14 @@ struct ProcessDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::map<std::wstring, std::wstring> operator*() CONST;
+	std::unordered_map<std::wstring, std::wstring> Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
 	 *
 	 * @return A hash for this detection data
 	 */
-	size_t operator~() CONST;
+	size_t Hash() CONST;
 };
 
 /**
@@ -349,14 +349,14 @@ struct FileDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::map<std::wstring, std::wstring> operator*() CONST;
+	std::unordered_map<std::wstring, std::wstring> Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
 	 *
 	 * @return A hash for this detection data
 	 */
-	size_t operator~() CONST;
+	size_t Hash() CONST;
 };
 
 /**
@@ -406,14 +406,14 @@ struct RegistryDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::map<std::wstring, std::wstring> operator*() CONST;
+	std::unordered_map<std::wstring, std::wstring> Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
 	 *
 	 * @return A hash for this detection data
 	 */
-	size_t operator~() CONST;
+	size_t Hash() CONST;
 };
 
 /**
@@ -453,14 +453,14 @@ struct ServiceDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::map<std::wstring, std::wstring> operator*() CONST;
+	std::unordered_map<std::wstring, std::wstring> Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
 	 *
 	 * @return A hash for this detection data
 	 */
-	size_t operator~() CONST;
+	size_t Hash() CONST;
 };
 
 /**
@@ -497,14 +497,14 @@ struct OtherDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::map<std::wstring, std::wstring> operator*();
+	std::unordered_map<std::wstring, std::wstring> Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
 	 *
 	 * @return A hash for this detection data
 	 */
-	size_t operator~();
+	size_t Hash() CONST;
 };
 
 /// Stores contextual information around a detection
@@ -562,6 +562,22 @@ class Detection {
 	/// A shared counter to keep track of detection IDs and ensure each new detection gets assigned
 	/// a unique identifier.
 	static volatile std::atomic<DWORD> IDCounter;
+
+	struct {
+		std::unordered_map<std::wstring, std::wstring> operator()(ProcessDetectionData data){return data.Serialize();}
+		std::unordered_map<std::wstring, std::wstring> operator()(FileDetectionData data){ return data.Serialize(); }
+		std::unordered_map<std::wstring, std::wstring> operator()(RegistryDetectionData data){return data.Serialize();}
+		std::unordered_map<std::wstring, std::wstring> operator()(ServiceDetectionData data){return data.Serialize();}
+		std::unordered_map<std::wstring, std::wstring> operator()(OtherDetectionData data){ return data.Serialize(); }
+	} serializer;
+
+	struct {
+		size_t operator()(ProcessDetectionData data){ return data.Hash(); }
+		size_t operator()(FileDetectionData data){ return data.Hash(); }
+		size_t operator()(RegistryDetectionData data){ return data.Hash(); }
+		size_t operator()(ServiceDetectionData data){ return data.Hash(); }
+		size_t operator()(OtherDetectionData data){ return data.Hash(); }
+	} hasher;
 public:
 
 	/// A unique identifier for this detection
@@ -613,6 +629,15 @@ public:
 
 	/// Overload comparison operator. Checks if the DetectionData is the same, regardless of context
 	bool operator==(const Detection& detection) const;
+
+	/**
+	 * Serialize the detection data in to a mapping of values. Note this should not
+	 * include any internal representations but rather only include values that have
+	 * meaning outside of BLUESPAWN's running.
+	 *
+	 * @return A mapping of properties to human-readable values
+	 */
+	std::unordered_map<std::wstring, std::wstring> Serialize() const;
 
 	/// Implicit cast to CriticalSection support so users can say EnterCriticalSection(Detection)
 	operator LPCRITICAL_SECTION();

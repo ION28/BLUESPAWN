@@ -5,6 +5,8 @@
 #include "common/StringUtils.h"
 #include "common/Utils.h"
 
+#include <sstream>
+
 ProcessDetectionData ProcessDetectionData::CreateImageDetectionData(
 	IN DWORD PID,
 	IN CONST std::wstring& ProcessName,
@@ -117,10 +119,10 @@ ProcessDetectionData ProcessDetectionData::CreateMemoryDetectionData(
 	IN CONST std::wstring& ProcessName,
 	IN PVOID64 BaseAddress,
 	IN DWORD MemorySize,
-	IN CONST std::optional<std::wstring>& ImageName = std::nullopt OPTIONAL,
-	IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
-	IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
-	IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
+	IN CONST std::optional<std::wstring>& ImageName OPTIONAL,
+	IN CONST std::optional<std::wstring>& ProcessPath OPTIONAL,
+	IN CONST std::optional<std::wstring>& ProcessCommand OPTIONAL,
+	IN std::unique_ptr<ProcessDetectionData>&& ParentProcess OPTIONAL
 ){
 	HandleWrapper hProcess{ OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, false, PID) };
 	if(hProcess){
@@ -148,10 +150,10 @@ ProcessDetectionData ProcessDetectionData::CreateMemoryDetectionData(
 	IN CONST std::wstring& ProcessName,
 	IN PVOID64 BaseAddress,
 	IN DWORD MemorySize,
-	IN CONST std::optional<std::wstring>& ImageName = std::nullopt OPTIONAL,
-	IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
-	IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
-	IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
+	IN CONST std::optional<std::wstring>& ImageName OPTIONAL,
+	IN CONST std::optional<std::wstring>& ProcessPath OPTIONAL,
+	IN CONST std::optional<std::wstring>& ProcessCommand OPTIONAL,
+	IN std::unique_ptr<ProcessDetectionData>&& ParentProcess OPTIONAL
 ){
 	std::optional<std::wstring> image{ ImageName };
 	if(!image){
@@ -176,24 +178,28 @@ ProcessDetectionData ProcessDetectionData::CreateMemoryDetectionData(
 	};
 }
 
-std::map<std::wstring, std::wstring> ProcessDetectionData::operator*() CONST {
-	std::map<std::wstring, std::wstring> properties{
+std::unordered_map<std::wstring, std::wstring> ProcessDetectionData::Serialize() CONST {
+	std::unordered_map<std::wstring, std::wstring> properties{
 		{ L"Type", type == ProcessDetectionType::MaliciousImage ? L"Image" :
 				   type == ProcessDetectionType::MaliciousMemory ? L"Memory" : L"Process"},
 		{ L"Name", ProcessName },
 		{ L"PID", std::to_wstring(PID) }
 	};
-	if(TID) properties.emplace(L"TID", *TID);
+	if(TID) properties.emplace(L"TID", std::to_wstring(*TID));
 	if(ProcessPath) properties.emplace(L"Process Path", *ProcessPath);
 	if(ProcessCommand) properties.emplace(L"Process Command", *ProcessCommand);
-	if(ParentProcess) properties.emplace(L"Parent PID", (*ParentProcess)->PID);
-	if(BaseAddress) properties.emplace(L"Base Address", *BaseAddress);
-	if(MemorySize) properties.emplace(L"Memory Size", *MemorySize);
+	if(ParentProcess) properties.emplace(L"Parent PID", std::to_wstring((*ParentProcess)->PID));
+	if(BaseAddress){
+		std::wstringstream wss{};
+		wss << std::hex << *BaseAddress;
+		properties.emplace(L"Base Address", wss.str());
+	}
+	if(MemorySize) properties.emplace(L"Memory Size", std::to_wstring(*MemorySize));
 	if(ImageName) properties.emplace(L"Image Name", *ImageName);
 	return properties;
 }
 
-size_t ProcessDetectionData::operator~() CONST {
+size_t ProcessDetectionData::Hash() CONST {
 	if(type == ProcessDetectionType::MaliciousProcess){
 		return (static_cast<size_t>(PID) << 8) ^ std::hash<std::wstring>{}(ProcessName) ^
 			(ProcessCommand ? std::hash<std::wstring>{}(*ProcessCommand) : 0) ^
@@ -250,8 +256,8 @@ FileDetectionData::FileDetectionData(
 	IN CONST std::wstring& path
 ) : FileDetectionData(FileSystem::File{ path }, std::nullopt){}
 
-std::map<std::wstring, std::wstring> FileDetectionData::operator*() CONST {
-	std::map<std::wstring, std::wstring> properties{
+std::unordered_map<std::wstring, std::wstring> FileDetectionData::Serialize() CONST {
+	std::unordered_map<std::wstring, std::wstring> properties{
 		{ L"Path", FilePath },
 		{ L"Name", FileName },
 		{ L"Exists", FileFound ? L"true" : L"false" },
@@ -278,15 +284,15 @@ std::map<std::wstring, std::wstring> FileDetectionData::operator*() CONST {
 		properties.emplace(L"Malicious Yara Rules", malicious);
 		properties.emplace(L"Other Yara Rules", identifier);
 	}
-	if(FileSigned) properties.emplace(L"Signed", *FileSigned ? true : false);
+	if(FileSigned) properties.emplace(L"Signed", *FileSigned ? L"true" : L"false");
 	if(Signer) properties.emplace(L"Signer", *Signer);
 	return properties;
 }
 
 RegistryDetectionData::RegistryDetectionData(
 	IN CONST Registry::RegistryKey& key,
-	IN CONST std::optional<Registry::RegistryValue>& value = std::nullopt OPTIONAL,
-	IN CONST std::optional<AllocationWrapper>& data = std::nullopt OPTIONAL
+	IN CONST std::optional<Registry::RegistryValue>& value OPTIONAL,
+	IN CONST std::optional<AllocationWrapper>& data OPTIONAL
 ) : KeyPath{ key.GetName() },
     key{ key },
 	value{ value },

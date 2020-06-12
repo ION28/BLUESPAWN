@@ -82,8 +82,8 @@ public:
 		InitializeCriticalSection(&section);
 	}
 
-	operator PCRITICAL_SECTION() const { return const_cast<LPCRITICAL_SECTION>(&section); }
-	operator CRITICAL_SECTION() const { return section; }
+	operator PCRITICAL_SECTION() const{ return const_cast<LPCRITICAL_SECTION>(&section); }
+	operator CRITICAL_SECTION() const{ return section; }
 };
 
 class BeginCriticalSection {
@@ -193,13 +193,14 @@ bool CompareMemory(const AllocationWrapper& wrapper) const{
 	} else if(!wrapper || !Memory.has_value()){
 		return false;
 	} else if(wrapper.AllocationSize == AllocationSize){
-		for(int i = 0; i < AllocationSize; i++)
-			if(pointer[i] != wrapper[i])
-				return false;
-		return true;
+		return RtlEqualMemory(wrapper.pointer, pointer, AllocationSize);
 	} else{
 		return false;
 	}
+}
+
+bool operator==(const AllocationWrapper& wrapper) const{
+	return CompareMemory(wrapper);
 }
 
 bool SetByte(SIZE_T offset, char value){
@@ -344,10 +345,11 @@ public:
 	operator bool() const{ return address; }
 	bool operator !() const{ return !address; }
 
-	AllocationWrapper ToAllocationWrapper(DWORD size = MemorySize) const {
+	AllocationWrapper ToAllocationWrapper(DWORD size = -1UL) const{
 		size = min(size, MemorySize);
 		if(size > 0x8000){
-			AllocationWrapper wrapper{ ::VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE), size, AllocationWrapper::VIRTUAL_ALLOC };
+			AllocationWrapper wrapper{ ::VirtualAlloc(nullptr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE), size,
+				AllocationWrapper::VIRTUAL_ALLOC };
 			if(process){
 				if(ReadProcessMemory(process, address, wrapper, size, nullptr)){
 					return wrapper;
@@ -359,7 +361,8 @@ public:
 				return wrapper;
 			}
 		} else{
-			AllocationWrapper wrapper{ ::HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size), size, AllocationWrapper::HEAP_ALLOC };
+			AllocationWrapper wrapper{ ::HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size), size,
+				AllocationWrapper::HEAP_ALLOC };
 			if(process){
 				if(ReadProcessMemory(process, address, wrapper, size, nullptr)){
 					return wrapper;

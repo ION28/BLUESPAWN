@@ -1,6 +1,5 @@
 #include "util/eventlogs/EventLogs.h"
 #include "common/StringUtils.h"
-#include "reaction/Detections.h"
 #include "util/log/Log.h"
 
 const int SIZE_DATA = 4096;
@@ -204,17 +203,8 @@ namespace EventLogs {
 		return eventSub;
 	}
 
-	std::shared_ptr<EVENT_DETECTION> EventLogs::EventLogItemToDetection(const EventLogItem& pItem) {
-		auto detect = std::make_shared<EVENT_DETECTION>(0, 0, L"", L"", L"");
-
-		detect->eventID = pItem.GetEventID();
-		detect->channel = pItem.GetChannel();
-		detect->eventRecordID = pItem.GetEventRecordID();
-		detect->timeCreated = pItem.GetTimeCreated();
-		detect->rawXML = pItem.GetXML();
-		detect->params = pItem.GetProperties();
-
-		return detect;
+	Detection EventLogs::EventLogItemToDetection(const EventLogItem& pItem) {
+		throw std::exception("Not supported");
 	}
 
 	bool IsChannelOpen(const std::wstring& channel) {

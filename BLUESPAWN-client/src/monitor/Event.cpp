@@ -1,6 +1,6 @@
 #include "monitor/Event.h"
-#include "reaction/Log.h"
 #include "util/eventlogs/EventLogs.h"
+#include "util/log/Log.h"
 
 Event::Event(EventType type) : type(type) {}
 

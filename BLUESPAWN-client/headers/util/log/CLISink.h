@@ -4,6 +4,7 @@
 
 #include "LogSink.h"
 #include "LogLevel.h"
+#include "DetectionSink.h"
 
 namespace Log {
 
@@ -14,8 +15,10 @@ namespace Log {
 	 * MessagePrepends. This prepended text is colored with the color indicated in
 	 * PrependColors. 
 	 */
-	class CLISink : public LogSink {
+	class CLISink : public LogSink, DetectionSink {
 	private:
+
+		/// Enum containing color codes for console colors
 		enum class MessageColor {
 			BLACK     = 0x0,
 			DARKBLUE  = 0x1,
@@ -34,8 +37,15 @@ namespace Log {
 			YELLOW    = 0xE,
 			WHITE     = 0xF,
 		};
-		std::wstring MessagePrepends[4] = { L"[ERROR]", L"[WARNING]", L"[INFO]", L"[VERBOSE]" };
-		MessageColor PrependColors[4] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, MessageColor::LIGHTBLUE };
+
+		/// Prepends for messages
+		std::wstring MessagePrepends[5] = { L"[ERROR]", L"[WARNING]", L"[INFO]", L"[VERBOSE]", L"[DETECTION]" };
+
+		/// Colors for the message prepends
+		MessageColor PrependColors[5] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, 
+			MessageColor::LIGHTBLUE, MessageColor::GOLD };
+
+		/// Mutex guarding accesses to the console
 		HandleWrapper hMutex;
 
 		/**
@@ -59,7 +69,10 @@ namespace Log {
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
 		 */
-		virtual void LogMessage(const LogLevel& level, const std::wstring& message) override;
+		virtual void LogMessage(
+			IN CONST LogLevel& level, 
+			IN CONST std::wstring& message
+		) override;
 
 		/**
 		 * Compares this CLISink to another LogSink. Currently, as only one console is supported,
@@ -70,6 +83,31 @@ namespace Log {
 		 *
 		 * @return Whether or not the argument and this sink are considered equal.
 		 */
-		virtual bool operator==(const LogSink& sink) const;
+		virtual bool operator==(
+			IN CONST LogSink& sink
+		) const;
+
+		/**
+		 * Records a detection to the console.
+		 *
+		 * @param detection The detection to record
+		 * @param type The type of record this is, either PreScan or PostScan
+		 */
+		virtual void RecordDetection(
+			IN CONST std::reference_wrapper<Detection>& detection,
+			IN RecordType type
+		) = 0;
+
+		/**
+		 * Records an association between two detections to the console
+		 *
+		 * @param first The first detection in the assocation. This detection's ID will be lower than the second's.
+		 * @param second The second detection in the association.
+		 */
+		virtual void RecordAssociation(
+			IN CONST std::reference_wrapper<Detection>& first,
+			IN CONST std::reference_wrapper<Detection>& second,
+			IN CONST Association& strength
+		) = 0;
 	};
 }

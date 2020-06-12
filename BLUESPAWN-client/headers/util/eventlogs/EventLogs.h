@@ -54,7 +54,7 @@ namespace EventLogs {
 	*/
 	std::optional<EventLogItem> EventToEventLogItem(const EventWrapper& hEvent, const std::vector<std::wstring>& params);
 
-	std::shared_ptr<EVENT_DETECTION> EventLogItemToDetection(const EventLogItem& pItem);
+	Detection EventLogItemToDetection(const EventLogItem& pItem);
 
 	/**
 	* Subscribe a HuntTriggerReaction to a specific Windows event

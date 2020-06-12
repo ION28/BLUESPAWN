@@ -1,7 +1,5 @@
 #pragma once
 
-#include "scan/ScanNode.h"
-
 #include <map>
 #include <vector>
 
