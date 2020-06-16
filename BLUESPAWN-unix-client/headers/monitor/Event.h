@@ -9,33 +9,82 @@
 #include "util/eventlogs/XpathQuery.h"
 #include "util/filesystem/FileSystem.h"
 
+#include <linux/ptrace.h>
+
 enum class EventType {
 	EventLog,
 	FileSystem
 };
 
+/**
+ * 
+ * Kindof thinking for the event structure on linux to do something like below:
+ * 
+ * An event is sent to listeners on a filesystem.  Listeners can be for specific events.  Once an event is registered, if that
+ * event is deteected it is thrown to listeners that are registered for that event
+ * 
+ * some sort of std::unordered_map that links to std::list for each event.
+ * 
+ */
 class Event {
-/*public:
-	EventType type;
+public:
 
 	void AddCallback(const std::function<void()>& callback);
 
-	virtual void RunCallbacks() const;
-
-	virtual bool Subscribe() = 0;
+    void RunCallbacks() const; //callbacks are what should be done when an event occurs?
 
 	virtual bool operator==(const Event& e) const = 0;
 
 protected:
-	Event(EventType type);
+	EventType type;
+
+	time_t timestamp;
+
+    Event(EventType &type);
 
 	std::vector<std::function<void()>> callbacks;
-	Reaction reaction;
+
 	std::optional<Scope> scope;
 
 };
 
-class EventLogEvent : public Event {
+enum class FileEventAction{
+	Read,
+	Write,
+	Execute
+};
+
+class FileEvent : public Event {
+protected:
+	std::string path;
+	FileEventAction action;
+	Permissions::User user; //who did it
+
+};
+
+class SystemCallEvent : public Event {
+	//so that we can look at certain system calls
+	int num;
+	struct pt_regs regs;
+};
+
+enum class ProcessEventAction{
+	Create, //fork
+	Signal
+};
+
+class ProcessEvent : public Event {
+	pid_t ppid;
+	pid_t pid;
+	ProcessEventAction action;
+	std::optional<int> signo; //for signal events
+	Permissions::User user;
+
+}
+
+//add any other events i can think of
+
+/*class EventLogEvent : public Event {
 public:
 	EventLogEvent(const std::string & channel, int eventID, const std::vector<EventLogs::XpathQuery>& queries = {});
 
@@ -74,5 +123,5 @@ public:
 	virtual bool Subscribe();
 
 	virtual bool operator==(const Event& e) const;
-	*/
-};
+	
+};*/
