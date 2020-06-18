@@ -2,9 +2,8 @@
 
 #include "common/wrappers.hpp"
 #include "util/log/Log.h"
-/*
-//TODO: Linuxize
-void EventListener::SubEventListener::HandleEventNotify(HANDLE hEvent){
+
+void EventListener::SubEventListener::HandleEventNotify(Events::EventHandle hEvent){
     if(map.find(hEvent) != map.end()){
         for(auto& func : map.at(hEvent)){
             func();
@@ -16,10 +15,10 @@ void EventListener::SubEventListener::ListenForEvents(){
     while(true){
 
         // Enter a critical section to ensure this function isn't accessing data that isn't ready
-        EnterCriticalSection(hSection);
+        pthread_mutex_lock(&hSection);
         auto slots{ events.size() };
         auto data{ events.data() };
-        LeaveCriticalSection(hSection);
+        pthread_mutex_unlock(&hSection);
 
         // Wait on the manager and events
         auto status = WaitForMultipleObjects(slots, data, false, INFINITE);
@@ -29,7 +28,8 @@ void EventListener::SubEventListener::ListenForEvents(){
             LOG_VERBOSE(3, "Manager event has been signalled; restarting wait");
 
             // Trigger manager response
-            SetEvent(hManagerResponse);
+            //SetEvent(hManagerResponse);
+            hManagerResponse.store(true);
 
             // If the thread should terminate, return
             if(terminate){
@@ -45,9 +45,10 @@ void EventListener::SubEventListener::ListenForEvents(){
             LOG_VERBOSE(1, "An event has been triggered; processing callbacks");
 
             // Handle the event notification
-            EnterCriticalSection(hSection);
+            //EnterCriticalSection(hSection);
+            pthread_mutex_lock(&hSection);
             HandleEventNotify(events[status - WAIT_OBJECT_0]);
-            LeaveCriticalSection(hSection);
+            pthread_mutex_unlock(&hSection);
 
             // Recalculate the number of slots and the events, begin wait again
             continue;
@@ -65,15 +66,15 @@ void EventListener::SubEventListener::ListenForEvents(){
 }
 
 EventListener::SubEventListener::SubEventListener() : 
-    hSection{},
-    hManager{ CreateEventA(nullptr, false, false, nullptr) },
-    hManagerResponse{ CreateEventA(nullptr, false, false, nullptr) },
-    dwSlotsFree{ MAXIMUM_WAIT_OBJECTS - 1 },
+    hManager{ false },
+    hManagerResponse{ false },
+    dwSlotsFree{ 0 }, //probably not needed
     dwFailureCount{ 0 },
     events{},
     terminate{ false },
     hThread{ &EventListener::SubEventListener::ListenForEvents, this }{
     events.emplace_back(hManager);
+    pthread_mutex_init(&hSection, NULL);
 }
 
 EventListener::SubEventListener::~SubEventListener(){
@@ -82,19 +83,23 @@ EventListener::SubEventListener::~SubEventListener(){
 
     // Set hManager, terminating the thread. No need to wait on the response; the join
     // will take care of waiting the appropriate amount of time.
-    SetEvent(hManager);
+    //SetEvent(hManager);
+    hManager.store(true);
 
     // Wait for the thread to finish
     hThread.join();
+
+    pthread_mutex_destroy(&hSection);
 }
 
 bool EventListener::SubEventListener::TrySubscribe(
-    IN const HANDLE& hEvent,
-    IN const std::vector<std::function<void()>>& callbacks
+    const Events::EventHandle& hEvent,
+    const std::vector<std::function<void()>>& callbacks
 ){
     // When reading or writing events, you must enter a critical section
-    auto lock{ BeginCriticalSection(hSection) };
+    //pthread_mutex_lock(&hSection);
 
+    auto lock{AcquireMutex(hSection)};
     // Check if event already has a subscription
     if(map.find(hEvent) != map.end()){
         LOG_WARNING("Event has already been subscribed to; combining callbacks. Note that it is recommended "
@@ -110,25 +115,14 @@ bool EventListener::SubEventListener::TrySubscribe(
 
     if(dwSlotsFree > 0){
         // Set the manager event since we're writing to map 
-        SetEvent(hManager);
+        //SetEvent(hManager);
+        hManager.store(true);
 
-        auto status{ WaitForSingleObject(hManagerResponse, 1000) };
+        auto status{ Events::WaitForSingleObject(hManagerResponse, INFINITE) };
 
-        // Ensure the manager event has been processed before making changes
-        while(WAIT_OBJECT_0 != status){
-            if(WAIT_TIMEOUT == status){
-                // A loop of WaitForSingleObjects with a timeout of 1000 tends to be faster than
-                // a single WaitForSingleObject with a timeout of INFINITE
-                status = WaitForSingleObject(hManagerResponse, 1000);
-            } else {
-                // An error occured; return failure
-                SetLastError(status);
-                return false;
-            }
-        }
 
         events.emplace_back(hEvent);
-        map.emplace(std::move(std::pair<HANDLE, std::vector<std::function<void()>>>{ hEvent, callbacks }));
+        map.emplace(std::move(std::pair<Events::EventHandle, std::vector<std::function<void()>>>{ hEvent, callbacks }));
         dwSlotsFree--;
         return true;
     }
@@ -137,10 +131,10 @@ bool EventListener::SubEventListener::TrySubscribe(
 }
 
 std::optional<std::vector<std::function<void()>>> EventListener::SubEventListener::GetSubscription(
-    IN const HANDLE& hEvent
+    const Events::EventHandle& hEvent
 ) const {
     // Enter a critical section before reading `map`
-    auto lock{ BeginCriticalSection(hSection) };
+    auto lock { AcquireMutex(hSection)};
 
     auto result{ map.find(hEvent) };
     if(result == map.end()){
@@ -151,12 +145,11 @@ std::optional<std::vector<std::function<void()>>> EventListener::SubEventListene
 }
 
 bool EventListener::SubEventListener::TryAddCallback(
-    IN const HANDLE& hEvent,
-    IN const std::function<void()>& callback
+    const Events::EventHandle& hEvent,
+    const std::function<void()>& callback
 ){
     // Enter a critical section before reading `map`
-    auto lock{ BeginCriticalSection(hSection) };
-
+    auto lock{ AcquireMutex(hSection) };
     auto result{ map.find(hEvent) };
     if(result == map.end()){
         return false;
@@ -174,11 +167,11 @@ void* getAddress(std::function<void()> f){
 }
 
 bool EventListener::SubEventListener::TryRemoveCallback(
-    IN const HANDLE& hEvent,
-    IN const std::function<void()>& callback
+    const Events::EventHandle& hEvent,
+    const std::function<void()>& callback
 ){
     // Enter a critical section before reading `map`
-    auto lock{ BeginCriticalSection(hSection) };
+    auto lock{ AcquireMutex(hSection) };
 
     auto result{ map.find(hEvent) };
     if(result == map.end()){
@@ -203,9 +196,9 @@ bool EventListener::SubEventListener::TryRemoveCallback(
 }
 
 bool EventListener::SubEventListener::TryUnsubscribe(
-    IN const HANDLE& hEvent
+    const Events::EventHandle& hEvent
 ){
-    auto lock{ BeginCriticalSection(hSection) };
+    auto lock{ AcquireMutex(hSection) };
 
     auto result{ map.find(hEvent) };
     if(result == map.end()){
@@ -213,23 +206,11 @@ bool EventListener::SubEventListener::TryUnsubscribe(
     }
 
     // Set hManager before modifying events, map, or dwSlotsFree
-    SetEvent(hManager);
+    //SetEvent(hManager);
 
-    auto status{ WaitForSingleObject(hManagerResponse, 1000) };
+    hManager.store(true);
 
-    // Ensure the manager event has been processed before making changes
-    while(WAIT_OBJECT_0 != status){
-
-        if(WAIT_ABANDONED_0 == status){
-            // Manager response has gone stale
-            hManagerResponse = CreateEventA(nullptr, false, false, nullptr);
-        } else if(WAIT_TIMEOUT == status){
-            status = WaitForSingleObject(hManagerResponse, 1000);
-        } else {
-            // An error occured; return failure
-            return false;
-        }
-    }
+    auto status{ Events::WaitForSingleObject(hManagerResponse, INFINITE) };
 
     map.erase(hEvent);
     for(unsigned idx = 0; idx < events.size(); idx++){
@@ -253,11 +234,11 @@ EventListener& EventListener::GetInstance(){
 }
 
 bool EventListener::Subscribe(
-    const HANDLE& hEvent,
+    const Events::EventHandle& hEvent,
     const std::vector<std::function<void()>>& callbacks
 ){
     // Acquire lock before accessing subeventlisteners
-    auto lock{ BeginCriticalSection(hSection) };
+    auto lock{ AcquireMutex(hSection) };
 
     for(auto& sublistener : subeventlisteners){
         // Try to subscribe to all subeventlisteners. It's O(n) time, but without a much more 
@@ -282,10 +263,10 @@ bool EventListener::Subscribe(
 }
 
 std::optional<std::vector<std::function<void()>>> EventListener::GetSubscription(
-    IN const HANDLE& hEvent
+    const Events::EventHandle& hEvent
 ) const {
     // Acquire lock before accessing subeventlisteners
-    auto lock{ BeginCriticalSection(hSection) };
+    auto lock{ AcquireMutex(hSection) };
 
     for(auto& sublistener : subeventlisteners){
         // See justification in EventListener::Subscribe
@@ -299,11 +280,11 @@ std::optional<std::vector<std::function<void()>>> EventListener::GetSubscription
 }
 
 bool EventListener::AddCallback(
-    IN const HANDLE& hEvent,
-    IN const std::function<void()>& callback
+    const Events::EventHandle& hEvent,
+    const std::function<void()>& callback
 ){
     // Acquire lock before accessing subeventlisteners
-    auto lock{ BeginCriticalSection(hSection) };
+    auto lock{ AcquireMutex(hSection) };
 
     for(auto& sublistener : subeventlisteners){
         // See justification in EventListener::Subscribe
@@ -317,11 +298,11 @@ bool EventListener::AddCallback(
 }
 
 bool EventListener::RemoveCallback(
-    IN const HANDLE& hEvent,
-    IN const std::function<void()>& callback
+    const Events::EventHandle& hEvent,
+    const std::function<void()>& callback
 ){
     // Acquire lock before accessing subeventlisteners
-    auto lock{ BeginCriticalSection(hSection) };
+    auto lock{ AcquireMutex(hSection) };
 
     for(auto& sublistener : subeventlisteners){
         // See justification in EventListener::Subscribe
@@ -335,10 +316,10 @@ bool EventListener::RemoveCallback(
 }
 
 bool EventListener::Unsubscribe(
-    IN const HANDLE& hEvent
+    const Events::EventHandle& hEvent
 ){
     // Acquire lock before accessing subeventlisteners
-    auto lock{ BeginCriticalSection(hSection) };
+    auto lock{ AcquireMutex(hSection) };
 
     for(auto& sublistener : subeventlisteners){
         // See justification in EventListener::Subscribe
@@ -350,4 +331,3 @@ bool EventListener::Unsubscribe(
     LOG_ERROR("Unable to unsubscribe from event; Event may not have a subscription.");
     return false;
 }
-*/

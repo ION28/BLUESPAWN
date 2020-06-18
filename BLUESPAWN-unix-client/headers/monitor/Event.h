@@ -13,7 +13,8 @@
 
 enum class EventType {
 	EventLog,
-	FileSystem
+	FileSystem,
+	SystemCall
 };
 
 /**
@@ -26,46 +27,73 @@ enum class EventType {
  * some sort of std::unordered_map that links to std::list for each event.
  * 
  */
+
+//Add watchers for this to actually do the watching for the event - make this sorta like windows
 class Event {
 public:
+	virtual bool operator==(const Event& e) const = 0; //note: == isnt going to be an exact equal
 
 	void AddCallback(const std::function<void()>& callback);
 
-    void RunCallbacks() const; //callbacks are what should be done when an event occurs?
+	virtual void RunCallbacks() const;
+	
+	virtual bool Subscribe() = 0;
 
-	virtual bool operator==(const Event& e) const = 0;
+	std::optional<Scope> GetScope() const;
+
+	EventType GetType() const;
 
 protected:
+    Event(EventType type);
+private:
 	EventType type;
-
-	time_t timestamp;
-
-    Event(EventType &type);
-
-	std::vector<std::function<void()>> callbacks;
-
 	std::optional<Scope> scope;
+
+
 
 };
 
 enum class FileEventAction{
 	Read,
 	Write,
-	Execute
+	Execute,
+	All
 };
 
 class FileEvent : public Event {
-protected:
+private:
 	std::string path;
 	FileEventAction action;
-	Permissions::User user; //who did it
+	bool watchSubdirs; //if its a directory, watch anything in the subdirectories as well
+public:
+    FileEvent(const std::string& path, FileEventAction action, bool watchSubdirs = false);
+
+	std::string GetPath() const;
+
+	bool IsWatchingSubdirs() const;
+
+	FileEventAction GetAction() const;
+
+	virtual bool Subscribe();
+
+	virtual bool operator==(const Event& e) const;
 
 };
 
 class SystemCallEvent : public Event {
 	//so that we can look at certain system calls
+private:
 	int num;
-	struct pt_regs regs;
+public:
+    SystemCallEvent(int num);
+
+	int GetNum() const;
+
+	virtual bool Subscribe();
+
+	virtual bool operator==(const Event& e) const;
+
+
 };
 
 enum class ProcessEventAction{
@@ -74,54 +102,17 @@ enum class ProcessEventAction{
 };
 
 class ProcessEvent : public Event {
-	pid_t ppid;
-	pid_t pid;
-	ProcessEventAction action;
-	std::optional<int> signo; //for signal events
-	Permissions::User user;
-
-}
-
-//add any other events i can think of
-
-/*class EventLogEvent : public Event {
-public:
-	EventLogEvent(const std::string & channel, int eventID, const std::vector<EventLogs::XpathQuery>& queries = {});
-
-	std::function<void(EventLogs::EventLogItem)> eventLogTrigger;
-
-	std::string GetChannel() const;
-	int GetEventID() const;
-	std::vector<EventLogs::XpathQuery> GetQueries() const;
-
-	virtual bool Subscribe();
-
-	virtual bool operator==(const Event& e) const;
-
 private:
-	std::optional<EventSubscription> eventSub;
-	std::string channel;
-	int eventID;
-	std::vector<EventLogs::XpathQuery> queries;
-};
-
-class FileEvent : public Event {
-
-	/// Directory to be watched
-	FileSystem::Folder directory;
-
-	/// Event that is triggered when the key changes
-	GenericWrapper<HANDLE> hEvent;
-
+	ProcessEventAction action; //the action
+	std::optional<int> signo; //for signal events
 public:
-	FileEvent(const FileSystem::Folder& file);
+    ProcessEvent(ProcessEventAction action, std::optional<int> signo = std::nullopt);
 
-	const GenericWrapper<HANDLE>& GetEvent() const;
+	ProcessEventAction GetAction() const;
 
-	const FileSystem::Folder& GetFolder() const;
+	std::optional<int> GetSignalNumber() const;
 
 	virtual bool Subscribe();
 
 	virtual bool operator==(const Event& e) const;
-	
-};*/
+};

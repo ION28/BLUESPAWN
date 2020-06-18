@@ -1,3 +1,4 @@
+
 #include "monitor/EventManager.h"
 
 #include "util/eventlogs/EventLogs.h"
@@ -11,13 +12,12 @@ EventManager& EventManager::GetInstance(){
 	return manager;
 }
 
-unsigned int EventManager::SubscribeToEvent(const std::shared_ptr<Event>& e, const std::function<void()>& callback) {
-	/*unsigned int status = ERROR_SUCCESS;
+bool EventManager::SubscribeToEvent(const std::shared_ptr<Event>& e, const std::function<void()>& callback) {
 
 	for(auto evt : vEventList){
 		if(*evt == *e){
 			evt->AddCallback(callback);
-			return status;
+			return true;
 		}
 	} 
 
@@ -27,7 +27,5 @@ unsigned int EventManager::SubscribeToEvent(const std::shared_ptr<Event>& e, con
 
 	vEventList.push_back(evt);
 
-	return status;*/
-
-	return 0;
+	return true;
 }

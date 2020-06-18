@@ -10,7 +10,7 @@
 class EventManager {
 
 	public:
-		unsigned int SubscribeToEvent(const std::shared_ptr<Event>& e, const std::function<void()>& callback);
+	    bool SubscribeToEvent(const std::shared_ptr<Event>& e, const std::function<void()>& callback);
 		
 		// EventManager is a singleton class; call GetInstance() to get an instance of it.
 		static EventManager& GetInstance();

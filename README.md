@@ -36,6 +36,11 @@ Visit [this map](https://bluespawn.cloud/coverage/) to see current coverage capa
 .\BLUESPAWN-client-x64.exe --help
 ```
 
+### The linuxdev branch
+
+This branch is currently under active development for Linux clients.  It is currently not stable or buildable, and is very behind the main branch
+A buildable release is expected soon.
+
 ### Mitigate Mode
 4. Run the following from your Administrative Command Prompt to audit your system for the presence of many security settings
 ```cmd
