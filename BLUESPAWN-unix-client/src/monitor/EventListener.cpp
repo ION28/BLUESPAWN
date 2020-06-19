@@ -41,6 +41,7 @@ void EventListener::SubEventListener::ListenForEvents(){
         }
 
         // Event has triggered a callback
+        //TODO: fix this stuff so that WAIT_OBJECT_0 is actually implemented
         else if(status > WAIT_OBJECT_0 && status < WAIT_OBJECT_0 + slots){
             LOG_VERBOSE(1, "An event has been triggered; processing callbacks");
 
