@@ -123,6 +123,12 @@ void FileScanner::UpdateModules(){
 	}
 }
 
+bool FileScanner::PerformQuickScan(IN CONST std::wstring& string){
+	if(FileSystem::CheckFileExists(string)){
+		return FileSystem::File{ string }.GetFileSigned();
+	} else return false;
+}
+
 std::unordered_map<std::reference_wrapper<Detection>, Association> FileScanner::GetAssociatedDetections(
 	IN CONST Detection& detection){
 	
@@ -190,7 +196,7 @@ Certainty FileScanner::ScanDetection(IN CONST Detection& detection){
 		if(file.yara){
 			for(auto& rule : file.yara->vKnownBadRules){
 				// Tune this!
-				certainty = certainty + Certainty::Weak;
+				certainty = certainty + Certainty::Moderate;
 			}
 		}
 

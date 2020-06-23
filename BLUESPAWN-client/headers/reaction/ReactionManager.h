@@ -21,7 +21,8 @@ public:
 
 	/**
 	 * Runs reactions applying to each detection. Note that if the detection has a remediator,
-	 * only reactions with IgnoreRemediator set to true will be run.
+	 * only reactions with IgnoreRemediator set to true will be run. The caller must acquire the
+	 * detection's critical section before attempting to call this function.
 	 *
 	 * @param detection The detection for which handlers will be run
 	 */

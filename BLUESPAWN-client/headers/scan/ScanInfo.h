@@ -7,52 +7,60 @@
 #include <map>
 #include <atomic>
 
-#include "common/wrappers.hpp"
-
-class Detection;
 class Scanner;
+class Detection;
+
+/// Forward declare template specializaiton for hashing reference wrappers for detections
+template<>
+struct std::hash<std::reference_wrapper<Detection>>;
+
+#include "common/wrappers.hpp"
 
 /// Represents the degree of certainty that a detection is malicious
 class Certainty {
+
+	/// A double holding a number between 0 and 1, indicating how strongly the referenced detection
+	/// is believed to be malicious, with 1 being the most certain that it is malicious
 	double confidence;
 
 public:
 
-	const static Certainty Certain;
-	const static Certainty Strong;
-	const static Certainty Moderate;
-	const static Certainty Weak;
-	const static Certainty None;
+	/// Define static certainty values
+	const static Certainty Certain;  // 1.00
+	const static Certainty Strong;   // 0.75
+	const static Certainty Moderate; // 0.50
+	const static Certainty Weak;     // 0.25
+	const static Certainty None;     // 0.00
 
 	Certainty(double value);
-	operator double();
+	operator double() const;
 
 	/**
 	 * If the strengths of two associations are to be combined, this function will compute the
 	 * resulting association. Using the numerical value of associations, the formula is
 	 * 1 - (1 - a1) * (1 - a2).
 	 */
-	Certainty operator+(Certainty c);
+	Certainty operator+(Certainty c) const;
 
 	/**
 	 * If an association is to be the composite of two associations, this function will compute the
 	 * resulting association. Using the numerical value of associations, the formula is
 	 * a1 * a2.
 	 */
-	Certainty operator*(Certainty c);
+	Certainty operator*(Certainty c) const;
 
 	/**
 	 * Used for comparing between certainties. Note that is computes approximate comparisons rather
 	 * than exact comparisons. Thus, any value within 0.125 of `confidence` is considered equal
 	 */
-	bool operator==(Certainty c);
-	bool operator!=(Certainty c);
-	bool operator<=(Certainty c);
-	bool operator>=(Certainty c);
+	bool operator==(Certainty c) const;
+	bool operator!=(Certainty c) const;
+	bool operator<=(Certainty c) const;
+	bool operator>=(Certainty c) const;
 
 	// These functions use exact comparisons rather than approximate comparisons
-	bool operator>(Certainty c);
-	bool operator<(Certainty c);
+	bool operator>(Certainty c) const;
+	bool operator<(Certainty c) const;
 };
 
 /// An association is the degree of certainty that two detections are related
@@ -120,8 +128,8 @@ public:
 	Certainty GetCertainty();
 
 	/**
-	 * Sets the degree of certainty that the detection referenced by this scan node is malicious. This does
-	 * not affect the associative certainty of this ScanNode.
+	 * Sets the degree of certainty that the detection referenced by this scan node is malicious. This does not affect 
+	 * the associative certainty of this ScanNode.
 	 *
 	 * @param certainty The value of certainty to be set
 	 */
@@ -130,8 +138,8 @@ public:
 	);
 
 	/**
-	 * Adds to the degree of certainty that the detection referenced by this scan node is malicious. This does
-	 * not affect the associative certainty of this ScanNode.
+	 * Adds to the degree of certainty that the detection referenced by this scan node is malicious. This does not affect
+	 * the associative certainty of this ScanNode.
 	 *
 	 * @param certainty The value of certainty to be added
 	 */

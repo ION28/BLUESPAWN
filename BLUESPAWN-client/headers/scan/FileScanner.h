@@ -32,7 +32,7 @@ public:
 	 *
 	 * @return A vector of strings referencing files
 	 */
-	std::vector<std::wstring> ExtractFilePaths(
+	static std::vector<std::wstring> ExtractFilePaths(
 		IN CONST std::vector<std::wstring>& strings
 	) const;
 
@@ -45,7 +45,7 @@ public:
 	 *
 	 * @return A vector containing all strings, converted to widestrings
 	 */
-	std::vector<std::wstring> ExtractStrings(
+	static std::vector<std::wstring> ExtractStrings(
 		IN CONST AllocationWrapper& data, 
 		IN DWORD dwMinLength = 5 OPTIONAL
 	) const;
@@ -81,8 +81,7 @@ public:
 	 *
 	 * @param detection The Detection to scan
 	 *
-	 * @return A Certainty indicating the degree of certainty to which the detection
-	 *         is malicious
+	 * @return A Certainty indicating the degree of certainty for which the detection is malicious
 	 */
 	Certainty ScanDetection(
 		IN CONST Detection& detection

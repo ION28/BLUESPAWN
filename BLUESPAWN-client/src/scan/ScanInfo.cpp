@@ -15,15 +15,19 @@ const Certainty Certainty::Moderate = 0.50;
 const Certainty Certainty::Weak =     0.25;
 const Certainty Certainty::None =     0.00;
 Certainty::Certainty(double certainty) : confidence{ certainty }{}
-Certainty::operator double(){ return confidence; }
-Certainty Certainty::operator*(Certainty c){ return confidence * c.confidence; }
-Certainty Certainty::operator+(Certainty c){ return 1 - (1 - confidence) * (1 - c.confidence); }
-bool Certainty::operator==(Certainty c){ return c.confidence > confidence ? c.confidence - confidence <= 0.125 : confidence - c.confidence <= 0.125; }
-bool Certainty::operator!=(Certainty c){ return c.confidence > confidence ? c.confidence - confidence > 0.125 : confidence - c.confidence > 0.125; }
-bool Certainty::operator>=(Certainty c){ return *this > c || *this == c; }
-bool Certainty::operator<=(Certainty c){ return *this > c || *this == c; }
-bool Certainty::operator>(Certainty c){ return confidence > c.confidence; }
-bool Certainty::operator<(Certainty c){ return confidence < c.confidence; }
+Certainty::operator double() const { return confidence; }
+Certainty Certainty::operator*(Certainty c) const { return confidence * c.confidence; }
+Certainty Certainty::operator+(Certainty c) const { return 1 - (1 - confidence) * (1 - c.confidence); }
+bool Certainty::operator==(Certainty c) const {
+	return c.confidence > confidence ? c.confidence - confidence <= 0.125 : confidence - c.confidence <= 0.125;
+}
+bool Certainty::operator!=(Certainty c) const { 
+	return c.confidence > confidence ? c.confidence - confidence > 0.125 : confidence - c.confidence > 0.125; 
+}
+bool Certainty::operator>=(Certainty c) const { return *this > c || *this == c; }
+bool Certainty::operator<=(Certainty c) const { return *this > c || *this == c; }
+bool Certainty::operator>(Certainty c) const { return confidence > c.confidence; }
+bool Certainty::operator<(Certainty c) const { return confidence < c.confidence; }
 
 volatile std::atomic<DWORD> Detection::IDCounter{ 1 };
 

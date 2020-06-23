@@ -13,7 +13,7 @@ DetectionRegister::DetectionRegister(IN CONST Certainty& threshold) :
 void DetectionRegister::AddDetectionAsync(
     IN CONST std::reference_wrapper<Detection>& detection, IN CONST Certainty& certainty){
 
-    BeginCriticalSection guard{ detection.get().hGuard };
+    EnterCriticalSection(detection.get());
     detection.get().info.SetCertainty(certainty);
     for(auto& scan : Scanner::scanners){
         detection.get().info.AddCertainty(scan.ScanDetection(detection.get()));
@@ -23,6 +23,12 @@ void DetectionRegister::AddDetectionAsync(
             for(auto& pair : scan.GetAssociatedDetections(detection.get())){
                 detection.get().info.AddAssociation(pair.first, pair.second);
                 pair.first.get().info.AddAssociation(detection.get(), pair.second);
+
+                auto first{ detection.get().dwID < pair.first.get().dwID ? detection : pair.first };
+                auto second{ detection.get().dwID < pair.first.get().dwID ? pair.first : detection };
+                for(auto& sink : Bluespawn::detectionSinks){
+                    sink->RecordAssociation(first, second, pair.second);
+                }
             }
         }
     }
@@ -39,7 +45,13 @@ void DetectionRegister::AddDetectionAsync(
     }
     LeaveCriticalSection(hQueueGuard);
 
+    for(auto& sink : Bluespawn::detectionSinks){
+        sink->RecordDetection(detection, RecordType::PostScan);
+    }
+
+    EnterCriticalSection(detection.get());
     Bluespawn::reaction.React(detection.get());
+    LeaveCriticalSection(detection.get());
 }
 
 void DetectionRegister::UpdateDetectionCertainty(
@@ -66,8 +78,14 @@ void DetectionRegister::UpdateDetectionCertainty(
         if(below && detection.get().info.GetCertainty() >= threshold){
             for(auto& scan : Scanner::scanners){
                 for(auto& pair : scan.GetAssociatedDetections(detection.get())){
-                    Detection copy{ pair.first };
-                    detection.get().info.AddAssociation(AddDetection(std::move(copy), Certainty::None), pair.second);
+                    detection.get().info.AddAssociation(pair.first, pair.second);
+                    pair.first.get().info.AddAssociation(detection.get(), pair.second);
+
+                    auto first{ detection.get().dwID < pair.first.get().dwID ? detection : pair.first };
+                    auto second{ detection.get().dwID < pair.first.get().dwID ? pair.first : detection };
+                    for(auto& sink : Bluespawn::detectionSinks){
+                        sink->RecordAssociation(first, second, pair.second);
+                    }
                 }
             }
         } 
@@ -90,6 +108,9 @@ std::reference_wrapper<Detection> DetectionRegister::AddDetection(IN Detection&&
     if(itr != scanned.end()){
         LeaveCriticalSection(hScannedGuard);
         auto ref{ *itr };
+        for(auto& sink : Bluespawn::detectionSinks){
+            sink->RecordDetection(ref, RecordType::PreScan);
+        }
         ThreadPool::GetInstance().EnqueueTask(std::bind(&DetectionRegister::UpdateDetectionCertainty, this, ref, 
                                                         certainty));
         return ref;
@@ -101,6 +122,9 @@ std::reference_wrapper<Detection> DetectionRegister::AddDetection(IN Detection&&
     if(itr != queue.end()){
         LeaveCriticalSection(hQueueGuard);
         auto ref{ *itr };
+        for(auto& sink : Bluespawn::detectionSinks){
+            sink->RecordDetection(ref, RecordType::PreScan);
+        }
         ThreadPool::GetInstance().EnqueueTask(std::bind(&DetectionRegister::UpdateDetectionCertainty, this, ref,
                                                         certainty));
         return ref;
@@ -112,7 +136,12 @@ std::reference_wrapper<Detection> DetectionRegister::AddDetection(IN Detection&&
     std::reference_wrapper<Detection> ref{ detections[detections.size() - 1] };
     LeaveCriticalSection(hGuard);
 
+    for(auto& sink : Bluespawn::detectionSinks){
+        sink->RecordDetection(ref, RecordType::PreScan);
+    }
+
     ResetEvent(hEvent);
+
     EnterCriticalSection(hQueueGuard);
     queue.emplace(ref);
     LeaveCriticalSection(hQueueGuard);

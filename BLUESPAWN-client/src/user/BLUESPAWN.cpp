@@ -69,11 +69,10 @@ const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{};
 MitigationRegister Bluespawn::mitigationRecord{ io };
 
-std::map<std::string, std::shared_ptr<Reaction>> reactions = {
-	{"log", std::make_shared<Reactions::LogReaction>()},
-	{"remove-value", std::make_shared<Reactions::RemoveValueReaction>( Bluespawn::io )},
-	{"suspend", std::make_shared<Reactions::SuspendProcessReaction>( Bluespawn::io )},
-	{"carve-memory", std::make_shared<Reactions::CarveProcessReaction>( Bluespawn::io )},
+std::map<std::string, std::unique_ptr<Reaction>> reactions{
+	{"remove-value", std::make_unique<Reactions::RemoveValueReaction>( Bluespawn::io )},
+	{"suspend", std::make_unique<Reactions::SuspendProcessReaction>( Bluespawn::io )},
+	{"carve-memory", std::make_unique<Reactions::CarveMemoryReaction>( Bluespawn::io )},
 };
 
 Aggressiveness Bluespawn::aggressiveness{ Aggressiveness::Normal };
@@ -159,8 +158,8 @@ void Bluespawn::RunMonitor() {
 	}
 }
 
-void Bluespawn::AddReaction(const std::shared_ptr<Reaction>& reaction){
-	Bluespawn::reaction.Combine(*reaction);
+void Bluespawn::AddReaction(std::unique_ptr<Reaction>&& reaction){
+	Bluespawn::reaction.AddHandler(std::move(reaction));
 }
 
 void Bluespawn::EnableMode(BluespawnMode mode, int option){

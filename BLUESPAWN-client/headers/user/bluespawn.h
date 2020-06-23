@@ -9,7 +9,7 @@
 #include "user/banners.h"
 
 #include "util/log/Log.h"
-#include "util/log/CLISink.h"
+#include "util/log/DetectionSink.h"
 #include "util/configurations/Registry.h"
 
 #include "hunt/Hunt.h"
@@ -39,7 +39,7 @@ class Bluespawn {
 	public:
 		Bluespawn();
 
-		void AddReaction(const std::shared_ptr<Reaction>& reaction);
+		void AddReaction(std::unique_ptr<Reaction>&& reaction);
 		void EnableMode(BluespawnMode mode, int argument = 0);
 
 		void Run();
@@ -48,6 +48,7 @@ class Bluespawn {
 		static MitigationRegister mitigationRecord;
 		static Aggressiveness aggressiveness;
 		static DetectionRegister detections;
+		static std::vector<std::unique_ptr<DetectionSink>> detectionSinks;
 		static bool EnablePreScanDetections;
 
 		static ReactionManager reaction;

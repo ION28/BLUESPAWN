@@ -267,6 +267,15 @@ struct ProcessDetectionData {
 	 * @return A hash for this detection data
 	 */
 	size_t Hash() CONST;
+
+	/**
+	 * Override comparison operator
+	 *
+	 * @param detection The data to compare
+	 *
+	 * @return True if the data is equal to this; false otherwise
+	 */
+	bool operator==(const ProcessDetectionData& detection) const = default;
 };
 
 /**
@@ -357,6 +366,15 @@ struct FileDetectionData {
 	 * @return A hash for this detection data
 	 */
 	size_t Hash() CONST;
+
+	/**
+	 * Override comparison operator
+	 *
+	 * @param detection The data to compare
+	 *
+	 * @return True if the data is equal to this; false otherwise
+	 */
+	bool operator==(const FileDetectionData& detection) const = default;
 };
 
 /**
@@ -414,6 +432,15 @@ struct RegistryDetectionData {
 	 * @return A hash for this detection data
 	 */
 	size_t Hash() CONST;
+
+	/**
+	 * Override comparison operator
+	 *
+	 * @param detection The data to compare
+	 *
+	 * @return True if the data is equal to this; false otherwise
+	 */
+	bool operator==(const RegistryDetectionData& detection) const = default;
 };
 
 /**
@@ -461,6 +488,15 @@ struct ServiceDetectionData {
 	 * @return A hash for this detection data
 	 */
 	size_t Hash() CONST;
+
+	/**
+	 * Override comparison operator
+	 *
+	 * @param detection The data to compare
+	 *
+	 * @return True if the data is equal to this; false otherwise
+	 */
+	bool operator==(const ServiceDetectionData& detection) const = default;
 };
 
 /**
@@ -505,6 +541,15 @@ struct OtherDetectionData {
 	 * @return A hash for this detection data
 	 */
 	size_t Hash() CONST;
+
+	/**
+	 * Override comparison operator
+	 *
+	 * @param detection The data to compare
+	 *
+	 * @return True if the data is equal to this; false otherwise
+	 */
+	bool operator==(const OtherDetectionData& detection) const = default;
 };
 
 /// Stores contextual information around a detection
@@ -531,7 +576,6 @@ struct DetectionContext {
 	 * @param FirstEvidenceTime The time at which the first evidence of this detection was created
 	 */
 	DetectionContext(
-		IN CONST std::optional<FILETIME>& DetectionCreatedTime = std::nullopt OPTIONAL,
 		IN CONST std::optional<std::wstring>& hunt = std::nullopt OPTIONAL,
 		IN CONST std::optional<FILETIME>& FirstEvidenceTime = std::nullopt OPTIONAL,
 		IN CONST std::optional<std::wstring>& note = std::nullopt OPTIONAL
@@ -563,7 +607,8 @@ class Detection {
 	/// a unique identifier.
 	static volatile std::atomic<DWORD> IDCounter;
 
-	struct {
+	/// A struct used to serialize detection data
+	static struct {
 		std::unordered_map<std::wstring, std::wstring> operator()(ProcessDetectionData data){return data.Serialize();}
 		std::unordered_map<std::wstring, std::wstring> operator()(FileDetectionData data){ return data.Serialize(); }
 		std::unordered_map<std::wstring, std::wstring> operator()(RegistryDetectionData data){return data.Serialize();}
@@ -571,20 +616,24 @@ class Detection {
 		std::unordered_map<std::wstring, std::wstring> operator()(OtherDetectionData data){ return data.Serialize(); }
 	} serializer;
 
-	struct {
+	/// A struct used to hash detection data
+	static struct {
 		size_t operator()(ProcessDetectionData data){ return data.Hash(); }
 		size_t operator()(FileDetectionData data){ return data.Hash(); }
 		size_t operator()(RegistryDetectionData data){ return data.Hash(); }
 		size_t operator()(ServiceDetectionData data){ return data.Hash(); }
 		size_t operator()(OtherDetectionData data){ return data.Hash(); }
 	} hasher;
+
+	friend class std::hash<Detection>;
+
 public:
 
 	/// A unique identifier for this detection
 	DWORD dwID;
 
-	/// Indicates whether the data represented by this detection is consistent with the
-	/// current state of the operating system.
+	/// Indicates whether the data represented by this detection is consistent with the current state of the operating
+	/// system.
 	bool DetectionStale;
 
 	/// Indicates the type of this detection
@@ -596,29 +645,27 @@ public:
 	/// Information related to the scans performed on this detection
 	ScanInfo info;
 
-	/// A function that when run will remediate the detection, either removing it, fixing it, or 
-	/// mitigating it.
+	/// A function that when run will remediate the detection, either removing it, fixing it, or  mitigating it.
 	std::optional<std::function<void(Detection& detection)>> remediator;
 
-	/// Describes the context surrounding the detection such as when the first evidence of the 
-	/// detection was created, the hunts generating this detection, and the time the detection
-	/// was generated.
-	std::optional<DetectionContext> context;
+	/// Describes the context surrounding the detection such as when the first evidence of the detection was created, 
+	/// the hunts generating this detection, and the time the detection was generated.
+	DetectionContext context;
 
 	/// A critical section guarding access to members of this class
 	CriticalSection hGuard;
 
 	/**
-	 * Creates a Detection object, given associated data, optional context, an optional remediator,
-	 * and an optional indicator as to whether the detection is stale.
+	 * Creates a Detection object, given associated data, optional context, an optional remediator, and an optional 
+	 * indicator as to whether the detection is stale.
 	 *
 	 * @param data The data associated with the detection to be created. The type will be deduced.
-	 * @param context The context surrounding the detection. If not provided, this will default to
-	 *        only include the time.
-	 * @param remediator A function that can be used to remediate the detection if it is determined
-	 *        to be malicious. By default, there is no remediator.
-	 * @param DetectionStale A boolean indicating whether the data represented by this detection is 
-	 *        consistent with the current state of the operating system. This defaults to false.
+	 * @param context The context surrounding the detection. If not provided, this will default to only include the 
+	 *        time.
+	 * @param remediator A function that can be used to remediate the detection if it is determined to be malicious. 
+	 *        By default, there is no remediator.
+	 * @param DetectionStale A boolean indicating whether the data represented by this detection is consistent with 
+	 *        the current state of the operating system. This defaults to false.
 	 */
 	Detection(
 		IN CONST DetectionData& data,
@@ -627,24 +674,42 @@ public:
 		IN bool DetectionStale = false OPTIONAL
 	);
 
-	/// Overload comparison operator. Checks if the DetectionData is the same, regardless of context
+	/**
+	 * Override for equality comparison operator. This checks if the data matches, ignoring other fields.
+	 *
+	 * @param detection The detection to compare
+	 * 
+	 * @return True if the detection is equal to this; false otherwise
+	 */
 	bool operator==(const Detection& detection) const;
 
 	/**
-	 * Serialize the detection data in to a mapping of values. Note this should not
-	 * include any internal representations but rather only include values that have
-	 * meaning outside of BLUESPAWN's running.
+	 * Serialize the detection data in to a mapping of values. Note this should not include any internal 
+	 * representations but rather only include values that have meaning outside of BLUESPAWN's running.
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
 	std::unordered_map<std::wstring, std::wstring> Serialize() const;
 
-	/// Implicit cast to CriticalSection support so users can say EnterCriticalSection(Detection)
+	/**
+	 * Implicit cast to a CRITICAL_SECTION pointer for use in synchronization functions
+	 *
+	 * @return hGuard
+	 */
 	operator LPCRITICAL_SECTION();
 };
 
+/// Template specialization defining how hashes of Detection objects should be calculated
 template<>
-class std::hash<Detection> {
+struct std::hash<Detection> {
 
+	/// Hashes a detection using its data
 	size_t operator()(const Detection& detection) const;
+};
+
+template<>
+struct std::hash<std::reference_wrapper<Detection>> {
+
+	/// Hashes a detection using its data
+	size_t operator()(const std::reference_wrapper<Detection>& detection) const;
 };

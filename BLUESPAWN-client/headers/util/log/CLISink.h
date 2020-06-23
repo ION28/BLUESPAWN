@@ -101,7 +101,8 @@ namespace Log {
 		/**
 		 * Records an association between two detections to the console
 		 *
-		 * @param first The first detection in the assocation. This detection's ID will be lower than the second's.
+		 * @param first The first detection in the assocation. This detection's ID will be lower than 
+		 *              the second's.
 		 * @param second The second detection in the association.
 		 */
 		virtual void RecordAssociation(

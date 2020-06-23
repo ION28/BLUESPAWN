@@ -4,95 +4,62 @@
 #include "util/filesystem/FileSystem.h"
 #include "util/processes/ProcessUtils.h"
 #include "util/configurations/Registry.h"
-#include "hunt/Hunt.h"
 #include "user/bluespawn.h"
 
-#include "scan/YaraScanner.h"
-#include "scan/FileScanner.h"
-#include "scan/RegistryScanner.h"
+#include <TlHelp32.h>
 
-std::map<std::shared_ptr<ScanNode>, Association> ProcessScanner::GetAssociatedDetections(const std::shared_ptr<ScanNode>& node){
-	if(!node->detection || node->detection->Type != DetectionType::Process){
-		return {};
-	}
+std::unordered_map<std::reference_wrapper<Detection>, Association> ProcessScanner::SearchCommand(
+	IN CONST std::wstring& ProcessCommand){
 
-	ProcessDetection detection = std::static_pointer_cast<PROCESS_DETECTION>(node->detection);
-	HandleWrapper hProcess{ OpenProcess(PROCESS_ALL_ACCESS, false, detection->PID) };
-	std::map<std::shared_ptr<ScanNode>, Association> detections{};
+	LOG_ERROR(L"Unable to properly scan command `" << ProcessCommand << L"`; function not implemented");
 
-	auto mapped{ GetMappedFile(hProcess, detection->lpAllocationBase) };
-	if(mapped){
-		std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(mapped->GetFilePath())), Association::Strong);
-		association.first->AddAssociation(node, association.second);
-		detections.emplace(association);
-	}
-
-	auto modules = EnumModules(hProcess);
-	for(auto path : modules){
-		if(FileSystem::CheckFileExists(path)){
-			FileSystem::File file{ path };
-			if(!file.GetFileSigned()){
-				std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(path)), Association::Strong);
-				association.first->AddAssociation(node, association.second);
-				detections.emplace(association);
-			}
-			if(Bluespawn::aggressiveness > Aggressiveness::Cursory){
-				auto& scanner{ YaraScanner::GetInstance() };
-				if(scanner.ScanFile(file)){
-					std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(path)), Association::Strong);
-					association.first->AddAssociation(node, association.second);
-					detections.emplace(association);
-				}
-			}
-		}
-	}
-
-	if(detection->lpAllocationBase && Bluespawn::aggressiveness > Aggressiveness::Cursory){
-		auto memory{ Utils::Process::ReadProcessMemory(detection->PID, detection->lpAllocationBase, detection->dwAllocationSize) };
-		if(memory){
-			auto strings = FileScanner::ExtractStrings(memory, 8);
-			auto filenames = FileScanner::ExtractFilePaths(strings);
-			for(auto filename : filenames){
-				std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<FILE_DETECTION>(filename)), Association::Moderate);
-				association.first->AddAssociation(node, association.second);
-				detections.emplace(association);
-			}
-
-			auto keynames = RegistryScanner::ExtractRegistryKeys(strings);
-			for(auto keyname : keynames){
-				Registry::RegistryValue value{ Registry::RegistryKey{ keyname }, L"Unknown", std::move(std::wstring{ L"Unknown" }) };
-				std::pair<std::shared_ptr<ScanNode>, Association> association(std::make_shared<ScanNode>(std::make_shared<REGISTRY_DETECTION>(value)), Association::Weak);
-				association.first->AddAssociation(node, association.second);
-				detections.emplace(association);
-			}
-		}
-	}
-
-	return detections;
-}
-
-std::vector<FileSystem::File> ProcessScanner::ScanCommand(const std::wstring& command){
-	auto& executable{ GetImagePathFromCommand(command) };
-	auto& file{ FileSystem::File(executable) };
-	if(file.GetFileExists()){
-		auto& mem{ file.Read() };
-		if(mem.CompareMemory(FileSystem::File(L"cmd.exe").Read())){
-			// Find the command
-		} else if(mem.CompareMemory(FileSystem::File(L"powershell.exe").Read())){
-			// Find the command
-		} else if(mem.CompareMemory(FileSystem::File(L"rundll32.exe").Read())){
-			// Find the dll
-		} else if(mem.CompareMemory(FileSystem::File(L"dllhost.exe").Read())){
-			// Find the dll
-		} else if(mem.CompareMemory(FileSystem::File(L"explorer.exe").Read())){
-			// Find LNK file
-		} else if(mem.CompareMemory(FileSystem::File(L"RegSrv.exe").Read())){
-
-		} else return { file };
-	}
 	return {};
 }
 
-Certainty ProcessScanner::ScanItem(const std::shared_ptr<ScanNode>& base){
+std::unordered_map<std::reference_wrapper<Detection>, Association> ProcessScanner::GetAssociatedDetections(
+	IN CONST Detection& detection){
+
+	if(detection.type != DetectionType::ProcessDetection){
+		return {};
+	}
+
+	std::unordered_map<std::reference_wrapper<Detection>, Association> detections{};
+	ProcessDetectionData data{ std::get<ProcessDetectionData>(detection.data) };
+	
+	if(data.type == ProcessDetectionType::MaliciousProcess && data.ProcessCommand){
+		auto associated{ SearchCommand(*data.ProcessCommand) };
+		detections.emplace(associated.begin(), associated.end());
+	}
+
+	HandleWrapper snapshot{ CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) };
+	
+	PROCESSENTRY32W entry{};
+	entry.dwSize = sizeof(entry);
+
+	if(Process32FirstW(snapshot, &entry)){
+		do if(entry.th32ParentProcessID == data.PID){
+			detections.emplace(Bluespawn::detections.AddDetection(Detection{
+				ProcessDetectionData::CreateProcessDetectionData(entry.th32ProcessID, entry.szExeFile)
+			}), Association::Moderate);
+		} else if(entry.th32ProcessID == data.PID){
+			HandleWrapper parent{ OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, entry.th32ParentProcessID) };
+			if(parent){
+				detections.emplace(Bluespawn::detections.AddDetection(Detection{
+					ProcessDetectionData::CreateProcessDetectionData(entry.th32ParentProcessID, 
+					                                                 GetProcessImage(parent))
+				}), Association::Weak);
+			} else{
+				detections.emplace(Bluespawn::detections.AddDetection(Detection{
+					ProcessDetectionData::CreateProcessDetectionData(entry.th32ParentProcessID, L"Unknown")
+                }), Association::Weak);
+			}
+		} while(Process32NextW(snapshot, &entry));
+	}
+}
+
+bool ProcessScanner::PerformQuickScan(IN CONST std::wstring& in){ return false; }
+
+Certainty ProcessScanner::ScanDetection(IN CONST Detection& detection){
+	/// TODO: Implement check for LOLBins
 	return Certainty::None;
 }

@@ -77,4 +77,10 @@ namespace Log {
 			}
 		}
 	}
+
+	void CLISink::RecordAssociation(IN CONST std::reference_wrapper<Detection>& first, 
+									IN CONST std::reference_wrapper<Detection>& second, IN CONST Association& a){
+		std::cout << "Detections with IDs " << first.get().dwID << " and " << second.get().dwID << " are associated "
+			<< " with strength " << static_cast<double>(a) << std::endl;
+	}
 }
