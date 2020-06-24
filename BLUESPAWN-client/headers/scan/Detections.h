@@ -21,19 +21,20 @@ enum class DetectionType {
 	RegistryDetection,
 	FileDetection,
 	ServiceDetection,
-	OtherDetection
+	OtherDetection,
 };
 
 /// Describes the type of registry entry associated with a RegistryDetectionData object
 enum class RegistryDetectionType {
-	CommandReference, // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a command used to run program
+	CommandReference, // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a command used to run
+	                  // a program
 	FileReference,    // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a file
 	FolderReference,  // The associated value is either a REG_SZ or REG_EXPAND_SZ that references a folder
 	PipeReference,    // The associated value is either a REG_SZ that references a named pipe
 	ShareReference,   // The associated value is either a REG_SZ that references a share
 	UserReference,    // The associated value is either a REG_SZ that references a user
 	Configuration,    // The associated value references a configuration for the operating system
-	Association       // The associated value is assumed malicious due to association with other malicious detections
+	Unknown,          // The associated value is assumed malicious, though its usage is unknown
 };
 
 /// Describes the type of detection is associated with a ProcessDetectionData object
@@ -192,12 +193,11 @@ struct ProcessDetectionData {
 	);
 
 	/**
-	 * Instantiates a ProcessDetectionData object representing a malicious image loaded in
-	 * to a process. This constructor is intended to be used primarily when a handle to the
-	 * process is infeasible to obtain. Note that this constructor is intended to be used
-	 * when the library is infected, hooked, stomped, hollowed, doppelganged, or similar, not 
-	 * when a loaded libary is determined to be malicious. No arguments will be deduced when
-	 * using this constructor.
+	 * Instantiates a ProcessDetectionData object representing a malicious memory section loaded in to a process. This 
+	 * constructor is intended to be used primarily when a handle to the process is infeasible to obtain. Note that 
+	 * this constructor is intended to be used when the library is infected, hooked, stomped, hollowed, doppelganged, 
+	 * or similar, not when a loaded libary is determined to be malicious. No arguments will be deduced when using this
+	 * constructor.
 	 *
 	 * @param PID The process ID of the process
 	 * @param ProcessName The name of the process
@@ -206,8 +206,7 @@ struct ProcessDetectionData {
 	 * @param ImageName The name of the image in memory being referenced by the detection
 	 * @param ProcessPath The path to the executable image of the process
 	 * @param ProcessCommand The command used to spawn the process
-	 * @param ParentProcess An pointer to a ProcessDetectionData struct containing information
-	 *        on the parent process.
+	 * @param ParentProcess An pointer to a ProcessDetectionData struct containing information on the parent process
 	 */
 	static ProcessDetectionData CreateMemoryDetectionData(
 		IN DWORD PID,
@@ -221,25 +220,23 @@ struct ProcessDetectionData {
 	);
 
 	/**
-	 * Instantiates a ProcessDetectionData object representing a malicious image loaded in
-	 * to a process. This constructor is intended to be used whenever a handle is available.
-	 * Most of the arguments can be calculated, though if they are available, passing them
-	 * improves efficiency. Note that this constructor is intended to be used when a loaded
-	 * libary is determined to be malicious, not when the library is infected, hooked, stomped,
-	 * hollowed, doppelganged, or similar.
+	 * Instantiates a ProcessDetectionData object representing a malicious memory section loaded in to a process. This 
+	 * constructor is intended to be used whenever a handle is available. Most of the arguments can be calculated, 
+	 * though if they are available, passing them improves efficiency. Note that this constructor is intended to be 
+	 * used when the library is infected, hooked, stomped, hollowed, doppelganged, or similar, not when a loaded libary
+	 * is determined to be malicious.
 	 *
 	 * @param ProcessHandle An open handle to the process
 	 * @param ProcessName The name of the process
 	 * @param BaseAddress The base address of the memory section
 	 * @param MemorySize The size of the memory section
-	 * @param ImageName The name of the image in memory being referenced by the detection. If 
-	 *		  skipped, this will be automatically deduced if possible.
-	 * @param ProcessPath The path to the executable image of the process. If skipped, this will
-	 *		  be automatically deduced
-	 * @param ProcessCommand The command used to spawn the process. If skipped, this will be
-	 *		  automatically deduced
-	 * @param ParentProcess An pointer to a ProcessDetectionData struct containing information
-	 *        on the parent process. If skipped, this will be automatically deduced
+	 * @param ImageName The name of the image in memory being referenced by the detection. If skipped, this will be 
+	 *        automatically deduced if possible.
+	 * @param ProcessPath The path to the executable image of the process. If skipped, this will be automatically 
+	 *        deduced
+	 * @param ProcessCommand The command used to spawn the process. If skipped, this will be automatically deduced
+	 * @param ParentProcess An pointer to a ProcessDetectionData struct containing information on the parent process. 
+	 *        If skipped, this will be automatically deduced
 	 */
 	static ProcessDetectionData CreateMemoryDetectionData(
 		IN CONST HandleWrapper& ProcessHandle,
@@ -253,13 +250,12 @@ struct ProcessDetectionData {
 	);
 
 	/**
-	 * Serialize the detection data in to a mapping of values. Note this should not
-	 * include any internal representations but rather only include values that have
-	 * meaning outside of BLUESPAWN's running.
+	 * Serialize the detection data in to a mapping of values. Note this should not include any internal representations
+	 * but rather only include values that have meaning outside of BLUESPAWN's running.
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::unordered_map<std::wstring, std::wstring> Serialize() CONST;
+	const std::unordered_map<std::wstring, std::wstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -276,6 +272,29 @@ struct ProcessDetectionData {
 	 * @return True if the data is equal to this; false otherwise
 	 */
 	bool operator==(const ProcessDetectionData& detection) const = default;
+
+private:
+
+	/// Record the hash of the data
+	size_t hash = 0;
+
+	/// Record the serialization of the data
+	std::unordered_map<std::wstring, std::wstring> serialization = {};
+
+	/// Raw constructor for a ProcessDetectionData
+	ProcessDetectionData(
+		IN ProcessDetectionType type,
+		IN DWORD PID,
+		IN CONST std::optional<DWORD> & TID,
+		IN CONST std::optional<HandleWrapper>& ProcessHandle,
+		IN CONST std::wstring & ProcessName,
+		IN CONST std::optional<std::wstring>& ProcessPath,
+		IN CONST std::optional<std::wstring>& ProcessCommand,
+		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess,
+		IN CONST std::optional<PVOID64>& BaseAddress,
+		IN CONST std::optional<DWORD>& MemorySize,
+		IN CONST std::optional<std::wstring>& ImageName
+	);
 };
 
 /**
@@ -324,15 +343,14 @@ struct FileDetectionData {
 	std::optional<std::wstring> Signer;
 
 	/**
-	 * Creates a FileDetectionData using an open handle to the file. This works under
-	 * the assumption that the detection matches the file found on disk. If generating
-	 * this detection from event logs or other records, this may not be the case. If
-	 * the file has already been scanned with yara, it is recommended that the result
-	 * be passed in to the constructor so that it doesn't have to be scanned a second time.
+	 * Creates a FileDetectionData using an open handle to the file. This works under the assumption that the 
+	 * detection matches the file found on disk. If generating this detection from event logs or other records this 
+	 * may not be the case. If the file has already been scanned with yara, it is recommended that the result be passed
+	 * in to the constructor so that it doesn't have to be scanned a second time.
 	 * 
 	 * @param file A File object representing the file.
-	 * @param scan The result of a yara scan performed on a file. This parameter is optional,
-	 *        but providing the result will avoid the need for the scan to be repeated.
+	 * @param scan The result of a yara scan performed on a file. This parameter is optional, but providing the result 
+	 * will avoid the need for the scan to be repeated.
 	 */
 	FileDetectionData(
 		IN CONST FileSystem::File& file,
@@ -340,10 +358,9 @@ struct FileDetectionData {
 	);
 
 	/**
-	 * Creates a FileDetectionData using the file's path on disk. This constructor is best
-	 * used when the file could not be found or it is infeasible to construct a File object
-	 * representing the underlying file. If a File object is available, using the other
-	 * constructor will be more efficient.
+	 * Creates a FileDetectionData using the file's path on disk. This constructor is best used when the file could not
+	 * be found or it is infeasible to construct a File object representing the underlying file. If a File object is 
+	 * available, using the other constructor will be more efficient.
 	 *
 	 * @param FilePath The path of the file
 	 */
@@ -352,13 +369,12 @@ struct FileDetectionData {
 	);
 
 	/**
-	 * Serialize the detection data in to a mapping of values. Note this should not
-	 * include any internal representations but rather only include values that have
-	 * meaning outside of BLUESPAWN's running.
+	 * Serialize the detection data in to a mapping of values. Note this should not include any internal representations
+	 * but rather only include values that have meaning outside of BLUESPAWN's running.
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::unordered_map<std::wstring, std::wstring> Serialize() CONST;
+	const std::unordered_map<std::wstring, std::wstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -375,15 +391,22 @@ struct FileDetectionData {
 	 * @return True if the data is equal to this; false otherwise
 	 */
 	bool operator==(const FileDetectionData& detection) const = default;
+
+private:
+
+	/// Record the hash of the data
+	size_t hash = 0;
+
+	/// Record the serialization of the data
+	std::unordered_map<std::wstring, std::wstring> serialization = {};
 };
 
 /**
- * Stores information about a registry entry identified as possibly malicious. This entry
- * may be a whole registry key, a registry value, or just part of a registry value.
+ * Stores information about a registry entry identified as possibly malicious. This entry may be a whole registry key,
+ * a registry value, or just part of a registry value.
  *
- * If a registry value is detected on and it is a REG_MULTI_SZ, rather than creating one 
- * detection for the value as a whole, create a separate detection for each potentially 
- * malicious entry in the value as a REG_SZ.
+ * If a registry value is detected on and it is a REG_MULTI_SZ, rather than creating one detection for the value as a 
+ * whole, create a separate detection for each potentially malicious entry in the value as a REG_SZ.
  */
 struct RegistryDetectionData {
 
@@ -399,32 +422,34 @@ struct RegistryDetectionData {
 	/// The raw data contained in the registry entry.
 	std::optional<AllocationWrapper> data;
 
+	/// The type of data in this registry detection
+	RegistryDetectionType type;
+
 	/**
-	 * Creates a RegistryDetectionData, referencing either a registry key, a registry value,
-	 * or part of a registry value. If a registry value is detected on and it is a REG_MULTI_SZ, 
-	 * rather than creating one detection for the value as a whole, create a separate detection 
-	 * for each potentially malicious entry in the value as a REG_SZ.
+	 * Creates a RegistryDetectionData, referencing either a registry key, a registry value, or part of a registry 
+	 * value. If a registry value is detected on and it is a REG_MULTI_SZ, rather than creating one detection for the 
+	 * value as a whole, create a separate detection for each potentially malicious entry in the value as a REG_SZ.
 	 *
 	 * @param key The associated with the registry entry.
 	 * @param value An optional value under the key associated with the registry entry
-	 * @param data An optional allocation wrapper storing the raw data associated with the registry 
-	 *        entry. If `value` represents only part of a registry value's data, this should not be
-	 *        set.
+	 * @param type The type of data referenced by this registry value. This defaults to Unknown
+	 * @param data An optional allocation wrapper storing the raw data associated with the registry entry. If `value` 
+	 *        represents only part of a registry value's data, this should not be set.
 	 */
 	RegistryDetectionData(
 		IN CONST Registry::RegistryKey& key,
 		IN CONST std::optional<Registry::RegistryValue>& value = std::nullopt OPTIONAL,
+		IN RegistryDetectionType type = RegistryDetectionType::Unknown OPTIONAL,
 		IN CONST std::optional<AllocationWrapper>& data = std::nullopt OPTIONAL
 	);
 
 	/**
-	 * Serialize the detection data in to a mapping of values. Note this should not
-	 * include any internal representations but rather only include values that have
-	 * meaning outside of BLUESPAWN's running.
+	 * Serialize the detection data in to a mapping of values. Note this should not include any internal representations
+	 * but rather only include values that have meaning outside of BLUESPAWN's running.
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::unordered_map<std::wstring, std::wstring> Serialize() CONST;
+	const std::unordered_map<std::wstring, std::wstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -441,12 +466,20 @@ struct RegistryDetectionData {
 	 * @return True if the data is equal to this; false otherwise
 	 */
 	bool operator==(const RegistryDetectionData& detection) const = default;
+
+private:
+
+	/// Record the hash of the data
+	size_t hash = 0;
+
+	/// Record the serialization of the data
+	std::unordered_map<std::wstring, std::wstring> serialization = {};
 };
 
 /**
- * Stores information about a service identified as possibly malicious. Note that when 
- * creating a service detection object, it is recommended that the registry keys and files
- * associated with the service should have separate detection objects.
+ * Stores information about a service identified as possibly malicious. Note that when creating a service detection 
+ * object, it is recommended that the registry keys and files associated with the service should have separate 
+ * detection objects.
  */
 struct ServiceDetectionData {
 
@@ -460,8 +493,7 @@ struct ServiceDetectionData {
 	std::optional<std::wstring> Description;
 
 	/**
-	 * Creates a ServiceDetectionData object, referencing a windows service that may be
-	 * malicious. 
+	 * Creates a ServiceDetectionData object, referencing a windows service that may be malicious. 
 	 * 
 	 * @param ServiceName The name of the service
 	 * @param DisplayName The display name of the service
@@ -474,13 +506,12 @@ struct ServiceDetectionData {
 	);
 
 	/**
-	 * Serialize the detection data in to a mapping of values. Note this should not
-	 * include any internal representations but rather only include values that have
-	 * meaning outside of BLUESPAWN's running.
+	 * Serialize the detection data in to a mapping of values. Note this should not include any internal representations
+	 * but rather only include values that have meaning outside of BLUESPAWN's running.
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::unordered_map<std::wstring, std::wstring> Serialize() CONST;
+	const std::unordered_map<std::wstring, std::wstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -497,11 +528,19 @@ struct ServiceDetectionData {
 	 * @return True if the data is equal to this; false otherwise
 	 */
 	bool operator==(const ServiceDetectionData& detection) const = default;
+
+private:
+
+	/// Record the hash of the data
+	size_t hash = 0;
+
+	/// Record the serialization of the data
+	std::unordered_map<std::wstring, std::wstring> serialization = {};
 };
 
 /**
- * Stores information about something not covered by other detection types identified as
- * possibly malicious. This includes things such as users, groups, shares, pipes, and more.
+ * Stores information about something not covered by other detection types identified as possibly malicious. This 
+ * includes things such as users, groups, shares, pipes, and more.
  */
 struct OtherDetectionData {
 	
@@ -512,14 +551,11 @@ struct OtherDetectionData {
 	std::unordered_map<std::wstring, std::wstring> DetectionProperties;
 
 	/**
-	 * Creates an OtherDetectionData object, referencing something on the system identified
-	 * as possibly malicious. OtherDetectionData objects consist of a type and a map of 
-	 * properties and their values, represented as strings.
+	 * Creates an OtherDetectionData object, referencing something on the system identified as possibly malicious. 
+	 * OtherDetectionData objects consist of a type and a map of properties and their values, represented as strings.
 	 *
-	 * @param DetectionType A string describing the type of detection associated with this 
-	 *        object
-	 * @param DetectionProperties A mapping of property to value describing what's being 
-	 *        referenced by this.
+	 * @param DetectionType A string describing the type of detection associated with this object
+	 * @param DetectionProperties A mapping of property to value describing what's being referenced by this.
 	 */
 	OtherDetectionData(
 		IN CONST std::wstring& DetectionType,
@@ -527,13 +563,12 @@ struct OtherDetectionData {
 	);
 
 	/**
-	 * Serialize the detection data in to a mapping of values. Note this should not
-	 * include any internal representations but rather only include values that have
-	 * meaning outside of BLUESPAWN's running.
+	 * Serialize the detection data in to a mapping of values. Note this should not include any internal representations 
+	 * but rather only include values that have meaning outside of BLUESPAWN's running.
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::unordered_map<std::wstring, std::wstring> Serialize() CONST;
+	const std::unordered_map<std::wstring, std::wstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -550,6 +585,14 @@ struct OtherDetectionData {
 	 * @return True if the data is equal to this; false otherwise
 	 */
 	bool operator==(const OtherDetectionData& detection) const = default;
+
+private:
+
+	/// Record the hash of the data
+	size_t hash = 0;
+
+	/// Record the serialization of the data
+	std::unordered_map<std::wstring, std::wstring> serialization = {};
 };
 
 /// Stores contextual information around a detection
@@ -571,8 +614,7 @@ struct DetectionContext {
 	 * Creates a DetectionContext for a detection. 
 	 *
 	 * @param DetectionCreatedTime The time at which the detection was created
-	 * @param hunt If the associated detection is created by a hunt, this is the hunt responsible for 
-	 *        creating it
+	 * @param hunt If the associated detection is created by a hunt, this is the hunt responsible for creating it
 	 * @param FirstEvidenceTime The time at which the first evidence of this detection was created
 	 */
 	DetectionContext(
@@ -592,16 +634,22 @@ typedef std::variant<
 > DetectionData;
 
 /**
- * Represents something that has been identified as potentially malicious. Each detection object
- * can be further broken down in to the types laid out in the DetectionType enum. Each type of
- * detection then has an associated DetectionData object providing information on the details of
- * what was detected. Each detection also may hold a remediator, which will handle the detection,
- * either removing it, fixing it, or mitigating it. This remediator can be used by a reaction and
- * should be set when the detection is created if possible. Finally, the the detection will hold
- * a DetectionContext object, which holds information about the detection itself, such as the hunts
- * that generated it, when it was generated, and when the thing being detected was first identified.
+ * Represents something that has been identified as potentially malicious. Each detection object can be further broken 
+ * down in to the types laid out in the DetectionType enum. Each type of detection then has an associated DetectionData
+ * object providing information on the details of what was detected. Each detection also may hold a remediator, which 
+ * will handle the detection, either removing it, fixing it, or mitigating it. This remediator can be used by a 
+ * reaction and should be set when the detection is created if possible. Finally, the the detection will hold a 
+ * DetectionContext object, which holds information about the detection itself, such as the hunts that generated it, 
+ * when it was generated, and when the thing being detected was first identified.
  */
 class Detection {
+private:
+
+	/// Record the hash of the data
+	size_t hash;
+
+	/// Record the serialization of the data
+	std::unordered_map<std::wstring, std::wstring> serialization;
 
 	/// A shared counter to keep track of detection IDs and ensure each new detection gets assigned
 	/// a unique identifier.
@@ -625,7 +673,9 @@ class Detection {
 		size_t operator()(OtherDetectionData data){ return data.Hash(); }
 	} hasher;
 
+	/// Declare related hash classes to be friends
 	friend class std::hash<Detection>;
+	friend class std::hash<std::reference_wrapper<Detection>>;
 
 public:
 
@@ -689,7 +739,7 @@ public:
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	std::unordered_map<std::wstring, std::wstring> Serialize() const;
+	const std::unordered_map<std::wstring, std::wstring>& Serialize() const;
 
 	/**
 	 * Implicit cast to a CRITICAL_SECTION pointer for use in synchronization functions
@@ -704,12 +754,13 @@ template<>
 struct std::hash<Detection> {
 
 	/// Hashes a detection using its data
-	size_t operator()(const Detection& detection) const;
+	size_t operator()(IN CONST Detection& detection) const;
 };
 
+/// Template specialization defining how hashes of reference wrappers for Detection objects should be calculated
 template<>
 struct std::hash<std::reference_wrapper<Detection>> {
 
 	/// Hashes a detection using its data
-	size_t operator()(const std::reference_wrapper<Detection>& detection) const;
+	size_t operator()(IN CONST std::reference_wrapper<Detection>& detection) const;
 };

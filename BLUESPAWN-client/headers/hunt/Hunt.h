@@ -16,10 +16,32 @@ class HuntRegister;
     HuntInfo{ this->name, this->dwTacticsUsed, this->dwCategoriesAffected, this->dwSourcesInvolved,                                    \
               (long) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() }
 
+#define HUNT_INIT()                                              \
+    std::vector<std::reference_wrapper<Detection>> detections{}; \
+    LOG_INFO(1, "Beginning hunt for " << name);
+
 #define HUNT_END()                             \
     LOG_INFO(2, "Finished hunt for " << name); \
 	return detections;
-    
+
+#define CREATE_DETECTION(certainty, ...)                                                  \
+    detections.emplace_back(                                                              \
+        ThreadPool::GetInstance().RequestPromise<std::reference_wrapper<Detection>>(      \
+            std::bind(&DetectionRegister::AddDetection, Bluespawn::detections, Detection{ \
+                          __VA_ARGS__,                                                    \
+                          DetectionContext{ GetName() }                                   \
+                      }, certainty)                                                       \
+            )                                                                             \
+    );
+
+#define CREATE_DETECTION_WITH_CONTEXT(certainty, ...)                                     \
+    detections.emplace_back(                                                              \
+        ThreadPool::GetInstance().RequestPromise<std::reference_wrapper<Detection>>(      \
+            std::bind(&DetectionRegister::AddDetection, Bluespawn::detections, Detection{ \
+                          __VA_ARGS__                                                     \
+                      }, certainty)                                                       \
+            )                                                                             \
+    );
 
 class Hunt {
 protected:
