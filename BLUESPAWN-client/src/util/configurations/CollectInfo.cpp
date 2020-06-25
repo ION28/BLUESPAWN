@@ -8,12 +8,12 @@
 #include "util/log/Log.h"
 
 void OutputComputerInformation() {
-	LOG_INFO("Computer Information\n");
-	LOG_INFO("DNS FQDN: " << GetFQDN());
-	LOG_INFO("Computer DNS Name: " << GetComputerDNSName());
-	LOG_INFO("Active Directory Domain: " << GetDomain());
-	LOG_INFO("Operating System: " << GetOSVersion());
-	LOG_INFO("Current User: " << GetCurrentUser());
+	LOG_INFO(1, L"Computer Information\n");
+	LOG_INFO(1, L"DNS FQDN: " << GetFQDN());
+	LOG_INFO(1, L"Computer DNS Name: " << GetComputerDNSName());
+	LOG_INFO(1, L"Active Directory Domain: " << GetDomain());
+	LOG_INFO(1, L"Operating System: " << GetOSVersion());
+	LOG_INFO(1, L"Current User: " << GetCurrentUser());
 }
 
 std::wstring GetOSVersion() {

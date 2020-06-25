@@ -16,7 +16,7 @@ namespace Log {
 	CLISink::CLISink() : hMutex{ CreateMutexW(nullptr, false, L"Local\\CLI-Mutex") } {}
 	
 	void CLISink::LogMessage(IN CONST LogLevel& level, IN CONST std::wstring& message){
-		auto mutex = AcquireMutex(hMutex);
+		AcquireMutex mutex{ hMutex };
 		if(level.Enabled()){
 			SetConsoleColor(CLISink::PrependColors[static_cast<WORD>(level.severity)]);
 			std::wcout << CLISink::MessagePrepends[static_cast<WORD>(level.severity)] << " ";
@@ -30,7 +30,7 @@ namespace Log {
 	}
 
 	void CLISink::RecordDetection(IN CONST std::reference_wrapper<Detection>& detection, IN RecordType type){
-		auto mutex{ AcquireMutex(hMutex) };
+		AcquireMutex mutex{ hMutex };
 
 		if(type == RecordType::PreScan && Bluespawn::EnablePreScanDetections || type == RecordType::PostScan){
 			SetConsoleColor(CLISink::PrependColors[4]);
@@ -40,25 +40,26 @@ namespace Log {
 			Detection copy{ detection.get() };
 			LeaveCriticalSection(detection.get());
 
-			std::wcout << L"Detection ID: " << detection.get().dwID << std::endl;
+			std::wcout << L"Detection ID: " << copy.dwID << std::endl;
 
-			if(copy.context){
-				std::wcout << L"\tDetection Recorded at " << FormatWindowsTime(copy.context->DetectionCreatedTime)
+			std::wcout << L"\tDetection Recorded at " << FormatWindowsTime(copy.context.DetectionCreatedTime)
+				<< std::endl;
+			if(copy.context.note){
+				std::wcout << L"\tNote: " << *copy.context.note << std::endl;
+			}
+			if(copy.context.FirstEvidenceTime){
+				std::wcout << L"\tFirst Evidence at " << FormatWindowsTime(*copy.context.FirstEvidenceTime) 
 					<< std::endl;
-				if(copy.context->note){
-					std::wcout << L"\tNote: " << *copy.context->note << std::endl;
-				}
-				if(copy.context->FirstEvidenceTime){
-					std::wcout << L"\tFirst Evidence at " << FormatWindowsTime(*copy.context->FirstEvidenceTime) 
-						<< std::endl;
-				}
+			}
+
+			if(copy.context.hunts.size()){
 				std::wcout << L"\tDetected by: ";
-				for(auto& hunt : detection.get().context->hunts){
+				for(auto& hunt : copy.context.hunts){
 					std::wcout << hunt << L", ";
 				}
 				std::wcout << std::endl;
 			}
-
+			
 			if(copy.DetectionStale){
 				std::wcout << L"\tDetection is stale" << std::endl;
 			}
@@ -69,6 +70,8 @@ namespace Log {
 													copy.type == DetectionType::ServiceDetection ? L"Service" :
 													std::get<OtherDetectionData>(copy.data).DetectionType) 
 				<< std::endl;
+
+			std::wcout << L"\tDetection Certainty: " << static_cast<double>(copy.info.GetCertainty()) << std::endl;
 			std::wcout << L"\tDetection Data: " << std::endl;
 
 			auto properties{ copy.Serialize() };
@@ -80,6 +83,8 @@ namespace Log {
 
 	void CLISink::RecordAssociation(IN CONST std::reference_wrapper<Detection>& first, 
 									IN CONST std::reference_wrapper<Detection>& second, IN CONST Association& a){
+		AcquireMutex mutex{ hMutex };
+
 		std::cout << "Detections with IDs " << first.get().dwID << " and " << second.get().dwID << " are associated "
 			<< " with strength " << static_cast<double>(a) << std::endl;
 	}

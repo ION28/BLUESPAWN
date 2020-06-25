@@ -11,9 +11,8 @@ namespace Log {
 	/**
 	 * CLISink provides a sink for the logger that directs output to the console.
 	 * 
-	 * Each log message is prepended with the severity of the log, as defined in
-	 * MessagePrepends. This prepended text is colored with the color indicated in
-	 * PrependColors. 
+	 * Each log message is prepended with the severity of the log, as defined in MessagePrepends. This prepended text 
+	 * is colored with the color indicated in PrependColors. 
 	 */
 	class CLISink : public LogSink, DetectionSink {
 	private:
@@ -49,10 +48,9 @@ namespace Log {
 		HandleWrapper hMutex;
 
 		/**
-		 * Sets the color of text written to the console. The low order nibble is the color
-		 * of the text, and the high order nibble is the color of the background. Colors are
-		 * defined in the MessageColor enum. Note that this function is for internal use, and
-		 * any external calls to it will be overridden by the next log message.
+		 * Sets the color of text written to the console. The low order nibble is the color of the text, and the high 
+		 * order nibble is the color of the background. Colors are defined in the MessageColor enum. Note that this 
+		 * function is for internal use, and any external calls to it will be overridden by the next log message.
 		 *
 		 * @param color The color to set the console
 		 */
@@ -63,8 +61,8 @@ namespace Log {
 		CLISink();
 
 		/**
-		 * Outputs a message to the console if its logging level is enabled. The log message
-		 * is prepended with its severity level.
+		 * Outputs a message to the console if its logging level is enabled. The log message is prepended with its 
+		 * severity level.
 		 *
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
@@ -75,9 +73,8 @@ namespace Log {
 		) override;
 
 		/**
-		 * Compares this CLISink to another LogSink. Currently, as only one console is supported,
-		 * any other CLISink is considered to be equal. This is subject to change in the event that
-		 * support for more consoles is added.
+		 * Compares this CLISink to another LogSink. Currently, as only one console is supported, any other CLISink is
+		 * considered to be equal. This is subject to change in the event that support for more consoles is added.
 		 *
 		 * @param sink The LogSink to compare
 		 *
@@ -96,19 +93,19 @@ namespace Log {
 		virtual void RecordDetection(
 			IN CONST std::reference_wrapper<Detection>& detection,
 			IN RecordType type
-		) = 0;
+		);
 
 		/**
 		 * Records an association between two detections to the console
 		 *
-		 * @param first The first detection in the assocation. This detection's ID will be lower than 
-		 *              the second's.
+		 * @param first The first detection in the assocation. This detection's ID will be lower than the second's.
 		 * @param second The second detection in the association.
+		 * @param strength The strength of the connection
 		 */
 		virtual void RecordAssociation(
 			IN CONST std::reference_wrapper<Detection>& first,
 			IN CONST std::reference_wrapper<Detection>& second,
 			IN CONST Association& strength
-		) = 0;
+		);
 	};
 }

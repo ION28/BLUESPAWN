@@ -1,18 +1,11 @@
 #include "util/log/XMLSink.h"
 #include "common/StringUtils.h"
+#include "common/Utils.h"
 
 #include <chrono>
 #include <iostream>
 
 namespace Log{
-
-	std::wstring ToWstringPad(DWORD value, size_t length=2){
-		wchar_t* buf = new wchar_t[length + 1];
-		swprintf(buf, (L"%0" + std::to_wstring(length) + L"d").c_str(), value);
-		std::wstring str = buf;
-		delete[] buf;
-		return str;
-	}
 
 	void UpdateLog(XMLSink* sink){
 		HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, L"Local\\FlushLogs") };
@@ -23,19 +16,16 @@ namespace Log{
 	}
 
 	XMLSink::XMLSink() :
-		hMutex{ CreateMutexW(nullptr, false, nullptr) } ,
 		Root{ XMLDoc.NewElement("bluespawn") },
 		thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr) }{
 		SYSTEMTIME time{};
 		GetLocalTime(&time);
-		wFileName = L"bluespawn-" + ToWstringPad(time.wMonth) + L"-" + ToWstringPad(time.wDay) + L"-" + ToWstringPad(time.wYear, 4) + L"-"
-			+ ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + L"-" + ToWstringPad(time.wSecond) + L".xml";
+		wFileName = L"bluespawn-" + FormatWindowsTime(time) + L".xml";
 		XMLDoc.InsertEndChild(Root);
 		ResumeThread(thread);
 	}
 
 	XMLSink::XMLSink(const std::wstring& wFileName) :
-		hMutex{ CreateMutexW(nullptr, false, nullptr) },
 		Root { XMLDoc.NewElement("bluespawn") },
 		wFileName{ wFileName },
 		thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr) }{
@@ -47,115 +37,147 @@ namespace Log{
 		TerminateThread(thread, 0);
 	}
 
-	tinyxml2::XMLElement* CreateDetctionXML(const std::shared_ptr<DETECTION>& detection, tinyxml2::XMLDocument& XMLDoc){
-		auto detect = XMLDoc.NewElement("detection");
-		if(detection->Type == DetectionType::Registry){
-			detect->SetAttribute("type", "Registry");
-			auto RegistryDetection = std::static_pointer_cast<REGISTRY_DETECTION>(detection);
-			auto Key = XMLDoc.NewElement("key");
-			auto Value = XMLDoc.NewElement("value");
-			auto Data = XMLDoc.NewElement("data");
-			Key->SetText(WidestringToString(RegistryDetection->value.key.ToString()).c_str());
-			Value->SetText(WidestringToString(RegistryDetection->value.wValueName).c_str());
-			Data->SetText(WidestringToString(RegistryDetection->value.ToString()).c_str());
-			detect->InsertEndChild(Key);
-			detect->InsertEndChild(Value);
-			detect->InsertEndChild(Data);
-		} else if(detection->Type == DetectionType::File){
-			detect->SetAttribute("type", "File");
-			auto FileDetection = std::static_pointer_cast<FILE_DETECTION>(detection);
-			auto Name = XMLDoc.NewElement("name");
-			auto Path = XMLDoc.NewElement("path");
-			auto Hash = XMLDoc.NewElement("hash");
-			Name->SetText(WidestringToString(FileDetection->wsFileName).c_str());
-			Path->SetText(WidestringToString(FileDetection->wsFilePath).c_str());
-			Hash->SetText(FileDetection->hash.c_str());
-			detect->InsertEndChild(Name);
-			detect->InsertEndChild(Path);
-			detect->InsertEndChild(Hash);
-		} else if(detection->Type == DetectionType::Process){
-			detect->SetAttribute("type", "Process");
-			auto ProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);
-			auto Path = XMLDoc.NewElement("path");
-			auto Cmd = XMLDoc.NewElement("hash");
-			auto Pid = XMLDoc.NewElement("pid");
-			Path->SetText(WidestringToString(ProcessDetection->wsImagePath).c_str());
-			Cmd->SetText(WidestringToString(ProcessDetection->wsCmdline).c_str());
-			Pid->SetText(std::to_string(ProcessDetection->PID).c_str());
-			detect->InsertEndChild(Path);
-			detect->InsertEndChild(Cmd);
-			detect->InsertEndChild(Pid);
-		} else if(detection->Type == DetectionType::Service){
-			detect->SetAttribute("type", "Service");
-			auto ServiceDetection = std::static_pointer_cast<SERVICE_DETECTION>(detection);
-			auto Name = XMLDoc.NewElement("name");
-			auto Path = XMLDoc.NewElement("path");
-			Name->SetText(WidestringToString(ServiceDetection->wsServiceName).c_str());
-			Path->SetText(WidestringToString(ServiceDetection->wsServiceExecutablePath).c_str());
-			detect->InsertEndChild(Name);
-			detect->InsertEndChild(Path);
-		} else if(detection->Type == DetectionType::Event){
-			detect->SetAttribute("type", "Event");
-			auto EventDetection = std::static_pointer_cast<EVENT_DETECTION>(detection);
-			auto ID = XMLDoc.NewElement("id");
-			auto RecordID = XMLDoc.NewElement("recordid");
-			auto Time = XMLDoc.NewElement("time");
-			auto Channel = XMLDoc.NewElement("channel");
-			auto Raw = XMLDoc.NewElement("raw");
-			ID->SetText(std::to_string(EventDetection->eventID).c_str());
-			RecordID->SetText(std::to_string(EventDetection->eventRecordID).c_str());
-			Time->SetText(WidestringToString(EventDetection->timeCreated).c_str());
-			Channel->SetText(WidestringToString(EventDetection->channel).c_str());
-			Raw->SetText(WidestringToString(EventDetection->rawXML).c_str());
-			detect->InsertEndChild(ID);
-			detect->InsertEndChild(RecordID);
-			detect->InsertEndChild(Time);
-			detect->InsertEndChild(Channel);
-			detect->InsertEndChild(Raw);
-			for(auto key : EventDetection->params){
-				auto name = WidestringToString(key.first);
-				auto idx1 = name.find("'") + 1;
-				auto tag = XMLDoc.NewElement(name.substr(idx1, name.find_last_of("'") - idx1).c_str());
-				tag->SetText(WidestringToString(key.second).c_str());
-				detect->InsertEndChild(tag);
+	void InsertElement(IN tinyxml2::XMLDocument& XMLDoc, IN tinyxml2::XMLElement* parent, IN CONST std::string& name,
+					   IN CONST std::wstring& value){
+		auto elem{ XMLDoc.NewElement(name.c_str()) };
+		elem->SetText(WidestringToString(value).c_str());
+		parent->InsertEndChild(elem);
+	}
+
+	void AddAssociation(IN tinyxml2::XMLDocument& doc, IN tinyxml2::XMLElement* to, IN DWORD id, IN double strength){
+		for(auto child{ to->FirstChildElement() }; child; child = child->NextSiblingElement()){
+			if(child->GetText() == std::string{ "associated-detections" }){
+				for(auto elem{ child->FirstChildElement() }; elem; elem = elem->NextSiblingElement()){
+					if(elem->GetText() == std::to_string(id)){
+						double existing{ 0 };
+						elem->FindAttribute("strength")->QueryDoubleValue(&existing);
+						elem->SetAttribute("strength", 1.0 - (1 - existing) * (1 - strength));
+						return;
+					}
+				}
+
+				auto elem{ doc.NewElement("association") };
+				elem->SetAttribute("strength", strength);
+				elem->SetText(std::to_string(id).c_str());
+				child->InsertEndChild(elem);
+				return;
 			}
 		}
-		return detect;
+
+		auto assocations{ doc.NewElement("associated-detections") };
+		auto elem{ doc.NewElement("association") };
+		elem->SetAttribute("strength", strength);
+		elem->SetText(std::to_string(id).c_str());
+		assocations->InsertEndChild(elem);
+		to->InsertEndChild(assocations);
+	}
+
+	void XMLSink::RecordDetection(IN CONST std::reference_wrapper<Detection>& detection, IN RecordType type){
+		BeginCriticalSection _{ hGuard };
+
+		EnterCriticalSection(detection.get());
+		Detection copy{ detection.get() };
+		LeaveCriticalSection(detection.get());
+
+		tinyxml2::XMLElement* detect{ nullptr };
+		if(detections.find(copy.dwID) != detections.end()){
+			detect = detections.at(copy.dwID);
+			detect->DeleteChildren();
+		} else{
+			detect = XMLDoc.NewElement("detection");
+			Root->InsertEndChild(detect);
+		}
+
+		if(type == RecordType::PreScan){
+			detect->SetAttribute("prescan", true);
+		}
+
+		detect->SetAttribute("type", (
+			copy.type == DetectionType::FileDetection ? "File" :
+			copy.type == DetectionType::ProcessDetection ? "Process" :
+			copy.type == DetectionType::RegistryDetection ? "Registry" :
+			copy.type == DetectionType::ServiceDetection ? "Service" :
+			WidestringToString(std::get<OtherDetectionData>(copy.data).DetectionType)
+		).c_str());
+
+		detect->SetAttribute("id", std::to_string(copy.dwID).c_str());
+		detect->SetAttribute("time", WidestringToString(FormatWindowsTime(copy.context.DetectionCreatedTime)).c_str());
+
+		if(copy.context.FirstEvidenceTime){
+			InsertElement(XMLDoc, detect, "first-evidence-time", FormatWindowsTime(*copy.context.FirstEvidenceTime));
+		}
+
+		if(copy.context.note){
+			InsertElement(XMLDoc, detect, "note", *copy.context.note);
+		}
+
+		InsertElement(XMLDoc, detect, "certainty", std::to_wstring(copy.info.GetCertainty()));
+
+		if(copy.context.hunts.size()){
+			auto hunts{ XMLDoc.NewElement("associated-hunts") };
+			for(const auto& hunt : copy.context.hunts){
+				InsertElement(XMLDoc, hunts, "hunt", hunt);
+			}
+			detect->InsertEndChild(hunts);
+		}
+
+		auto data{ XMLDoc.NewElement("associated-data") };
+		for(const auto& entry : copy.Serialize()){
+			auto elem{ XMLDoc.NewElement("property") };
+			elem->SetAttribute("name", WidestringToString(entry.first).c_str());
+			data->InsertEndChild(elem);
+		}
+		detect->InsertEndChild(data);
+
+		auto assoc{ copy.info.GetAssociations() };
+		if(assoc.size()){
+			auto assocations{ XMLDoc.NewElement("associated-detections") };
+			for(const auto& det : assoc){
+				auto elem{ XMLDoc.NewElement("association") };
+				elem->SetAttribute("strength", static_cast<double>(det.second));
+				elem->SetText(std::to_string(det.first.get().dwID).c_str());
+				assocations->InsertEndChild(elem);
+			}
+			detect->InsertEndChild(assocations);
+		}
+	}
+
+	void XMLSink::RecordAssociation(IN CONST std::reference_wrapper<Detection>& first,
+									IN CONST std::reference_wrapper<Detection>& second,
+									IN CONST Association& strength){
+		BeginCriticalSection _{ hGuard };
+
+		if(detections.find(first.get().dwID) != detections.end()){
+			AddAssociation(XMLDoc, detections.at(first.get().dwID), second.get().dwID, strength);
+		}
+
+		if(detections.find(second.get().dwID) != detections.end()){
+			AddAssociation(XMLDoc, detections.at(second.get().dwID), first.get().dwID, strength);
+		}
 	}
 
 	void XMLSink::LogMessage(const LogLevel& level, const std::wstring& message){
-		auto mutex = AcquireMutex(hMutex);
-		if(level.Enabled() && level.severity == Severity::LogHunt && info){
-			auto hunt = XMLDoc.NewElement("hunt");
-			hunt->SetAttribute("categories", static_cast<int64_t>(info->HuntCategories));
-			hunt->SetAttribute("datasources", static_cast<int64_t>(info->HuntDatasources));
-			hunt->SetAttribute("tactics", static_cast<int64_t>(info->HuntTactics));
-			hunt->SetAttribute("time", info->HuntStartTime);
-
-			auto name = XMLDoc.NewElement("name");
-			name->SetText(WidestringToString(info->HuntName).c_str());
-			hunt->InsertFirstChild(name);
-
-			if(message.length() > 0){
-				auto msg = XMLDoc.NewElement("message");
-				msg->SetText(message.c_str());
-				hunt->InsertEndChild(msg);
-			}
-			for(auto detection : detections){
-				hunt->InsertEndChild(CreateDetctionXML(detection, XMLDoc));
-			}
-
-			Root->InsertEndChild(hunt);
-		} else if(level.Enabled()) {
+		BeginCriticalSection _{ hGuard };
+		
+		if(level.Enabled()) {
 			auto msg = XMLDoc.NewElement(MessageTags[static_cast<DWORD>(level.severity)].c_str());
-			msg->SetAttribute("time", (long) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+			if(level.detail){
+				msg->SetAttribute("detail", *level.detail == Detail::High ? "high" :
+				                            *level.detail == Detail::Moderate ? "moderate" : "low");
+			}
+
+			SYSTEMTIME time{};
+			GetLocalTime(&time);
+			msg->SetAttribute("time", WidestringToString(FormatWindowsTime(time)).c_str());
+
 			msg->SetText(message.c_str());
 			Root->InsertEndChild(msg);
 		}
 	}
 
 	bool XMLSink::operator==(const LogSink& sink) const {
-		return (bool) dynamic_cast<const XMLSink*>(&sink) && dynamic_cast<const XMLSink*>(&sink)->wFileName == wFileName;
+		return (bool) dynamic_cast<const XMLSink*>(&sink) &&
+			dynamic_cast<const XMLSink*>(&sink)->wFileName == wFileName;
 	}
 
 	void XMLSink::Flush(){

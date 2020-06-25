@@ -47,6 +47,7 @@ public:
 	 *
 	 * @param first The first detection in the assocation. This detection's ID will be lower than the second's.
 	 * @param second The second detection in the association.
+	 * @param strength The strength of the connection
 	 */
 	virtual void RecordAssociation(
 		IN CONST std::reference_wrapper<Detection>& first,

@@ -98,7 +98,11 @@ void DetectionRegister::UpdateDetectionCertainty(
         }
     }
 
-    LeaveCriticalSection(detection.get());
+    LeaveCriticalSection(detection.get()); 
+    
+    for(auto& sink : Bluespawn::detectionSinks){
+        sink->RecordDetection(detection, RecordType::PostScan);
+    }
 }
 
 std::reference_wrapper<Detection> DetectionRegister::AddDetection(IN Detection&& detection, 

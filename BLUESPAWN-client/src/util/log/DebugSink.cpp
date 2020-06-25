@@ -1,48 +1,82 @@
 #include <Windows.h>
 
-#include <iostream>
+#include <sstream>
 
 #include "util/log/DebugSink.h"
+#include "user/bluespawn.h"
+#include "common/Utils.h"
 
-namespace Log {
-	void DebugSink::LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info, 
-		const std::vector<std::shared_ptr<DETECTION>>& detections){
+#define DEBUG_STREAM(...) \
+    OutputDebugStringW((std::wstringstream{} << __VA_ARGS__).str().c_str())
+
+#define DETECTION_DEBUG_STREAM(...)                                                                                  \
+    DEBUG_STREAM((type == RecordType::PreScan ? L"[Pre-Scan Detection]" : L"[Detection]") << L"[ID " << copy.dwID << \
+                 L"]" << __VA_ARGS__);
+
+namespace Log{
+
+	void DebugSink::LogMessage(IN CONST LogLevel& level, IN CONST std::wstring& message){
+		BeginCriticalSection _{ hGuard };
+
 		if(level.Enabled()){
-			if(level.severity == Severity::LogHunt){
-				std::wstring sLogHeader = L"[" + info->HuntName + L"] - ";
-				OutputDebugStringW((sLogHeader + std::to_wstring(detections.size()) + L" detection" + (detections.size() == 1 ? L"!" : L"s!")).c_str());
-				for(auto detection : detections){
-					if(detection->Type == DetectionType::File){
-						auto lpFileDetection = std::static_pointer_cast<FILE_DETECTION>(detection);
-						OutputDebugStringW((sLogHeader + L"\tPotentially malicious file detected - " + lpFileDetection->wsFilePath).c_str());
-					} else if(detection->Type == DetectionType::Process){
-						auto lpProcessDetection = std::static_pointer_cast<PROCESS_DETECTION>(detection);
-						OutputDebugStringW((sLogHeader + L"\tPotentially malicious process detected - " + lpProcessDetection->wsCmdline + L" (PID is " + std::to_wstring(lpProcessDetection->PID) + L")").c_str());
-					} else if(detection->Type == DetectionType::Service){
-						auto lpServiceDetection = std::static_pointer_cast<SERVICE_DETECTION>(detection);
-						OutputDebugStringW((sLogHeader + L"\tPotentially malicious service detected - " + lpServiceDetection->wsServiceName + L" (Path is " + lpServiceDetection->wsServiceExecutablePath + L")").c_str());
-					} else if(detection->Type == DetectionType::Registry){
-						auto lpRegistryDetection = std::static_pointer_cast<REGISTRY_DETECTION>(detection);
-						OutputDebugStringW((sLogHeader + L"\tPotentially malicious registry key detected - " + lpRegistryDetection->value.key.ToString() + L": " + lpRegistryDetection->value.wValueName + L" with value " +
-							lpRegistryDetection->value.ToString()).c_str());
-					} else {
-						OutputDebugStringW((sLogHeader + L"\tUnknown detection type!").c_str());
-					}
-				}
-				if(message.size() > 0){
-					LPCSTR lpwMessage = message.c_str();
-					LPWSTR lpMessage = new WCHAR[message.length() + 1]{};
-					MultiByteToWideChar(CP_ACP, 0, lpwMessage, static_cast<int>(message.length()), lpMessage, static_cast<int>(message.length()));
+			DEBUG_STREAM(DebugSink::MessagePrepends[static_cast<WORD>(level.severity)] << L" " << message);
+		}
+	}
 
-					OutputDebugStringW((sLogHeader + L"\tAssociated Message: " + lpMessage).c_str());
+	bool DebugSink::operator==(IN CONST LogSink& sink) const{
+		return (bool) dynamic_cast<const DebugSink*>(&sink);
+	}
+
+	void DebugSink::RecordDetection(IN CONST std::reference_wrapper<Detection>& detection, IN RecordType type){
+		BeginCriticalSection _{ hGuard };
+
+		if(type == RecordType::PreScan && Bluespawn::EnablePreScanDetections || type == RecordType::PostScan){
+
+			EnterCriticalSection(detection.get());
+			Detection copy{ detection.get() };
+			LeaveCriticalSection(detection.get());
+
+			DETECTION_DEBUG_STREAM(L" Detection Logged at " << FormatWindowsTime(copy.context.DetectionCreatedTime));
+			if(copy.context.note){
+				DETECTION_DEBUG_STREAM(L" Note: " << *copy.context.note);
+			}
+			if(copy.context.FirstEvidenceTime){
+				DETECTION_DEBUG_STREAM(L" First Evidence: " << FormatWindowsTime(*copy.context.FirstEvidenceTime));
+			}
+
+			if(detection.get().context.hunts.size()){
+				std::wstringstream hunts{};
+				for(auto& hunt : detection.get().context.hunts){
+					hunts << hunt << L", ";
 				}
-			} else {
-				OutputDebugStringA((DebugSink::MessagePrepends[static_cast<WORD>(level.severity)] + " " + message).c_str());
+				DETECTION_DEBUG_STREAM(L" Associated Hunts: " << hunts.str());
+			}
+
+			if(copy.DetectionStale){
+				DETECTION_DEBUG_STREAM(L" Detection is Stale");
+			}
+
+			DETECTION_DEBUG_STREAM(L" Detection Type: " << 
+				(copy.type == DetectionType::FileDetection ? L"File" :
+				 copy.type == DetectionType::ProcessDetection ? L"Process" :
+				 copy.type == DetectionType::RegistryDetection ? L"Registry" :
+				 copy.type == DetectionType::ServiceDetection ? L"Service" :
+				 std::get<OtherDetectionData>(copy.data).DetectionType));
+
+			DETECTION_DEBUG_STREAM(L" Detection Certainty: " << static_cast<double>(copy.info.GetCertainty()));
+
+			auto properties{ copy.Serialize() };
+			for(auto& pair : properties){
+				DETECTION_DEBUG_STREAM(L"[Data] " << pair.first << L": " << pair.second);
 			}
 		}
 	}
 
-	bool DebugSink::operator==(const LogSink& sink) const {
-		return (bool) dynamic_cast<const DebugSink*>(&sink);
+	void DebugSink::RecordAssociation(IN CONST std::reference_wrapper<Detection>& first,
+									IN CONST std::reference_wrapper<Detection>& second, IN CONST Association& a){
+		BeginCriticalSection _{ hGuard };
+
+		DEBUG_STREAM(L"[Detection][ID " << first.get().dwID << L"]" << L" Associated with " << second.get().dwID << 
+					 L" with strength " << static_cast<double>(a));
 	}
 }
