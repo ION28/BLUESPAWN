@@ -13,7 +13,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	std::vector<std::shared_ptr<DETECTION>> HuntT1182::RunHunt(const Scope& scope){
+	std::vector<std::reference_wrapper<Detection>> HuntT1182::RunHunt(const Scope& scope){
 		HUNT_INIT();
 
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager", {
@@ -25,8 +25,8 @@ namespace Hunts {
 		HUNT_END();
 	}
 
-	std::vector<std::shared_ptr<Event>> HuntT1182::GetMonitoringEvents() {
-		std::vector<std::shared_ptr<Event>> events;
+	std::vector<std::unique_ptr<Event>> HuntT1182::GetMonitoringEvents() {
+		std::vector<std::unique_ptr<Event>> events;
 
 		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager" }));
 

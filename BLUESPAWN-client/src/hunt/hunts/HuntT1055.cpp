@@ -26,7 +26,7 @@ namespace Hunts{
 		dwTacticsUsed = (DWORD) Tactic::PrivilegeEscalation | (DWORD) Tactic::DefenseEvasion;
 	}
 
-	bool ScanProcess(DWORD pid, std::vector<std::shared_ptr<DETECTION>>& detections){
+	bool ScanProcess(DWORD pid, std::vector<std::reference_wrapper<Detection>>& detections){
 		pesieve::t_params params = {
 			pid,
 			3,
@@ -78,7 +78,7 @@ namespace Hunts{
 		return false;
 	}
 
-	std::vector<std::shared_ptr<DETECTION>> HuntT1055::RunHunt(const Scope& scope){
+	std::vector<std::reference_wrapper<Detection>> HuntT1055::RunHunt(const Scope& scope){
 		HUNT_INIT();
 
 		int identified = 0;

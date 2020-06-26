@@ -12,7 +12,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	std::vector<std::shared_ptr<DETECTION>> HuntT1103::RunHunt(const Scope& scope){
+	std::vector<std::reference_wrapper<Detection>> HuntT1103::RunHunt(const Scope& scope){
 		HUNT_INIT();
 
 		for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", {
@@ -26,7 +26,7 @@ namespace Hunts {
 		HUNT_END();
 	}
 
-	std::vector<std::shared_ptr<Event>> HuntT1103::GetMonitoringEvents(){
+	std::vector<std::unique_ptr<Event>> HuntT1103::GetMonitoringEvents(){
 		return GetRegistryEvents(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", true, false, false);
 	}
 }

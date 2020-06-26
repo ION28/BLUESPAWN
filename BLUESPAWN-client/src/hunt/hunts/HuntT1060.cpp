@@ -28,7 +28,7 @@ namespace Hunts {
 		};
 	}
 
-	std::vector<std::shared_ptr<DETECTION>> HuntT1060::RunHunt(const Scope& scope){
+	std::vector<std::reference_wrapper<Detection>> HuntT1060::RunHunt(const Scope& scope){
 		HUNT_INIT();
 		
 		for(auto& key : RunKeys){
@@ -58,16 +58,16 @@ namespace Hunts {
 		HUNT_END();
 	}
 
-	std::vector<std::shared_ptr<Event>> HuntT1060::GetMonitoringEvents() {
-		std::vector<std::shared_ptr<Event>> events;
+	std::vector<std::unique_ptr<Event>> HuntT1060::GetMonitoringEvents() {
+		std::vector<std::unique_ptr<Event>> events;
 
 		for(auto key : RunKeys){ 
-			ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, key));
+			Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, key);
 		}
 
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Command Processor"));
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders"));
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders"))
+		Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Command Processor");
+		Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders");
+		Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders")
 
 		return events;
 	}

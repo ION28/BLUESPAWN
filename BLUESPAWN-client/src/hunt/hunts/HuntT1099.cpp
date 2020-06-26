@@ -14,7 +14,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::DefenseEvasion;
 	}
 
-	std::vector<std::shared_ptr<DETECTION>> HuntT1099::RunHunt(const Scope& scope) {
+	std::vector<std::reference_wrapper<Detection>> HuntT1099::RunHunt(const Scope& scope) {
 		HUNT_INIT();
 
 		// Create existance queries so interesting data is output
@@ -52,8 +52,8 @@ namespace Hunts {
 		HUNT_END();
 	}
 
-	std::vector<std::shared_ptr<Event>> HuntT1099::GetMonitoringEvents() {
-		std::vector<std::shared_ptr<Event>> events;
+	std::vector<std::unique_ptr<Event>> HuntT1099::GetMonitoringEvents() {
+		std::vector<std::unique_ptr<Event>> events;
 		events.push_back(std::make_shared<EventLogEvent>(L"Microsoft-Windows-Sysmon/Operational", 2));
 		return events;
 	}

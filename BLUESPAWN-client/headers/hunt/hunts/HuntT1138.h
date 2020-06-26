@@ -13,7 +13,7 @@ namespace Hunts {
 	public:
 		HuntT1138();
 
-		virtual std::vector<std::shared_ptr<DETECTION>> RunHunt(const Scope& scope);
-		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
+		virtual std::vector<std::reference_wrapper<Detection>> RunHunt(const Scope& scope);
+		virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

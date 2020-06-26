@@ -3,7 +3,7 @@
 
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
-#include "scan/YaraScanner.h"
+#include "user/bluespawn.h"
 
 using namespace Registry;
 
@@ -15,13 +15,19 @@ namespace Hunts{
 	}
 
 
-	std::vector<std::shared_ptr<DETECTION>> HuntT1037::RunHunt(const Scope& scope) {
+	std::vector<std::reference_wrapper<Detection>> HuntT1037::RunHunt(const Scope& scope) {
 		HUNT_INIT();
 
 		for(auto& detection : CheckValues(HKEY_CURRENT_USER, L"Environment", {
 				{ L"UserInitMprLogonScript", L"", false, CheckSzEmpty }
 		}, true, true)){
-			REGISTRY_DETECTION(detection);
+			CREATE_DETECTION(Certainty::Strong, 
+							 RegistryDetectionData{
+								 detection.key,
+								 detection,
+								 RegistryDetectionType::FileReference,
+								 detection.key.GetRawValue(detection.wValueName)
+							 });
 		}
 
 		std::vector<FileSystem::Folder> startup_directories = { FileSystem::Folder(L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp") };
@@ -35,14 +41,18 @@ namespace Hunts{
 		for(auto folder : startup_directories) {
 			LOG_VERBOSE(1, L"Scanning " << folder.GetFolderPath());
 			for(auto value : folder.GetFiles(std::nullopt, -1)) {
-				FILE_DETECTION(value.GetFilePath());
+				CREATE_DETECTION(Certainty::Moderate, FileDetectionData{ value });
 			}
 		}
 
 		HUNT_END();
 	}
 
-	std::vector<std::shared_ptr<Event>> HuntT1037::GetMonitoringEvents() {
-		return Registry::GetRegistryEvents(HKEY_CURRENT_USER, L"Environment", true, true, false);
+	std::vector<std::unique_ptr<Event>> HuntT1037::GetMonitoringEvents() {
+		std::vector<std::unique_ptr<Event>> events;
+
+		Registry::GetRegistryEvents(events, HKEY_CURRENT_USER, L"Environment", true, true, false);
+
+		return events;
 	}
 }

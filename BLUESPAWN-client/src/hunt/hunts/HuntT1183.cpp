@@ -15,7 +15,7 @@ namespace Hunts{
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	std::vector<std::shared_ptr<DETECTION>> HuntT1183::RunHunt(const Scope& scope){
+	std::vector<std::reference_wrapper<Detection>> HuntT1183::RunHunt(const Scope& scope){
 		HUNT_INIT();
 
 		std::vector<RegistryValue> values;
@@ -44,8 +44,8 @@ namespace Hunts{
 		HUNT_END();
 	}
 
-	std::vector<std::shared_ptr<Event>> HuntT1183::GetMonitoringEvents() {
-		std::vector<std::shared_ptr<Event>> events;
+	std::vector<std::unique_ptr<Event>> HuntT1183::GetMonitoringEvents() {
+		std::vector<std::unique_ptr<Event>> events;
 
 		ADD_ALL_VECTOR(events, GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options", true, false, true));
 		ADD_ALL_VECTOR(events, GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options", true, false, true));

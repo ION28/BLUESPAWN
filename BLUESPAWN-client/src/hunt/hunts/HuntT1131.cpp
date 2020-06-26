@@ -13,7 +13,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence;
 	}
 
-	std::vector<std::shared_ptr<DETECTION>> HuntT1131::RunHunt(const Scope& scope){
+	std::vector<std::reference_wrapper<Detection>> HuntT1131::RunHunt(const Scope& scope){
 		HUNT_INIT();
 
 		auto safeAuthPackages = okAuthPackages;
@@ -28,8 +28,8 @@ namespace Hunts {
 		HUNT_END();
 	}
 
-	std::vector<std::shared_ptr<Event>> HuntT1131::GetMonitoringEvents() {
-		std::vector<std::shared_ptr<Event>> events;
+	std::vector<std::unique_ptr<Event>> HuntT1131::GetMonitoringEvents() {
+		std::vector<std::unique_ptr<Event>> events;
 
 		events.push_back(std::make_shared<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" }));
 

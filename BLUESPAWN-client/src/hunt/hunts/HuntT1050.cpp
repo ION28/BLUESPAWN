@@ -2,7 +2,7 @@
 
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
-#include "util/log/HuntLogMessage.h"
+#include "scan/ServiceScanner.h"
 #include "scan/YaraScanner.h"
 
 #include "common/Utils.h"
@@ -41,7 +41,7 @@ namespace Hunts {
 		return queryResults;
 	}
 
-	std::vector<std::shared_ptr<DETECTION>> HuntT1050::RunHunt(const Scope& scope) {
+	std::vector<std::reference_wrapper<Detection>> HuntT1050::RunHunt(const Scope& scope) {
 		HUNT_INIT();
 
 		auto queryResults = Get7045Events();
@@ -74,11 +74,11 @@ namespace Hunts {
 		HUNT_END();
 	}
 
-	std::vector<std::shared_ptr<Event>> HuntT1050::GetMonitoringEvents() {
-		std::vector<std::shared_ptr<Event>> events;
+	std::vector<std::unique_ptr<Event>> HuntT1050::GetMonitoringEvents() {
+		std::vector<std::unique_ptr<Event>> events;
 
-		events.push_back(std::make_shared<EventLogEvent>(L"System", 7045));
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services", false, false));
+		events.push_back(std::make_unique<EventLogEvent>(L"System", 7045));
+		Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services", false, false);
 
 		return events;
 	}
