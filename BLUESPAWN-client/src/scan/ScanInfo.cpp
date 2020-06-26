@@ -1,13 +1,10 @@
 #include "scan/ScanInfo.h"
 
 #include <queue>
-#include <set>
+#include <unordered_map>
+#include <atomic>
 
-#include "scan/RegistryScanner.h"
-#include "scan/FileScanner.h"
-#include "scan/ProcessScanner.h"
-
-#include "user/bluespawn.h"
+#include "scan/Detections.h"
 
 const Certainty Certainty::Certain =  1.00;
 const Certainty Certainty::Strong =   0.75;
@@ -34,12 +31,12 @@ volatile std::atomic<DWORD> Detection::IDCounter{ 1 };
 ScanInfo::ScanInfo() : 
 	certainty{ Certainty::None },
 	cAssociativeCertainty{ Certainty::None },
-	associations{},
+	associations{ std::make_unique<std::unordered_map<std::reference_wrapper<Detection>, Association>>() },
 	bAssociativeStale{ true }{}
 
 std::unordered_map<std::reference_wrapper<Detection>, Association> ScanInfo::GetAssociations(){
 	EnterCriticalSection(hGuard);
-	auto copy{ associations };
+	auto copy{ *associations };
 	LeaveCriticalSection(hGuard);
 	return copy;
 }
@@ -49,7 +46,7 @@ Certainty ScanInfo::GetCertainty(){
 		cAssociativeCertainty = Certainty::None;
 		
 		EnterCriticalSection(hGuard);
-		for(auto& pair : associations){
+		for(auto& pair : *associations){
 			cAssociativeCertainty = cAssociativeCertainty + (pair.first.get().info.certainty * pair.second);
 		}
 		LeaveCriticalSection(hGuard);
@@ -62,10 +59,10 @@ Certainty ScanInfo::GetCertainty(){
 void ScanInfo::AddAssociation(IN CONST std::reference_wrapper<Detection>& node, IN CONST Association& a){
 	EnterCriticalSection(hGuard);
 	bAssociativeStale = true;
-	if(associations.find(node) == associations.end()){
-		associations.emplace(node, a);
+	if(associations->find(node) == associations->end()){
+		associations->emplace(node, a);
 	} else{
-		auto& assoc{ associations.at(node) };
+		auto& assoc{ associations->at(node) };
 		assoc = assoc + a;
 	}
 	LeaveCriticalSection(hGuard);

@@ -2,6 +2,8 @@
 #include "common/StringUtils.h"
 #include "util/log/Log.h"
 
+#include <string>
+
 const int SIZE_DATA = 4096;
 const int ARRAY_SIZE = 10;
 
@@ -19,7 +21,7 @@ namespace EventLogs {
 		auto queryParam = param.c_str();
 		EventWrapper hContext = EvtCreateRenderContext(1, &queryParam, EvtRenderContextValues);
 		if (!hContext){
-			LOG_ERROR("EventLogs::GetEventParam: EvtCreateRenderContext failed with " + std::to_string(GetLastError()));
+			LOG_ERROR(L"EventLogs::GetEventParam: EvtCreateRenderContext failed with " + std::to_wstring(GetLastError()));
 			return std::nullopt;
 		}
 

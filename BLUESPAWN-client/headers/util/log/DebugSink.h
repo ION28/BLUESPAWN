@@ -16,7 +16,7 @@ namespace Log {
 	private:
 
 		/// A list of different prepends to be used at each log level
-		static std::wstring MessagePrepends[4] = { L"[ERROR]", L"[WARNING]", L"[INFO]", L"[VERBOSE]" };
+		static inline std::wstring MessagePrepends[4] = { L"[ERROR]", L"[WARNING]", L"[INFO]", L"[VERBOSE]" };
 
 		/// A critical section ensuring associated messages occur consecutively
 		CriticalSection hGuard;

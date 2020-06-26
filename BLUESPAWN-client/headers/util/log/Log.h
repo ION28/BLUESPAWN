@@ -18,6 +18,14 @@
 #define LOG_ERROR(...) \
    LOG(Log::LogLevel::LogError, __VA_ARGS__ << Log::endlog)
 
+// A macro to log an LSTATUS and/or HRESULT error
+#define LOG_SYSTEM_ERROR(ERROR_ID) \
+   LOG_ERROR("System Error Code 0x" << std::uppercase << std::hex << ERROR_ID << ": " << Log::FormatErrorMessage(ERROR_ID));
+
+// A macro that evaluates to a string describing the code in GetLastError()
+#define SYSTEM_ERROR \
+	"System Error Code 0x" << std::uppercase << std::hex << GetLastError() << ": " << Log::FormatErrorMessage(GetLastError())
+
 // A macro to log a warning in the set of sinks specified by AddSink and RemoveSink
 #define LOG_WARNING(...) \
    LOG(Log::LogLevel::LogWarn, __VA_ARGS__ << Log::endlog)
@@ -151,4 +159,13 @@ namespace Log {
 		IN std::unique_ptr<LogSink>&& sink,
 		IN CONST std::vector<std::reference_wrapper<LogLevel>>& levels
 	);
+
+	/**
+	* Gets a System Error Message's Description given the error code
+	*
+	* @param DWORD returned from GetLastError()
+	*
+	* @return A std::wstring containing the System Error Message Description
+	*/
+	std::wstring FormatErrorMessage(DWORD dwNum);
 }

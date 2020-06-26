@@ -551,7 +551,7 @@ namespace FileSystem{
 		} else{
 			auto signer{ FileSystem::GetCertificateIssuer(FilePath) };
 			if(signer){
-				return *signer
+				return *signer;
 			} else{
 				LOG_ERROR("Unable to get the certificate issuer for " << FilePath << ": " << SYSTEM_ERROR);
 			}

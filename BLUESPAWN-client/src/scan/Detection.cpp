@@ -426,3 +426,9 @@ size_t std::hash<std::reference_wrapper<Detection>>::operator()(
 
 	return std::visit(detection.get().hasher, detection.get().data);
 }
+
+bool std::equal_to<std::reference_wrapper<Detection>>::operator()(
+	IN CONST std::reference_wrapper<Detection>& _Left, IN CONST std::reference_wrapper<Detection>& _Right) const {
+
+	return _Left.get() == _Right.get();
+}

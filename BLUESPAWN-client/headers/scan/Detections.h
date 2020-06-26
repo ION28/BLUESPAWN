@@ -724,6 +724,16 @@ public:
 		IN bool DetectionStale = false OPTIONAL
 	);
 
+	/// Define a copy constructor
+	Detection(
+		IN CONST Detection& detection
+	);
+	
+	/// Define assignment operator
+	Detection& operator=(
+		IN CONST Detection& detection
+	);
+
 	/**
 	 * Override for equality comparison operator. This checks if the data matches, ignoring other fields.
 	 *
@@ -754,7 +764,9 @@ template<>
 struct std::hash<Detection> {
 
 	/// Hashes a detection using its data
-	size_t operator()(IN CONST Detection& detection) const;
+	size_t operator()(
+		IN CONST Detection& detection
+	) const;
 };
 
 /// Template specialization defining how hashes of reference wrappers for Detection objects should be calculated
@@ -762,5 +774,18 @@ template<>
 struct std::hash<std::reference_wrapper<Detection>> {
 
 	/// Hashes a detection using its data
-	size_t operator()(IN CONST std::reference_wrapper<Detection>& detection) const;
+	size_t operator()(
+		IN CONST std::reference_wrapper<Detection>& detection
+	) const;
+};
+
+/// Template specialization defining how equality of reference wrappers for Detection objects should be calculated
+template<>
+struct std::equal_to<std::reference_wrapper<Detection>> {
+
+	/// Compares reference wrappers by comparing their wrapped value
+	bool operator()(
+		IN CONST std::reference_wrapper<Detection>& _Left,
+		IN CONST std::reference_wrapper<Detection>& _Right
+	) const;
 };

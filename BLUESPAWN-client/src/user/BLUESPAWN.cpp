@@ -1,7 +1,7 @@
 #include "user/bluespawn.h"
 #include "user/CLI.h"
-#include "util/log/HuntLogMessage.h"
 #include "util/log/DebugSink.h"
+#include "util/log/CLISink.h"
 #include "util/log/XMLSink.h"
 #include "common/DynamicLinker.h"
 #include "common/StringUtils.h"

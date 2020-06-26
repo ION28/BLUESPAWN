@@ -73,7 +73,7 @@ typedef Certainty Association;
 class ScanInfo {
 
 	/// A mapping of detections to their association strength with the current node.
-	std::unordered_map<std::reference_wrapper<Detection>, Association> associations;
+	std::unique_ptr<std::unordered_map<std::reference_wrapper<Detection>, Association>> associations;
 
 	/// The degree of certainty that the detection referenced by this scan node is malicious
 	/// Note that this ignores all associations
