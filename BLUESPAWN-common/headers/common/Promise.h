@@ -92,7 +92,7 @@ public:
 	 * @return Returns an optional, holding the value used to fufill it or 
 	 * nullopt if invalidated.
 	 */
-	std::optional<T> GetValue(){
+	std::optional<T> GetValue() const {
 		auto status{ WaitForSingleObject(hEvent, INFINITE) };
 		if(status != WAIT_OBJECT_0){
 			throw std::exception("Waiting for value failed");
@@ -166,11 +166,12 @@ public:
 
 		if(!Finished()){
 			members->value = value;
-
 			SetEvent(hEvent);
+			auto copy{ members->SuccessFunctions };
+
 			LeaveCriticalSection(hGuard);
 
-			for(const auto& func : members->SuccessFunctions){
+			for(const auto& func : copy){
 				func(value);
 			}
 
@@ -178,8 +179,7 @@ public:
 		} else{
 			LeaveCriticalSection(hGuard);
 			
-			return members->value && (detail::has_operator_equals_impl<T>::type::value ? 
-				value == members->value : false);
+			return false;
 		}
 	}
 
@@ -200,9 +200,10 @@ public:
 
 		if(!Finished()){
 			SetEvent(hEvent);
+			auto copy{ members->FailureFunctions };
 			LeaveCriticalSection(hGuard);
 
-			for(const auto& func : members->FailureFunctions){
+			for(const auto& func : copy){
 				func();
 			}
 
@@ -219,7 +220,7 @@ public:
 	 *
 	 * @return true if this promise has been fufilled; false otherwise.
 	 */
-	bool Fufilled(){
+	bool Fufilled() const {
 		return Finished() && members->value;
 	}
 
@@ -228,7 +229,7 @@ public:
 	 *
 	 * @return true if this promise has been invalidated; false otherwise.
 	 */
-	bool Invalidated(){
+	bool Invalidated() const {
 		return Finished() && !members->value;
 	}
 
@@ -237,7 +238,7 @@ public:
 	 *
 	 * @return true if this promise has been either fufilled invalidated; false otherwise.
 	 */
-	bool Finished(){
+	bool Finished() const {
 		return WAIT_TIMEOUT != WaitForSingleObjectEx(hEvent, 0, true);
 	}
 
@@ -246,7 +247,7 @@ public:
 	 *
 	 * @return True if this promise is guaranteed to not be invalidated; false otherwise.
 	 */
-	bool IsGuaranteed(){
+	bool IsGuaranteed() const {
 		return guaranteed;
 	}
 
@@ -257,7 +258,7 @@ public:
 	 *
 	 * @return A handle to the underlying event for this promise.
 	 */
-	operator HANDLE(){
+	operator HANDLE() const {
 		return hEvent;
 	}
 

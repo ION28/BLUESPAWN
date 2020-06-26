@@ -15,7 +15,7 @@ void MitigationRegister::AuditMitigations(SecurityLevel securityLevel) {
 				io.InformUser(vRegisteredMitigations[i]->getName() + L" is NOT configured.");
 			}
 			else {
-				LOG_INFO(vRegisteredMitigations[i]->getName() + L" is enabled.");
+				LOG_INFO(1, vRegisteredMitigations[i]->getName() + L" is enabled.");
 				io.InformUser(vRegisteredMitigations[i]->getName() + L" is enabled.");
 			}
 		}
@@ -29,15 +29,15 @@ void MitigationRegister::EnforceMitigations(SecurityLevel securityLevel, bool bF
 	for(int i = 0; i < vRegisteredMitigations.size(); i++) {
 		if (vRegisteredMitigations[i]->MitigationApplies()) {
 			if (!vRegisteredMitigations[i]->MitigationIsEnforced(securityLevel)) {
-				LOG_WARNING(vRegisteredMitigations[i]->getName() + L" is NOT configured.");
+				LOG_INFO(2, vRegisteredMitigations[i]->getName() + L" is NOT configured.");
 				if (bForceEnforce) {
-					LOG_WARNING(L"Enforcing mitigation for " + vRegisteredMitigations[i]->getName());
+					LOG_INFO(1, L"Enforcing mitigation for " + vRegisteredMitigations[i]->getName());
 					io.InformUser(L"Enforcing mitigation for " + vRegisteredMitigations[i]->getName());
 					if (vRegisteredMitigations[i]->EnforceMitigation(securityLevel)) {
 						iEnforcedCount++;
 					}
 					else {
-						LOG_WARNING(L"Unable to enforce mitigation for " + vRegisteredMitigations[i]->getName());
+						LOG_ERROR(L"Unable to enforce mitigation for " + vRegisteredMitigations[i]->getName());
 						io.InformUser(L"Unable to enforce mitigation for " + vRegisteredMitigations[i]->getName());
 					}
 				}
@@ -48,18 +48,18 @@ void MitigationRegister::EnforceMitigations(SecurityLevel securityLevel, bool bF
 						dwChoice = io.GetUserConfirm(L"Would you like to enforce this (y/n)");
 					}
 					if (dwChoice > 0) {
-						LOG_INFO(L"Enforcing " + vRegisteredMitigations[i]->getName());
+						LOG_INFO(1, L"Enforcing " + vRegisteredMitigations[i]->getName());
 						io.InformUser(L"Enforcing " + vRegisteredMitigations[i]->getName());
 						if (vRegisteredMitigations[i]->EnforceMitigation(securityLevel)) {
 							iEnforcedCount++;
 						}
 						else {
-							LOG_WARNING(L"Unable to enforce mitigation for " + vRegisteredMitigations[i]->getName());
+							LOG_ERROR(L"Unable to enforce mitigation for " + vRegisteredMitigations[i]->getName());
 							io.InformUser(L"Unable to enforce mitigation for " + vRegisteredMitigations[i]->getName());
 						}
 					}
 					else {
-						LOG_INFO(L"User chose not to enforce " + vRegisteredMitigations[i]->getName());
+						LOG_INFO(2, L"User chose not to enforce " + vRegisteredMitigations[i]->getName());
 						iMitigationsIgnored++;
 					}
 				}
@@ -67,11 +67,11 @@ void MitigationRegister::EnforceMitigations(SecurityLevel securityLevel, bool bF
 		}
 	}
 	if (iMitigationsIgnored == 0) {
-		LOG_INFO(L"Enforced " + std::to_wstring(vRegisteredMitigations.size()) + L" Mitigations making " + std::to_wstring(iEnforcedCount) + L" changes.");
+		LOG_INFO(2, L"Enforced " + std::to_wstring(vRegisteredMitigations.size()) + L" Mitigations making " + std::to_wstring(iEnforcedCount) + L" changes.");
 		io.InformUser(L"Enforced " + std::to_wstring(vRegisteredMitigations.size()) + L" Mitigations making " + std::to_wstring(iEnforcedCount) + L" changes.");
 	}
 	else {
-		LOG_INFO(L"Enforced " + std::to_wstring(vRegisteredMitigations.size() - iMitigationsIgnored) + L" Mitigations making " + std::to_wstring(iEnforcedCount) +
+		LOG_INFO(2, L"Enforced " + std::to_wstring(vRegisteredMitigations.size() - iMitigationsIgnored) + L" Mitigations making " + std::to_wstring(iEnforcedCount) +
 			L" changes. Chose not to enforce " + std::to_wstring(iMitigationsIgnored) + L" Mitigations.");
 		io.InformUser(L"Enforced " + std::to_wstring(vRegisteredMitigations.size() - iMitigationsIgnored) + L" Mitigations making " + std::to_wstring(iEnforcedCount) + 
 			L" changes. Chose not to enforce " + std::to_wstring(iMitigationsIgnored) + L" Mitigations.");

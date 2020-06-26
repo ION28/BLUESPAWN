@@ -92,7 +92,7 @@ void DetectionRegister::UpdateDetectionCertainty(
 
         // Existing associations' associativity scores are now stale
         else{
-            for(auto& pair : detection.get().info.associations){
+            for(auto& pair : *detection.get().info.associations){
                 pair.first.get().info.bAssociativeStale = true;
             }
         }

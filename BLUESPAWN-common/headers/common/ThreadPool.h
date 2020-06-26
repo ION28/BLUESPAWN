@@ -76,7 +76,7 @@ public:
 		IN CONST std::function<T()>& function
 	){
 		Promise<T> promise{ false };
-		EnqueueTask([promise](){
+		EnqueueTask([promise, function]() mutable {
 			try {
 				promise.Fufill(function());
 			} catch(...){

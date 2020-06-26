@@ -18,7 +18,7 @@ bool GetFilesSimilar(const AllocationWrapper& lpFile1, const AllocationWrapper& 
 }
 
 std::vector<std::wstring> FileScanner::ExtractStrings(IN CONST AllocationWrapper& data, 
-													  IN DWORD dwMinLength OPTIONAL) const {
+													  IN DWORD dwMinLength OPTIONAL){
 	std::vector<std::wstring> strings{};
 
 	DWORD dwStringStart{};
@@ -59,7 +59,7 @@ std::vector<std::wstring> FileScanner::ExtractStrings(IN CONST AllocationWrapper
 	return strings;
 }
 
-std::vector<std::wstring> FileScanner::ExtractFilePaths(IN CONST std::vector<std::wstring>& strings) const {
+std::vector<std::wstring> FileScanner::ExtractFilePaths(IN CONST std::vector<std::wstring>& strings){
 	std::vector<std::wstring> filepaths{};
 	std::wregex regex{ L"[a-zA-Z]:([/\\\\][a-zA-Z0-9\\. @_-]+)+" };
 	for(auto& string : strings){
@@ -100,7 +100,7 @@ void FileScanner::UpdateModules(){
 			for(auto& mod : modules){
 				auto name{ ToLowerCaseW(mod) };
 				if(FileScanner::modules.find(name) == FileScanner::modules.end()){
-					FileScanner::modules.emplace(name, std::set<DWORD>{ processes[i] });
+					FileScanner::modules.emplace(name, std::unordered_set<DWORD>{ processes[i] });
 				} else FileScanner::modules.at(name).emplace(processes[i]);
 			}
 		}

@@ -24,23 +24,19 @@ class HuntRegister;
     LOG_INFO(2, "Finished hunt for " << name); \
 	return detections;
 
-#define CREATE_DETECTION(certainty, ...)                                                  \
-    detections.emplace_back(                                                              \
-        ThreadPool::GetInstance().RequestPromise<std::reference_wrapper<Detection>>(      \
-            std::bind(&DetectionRegister::AddDetection, Bluespawn::detections, Detection{ \
-                          __VA_ARGS__,                                                    \
-                          DetectionContext{ GetName() }                                   \
-                      }, certainty)                                                       \
-            )                                                                             \
+#define CREATE_DETECTION(certainty, ...)              \
+    detections.emplace_back(                          \
+        Bluespawn::detections.AddDetection(Detection{ \
+            __VA_ARGS__,                              \
+            DetectionContext{ GetName() }             \
+        }, certainty)                                 \
     );
 
-#define CREATE_DETECTION_WITH_CONTEXT(certainty, ...)                                     \
-    detections.emplace_back(                                                              \
-        ThreadPool::GetInstance().RequestPromise<std::reference_wrapper<Detection>>(      \
-            std::bind(&DetectionRegister::AddDetection, Bluespawn::detections, Detection{ \
-                          __VA_ARGS__                                                     \
-                      }, certainty)                                                       \
-            )                                                                             \
+#define CREATE_DETECTION_WITH_CONTEXT(certainty, ...) \
+    detections.emplace_back(                          \
+        Bluespawn::detections.AddDetection(Detection{ \
+            __VA_ARGS__,                              \
+        }, certainty)                                 \
     );
 
 class Hunt {

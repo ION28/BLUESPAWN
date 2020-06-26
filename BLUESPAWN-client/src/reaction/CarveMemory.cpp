@@ -10,31 +10,35 @@ namespace Reactions{
 
 	void CarveMemoryReaction::React(IN Detection& detection){
 		auto& data{ std::get<ProcessDetectionData>(detection.data) };
-		HandleWrapper process{ OpenProcess(PROCESS_SUSPEND_RESUME, false, data.PID) };
+		if(!data.PID){
+			return;
+		}
+
+		HandleWrapper process{ OpenProcess(PROCESS_SUSPEND_RESUME, false, *data.PID) };
 		if(process){
-			if(Bluespawn::io.GetUserConfirm(L"`" + (data.ProcessCommand ? *data.ProcessCommand : data.ProcessName) +
-											L"` (PID " + std::to_wstring(data.PID) + L") appears to be infected. "
+			if(Bluespawn::io.GetUserConfirm(L"`" + (data.ProcessCommand ? *data.ProcessCommand : *data.ProcessName) +
+											L"` (PID " + std::to_wstring(*data.PID) + L") appears to be infected. "
 											"Carve out infected memory?") == 1){
 				if(data.ImageName){
-					if(!PERemover{ data.PID, *data.ImageName }.RemoveImage()){
+					if(!PERemover{ *data.PID, *data.ImageName }.RemoveImage()){
 						LOG_ERROR(L"Failed to carve image " << *data.ImageName << L" from process with PID " 
-								  << data.PID);
+								  << *data.PID);
 					} else{
 						LOG_INFO(1, L"Successfully carved image " << *data.ImageName << L" from process with PID "
-								  << data.PID);
+								  << *data.PID);
 					}
 				} else{
-					if(!PERemover{ data.PID, *data.BaseAddress, *data.MemorySize }.RemoveImage()){
+					if(!PERemover{ *data.PID, *data.BaseAddress, *data.MemorySize }.RemoveImage()){
 						LOG_ERROR(L"Failed to carve memory at " << *data.BaseAddress << L" from process with PID "
-								  << data.PID);
+								  << *data.PID);
 					} else{
 						LOG_INFO(1,L"Successfully carved memory at " << *data.BaseAddress << L" from process with PID "
-								 << data.PID);
+								 << *data.PID);
 					}
 				}
 			}
 		} else{
-			LOG_ERROR("Unable to open potentially infected process " << data.PID);
+			LOG_ERROR("Unable to open potentially infected process " << *data.PID);
 		}
 	}
 

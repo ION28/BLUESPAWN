@@ -192,12 +192,16 @@ ProcessDetectionData ProcessDetectionData::CreateMemoryDetectionData(
 	};
 }
 
-ProcessDetectionData::ProcessDetectionData(IN ProcessDetectionType type, IN DWORD PID,
-	IN CONST std::optional<DWORD>& TID, IN CONST std::optional<HandleWrapper>& ProcessHandle,
-	IN CONST std::wstring& ProcessName, IN CONST std::optional<std::wstring>& ProcessPath,
-	IN CONST std::optional<std::wstring>& ProcessCommand, IN std::unique_ptr<ProcessDetectionData>&& ParentProcess,
-	IN CONST std::optional<PVOID64>& BaseAddress, IN CONST std::optional<DWORD>& MemorySize,
-	IN CONST std::optional<std::wstring>& ImageName) :
+ProcessDetectionData::ProcessDetectionData(IN ProcessDetectionType type, IN CONST std::optional<DWORD> PID,
+										   IN CONST std::optional<DWORD>& TID,
+										   IN CONST std::optional<HandleWrapper>& ProcessHandle,
+										   IN CONST std::optional<std::wstring>& ProcessName,
+										   IN CONST std::optional<std::wstring>& ProcessPath,
+										   IN CONST std::optional<std::wstring>& ProcessCommand,
+										   IN std::unique_ptr<ProcessDetectionData>&& ParentProcess,
+										   IN CONST std::optional<PVOID64>& BaseAddress,
+										   IN CONST std::optional<DWORD>& MemorySize,
+										   IN CONST std::optional<std::wstring>& ImageName) :
 	type{ type },
 	PID{ PID },
 	TID{ TID },
@@ -214,14 +218,15 @@ ProcessDetectionData::ProcessDetectionData(IN ProcessDetectionType type, IN DWOR
 
 	serialization = std::unordered_map<std::wstring, std::wstring>{
 		{ L"Type", type == ProcessDetectionType::MaliciousImage ? L"Image" :
-				   type == ProcessDetectionType::MaliciousMemory ? L"Memory" : L"Process"},
-		{ L"Name", ProcessName },
-		{ L"PID", std::to_wstring(PID) }
+				   type == ProcessDetectionType::MaliciousMemory ? L"Memory" : 
+		           type == ProcessDetectionType::MaliciousProcess ? L"Process" : L"Command" },
 	};
+	if(PID) serialization.emplace(L"PID", std::to_wstring(*PID));
 	if(TID) serialization.emplace(L"TID", std::to_wstring(*TID));
+	if(ProcessName) serialization.emplace(L"Process Name", *ProcessName);
 	if(ProcessPath) serialization.emplace(L"Process Path", *ProcessPath);
 	if(ProcessCommand) serialization.emplace(L"Process Command", *ProcessCommand);
-	if(ParentProcess) serialization.emplace(L"Parent PID", std::to_wstring(ParentProcess->PID));
+	if(ParentProcess && ParentProcess->PID) serialization.emplace(L"Parent PID", std::to_wstring(*ParentProcess->PID));
 	if(BaseAddress){
 		std::wstringstream wss{};
 		wss << std::hex << *BaseAddress;

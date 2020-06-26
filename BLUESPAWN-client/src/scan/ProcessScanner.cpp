@@ -28,7 +28,9 @@ std::unordered_map<std::reference_wrapper<Detection>, Association> ProcessScanne
 	
 	if(data.type == ProcessDetectionType::MaliciousProcess && data.ProcessCommand){
 		auto associated{ SearchCommand(*data.ProcessCommand) };
-		detections.emplace(associated.begin(), associated.end());
+		for(auto& pair : associated){
+			detections.emplace(pair.first, pair.second);
+		}
 	}
 
 	HandleWrapper snapshot{ CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) };
@@ -55,6 +57,8 @@ std::unordered_map<std::reference_wrapper<Detection>, Association> ProcessScanne
 			}
 		} while(Process32NextW(snapshot, &entry));
 	}
+
+	return detections;
 }
 
 bool ProcessScanner::PerformQuickScan(IN CONST std::wstring& in){ return false; }

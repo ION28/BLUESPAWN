@@ -34,7 +34,7 @@ public:
 	 */
 	static std::vector<std::wstring> ExtractFilePaths(
 		IN CONST std::vector<std::wstring>& strings
-	) const;
+	);
 
 	/** 
 	 * Searches through memory for strings (hex range 0x20 to 0x79) of a certain minimum length, either
@@ -48,7 +48,7 @@ public:
 	static std::vector<std::wstring> ExtractStrings(
 		IN CONST AllocationWrapper& data, 
 		IN DWORD dwMinLength = 5 OPTIONAL
-	) const;
+	);
 
 	/**
 	 * Gets a vector of detections associated with the provided detection. This searches for processes with

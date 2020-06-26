@@ -42,6 +42,8 @@ enum class ProcessDetectionType {
 	MaliciousProcess, // Refers to the process itself rather than something within it
 	MaliciousImage,   // Refers to a specific image within the process
 	MaliciousMemory,  // Refers to a location in memory of the process
+	MaliciousCommand, // Refers to a command to be used to spawn a process. If a specific process is identified,
+	                  // the type should be MaliciousProcess instead
 };
 
 /**
@@ -53,7 +55,7 @@ struct ProcessDetectionData {
 	ProcessDetectionType type;
 
 	/// The process ID of the process
-	DWORD PID;
+	std::optional<DWORD> PID;
 
 	/// The thread IDs of the threads within the process that triggered the detection. 
 	/// This will rarely be used.
@@ -63,7 +65,7 @@ struct ProcessDetectionData {
 	std::optional<HandleWrapper> ProcessHandle;
 
 	/// The name of the process
-	std::wstring ProcessName;
+	std::optional<std::wstring> ProcessName;
 
 	/// The path to the executable image of the process
 	std::optional<std::wstring> ProcessPath;
@@ -250,6 +252,15 @@ struct ProcessDetectionData {
 	);
 
 	/**
+	 * Instantiates a ProcessDetectionData object representing a malicious command used to spawn a process.
+	 *
+	 * @param ProcessCommand The command used to spawn a process
+	 */
+	static ProcessDetectionData CreateCommandDetectionData(
+		IN CONST std::wstring& ProcessCommand
+	);
+
+	/**
 	 * Serialize the detection data in to a mapping of values. Note this should not include any internal representations
 	 * but rather only include values that have meaning outside of BLUESPAWN's running.
 	 *
@@ -284,10 +295,10 @@ private:
 	/// Raw constructor for a ProcessDetectionData
 	ProcessDetectionData(
 		IN ProcessDetectionType type,
-		IN DWORD PID,
+		IN CONST std::optional<DWORD> PID,
 		IN CONST std::optional<DWORD> & TID,
 		IN CONST std::optional<HandleWrapper>& ProcessHandle,
-		IN CONST std::wstring & ProcessName,
+		IN CONST std::optional<std::wstring> & ProcessName,
 		IN CONST std::optional<std::wstring>& ProcessPath,
 		IN CONST std::optional<std::wstring>& ProcessCommand,
 		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess,

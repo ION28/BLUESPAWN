@@ -86,6 +86,45 @@ struct RegistryEventThreadArgs {
 	std::optional<RegistryEvent>* Events;
 };
 
+/// Template specialization defining how unique_ptrs to Events should be hashed
+template<>
+class std::hash<std::unique_ptr<Event>> {
+	size_t operator()(
+		IN CONST std::unique_ptr<Event>& evt
+	) const;
+};
+
+/// Template specialization defining how unique_ptrs to Events should be compared
+template<>
+class std::equal_to<std::unique_ptr<Event>> {
+	bool operator()(
+		IN CONST std::unique_ptr<Event>& left, 
+		IN CONST std::unique_ptr<Event>& right
+	) const;
+};
+
 namespace Registry {
-	std::vector<std::shared_ptr<Event>> GetRegistryEvents(HKEY hkHive, const std::wstring& path, bool WatchWow64 = true, bool WatchUsers = true, bool WatchSubkeys = false);
+
+	/**
+	 * Creates a vector of events to be triggered when any value under a specified registry key path changes,
+	 * automatically mirrored across users if WatchUsers is true and mirrored to WoW64 if WatchWow64 is true. The 
+	 * events generated will also trigger when any subkey is changed if WatchSubkeys is set to true.
+	 *
+	 * @param dest The vector to which events created by this function will be added
+	 * @param hkHive The hive under which the path will be searched. If WatchUsers is true, this will be also be 
+	 *        substituted by each user's hive. In most cases, hkHive should be HKEY_LOCAL_MACHINE.
+	 * @param path The path of the key under the hive.
+	 * @param WatchWow64 Indicates whether events should be generated for Wow64 versions of keys, if present
+	 * @param WatchUsers Indicates whether events should be generated for the key at the path under each user's hive,
+	 *        if present
+	 * @param WatchSubkeys Indicates whether all events generated should be triggered when any subkey is modified
+	 */
+	void GetRegistryEvents(
+		IN std::vector<std::unique_ptr<Event>>& dest,
+		IN HKEY hkHive, 
+		IN CONST std::wstring& path, 
+		IN bool WatchWow64 = true OPTIONAL, 
+		IN bool WatchUsers = true OPTIONAL, 
+		IN bool WatchSubkeys = false OPTIONAL
+	);
 }

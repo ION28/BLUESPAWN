@@ -1,7 +1,5 @@
 #include "hunt/RegistryHunt.h"
 #include "reaction/Reaction.h"
-
-#include "util/log/HuntLogMessage.h"
 #include "util/log/Log.h"
 
 #include <regex>
@@ -124,48 +122,48 @@ namespace Registry {
 					auto data = key.GetValue<std::wstring>(check.name);
 					if(!data.has_value()){
 						if(check.MissingBad){
-							LOG_INFO("Under key " << key << ", desired value " << check.name << " was missing.");
+							LOG_INFO(3, "Under key " << key << ", desired value " << check.name << " was missing.");
 							vIdentifiedValues.emplace_back(RegistryValue{ key, check.name, std::move(std::wstring{}) });
 						}
 					} else if(!check(*data)){
 						auto value = RegistryValue{ key, check.name, std::move(*data) };
-						LOG_INFO("Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
+						LOG_INFO(2, "Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
 						vIdentifiedValues.emplace_back(value);
 					}
 				} else if(check.GetType() == RegistryType::REG_MULTI_SZ_T){
 					auto data = key.GetValue<std::vector<std::wstring>>(check.name);
 					if(!data.has_value()){
 						if(check.MissingBad){
-							LOG_INFO("Under key " << key << ", desired value " << check.name << " was missing.");
+							LOG_INFO(3, "Under key " << key << ", desired value " << check.name << " was missing.");
 							vIdentifiedValues.emplace_back(RegistryValue{ key, check.name, std::move(std::vector<std::wstring>{}) });
 						}
 					} else if(!check(*data)){
 						auto value = RegistryValue{ key, check.name, std::move(*data) };
-						LOG_INFO("Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
+						LOG_INFO(2, "Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
 						vIdentifiedValues.emplace_back(value);
 					}
 				} else if(check.GetType() == RegistryType::REG_DWORD_T){
 					auto data = key.GetValue<DWORD>(check.name);
 					if(!data.has_value()){
 						if(check.MissingBad){
-							LOG_INFO("Under key " << key << ", desired value " << check.name << " was missing.");
+							LOG_INFO(3, "Under key " << key << ", desired value " << check.name << " was missing.");
 							vIdentifiedValues.emplace_back(RegistryValue{ key, check.name, std::move(0) });
 						}
 					} else if(!check(*data)){
 						auto value = RegistryValue{ key, check.name, std::move(*data) };
-						LOG_INFO("Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
+						LOG_INFO(2, "Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
 						vIdentifiedValues.emplace_back(value);
 					}
 				} else if(check.GetType() == RegistryType::REG_BINARY_T){
 					auto data = key.GetRawValue(check.name);
 					if(!data){
 						if(check.MissingBad){
-							LOG_INFO("Under key " << key << ", desired value " << check.name << " was missing.");
+							LOG_INFO(3, "Under key " << key << ", desired value " << check.name << " was missing.");
 							vIdentifiedValues.emplace_back(RegistryValue{ key, check.name, std::move(AllocationWrapper{ nullptr, 0 }) });
 						}
 					} else if(!check(data)){
 						auto value = RegistryValue{ key, check.name, std::move(data) };
-						LOG_INFO("Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
+						LOG_INFO(2, "Under key " << key << ", value " << check.name << " had potentially malicious data " << value);
 						vIdentifiedValues.emplace_back(value);
 					}
 				}
@@ -209,28 +207,28 @@ namespace Registry {
 					auto data = key.GetValue<std::wstring>(value);
 					auto regValue = RegistryValue{ key, value, std::move(!data ? L"" : *data) };
 
-					LOG_INFO("Under key " << key << ", value " << value << " was present with data " << regValue);
+					LOG_INFO(2, "Under key " << key << ", value " << value << " was present with data " << regValue);
 
 					vRegValues.emplace_back(regValue);
 				} else if(type == RegistryType::REG_MULTI_SZ_T){
 					auto data = key.GetValue<std::vector<std::wstring>>(value);
 					auto regValue = RegistryValue{ key, value, std::move(!data ? std::vector<std::wstring>{} : *data) };
 
-					LOG_INFO("Under key " << key << ", value " << value << " was present with data " << regValue);
+					LOG_INFO(2, "Under key " << key << ", value " << value << " was present with data " << regValue);
 
 					vRegValues.emplace_back(regValue);
 				} else if(type == RegistryType::REG_DWORD_T){
 					auto data = key.GetValue<DWORD>(value);
 					auto regValue = RegistryValue{ key, value, std::move(!data ? 0 : *data) };
 
-					LOG_INFO("Under key " << key << ", value " << value << " was present with data " << regValue);
+					LOG_INFO(2, "Under key " << key << ", value " << value << " was present with data " << regValue);
 
 					vRegValues.emplace_back(regValue);
 				} else {
 					auto data = key.GetRawValue(value);
 					auto regValue = RegistryValue{ key, value, std::move(data) };
 
-					LOG_INFO("Under key " << key << ", value " << value << " was present with data " << regValue);
+					LOG_INFO(2, "Under key " << key << ", value " << value << " was present with data " << regValue);
 
 					vRegValues.emplace_back(regValue);
 				}

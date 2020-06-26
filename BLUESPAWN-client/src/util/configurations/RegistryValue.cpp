@@ -29,6 +29,23 @@ namespace Registry {
 		type{ RegistryType::REG_MULTI_SZ_T },
 		data{ std::forward<std::vector<std::wstring>>(vData) }{}
 
+
+	std::optional<RegistryValue> RegistryValue::Create(IN CONST RegistryKey& key, 
+													   IN CONST std::wstring& wsValueName){
+		if(key.ValueExists(wsValueName)){
+			auto type{ key.GetValueType(wsValueName) };
+			if(type == RegistryType::REG_DWORD_T){
+				return RegistryValue{ key, wsValueName, *key.GetValue<DWORD>(wsValueName) };
+			} else if(type == RegistryType::REG_MULTI_SZ_T){
+				return RegistryValue{ key, wsValueName, *key.GetValue<std::vector<std::wstring>>(wsValueName) };
+			} else if(type == RegistryType::REG_EXPAND_SZ_T || type == RegistryType::REG_SZ_T){
+				return RegistryValue{ key, wsValueName, *key.GetValue<std::wstring>(wsValueName) };
+			} else return RegistryValue{ key, wsValueName, key.GetRawValue(wsValueName) };
+		}
+
+		return std::nullopt;
+	}
+
 	RegistryType RegistryValue::GetType() const {
 		return type;
 	}

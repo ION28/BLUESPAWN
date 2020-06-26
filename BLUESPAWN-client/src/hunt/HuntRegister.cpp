@@ -9,7 +9,7 @@
 #include "common/Promise.h"
 
 void HuntRegister::RegisterHunt(std::unique_ptr<Hunt>&& hunt) {
-	vRegisteredHunts.emplace_back(hunt);
+	vRegisteredHunts.emplace_back(std::move(hunt));
 }
 
 std::vector<Promise<std::vector<std::reference_wrapper<Detection>>>>
@@ -47,8 +47,8 @@ Promise<std::vector<std::reference_wrapper<Detection>>> HuntRegister::RunHunt(IN
 																			  IN CONST Scope& scope OPTIONAL){
 	Bluespawn::io.InformUser(L"Starting scan for " + hunt.GetName());
 
-	return ThreadPool::GetInstance()
-		.RequestPromise<std::vector<std::reference_wrapper<Detection>>>(std::bind(&Hunt::RunHunt, hunt, scope));
+	return ThreadPool::GetInstance().RequestPromise<std::vector<std::reference_wrapper<Detection>>>(
+		std::bind(&Hunt::RunHunt, hunt, scope));
 }
 
 void HuntRegister::SetupMonitoring(){

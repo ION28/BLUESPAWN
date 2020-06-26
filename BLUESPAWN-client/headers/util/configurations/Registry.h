@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <optional>
+#include <type_traits>
 
 #include "common/DynamicLinker.h"
 #include "common/wrappers.hpp"
@@ -249,3 +250,11 @@ namespace Registry {
 		operator HKEY() const;
 	};
 }
+
+
+template<>
+struct std::hash<Registry::RegistryKey> {
+	size_t operator()(
+		IN CONST Registry::RegistryKey& key
+	) const;
+};

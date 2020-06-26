@@ -31,13 +31,11 @@ std::unordered_map<std::reference_wrapper<Detection>, Association> MemoryScanner
 				FileDetectionData{ *data.ImageName }
 			}), Association::Certain);
 		} else{
-			FILETIME time{};
-			GetSystemTimeAsFileTime(&time);
 			detections.emplace(Bluespawn::detections.AddDetection(Detection{
 				FileDetectionData{ *data.ImageName },
-				DetectionContext{ time, std::nullopt, detection.context->FirstEvidenceTime, L"This image appears to "
-				    "have been modified to behave maliciously, so while it's possible this file is malicious, this "
-			        "detection was created to serve as an IoC" }
+				DetectionContext{ std::nullopt, detection.context.FirstEvidenceTime, L"This image appears to have been"
+				    " modified to behave maliciously, so while it's possible this file is malicious, this detection "
+			        "created to serve as an IoC" }
 			}), Association::Moderate);
 		}
 	}
@@ -69,11 +67,11 @@ bool MemoryScanner::PerformQuickScan(IN CONST std::wstring& in){
 	return false; 
 }
 
-#define PAGE_EXECUTABLE(prot) \
+#define IS_PAGE_EXECUTABLE(prot) \
     (prot & 0xF0)
-#define PAGE_WRITECOPY(prot) \
+#define IS_PAGE_WRITECOPY(prot) \
     (prot == 0x80 || prot == 0x08)
-#define PAGE_WRITEABLE(prot) \
+#define IS_PAGE_WRITEABLE(prot) \
     (prot & 0xCC)
 
 Certainty MemoryScanner::ScanDetection(IN CONST Detection& detection){
@@ -101,27 +99,28 @@ Certainty MemoryScanner::ScanDetection(IN CONST Detection& detection){
 	MEMORY_BASIC_INFORMATION info{};
 	if(VirtualQueryEx(*data.ProcessHandle, *data.BaseAddress, &info, sizeof(info))){
 
-		bool wc{ PAGE_WRITECOPY(info.AllocationProtect) };
-		if(PAGE_EXECUTABLE(info.AllocationProtect) && !wc){
+		bool wc{ IS_PAGE_WRITECOPY(info.AllocationProtect) };
+		if(IS_PAGE_EXECUTABLE(info.AllocationProtect) && !wc){
 			certainty = certainty + Certainty::Moderate;
-			LOG_INFO(3, L"Allocation at " << *data.BaseAddress << L" in process with PID " << GetProcessId(*data.ProcessHandle)
-					 << L" has suspicious permissions " << std::hex << info.Protect);
+			LOG_INFO(3, L"Allocation at " << *data.BaseAddress << L" in process with PID " << 
+					 GetProcessId(*data.ProcessHandle) << L" has suspicious permissions " << std::hex << info.Protect);
 		}
 		
 		auto addr{ reinterpret_cast<PCHAR>(*data.BaseAddress) };
 		while(addr < reinterpret_cast<PCHAR>(*data.BaseAddress) + *data.MemorySize){
 			if(VirtualQueryEx(*data.ProcessHandle, addr, &info, sizeof(info))){
-				if(PAGE_EXECUTABLE(info.Protect) && (PAGE_WRITEABLE(info.Protect) || !wc)){
+				if(IS_PAGE_EXECUTABLE(info.Protect) && (IS_PAGE_WRITEABLE(info.Protect) || !wc)){
 					LOG_INFO(3, L"Page at " << reinterpret_cast<PVOID64>(addr) << L" in process with PID " << 
-							 GetProcessId(*data.ProcessHandle) << L" has suspicious permissions " << std::hex << info.Protect);
+							 GetProcessId(*data.ProcessHandle) << L" has suspicious permissions " << std::hex <<
+							 info.Protect);
 					certainty = certainty + Certainty::Moderate;
 				}
 				addr += info.RegionSize;
 			} else return certainty;
 		}
 	} else{
-		LOG_WARNING(L"Failed to analyze memory protections for memory at " << *data.BaseAddress << L" in process with PID "
-					<< GetProcessId(*data.ProcessHandle) << L" with error 0x" << std::hex << GetLastError());
+		LOG_WARNING(L"Failed to analyze memory protections for memory at " << *data.BaseAddress << L" in process with "
+					"PID " << GetProcessId(*data.ProcessHandle) << L" with error 0x" << std::hex << GetLastError());
 	}
 	
 	return certainty;
