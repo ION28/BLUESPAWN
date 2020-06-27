@@ -495,7 +495,7 @@ private:
 struct ServiceDetectionData {
 
 	/// The name of the service
-	std::wstring ServiceName;
+	std::optional<std::wstring> ServiceName;
 
 	/// The display name of the service
 	std::optional<std::wstring> DisplayName;
@@ -503,16 +503,22 @@ struct ServiceDetectionData {
 	/// The description of the service
 	std::optional<std::wstring> Description;
 
+	/// The service path
+	std::optional<std::wstring> FilePath;
+
 	/**
-	 * Creates a ServiceDetectionData object, referencing a windows service that may be malicious. 
+	 * Creates a ServiceDetectionData object, referencing a windows service that may be malicious. Either DisplayName
+	 * or ServiceName is required.
 	 * 
 	 * @param ServiceName The name of the service
 	 * @param DisplayName The display name of the service
+	 * @param FilePath The path the the service executable
 	 * @param Description The description of the service
 	 */
 	ServiceDetectionData(
-		IN CONST std::wstring& ServiceName,
+		IN CONST std::optional<std::wstring>& ServiceName = std::nullopt OPTIONAL,
 		IN CONST std::optional<std::wstring>& DisplayName = std::nullopt OPTIONAL,
+		IN CONST std::optional<std::wstring>& FilePath = std::nullopt OPTIONAL,
 		IN CONST std::optional<std::wstring>& Description = std::nullopt OPTIONAL
 	);
 

@@ -367,16 +367,18 @@ size_t RegistryDetectionData::Hash() CONST{
 }
 
 ServiceDetectionData::ServiceDetectionData(
-	IN CONST std::wstring& ServiceName,
-	IN CONST std::optional<std::wstring>& DisplayName OPTIONAL,
-	IN CONST std::optional<std::wstring>& Description OPTIONAL
+	IN CONST std::optional<std::wstring>& ServiceName = std::nullopt OPTIONAL,
+	IN CONST std::optional<std::wstring>& DisplayName = std::nullopt OPTIONAL,
+	IN CONST std::optional<std::wstring>& FilePath = std::nullopt OPTIONAL,
+	IN CONST std::optional<std::wstring>& Description = std::nullopt OPTIONAL
 ) : ServiceName{ ServiceName },
     DisplayName{ DisplayName },
+	FilePath{ FilePath },
 	Description{ Description }{
 
-	serialization = std::unordered_map<std::wstring, std::wstring>{
-		{ L"Service Name", ServiceName },
-	};
+	serialization = std::unordered_map<std::wstring, std::wstring>{};
+	if(ServiceName){ serialization.emplace(L"Service Name", *ServiceName); }
+	if(FilePath){ serialization.emplace(L"Service Executable", *FilePath); }
 	if(DisplayName){ serialization.emplace(L"Display Name", *DisplayName); }
 	if(Description){ serialization.emplace(L"Description", *Description); }
 

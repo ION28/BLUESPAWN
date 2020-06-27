@@ -10,7 +10,7 @@
 
 #include <regex>
 
-std::vector<std::wstring> RegistryScanner::ExtractRegistryKeys(const std::vector<std::wstring>& strings){
+std::vector<std::wstring> RegistryScanner::ExtractRegistryKeys(IN CONST std::vector<std::wstring>& strings){
 	std::vector<std::wstring> keys{};
 	std::wregex regex{ L"(system|software)([/\\\\][a-zA-Z0-9\\. @_-]+)+" };
 	for(auto& string : strings){
@@ -70,7 +70,7 @@ std::unordered_map<std::reference_wrapper<Detection>, Association> RegistryScann
 	return detections;
 }
 
-Certainty ScanDetection(IN CONST Detection& detection){
+Certainty RegistryScanner::ScanDetection(IN CONST Detection& detection){
 	if(Bluespawn::aggressiveness != Aggressiveness::Intensive || detection.type != DetectionType::RegistryDetection ||
 	   detection.DetectionStale){
 		

@@ -4,6 +4,8 @@
 #include "util/log/Log.h"
 #include "scan/ServiceScanner.h"
 #include "scan/YaraScanner.h"
+#include "util/processes/ProcessUtils.h"
+#include "user/bluespawn.h"
 
 #include "common/Utils.h"
 #include "common/StringUtils.h"
@@ -46,29 +48,31 @@ namespace Hunts {
 
 		auto queryResults = Get7045Events();
 
-		std::set<std::pair<std::wstring, std::wstring>> services;
-		
 		for (auto result : queryResults) {
-			auto imageName = result.GetProperty(L"Event/EventData/Data[@Name='ServiceName']");
-			auto imagePath = ExpandEnvStringsW(result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']"));
+			auto imageName{ result.GetProperty(L"Event/EventData/Data[@Name='ServiceName']") };
+			auto imagePath{ GetImagePathFromCommand(result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']")) };
+			
+			FILETIME ft{};
 
-			// TODO: Command line parsing
-			if(imagePath.find(L"\\system32\\svchost.exe") != std::wstring::npos){
-				for(auto subkey : Registry::RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services" }.EnumerateSubkeys()){
-					if(subkey.ValueExists(L"DisplayName") && subkey.GetValue<std::wstring>(L"DisplayName") == imageName){
-						 auto params = Registry::RegistryKey{ subkey, L"Parameters" };
-						 if(params.Exists() && params.ValueExists(L"ServiceDll")){
-							 imagePath = *params.GetValue<std::wstring>(L"ServiceDll");
-						 }
-					}
-				}
+			ULONGLONG time = (ULONGLONG) stoull(result.GetTimeCreated());
+			ULONGLONG nano = 0;
+
+			ft.dwHighDateTime = (DWORD) ((time >> 32) & 0xFFFFFFFF);
+			ft.dwLowDateTime = (DWORD) (time & 0xFFFFFFFF);
+
+			auto malicious{ Certainty::None };
+
+			if(imagePath.find(L"svchost.exe") != std::wstring::npos){
+				// svchost services are rarely if ever should have 7045 events
+				malicious = malicious + Certainty::Strong;
+			} else if(ServiceScanner::QuickScan(std::nullopt, imageName, imagePath)){
+				malicious = malicious + Certainty::Moderate;
 			}
 
-			services.emplace(std::pair<std::wstring, std::wstring>{ imageName, imagePath });
-		}
-
-		for(const auto& service : services){
-			SERVICE_DETECTION(service.first, service.second);
+			if(malicious > Certainty::None){
+				CREATE_DETECTION_WITH_CONTEXT(malicious, ServiceDetectionData{ std::nullopt, imageName, imagePath},
+											  DetectionContext{ GetName(), ft });
+			}
 		}
 
 		HUNT_END();
@@ -78,7 +82,6 @@ namespace Hunts {
 		std::vector<std::unique_ptr<Event>> events;
 
 		events.push_back(std::make_unique<EventLogEvent>(L"System", 7045));
-		Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services", false, false);
 
 		return events;
 	}

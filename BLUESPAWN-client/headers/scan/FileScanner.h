@@ -71,7 +71,7 @@ public:
 	 *
 	 * @return True if the object represented by the string is potentially malicious
 	 */
-	virtual bool PerformQuickScan(
+	static bool PerformQuickScan(
 		IN CONST std::wstring& info
 	);
 
@@ -83,7 +83,7 @@ public:
 	 *
 	 * @return A Certainty indicating the degree of certainty for which the detection is malicious
 	 */
-	Certainty ScanDetection(
+	virtual Certainty ScanDetection(
 		IN CONST Detection& detection
 	);
 };

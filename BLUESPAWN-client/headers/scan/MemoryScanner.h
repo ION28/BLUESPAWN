@@ -40,7 +40,7 @@ public:
 	 *
 	 * @return A Certainty indicating the degree of certainty for which the detection is malicious
 	 */
-	Certainty ScanDetection(
+	virtual Certainty ScanDetection(
 		IN CONST Detection& detection
 	);
 };
