@@ -1,10 +1,7 @@
 #pragma once
-
 #include "../Hunt.h"
-#include "reaction/Reaction.h"
-#include "reaction/Log.h"
 
-namespace Hunts{
+namespace Hunts {
 
 	/**
 	 * HuntT1183 examines the Image File Execution Options for debuggers and silent
@@ -14,7 +11,10 @@ namespace Hunts{
 	public:
 		HuntT1183();
 
-		virtual std::vector<std::reference_wrapper<Detection>> RunHunt(const Scope& scope);
+		virtual std::vector<std::reference_wrapper<Detection>> RunHunt(
+			IN CONST Scope& scope
+		) override;
+
 		virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
 	};
 }
