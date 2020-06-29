@@ -367,10 +367,10 @@ size_t RegistryDetectionData::Hash() CONST{
 }
 
 ServiceDetectionData::ServiceDetectionData(
-	IN CONST std::optional<std::wstring>& ServiceName = std::nullopt OPTIONAL,
-	IN CONST std::optional<std::wstring>& DisplayName = std::nullopt OPTIONAL,
-	IN CONST std::optional<std::wstring>& FilePath = std::nullopt OPTIONAL,
-	IN CONST std::optional<std::wstring>& Description = std::nullopt OPTIONAL
+	IN CONST std::optional<std::wstring>& ServiceName OPTIONAL,
+	IN CONST std::optional<std::wstring>& DisplayName OPTIONAL,
+	IN CONST std::optional<std::wstring>& FilePath OPTIONAL,
+	IN CONST std::optional<std::wstring>& Description OPTIONAL
 ) : ServiceName{ ServiceName },
     DisplayName{ DisplayName },
 	FilePath{ FilePath },

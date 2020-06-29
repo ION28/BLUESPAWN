@@ -31,7 +31,7 @@ public:
 	 *
 	 * @return true if the service may be malicious, false otherwise
 	 */
-	static bool QuickScan(
+	static bool PerformQuickScan(
 		IN CONST std::optional<std::wstring>& ServiceName,
 		IN CONST std::optional<std::wstring>& ServiceDisplayName,
 		IN CONST std::optional<std::wstring>& ServicePath = std::nullopt OPTIONAL

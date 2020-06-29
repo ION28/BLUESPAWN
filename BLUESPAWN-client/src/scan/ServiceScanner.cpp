@@ -110,7 +110,7 @@ bool ServiceScanner::PerformQuickScan(IN CONST std::optional<std::wstring>& Serv
 	return false;
 }
 
-Certainty ScanDetection(IN CONST Detection& detection){
+Certainty ServiceScanner::ScanDetection(IN CONST Detection& detection){
 	if(detection.type == DetectionType::ServiceDetection){
 		ServiceDetectionData data{ std::get<ServiceDetectionData>(detection.data) };
 		if(data.ServiceName && StringContainsKeywords(*data.ServiceName))

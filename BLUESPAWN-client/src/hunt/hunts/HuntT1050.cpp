@@ -65,7 +65,7 @@ namespace Hunts {
 			if(imagePath.find(L"svchost.exe") != std::wstring::npos){
 				// svchost services are rarely if ever should have 7045 events
 				malicious = malicious + Certainty::Strong;
-			} else if(ServiceScanner::QuickScan(std::nullopt, imageName, imagePath)){
+			} else if(ServiceScanner::PerformQuickScan(std::nullopt, imageName, imagePath)){
 				malicious = malicious + Certainty::Moderate;
 			}
 

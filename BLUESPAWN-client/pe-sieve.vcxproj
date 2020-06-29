@@ -47,6 +47,37 @@
   </ImportGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ItemGroup>
+    <ClCompile Include="external\pe-sieve\postprocessors\dump_report.cpp" />
+    <ClCompile Include="external\pe-sieve\postprocessors\imp_rec\iat_block.cpp" />
+    <ClCompile Include="external\pe-sieve\postprocessors\imp_rec\iat_finder.cpp" />
+    <ClCompile Include="external\pe-sieve\postprocessors\imp_rec\import_table_finder.cpp" />
+    <ClCompile Include="external\pe-sieve\postprocessors\imp_rec\imp_reconstructor.cpp" />
+    <ClCompile Include="external\pe-sieve\postprocessors\pe_buffer.cpp" />
+    <ClCompile Include="external\pe-sieve\postprocessors\pe_reconstructor.cpp" />
+    <ClCompile Include="external\pe-sieve\postprocessors\report_formatter.cpp" />
+    <ClCompile Include="external\pe-sieve\postprocessors\results_dumper.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\artefact_scanner.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\code_scanner.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\headers_scanner.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\hook_targets_resolver.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\mapping_scanner.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\mempage_data.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\module_data.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\patch_analyzer.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\patch_list.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\scanned_modules.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\scanner.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\scan_report.cpp" />
+    <ClCompile Include="external\pe-sieve\scanners\workingset_scanner.cpp" />
+    <ClCompile Include="external\pe-sieve\utils\artefacts_util.cpp" />
+    <ClCompile Include="external\pe-sieve\utils\format_util.cpp" />
+    <ClCompile Include="external\pe-sieve\utils\modules_enum.cpp" />
+    <ClCompile Include="external\pe-sieve\utils\path_converter.cpp" />
+    <ClCompile Include="external\pe-sieve\utils\path_util.cpp" />
+    <ClCompile Include="external\pe-sieve\utils\process_minidump.cpp" />
+    <ClCompile Include="external\pe-sieve\utils\process_privilege.cpp" />
+    <ClCompile Include="external\pe-sieve\utils\process_util.cpp" />
+    <ClCompile Include="external\pe-sieve\utils\workingset_enum.cpp" />
     <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\pe_sieve.h" />
     <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include\pe_sieve_types.h" />
     <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\params_info\pe_sieve_params_info.h" />
@@ -86,10 +117,6 @@
     <ClCompile Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\pe_sieve.cpp" />
     <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\color_scheme.h" />
     <ClCompile Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\params_info\pe_sieve_params_info.cpp" />
-    <ClCompile Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\*.cpp" />
-    <ClCompile Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\postprocessors\*.cpp" />
-    <ClCompile Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\postprocessors\imp_rec\*.cpp" />
-    <ClCompile Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\utils\*.cpp" />
     <ClCompile Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\dll_main.cpp" />
     <None Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\main.def" />
   </ItemGroup>

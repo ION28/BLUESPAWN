@@ -296,6 +296,7 @@
     <ResourceCompile Include="resources\BLUESPAWN-client.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".clang-format" />
     <None Include="resources\indicators" />
     <None Include="resources\severe" />
     <None Include="resources\severe2" />

@@ -14,7 +14,7 @@ EventManager& EventManager::GetInstance(){
 DWORD EventManager::SubscribeToEvent(const std::unique_ptr<Event>& e, const std::function<void()>& callback) {
 	DWORD status = ERROR_SUCCESS;
 
-	for(auto evt : vEventList){
+	for(auto& evt : vEventList){
 		if(*evt == *e){
 			evt->AddCallback(callback);
 			return status;
