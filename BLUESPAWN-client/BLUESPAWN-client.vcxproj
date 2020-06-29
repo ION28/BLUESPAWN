@@ -87,6 +87,7 @@
     <ClInclude Include="headers\scan\RegistryScanner.h" />
     <ClInclude Include="headers\scan\Scanner.h" />
     <ClInclude Include="headers\scan\ScanInfo.h" />
+    <ClInclude Include="headers\scan\ServiceScanner.h" />
     <ClInclude Include="headers\user\banners.h" />
     <ClInclude Include="headers\user\bluespawn.h" />
     <ClInclude Include="headers\user\CLI.h" />
@@ -220,6 +221,7 @@
     <ClCompile Include="src\scan\RegistryScanner.cpp" />
     <ClCompile Include="src\scan\Scanner.cpp" />
     <ClCompile Include="src\scan\ScanInfo.cpp" />
+    <ClCompile Include="src\scan\ServiceScanner.cpp" />
     <ClCompile Include="src\user\banners.cpp" />
     <ClCompile Include="src\user\BLUESPAWN.cpp" />
     <ClCompile Include="src\user\CLI.cpp" />

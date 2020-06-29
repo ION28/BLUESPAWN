@@ -10,7 +10,7 @@ private:
 
 	/**
 	 * Scans a command for possibly associated detections. The intended use-case of this is to find things
-	 * such as malware.exe in the command `cmd.exe /c "malware.exe"`. 
+	 * such as malware.exe in the command `cmd.exe /c "malware.exe"`.
 	 */
 	std::unordered_map<std::reference_wrapper<Detection>, Association> SearchCommand(
 		IN CONST std::wstring& ProcessCommand
@@ -19,7 +19,7 @@ private:
 public:
 
 	/**
-	 * Gets a vector of detections associated with the provided detection. This is done by finding child 
+	 * Gets a vector of detections associated with the provided detection. This is done by finding child
 	 * processes and files referenced in the command used to spawn the process.
 	 *
 	 * @param detection The detection for which associations will be found
@@ -31,13 +31,14 @@ public:
 	);
 
 	/**
-	 * This function will return false, as there is no "quick" scan to check if a process may be bad
+	 * This function will treat `info` as a command to determine if any process created with that command would
+	 * be malicious.
 	 *
-	 * @param info Unused
+	 * @param info A command to scan
 	 *
-	 * @return False
+	 * @return True if the command appears malicious; false otherwise
 	 */
-	virtual bool PerformQuickScan(
+	static bool PerformQuickScan(
 		IN CONST std::wstring& info
 	);
 
