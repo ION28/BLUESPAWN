@@ -2,7 +2,6 @@
 
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
-#include "reaction/Reaction.h"
 
 namespace Mitigations {
 

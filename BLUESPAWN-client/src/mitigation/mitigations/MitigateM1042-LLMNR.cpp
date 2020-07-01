@@ -23,7 +23,7 @@ namespace Mitigations {
 		) {}
 
 	bool MitigateM1042LLMNR::MitigationIsEnforced(SecurityLevel level) {
-		LOG_INFO("Checking for presence of " << name);
+		LOG_INFO(1, "Checking for presence of " << name);
 
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient" };
 		std::wstring value = L"EnableMulticast";

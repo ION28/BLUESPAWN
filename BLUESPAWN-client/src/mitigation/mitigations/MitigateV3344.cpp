@@ -35,13 +35,13 @@ namespace Mitigations{
 	}
 
 	bool MitigateV3344::MitigationIsEnforced(SecurityLevel level) {
-		LOG_INFO("Checking for presence of " << name);
+		LOG_INFO(1, "Checking for presence of " << name);
 
 		return  LimitBlankPasswordUse(false);
 	}
 
 	bool MitigateV3344::EnforceMitigation(SecurityLevel level) {
-		LOG_INFO("Enforcing Mitigation for " << name);
+		LOG_INFO(1, "Enforcing Mitigation for " << name);
 
 		return  LimitBlankPasswordUse(level >= SecurityLevel::Medium);
 	}

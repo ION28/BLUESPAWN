@@ -3,7 +3,6 @@
 #include <vector>
 #include <optional>
 #include <functional>
-#include "reaction/Reaction.h"
 #include "hunt/Scope.h"
 #include "util/eventlogs/EventSubscription.h"
 #include "util/configurations/Registry.h"

@@ -4,9 +4,9 @@
 #include <vector>
 #include <string>
 
+#include "reaction/Reaction.h"
 #include "hunt/HuntInfo.h"
 #include "scan/Detections.h"
-#include "reaction/Reaction.h"
 
 /**
  * A container class for handling reactions to various types of detections.

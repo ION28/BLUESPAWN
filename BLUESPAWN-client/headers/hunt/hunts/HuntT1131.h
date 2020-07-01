@@ -1,8 +1,7 @@
 #pragma once
 #include "../Hunt.h"
 
-#include "reaction/Reaction.h"
-#include "reaction/Log.h"
+#include <unordered_set>
 
 namespace Hunts {
 
@@ -12,8 +11,8 @@ namespace Hunts {
 	 */
 	class HuntT1131 : public Hunt {
 	private:
-		std::vector<std::wstring> okAuthPackages = { L"msv1_0", L"SshdPinAuthLsa" };
-		std::vector<std::wstring> okNotifPackages = { L"scecli" };
+		std::unordered_set<std::wstring> okAuthPackages = { L"msv1_0", L"SshdPinAuthLsa" };
+		std::unordered_set<std::wstring> okNotifPackages = { L"scecli" };
 	public:
 		HuntT1131();
 

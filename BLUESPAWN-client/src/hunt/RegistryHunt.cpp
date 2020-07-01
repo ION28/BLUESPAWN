@@ -1,5 +1,4 @@
 #include "hunt/RegistryHunt.h"
-#include "reaction/Reaction.h"
 #include "util/log/Log.h"
 
 #include <regex>

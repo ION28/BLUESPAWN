@@ -23,7 +23,7 @@ namespace Mitigations {
 		) {}
 
 	bool MitigateM1042NBT::MitigationIsEnforced(SecurityLevel level) {
-		LOG_INFO("Checking for presence of " << name);
+		LOG_INFO(1, "Checking for presence of " << name);
 
 		auto base = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\NetBT\\Parameters\\Interfaces" };
 		std::wstring value = L"NetbiosOptions";

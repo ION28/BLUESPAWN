@@ -22,7 +22,7 @@ namespace Mitigations {
 		) {}
 
 	bool MitigateV3479::MitigationIsEnforced(SecurityLevel level) {
-		LOG_INFO("Checking for presence of " << name);
+		LOG_INFO(1, "Checking for presence of " << name);
 
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Session Manager" };
 		std::wstring value = L"SafeDllSearchMode";

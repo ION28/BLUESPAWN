@@ -22,7 +22,7 @@ namespace Mitigations {
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Lsa" };
 		auto data = key.GetValue<DWORD>(L"RestrictAnonymous");
 		if(!data || !*data){
-			LOG_INFO(L"[" + name + L"] RestrictAnonymous value is not set to 1");
+			LOG_INFO(1, L"[" + name + L"] RestrictAnonymous value is not set to 1");
 			return false;
 		}
 

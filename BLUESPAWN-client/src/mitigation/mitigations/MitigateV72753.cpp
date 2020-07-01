@@ -21,7 +21,7 @@ namespace Mitigations {
 		) {}
 
 	bool MitigateV72753::MitigationIsEnforced(SecurityLevel level) {
-		LOG_INFO("Checking for presence of " << name);
+		LOG_INFO(1, "Checking for presence of " << name);
 
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\Wdigest" };
 		std::wstring value = L"UseLogonCredential";
@@ -36,7 +36,7 @@ namespace Mitigations {
 
 		if(key.GetValue<DWORD>(value) == 1){
 			if(level == SecurityLevel::Low){
-				LOG_INFO(L"[" + name + L"] Mitigation is not being enforced due to low security level.");
+				LOG_INFO(1, L"[" + name + L"] Mitigation is not being enforced due to low security level.");
 				return true;
 			}
 			return false;

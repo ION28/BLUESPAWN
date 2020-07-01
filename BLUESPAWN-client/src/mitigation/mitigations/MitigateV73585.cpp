@@ -22,7 +22,7 @@ namespace Mitigations {
 		) {}
 
 	bool MitigateV73585::MitigationIsEnforced(SecurityLevel level) {
-		LOG_INFO("Checking for presence of " << name);
+		LOG_INFO(1, "Checking for presence of " << name);
 
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Policies\\Microsoft\\Windows\\Installer" };
 		std::wstring value = L"AlwaysInstallElevated";

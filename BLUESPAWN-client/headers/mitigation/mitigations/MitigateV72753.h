@@ -1,8 +1,6 @@
 #pragma once
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
-#include "reaction/Reaction.h"
-#include "reaction/Log.h"
 
 namespace Mitigations {
 

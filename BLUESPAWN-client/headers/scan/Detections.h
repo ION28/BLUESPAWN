@@ -455,6 +455,19 @@ struct RegistryDetectionData {
 	);
 
 	/**
+	 * Creates a RegistryDetectionData, referencing either a registry key, a registry value, or part of a registry
+	 * value. If a registry value is detected on and it is a REG_MULTI_SZ, rather than creating one detection for the
+	 * value as a whole, create a separate detection for each potentially malicious entry in the value as a REG_SZ.
+	 *
+	 * @param value A RegistryValue object containing information about the value
+	 * @param type The type of data referenced by this registry value. This defaults to Unknown.
+	 */
+	RegistryDetectionData(
+		IN CONST std::optional<Registry::RegistryValue>& value,
+		IN RegistryDetectionType type = RegistryDetectionType::Unknown OPTIONAL
+	);
+
+	/**
 	 * Serialize the detection data in to a mapping of values. Note this should not include any internal representations
 	 * but rather only include values that have meaning outside of BLUESPAWN's running.
 	 *

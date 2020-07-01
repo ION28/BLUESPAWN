@@ -11,7 +11,7 @@ EventManager& EventManager::GetInstance(){
 	return manager;
 }
 
-DWORD EventManager::SubscribeToEvent(const std::unique_ptr<Event>& e, const std::function<void()>& callback) {
+DWORD EventManager::SubscribeToEvent(std::unique_ptr<Event>&& e, const std::function<void()>& callback) {
 	DWORD status = ERROR_SUCCESS;
 
 	for(auto& evt : vEventList){
@@ -21,11 +21,10 @@ DWORD EventManager::SubscribeToEvent(const std::unique_ptr<Event>& e, const std:
 		}
 	} 
 
-	std::unique_ptr<Event> evt = e;
-	evt->AddCallback(callback);
-	evt->Subscribe();
+	e->AddCallback(callback);
+	e->Subscribe();
 
-	vEventList.push_back(evt);
+	vEventList.push_back(std::move(e));
 
 	return status;
 }

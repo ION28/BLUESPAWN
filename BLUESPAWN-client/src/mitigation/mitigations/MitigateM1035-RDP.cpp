@@ -15,7 +15,7 @@ namespace Mitigations {
 		) {}
 
 	bool MitigateM1035RDP::MitigationIsEnforced(SecurityLevel level) {
-		LOG_INFO(L"Checking for presence of " << name);
+		LOG_INFO(1, L"Checking for presence of " << name);
 
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp" };
 		if (key.ValueExists(L"UserAuthentication")) {
@@ -30,7 +30,7 @@ namespace Mitigations {
 	}
 
 	bool MitigateM1035RDP::EnforceMitigation(SecurityLevel level) {
-		LOG_INFO(L"Enforcing mitigation " << name);
+		LOG_INFO(1, L"Enforcing mitigation " << name);
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp" };
 		if (key.SetValue<DWORD>(L"UserAuthentication", 1)) {
 			LOG_VERBOSE(1, "NLA successfully enabled for RDP.");

@@ -1,7 +1,5 @@
 #pragma once
 #include "../Hunt.h"
-#include "reaction/Reaction.h"
-#include "reaction/Log.h"
 
 #include <string>
 #include <vector>

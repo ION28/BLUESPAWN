@@ -35,13 +35,13 @@ namespace Mitigations{
 	}
 
 	bool MitigateV3379::MitigationIsEnforced(SecurityLevel level) {
-		LOG_INFO("Checking for presence of " << name);
+		LOG_INFO(1, "Checking for presence of " << name);
 
 		return CheckNoLMHash(false);
 	}
 
 	bool MitigateV3379::EnforceMitigation(SecurityLevel level) {
-		LOG_INFO("Enforcing Mitigation for " << name);
+		LOG_INFO(1, "Enforcing Mitigation for " << name);
 
 		return CheckNoLMHash(level >= SecurityLevel::Medium);
 	}

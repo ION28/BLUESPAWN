@@ -1,11 +1,9 @@
 #pragma once
 #include <Windows.h>
 
-#include <vector>
+#include <unordered_set>
 
 #include "../Hunt.h"
-#include "reaction/Reaction.h"
-#include "reaction/Log.h"
 
 namespace Hunts {
 
@@ -14,7 +12,7 @@ namespace Hunts {
 	 */
 	class HuntT1101 : public Hunt {
 	private:
-		std::vector<std::wstring> okSecPackages = { L"\"\"", L"wsauth", L"kerberos", L"msv1_0", L"schannel", L"wdigest", L"tspkg", L"pku2u" };
+		std::unordered_set<std::wstring> okSecPackages = { L"\"\"", L"wsauth", L"kerberos", L"msv1_0", L"schannel", L"wdigest", L"tspkg", L"pku2u" };
 
 	public:
 		HuntT1101();

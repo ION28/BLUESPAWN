@@ -7,7 +7,6 @@
 #include "Scope.h"
 #include "HuntInfo.h"
 
-#include "reaction/Reaction.h"
 #include "monitor/Event.h"
 
 class HuntRegister;

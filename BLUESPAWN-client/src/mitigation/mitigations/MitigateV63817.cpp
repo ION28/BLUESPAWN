@@ -22,7 +22,7 @@ namespace Mitigations {
 		) {}
 
 	bool MitigateV63817::MitigationIsEnforced(SecurityLevel level) {
-		LOG_INFO("Checking for presence of " << name);
+		LOG_INFO(1, "Checking for presence of " << name);
 
 		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" };
 		std::wstring value = L"FilterAdministratorToken";

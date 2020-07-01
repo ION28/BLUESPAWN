@@ -69,11 +69,7 @@ const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{};
 MitigationRegister Bluespawn::mitigationRecord{ io };
 
-std::map<std::string, std::unique_ptr<Reaction>> reactions{
-    { "remove-value", std::make_unique<Reactions::RemoveValueReaction>(Bluespawn::io) },
-    { "suspend", std::make_unique<Reactions::SuspendProcessReaction>(Bluespawn::io) },
-    { "carve-memory", std::make_unique<Reactions::CarveMemoryReaction>(Bluespawn::io) },
-};
+std::map<std::string, std::unique_ptr<Reaction>> reactions{};
 
 Aggressiveness Bluespawn::aggressiveness{ Aggressiveness::Normal };
 
@@ -118,6 +114,10 @@ Bluespawn::Bluespawn() {
     mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
     mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
     mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
+
+    reactions.emplace("remove-value", std::make_unique<Reactions::RemoveValueReaction>());
+    reactions.emplace("suspend", std::make_unique<Reactions::SuspendProcessReaction>());
+    reactions.emplace("carve-memory", std::make_unique<Reactions::CarveMemoryReaction>());
 }
 
 void Bluespawn::RunHunts() {
@@ -233,7 +233,8 @@ Aggressiveness GetAggressiveness(const cxxopts::OptionValue& value) {
     } else if(CompareIgnoreCase<std::string>(level, "Intensive")) {
         aHuntLevel = Aggressiveness::Intensive;
     } else {
-        LOG_ERROR("Error " << level << " - Unknown level. Please specify either Cursory, Normal, or Intensive");
+        LOG_ERROR("Error " << StringToWidestring(level)
+                           << " - Unknown level. Please specify either Cursory, Normal, or Intensive");
         LOG_ERROR("Will default to Normal for this run.");
         Bluespawn::io.InformUser(L"Error " + StringToWidestring(level) +
                                  L" - Unknown level. Please specify either Cursory, Normal, or Intensive");
@@ -304,10 +305,10 @@ int main2(int argc, char* argv[]) {
             startIdx = endIdx + 1;
         }
 
-        Reaction combined = {};
+        //Reaction combined = {};
         for(auto reaction : reaction_set) {
             if(reactions.find(reaction) != reactions.end()) {
-                bluespawn.AddReaction(reactions[reaction]);
+                //bluespawn.AddReaction(reactions[reaction]);
             } else {
                 bluespawn.io.AlertUser(L"Unknown reaction \"" + StringToWidestring(reaction) + L"\"", INFINITY,
                                        ImportanceLevel::MEDIUM);

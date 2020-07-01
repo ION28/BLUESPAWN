@@ -1,89 +1,90 @@
 #include "hunt/hunts/HuntT1050.h"
 
-#include "util/eventlogs/EventLogs.h"
-#include "util/log/Log.h"
-#include "scan/ServiceScanner.h"
-#include "scan/YaraScanner.h"
-#include "util/processes/ProcessUtils.h"
-#include "user/bluespawn.h"
-
-#include "common/Utils.h"
-#include "common/StringUtils.h"
-
 #include <iostream>
 #include <set>
 
+#include "common/StringUtils.h"
+#include "common/Utils.h"
+
+#include "util/eventlogs/EventLogs.h"
+#include "util/log/Log.h"
+#include "util/processes/ProcessUtils.h"
+
+#include "scan/ServiceScanner.h"
+#include "scan/YaraScanner.h"
+#include "user/bluespawn.h"
+
 namespace Hunts {
 
-	HuntT1050::HuntT1050() : Hunt(L"T1050 - New Service") {
-		// TODO: update these categories
-		dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Files;
-		dwSourcesInvolved = (DWORD) DataSource::Registry | (DWORD) DataSource::FileSystem;
-		dwTacticsUsed = (DWORD) Tactic::Persistence;
-	}
+    HuntT1050::HuntT1050() : Hunt(L"T1050 - New Service") {
+        // TODO: update these categories
+        dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Files;
+        dwSourcesInvolved = (DWORD) DataSource::Registry | (DWORD) DataSource::FileSystem;
+        dwTacticsUsed = (DWORD) Tactic::Persistence;
+    }
 
-	std::vector<EventLogs::EventLogItem> HuntT1050::Get7045Events() {
-		// Create existance queries so interesting data is output
-		std::vector<EventLogs::XpathQuery> queries;
-		auto param1 = EventLogs::ParamList();
-		auto param2 = EventLogs::ParamList();
-		auto param3 = EventLogs::ParamList();
-		auto param4 = EventLogs::ParamList();
-		param1.push_back(std::make_pair(L"Name", L"'ServiceName'"));
-		param2.push_back(std::make_pair(L"Name", L"'ImagePath'"));
-		param3.push_back(std::make_pair(L"Name", L"'ServiceType'"));
-		param4.push_back(std::make_pair(L"Name", L"'StartType'"));
-		queries.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param1));
-		queries.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param2));
-		queries.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param3));
-		queries.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param4));
+    std::vector<EventLogs::EventLogItem> HuntT1050::Get7045Events() {
+        // Create existance queries so interesting data is output
+        std::vector<EventLogs::XpathQuery> queries;
+        auto param1 = EventLogs::ParamList();
+        auto param2 = EventLogs::ParamList();
+        auto param3 = EventLogs::ParamList();
+        auto param4 = EventLogs::ParamList();
+        param1.push_back(std::make_pair(L"Name", L"'ServiceName'"));
+        param2.push_back(std::make_pair(L"Name", L"'ImagePath'"));
+        param3.push_back(std::make_pair(L"Name", L"'ServiceType'"));
+        param4.push_back(std::make_pair(L"Name", L"'StartType'"));
+        queries.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param1));
+        queries.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param2));
+        queries.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param3));
+        queries.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param4));
 
-		auto queryResults = EventLogs::QueryEvents(L"System", 7045, queries);
+        auto queryResults = EventLogs::QueryEvents(L"System", 7045, queries);
 
-		return queryResults;
-	}
+        return queryResults;
+    }
 
-	std::vector<std::reference_wrapper<Detection>> HuntT1050::RunHunt(const Scope& scope) {
-		HUNT_INIT();
+    std::vector<std::reference_wrapper<Detection>> HuntT1050::RunHunt(const Scope& scope) {
+        HUNT_INIT();
 
-		auto queryResults = Get7045Events();
+        auto queryResults = Get7045Events();
 
-		for (auto result : queryResults) {
-			auto imageName{ result.GetProperty(L"Event/EventData/Data[@Name='ServiceName']") };
-			auto imagePath{ GetImagePathFromCommand(result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']")) };
-			
-			FILETIME ft{};
+        for(auto result : queryResults) {
+            auto imageName{ result.GetProperty(L"Event/EventData/Data[@Name='ServiceName']") };
+            auto imagePath{ GetImagePathFromCommand(result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']")) };
 
-			ULONGLONG time = (ULONGLONG) stoull(result.GetTimeCreated());
-			ULONGLONG nano = 0;
+            FILETIME ft{};
 
-			ft.dwHighDateTime = (DWORD) ((time >> 32) & 0xFFFFFFFF);
-			ft.dwLowDateTime = (DWORD) (time & 0xFFFFFFFF);
+            ULONGLONG time = (ULONGLONG) stoull(result.GetTimeCreated());
+            ULONGLONG nano = 0;
 
-			auto malicious{ Certainty::None };
+            ft.dwHighDateTime = (DWORD)((time >> 32) & 0xFFFFFFFF);
+            ft.dwLowDateTime = (DWORD)(time & 0xFFFFFFFF);
 
-			if(imagePath.find(L"svchost.exe") != std::wstring::npos){
-				// svchost services are rarely if ever should have 7045 events
-				malicious = malicious + Certainty::Strong;
-			} else if(ServiceScanner::PerformQuickScan(std::nullopt, imageName, imagePath)){
-				malicious = malicious + Certainty::Moderate;
-			}
+            auto malicious{ Certainty::None };
 
-			if(malicious > Certainty::None){
-				CREATE_DETECTION_WITH_CONTEXT(malicious, ServiceDetectionData{ std::nullopt, imageName, imagePath},
-											  DetectionContext{ GetName(), ft });
-			}
-		}
+            if(imagePath.find(L"svchost.exe") != std::wstring::npos) {
+                // svchost services are rarely if ever should have 7045 events
+                malicious = malicious + Certainty::Strong;
+            } else if(ServiceScanner::PerformQuickScan(std::nullopt, imageName, imagePath)) {
+                malicious = malicious + Certainty::Moderate;
+            }
 
-		HUNT_END();
-	}
+            if(malicious > Certainty::None) {
+                CREATE_DETECTION_WITH_CONTEXT(malicious, ServiceDetectionData{ std::nullopt, imageName, imagePath },
+                                              DetectionContext{ GetName(), ft });
+            }
+        }
 
-	std::vector<std::unique_ptr<Event>> HuntT1050::GetMonitoringEvents() {
-		std::vector<std::unique_ptr<Event>> events;
+        HUNT_END();
+    }
 
-		events.push_back(std::make_unique<EventLogEvent>(L"System", 7045));
+    std::vector<std::unique_ptr<Event>> HuntT1050::GetMonitoringEvents() {
+        std::vector<std::unique_ptr<Event>> events;
 
-		return events;
-	}
+        events.push_back(std::make_unique<EventLogEvent>(L"System", 7045));
 
-}
+        return events;
+    }
+
+}   // namespace Hunts
