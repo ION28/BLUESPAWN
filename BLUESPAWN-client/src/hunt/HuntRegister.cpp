@@ -8,6 +8,8 @@
 #include "common/ThreadPool.h"
 #include "common/Promise.h"
 
+decltype(HuntRegister::vRegisteredHunts) HuntRegister::vRegisteredHunts{};
+
 void HuntRegister::RegisterHunt(std::unique_ptr<Hunt>&& hunt) {
 	vRegisteredHunts.emplace_back(std::move(hunt));
 }

@@ -99,5 +99,8 @@ T StringReplace(const T& string, const T& search, const T& replacement){
 	for(auto find{ copy.find(search) }; find != std::string::npos; find = copy.find(search, find + replacement.size())){
 		copy.replace(copy.begin() + find, copy.begin() + find + search.length(), replacement);
 	}
-	return copy
+	return copy;
 }
+
+template std::wstring StringReplace(const std::wstring& string, const std::wstring& search, const std::wstring& replacement);
+template std::string StringReplace(const std::string& string, const std::string& search, const std::string& replacement);

@@ -68,10 +68,13 @@
 const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{};
 MitigationRegister Bluespawn::mitigationRecord{ io };
+Aggressiveness Bluespawn::aggressiveness{ Aggressiveness::Normal };
+DetectionRegister Bluespawn::detections{ Certainty::Moderate };
+std::vector<std::unique_ptr<DetectionSink>> Bluespawn::detectionSinks{};
+bool Bluespawn::EnablePreScanDetections{ false };
+ReactionManager Bluespawn::reaction{};
 
 std::map<std::string, std::unique_ptr<Reaction>> reactions{};
-
-Aggressiveness Bluespawn::aggressiveness{ Aggressiveness::Normal };
 
 Bluespawn::Bluespawn() {
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1004>());
@@ -245,7 +248,7 @@ Aggressiveness GetAggressiveness(const cxxopts::OptionValue& value) {
     return aHuntLevel;
 }
 
-int main2(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     Bluespawn bluespawn{};
 
     print_banner();
@@ -305,10 +308,9 @@ int main2(int argc, char* argv[]) {
             startIdx = endIdx + 1;
         }
 
-        //Reaction combined = {};
         for(auto reaction : reaction_set) {
             if(reactions.find(reaction) != reactions.end()) {
-                //bluespawn.AddReaction(reactions[reaction]);
+                bluespawn.AddReaction(std::move(reactions[reaction]));
             } else {
                 bluespawn.io.AlertUser(L"Unknown reaction \"" + StringToWidestring(reaction) + L"\"", INFINITY,
                                        ImportanceLevel::MEDIUM);

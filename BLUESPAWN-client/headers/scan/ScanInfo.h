@@ -91,6 +91,7 @@ class ScanInfo {
 
 	friend class DetectionRegister;
 	friend class Scanner;
+	friend class Detection;
 
 	/**
 	 * Adds an association between this node and the given node with the given strength. Note that

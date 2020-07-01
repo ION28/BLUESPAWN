@@ -332,17 +332,13 @@ struct FileDetectionData {
 	std::optional<FileSystem::File> FileHandle;
 
 	/// Hashes of the file
-	struct {
-		std::optional<std::wstring> MD5;
-		std::optional<std::wstring> SHA1;
-		std::optional<std::wstring> SHA256;
-	} HashInfo;
+	std::optional<std::wstring> MD5;
+	std::optional<std::wstring> SHA1;
+	std::optional<std::wstring> SHA256;
 
 	/// Timestamps associated with the file
-	struct {
-		std::optional<FILETIME> LastOpened;
-		std::optional<FILETIME> FileCreated;
-	} TimestampInfo;
+	std::optional<FILETIME> LastOpened;
+	std::optional<FILETIME> FileCreated;
 
 	/// Information about a yara scan performed on the file
 	std::optional<YaraScanResult> yara;
@@ -401,7 +397,7 @@ struct FileDetectionData {
 	 *
 	 * @return True if the data is equal to this; false otherwise
 	 */
-	bool operator==(const FileDetectionData& detection) const = default;
+	bool operator==(const FileDetectionData& detection) const;
 
 private:
 
@@ -463,7 +459,7 @@ struct RegistryDetectionData {
 	 * @param type The type of data referenced by this registry value. This defaults to Unknown.
 	 */
 	RegistryDetectionData(
-		IN CONST std::optional<Registry::RegistryValue>& value,
+		IN CONST Registry::RegistryValue& value,
 		IN RegistryDetectionType type = RegistryDetectionType::Unknown OPTIONAL
 	);
 
@@ -687,11 +683,21 @@ private:
 
 	/// A struct used to serialize detection data
 	static struct {
-		std::unordered_map<std::wstring, std::wstring> operator()(ProcessDetectionData data){return data.Serialize();}
-		std::unordered_map<std::wstring, std::wstring> operator()(FileDetectionData data){ return data.Serialize(); }
-		std::unordered_map<std::wstring, std::wstring> operator()(RegistryDetectionData data){return data.Serialize();}
-		std::unordered_map<std::wstring, std::wstring> operator()(ServiceDetectionData data){return data.Serialize();}
-		std::unordered_map<std::wstring, std::wstring> operator()(OtherDetectionData data){ return data.Serialize(); }
+		const std::unordered_map<std::wstring, std::wstring>& operator()(ProcessDetectionData data){
+			return data.Serialize();
+		}
+		const std::unordered_map<std::wstring, std::wstring>& operator()(FileDetectionData data){
+			return data.Serialize(); 
+		}
+		const std::unordered_map<std::wstring, std::wstring>& operator()(RegistryDetectionData data){
+			return data.Serialize();
+		}
+		const std::unordered_map<std::wstring, std::wstring>& operator()(ServiceDetectionData data){
+			return data.Serialize();
+		}
+		const std::unordered_map<std::wstring, std::wstring>& operator()(OtherDetectionData data){
+			return data.Serialize(); 
+		}
 	} serializer;
 
 	/// A struct used to hash detection data
@@ -726,7 +732,7 @@ public:
 	ScanInfo info;
 
 	/// A function that when run will remediate the detection, either removing it, fixing it, or  mitigating it.
-	std::optional<std::function<void(Detection& detection)>> remediator;
+	std::optional<std::function<void()>> remediator;
 
 	/// Describes the context surrounding the detection such as when the first evidence of the detection was created, 
 	/// the hunts generating this detection, and the time the detection was generated.
@@ -771,7 +777,9 @@ public:
 	 * 
 	 * @return True if the detection is equal to this; false otherwise
 	 */
-	bool operator==(const Detection& detection) const;
+	bool operator==(
+		IN CONST Detection& detection
+	) const;
 
 	/**
 	 * Serialize the detection data in to a mapping of values. Note this should not include any internal 

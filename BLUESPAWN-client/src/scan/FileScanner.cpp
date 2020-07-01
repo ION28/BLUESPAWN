@@ -142,9 +142,9 @@ std::unordered_map<std::reference_wrapper<Detection>, Association> FileScanner::
 	if(data.FileFound){
 		UpdateModules();
 
-		if(data.HashInfo.SHA256){
-			if(hashes.count(*data.HashInfo.SHA256)){
-				auto loaded{ hashes.at(*data.HashInfo.SHA256) };
+		if(data.SHA256){
+			if(hashes.count(*data.SHA256)){
+				auto loaded{ hashes.at(*data.SHA256) };
 				for(auto& lib : loaded){
 					for(auto pid : modules.at(lib)){
 						auto alloc{ GetModuleAddress(pid, lib) };
