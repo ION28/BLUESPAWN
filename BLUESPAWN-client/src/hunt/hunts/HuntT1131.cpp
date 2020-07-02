@@ -15,7 +15,7 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::Persistence;
     }
 
-    std::vector<std::reference_wrapper<Detection>> HuntT1131::RunHunt(const Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1131::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
         Registry::RegistryKey key{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };

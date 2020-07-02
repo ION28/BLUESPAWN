@@ -4,8 +4,9 @@
 #include <string>
 
 #include "scan/Detections.h"
+#include "scan/Scanner.h"
 
-class MemoryScanner {
+class MemoryScanner : public Scanner {
 public:
 
 	/**
@@ -17,7 +18,7 @@ public:
 	 *
 	 * @return A vector of detections associated with the provided detection
 	 */
-	virtual std::unordered_map<std::reference_wrapper<Detection>, Association> GetAssociatedDetections(
+	virtual std::unordered_map<std::shared_ptr<Detection>, Association> GetAssociatedDetections(
 		IN CONST Detection& detection
 	);
 

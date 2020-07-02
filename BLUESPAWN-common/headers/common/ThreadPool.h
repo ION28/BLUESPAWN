@@ -24,9 +24,15 @@ private:
 	/// A semaphore counting the number of tasks in the queue
 	HandleWrapper hSemaphore;
 
+	/// An event object that will be signalled whenever the threadpool has no remaining tasks
+	HandleWrapper hEvent;
+
 	/// A boolean indicating whether the threadpool is active. If false, all threads will
 	/// terminate when they finish their tasks.
 	bool active;
+
+	/// The number of tasks not finished being executed. Access is protected by hGuard
+	size_t count;
 
 	/// The threadpool instance
 	static ThreadPool instance;
@@ -64,12 +70,14 @@ public:
 	);
 
 	/**
-	 * Enqueue a function to the threadpool and return a promise for its
-	 * return value. The promise will be fufilled if the function returns
-	 * a value or invalidated if the function throws an exception. If more
-	 * complex fufillment or invalidation guidelines are required, design
-	 * an std::function to handle creation of the promise and use EnqueueTask
-	 * instead.
+	 * Enqueue a function to the threadpool and return a promise for its return value. The promise will be fufilled if
+	 * the function returns a value or invalidated if the function throws an exception. If more complex fufillment or 
+	 * invalidation guidelines are required, design an std::function to handle creation of the promise and use 
+	 * EnqueueTask instead.
+	 *
+	 * @param function The function to return a promise for
+	 *
+	 * @return A promise which will hold the return value of the function
 	 */
 	template<class T>
 	Promise<T> RequestPromise(
@@ -97,4 +105,9 @@ public:
 	void AddExceptionHandler(
 		IN CONST std::function<void(const std::exception& e)>& function
 	);
+
+	/**
+	 * Waits for all tasks to be finished before returning.
+	 */
+	void Wait() const;
 };

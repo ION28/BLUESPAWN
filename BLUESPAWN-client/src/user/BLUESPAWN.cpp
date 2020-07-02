@@ -5,6 +5,7 @@
 
 #include "common/DynamicLinker.h"
 #include "common/StringUtils.h"
+#include "common/ThreadPool.h"
 
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/CLISink.h"
@@ -70,7 +71,7 @@ HuntRegister Bluespawn::huntRecord{};
 MitigationRegister Bluespawn::mitigationRecord{ io };
 Aggressiveness Bluespawn::aggressiveness{ Aggressiveness::Normal };
 DetectionRegister Bluespawn::detections{ Certainty::Moderate };
-std::vector<std::unique_ptr<DetectionSink>> Bluespawn::detectionSinks{};
+std::vector<std::shared_ptr<DetectionSink>> Bluespawn::detectionSinks{};
 bool Bluespawn::EnablePreScanDetections{ false };
 ReactionManager Bluespawn::reaction{};
 
@@ -176,6 +177,9 @@ void Bluespawn::Run() {
     }
     if(modes.find(BluespawnMode::HUNT) != modes.end()) { RunHunts(); }
     if(modes.find(BluespawnMode::MONITOR) != modes.end()) { RunMonitor(); }
+
+    ThreadPool::GetInstance().Wait();
+    Bluespawn::detections.Wait();
 }
 
 void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
@@ -198,9 +202,12 @@ void ParseLogSinks(const std::string& sinks) {
     std::set<std::string> sink_set;
     for(unsigned startIdx = 0; startIdx < sinks.size();) {
         auto endIdx{ sinks.find(',', startIdx) };
-        auto sink{ sinks.substr(startIdx, endIdx - startIdx) };
+        auto sink{ sinks.substr(startIdx, endIdx - startIdx - 1) };
         sink_set.emplace(sink);
         startIdx = endIdx + 1;
+        if(endIdx == std::string::npos){
+            break;
+        }
     }
 
     std::vector<std::reference_wrapper<Log::LogLevel>> levels{
@@ -210,14 +217,17 @@ void ParseLogSinks(const std::string& sinks) {
 
     for(auto sink : sink_set) {
         if(sink == "console") {
-            auto console = std::make_unique<Log::CLISink>();
-            Log::AddSink(std::move(console), levels);
+            auto console = std::make_shared<Log::CLISink>();
+            Log::AddSink(console, levels);
+            Bluespawn::detectionSinks.emplace_back(console);
         } else if(sink == "xml") {
-            auto XML = std::make_unique<Log::XMLSink>();
-            Log::AddSink(std::move(XML), levels);
+            auto XML = std::make_shared<Log::XMLSink>();
+            Log::AddSink(XML, levels);
+            Bluespawn::detectionSinks.emplace_back(XML);
         } else if(sink == "debug") {
-            auto debug = std::make_unique<Log::DebugSink>();
-            Log::AddSink(std::move(debug), levels);
+            auto debug = std::make_shared<Log::DebugSink>();
+            Log::AddSink(debug, levels);
+            Bluespawn::detectionSinks.emplace_back(debug);
         } else {
             Bluespawn::io.AlertUser(L"Unknown log sink \"" + StringToWidestring(sink) + L"\"", INFINITY,
                                     ImportanceLevel::MEDIUM);
@@ -258,7 +268,7 @@ int main(int argc, char* argv[]) {
     // clang-format off
     options.add_options()
         ("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
-        ("n,monitor", "Monitor the System for Malicious Activity. Available options are Cursory, Normal, or Intensive.",
+        ("n,monitor", "Monitor the System for malicious activity, dispatching hunts as changes are detected.",
             cxxopts::value<std::string>()->implicit_value("Normal"))
         ("m,mitigate", "Mitigates vulnerabilities by applying security settings. Available options are audit and enforce.", 
              cxxopts::value<std::string>()->implicit_value("audit"))
@@ -269,7 +279,7 @@ int main(int argc, char* argv[]) {
         ("log", "Specify how Bluespawn should log events. Options are console (default), xml, and debug.",
             cxxopts::value<std::string>()->default_value("console"))
         ("r,react", "Specifies how bluespawn should react to potential threats dicovered during hunts.",
-             cxxopts::value<std::string>()->default_value("log"))
+             cxxopts::value<std::string>()->default_value(""))
         ("v,verbose", "Verbosity", cxxopts::value<int>()->default_value("1"))
         ("debug", "Enable Debug Output", cxxopts::value<int>()->default_value("0"));
     

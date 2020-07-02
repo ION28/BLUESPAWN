@@ -4,15 +4,16 @@
 #include <string>
 
 #include "scan/Detections.h"
+#include "scan/Scanner.h"
 
-class ProcessScanner {
+class ProcessScanner : public Scanner {
 private:
 
 	/**
 	 * Scans a command for possibly associated detections. The intended use-case of this is to find things
 	 * such as malware.exe in the command `cmd.exe /c "malware.exe"`.
 	 */
-	std::unordered_map<std::reference_wrapper<Detection>, Association> SearchCommand(
+	std::unordered_map<std::shared_ptr<Detection>, Association> SearchCommand(
 		IN CONST std::wstring& ProcessCommand
 	);
 
@@ -26,7 +27,7 @@ public:
 	 *
 	 * @return A vector of detections associated with the provided detection
 	 */
-	virtual std::unordered_map<std::reference_wrapper<Detection>, Association> GetAssociatedDetections(
+	virtual std::unordered_map<std::shared_ptr<Detection>, Association> GetAssociatedDetections(
 		IN CONST Detection& detection
 	);
 

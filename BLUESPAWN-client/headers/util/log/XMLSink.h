@@ -9,7 +9,7 @@ namespace Log {
 	/**
 	 * XMLSink provides a sink for the logger that saves log messages to an XML file.
 	 */
-	class XMLSink : public LogSink, DetectionSink {
+	class XMLSink : public LogSink, public DetectionSink {
 
 		/// Guards access to the XML document
 		CriticalSection hGuard;
@@ -86,7 +86,7 @@ namespace Log {
 		 * @param type The type of record this is, either PreScan or PostScan
 		 */
 		virtual void RecordDetection(
-			IN CONST std::reference_wrapper<Detection>& detection,
+			IN CONST std::shared_ptr<Detection>& detection,
 			IN RecordType type
 		);
 
@@ -97,8 +97,8 @@ namespace Log {
 		 * @param second The second detection in the association.
 		 */
 		virtual void RecordAssociation(
-			IN CONST std::reference_wrapper<Detection>& first,
-			IN CONST std::reference_wrapper<Detection>& second,
+			IN CONST std::shared_ptr<Detection>& first,
+			IN CONST std::shared_ptr<Detection>& second,
 			IN CONST Association& strength
 		);
 	};

@@ -6,7 +6,9 @@
 #include <vector>
 #include <unordered_set>
 
-class FileScanner {
+#include "scan/Scanner.h"
+
+class FileScanner : public Scanner {
 	
 	/// A mapping of module names to sets of the PIDs of processes with the module loaded
 	std::unordered_map<std::wstring, std::unordered_set<DWORD>> modules;
@@ -18,9 +20,12 @@ class FileScanner {
 	FILETIME ModuleLastUpdateTime;
 
 	/// The rate at which `modules` is updated, in milliseconds
-	static const DWORD MODULE_UPDATE_INTERVAL{ 120000 };
+	static const DWORD MODULE_UPDATE_INTERVAL{ 300000 };
 
-	/// Checks if `modules` needs to be updated, and if so, updates it and lastupdate
+	/// CriticalSection guarding access to `modules`, `hashes`, and `ModuleLastUpdateTime`
+	CriticalSection hGuard;
+
+	/// Checks if `modules` needs to be updated, and if so, updates it and `ModuleLastUpdateTime`
 	void UpdateModules();
 
 public:
@@ -59,7 +64,7 @@ public:
 	 *
 	 * @return A vector of detections associated with the provided detection
 	 */
-	virtual std::unordered_map<std::reference_wrapper<Detection>, Association> GetAssociatedDetections(
+	virtual std::unordered_map<std::shared_ptr<Detection>, Association> GetAssociatedDetections(
 		IN CONST Detection& detection
 	);
 

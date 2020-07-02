@@ -17,7 +17,7 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
     }
 
-    std::vector<std::reference_wrapper<Detection>> HuntT1138::RunHunt(const Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1138::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
         auto& values{ CheckKeyValues(HKEY_LOCAL_MACHINE,

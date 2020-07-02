@@ -28,7 +28,7 @@ namespace Registry {
         { HKEY_CURRENT_CONFIG, L"HKEY_CURRENT_CONFIG" },
     };
 
-    std::map<HKEY, int> RegistryKey::_ReferenceCounts = {};
+    std::unordered_map<HKEY, int> RegistryKey::_ReferenceCounts = {};
 
     bool RegistryKey::CheckKeyExists(HKEY hive, const std::wstring& name, bool WoW64) {
         auto wLowerPath = ToLowerCase(name);

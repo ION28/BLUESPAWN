@@ -16,7 +16,7 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::DefenseEvasion;
     }
 
-    std::vector<std::reference_wrapper<Detection>> HuntT1099::RunHunt(const Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1099::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
         // Create existance queries so interesting data is output

@@ -11,7 +11,7 @@ namespace Hunts {
 	public:
 		HuntT1004();
 
-		virtual std::vector<std::reference_wrapper<Detection>> RunHunt(
+		virtual std::vector<std::shared_ptr<Detection>> RunHunt(
 			IN CONST Scope& scope
 		) override;
 

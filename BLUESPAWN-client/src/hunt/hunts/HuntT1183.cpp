@@ -19,7 +19,7 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
     }
 
-    std::vector<std::reference_wrapper<Detection>> HuntT1183::RunHunt(IN CONST Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1183::RunHunt(IN CONST Scope& scope) {
         HUNT_INIT()
 
         auto IFEO = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File "

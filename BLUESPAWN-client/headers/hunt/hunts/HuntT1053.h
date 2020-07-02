@@ -15,7 +15,7 @@ namespace Hunts {
 		std::vector<EventLogs::EventLogItem> Get4698Events();
 		std::vector<EventLogs::EventLogItem> Get106Events();
 
-		virtual std::vector<std::reference_wrapper<Detection>> RunHunt(const Scope& scope) override;
+		virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
 		virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

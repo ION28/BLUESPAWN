@@ -14,19 +14,19 @@
 class DetectionRegister {
 
 	/// A vector containing all detections made
-	std::vector<Detection> detections;
+	std::vector<std::shared_ptr<Detection>> detections;
 
 	/// CriticalSection guarding accesses to `detections`
 	CriticalSection hGuard;
 
 	/// A set containing all detections scanned
-	std::unordered_set<std::reference_wrapper<Detection>> scanned;
+	std::unordered_set<std::shared_ptr<Detection>> scanned;
 
 	/// CriticalSection guarding access to `scanned`
 	CriticalSection hScannedGuard;
 
 	/// A set containing all detections found but not done being scanned
-	std::unordered_set<std::reference_wrapper<Detection>> queue;
+	std::unordered_set<std::shared_ptr<Detection>> queue;
 
 	/// CriticalSection guarding accesses to `queue`.
 	CriticalSection hQueueGuard;
@@ -39,13 +39,13 @@ class DetectionRegister {
 
 	/// Called behind the scenes when queueing a scan with AddDetection
 	void AddDetectionAsync(
-		IN CONST std::reference_wrapper<Detection>& detection,
+		IN CONST std::shared_ptr<Detection>& detection,
 		IN CONST Certainty& level = Certainty::None OPTIONAL
 	);
 
 	/// Used to update the certainty of a detection, possibly triggering assocation scans
 	void UpdateDetectionCertainty(
-		IN CONST std::reference_wrapper<Detection>& detection,
+		IN CONST std::shared_ptr<Detection>& detection,
 		IN CONST Certainty& level = Certainty::None OPTIONAL
 	);
 
@@ -74,7 +74,7 @@ public:
 	 *
 	 * @return A reference to the detection added.
 	 */
-	std::reference_wrapper<Detection> AddDetection(
+	std::shared_ptr<Detection> AddDetection(
 		IN Detection&& detection, 
 		IN CONST Certainty& level = Certainty::None OPTIONAL
 	);
@@ -86,7 +86,7 @@ public:
 	 * 
 	 * @return A vector of detections above the specified level
 	 */
-	std::vector<std::reference_wrapper<Detection>> GetAllDetections(
+	std::vector<std::shared_ptr<Detection>> GetAllDetections(
 		IN CONST Certainty& level = Certainty::Moderate OPTIONAL
 	) CONST;
 

@@ -36,7 +36,7 @@ public:
 	 * @param type The type of record this is, either PreScan or PostScan
 	 */
 	virtual void RecordDetection(
-		IN CONST std::reference_wrapper<Detection>& detection,
+		IN CONST std::shared_ptr<Detection>& detection,
 		IN RecordType type
 	) = 0;
 
@@ -50,8 +50,8 @@ public:
 	 * @param strength The strength of the connection
 	 */
 	virtual void RecordAssociation(
-		IN CONST std::reference_wrapper<Detection>& first,
-		IN CONST std::reference_wrapper<Detection>& second,
+		IN CONST std::shared_ptr<Detection>& first,
+		IN CONST std::shared_ptr<Detection>& second,
 		IN CONST Association& strength
 	) = 0;
 };

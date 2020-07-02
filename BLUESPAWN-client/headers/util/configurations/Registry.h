@@ -93,7 +93,7 @@ namespace Registry {
 		RegistryKey& operator=(RegistryKey&& key) noexcept;
 
 	private:
-		static std::map<HKEY, int> _ReferenceCounts;
+		static std::unordered_map<HKEY, int> _ReferenceCounts;
 
 		HKEY hkBackingKey;
 
@@ -251,10 +251,9 @@ namespace Registry {
 	};
 }
 
-
 template<>
 struct std::hash<Registry::RegistryKey> {
 	size_t operator()(
 		IN CONST Registry::RegistryKey& key
-	) const;
+		) const;
 };

@@ -12,7 +12,7 @@ class Detection;
 
 /// Forward declare template specializaiton for hashing reference wrappers for detections
 template<>
-struct std::hash<std::reference_wrapper<Detection>>;
+struct std::hash<std::shared_ptr<Detection>>;
 
 #include "common/wrappers.hpp"
 
@@ -73,7 +73,7 @@ typedef Certainty Association;
 class ScanInfo {
 
 	/// A mapping of detections to their association strength with the current node.
-	std::unique_ptr<std::unordered_map<std::reference_wrapper<Detection>, Association>> associations;
+	std::unique_ptr<std::unordered_map<std::shared_ptr<Detection>, Association>> associations;
 
 	/// The degree of certainty that the detection referenced by this scan node is malicious
 	/// Note that this ignores all associations
@@ -102,7 +102,7 @@ class ScanInfo {
 	 * @param strength The strength of the association between the two nodes
 	 */
 	void AddAssociation(
-		IN CONST std::reference_wrapper<Detection>& node, 
+		IN CONST std::shared_ptr<Detection>& node, 
 		IN CONST Association& strength
 	);
 
@@ -118,7 +118,7 @@ public:
 	 *
 	 * @return The associations of this node
 	 */
-	std::unordered_map<std::reference_wrapper<Detection>, Association> GetAssociations();
+	std::unordered_map<std::shared_ptr<Detection>, Association> GetAssociations();
 
 	/**
 	 * Retrieves the certainty that the detection this is a part of is malicious. If any association has

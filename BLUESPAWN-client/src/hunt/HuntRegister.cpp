@@ -14,13 +14,13 @@ void HuntRegister::RegisterHunt(std::unique_ptr<Hunt>&& hunt) {
 	vRegisteredHunts.emplace_back(std::move(hunt));
 }
 
-std::vector<Promise<std::vector<std::reference_wrapper<Detection>>>>
+std::vector<Promise<std::vector<std::shared_ptr<Detection>>>>
 HuntRegister::RunHunts(IN CONST Scope& scope OPTIONAL, IN CONST bool async OPTIONAL){
 	Bluespawn::io.InformUser(L"Starting a hunt for " + std::to_wstring(vRegisteredHunts.size()) + L" techniques.");
 
-	std::vector<Promise<std::vector<std::reference_wrapper<Detection>>>> detections{};
-	for(auto& name : vRegisteredHunts) {
-		detections.emplace_back(RunHunt(*name, scope));
+	std::vector<Promise<std::vector<std::shared_ptr<Detection>>>> detections{};
+	for(auto& hunt : vRegisteredHunts) {
+		detections.emplace_back(RunHunt(hunt.get(), scope));
 	}
 
 	if(async){
@@ -45,12 +45,14 @@ HuntRegister::RunHunts(IN CONST Scope& scope OPTIONAL, IN CONST bool async OPTIO
 	return detections;
 }
 
-Promise<std::vector<std::reference_wrapper<Detection>>> HuntRegister::RunHunt(IN Hunt& hunt, 
+Promise<std::vector<std::shared_ptr<Detection>>> HuntRegister::RunHunt(IN Hunt* hunt, 
 																			  IN CONST Scope& scope OPTIONAL){
-	Bluespawn::io.InformUser(L"Starting scan for " + hunt.GetName());
+	Bluespawn::io.InformUser(L"Starting scan for " + hunt->GetName());
 
-	return ThreadPool::GetInstance().RequestPromise<std::vector<std::reference_wrapper<Detection>>>(
-		std::bind(&Hunt::RunHunt, hunt, scope));
+	return ThreadPool::GetInstance().RequestPromise<std::vector<std::shared_ptr<Detection>>>(
+		[hunt, scope]() mutable { 
+			return hunt->RunHunt(scope); 
+		});
 }
 
 void HuntRegister::SetupMonitoring(){

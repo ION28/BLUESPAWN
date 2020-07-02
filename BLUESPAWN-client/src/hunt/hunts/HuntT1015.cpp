@@ -17,7 +17,7 @@ namespace Hunts {
 		dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
 	}
 
-	void HuntT1015::EvaluateRegistry(std::vector<std::reference_wrapper<Detection>>& detections) {
+	void HuntT1015::EvaluateRegistry(std::vector<std::shared_ptr<Detection>>& detections) {
 		for (auto& key : vAccessibilityBinaries) {
 			std::vector<RegistryValue> debugger{ CheckValues(HKEY_LOCAL_MACHINE, wsIFEO + key, {
 				{ L"Debugger", L"", false, CheckSzEmpty },
@@ -35,7 +35,7 @@ namespace Hunts {
 		}
 	}
 
-	void HuntT1015::EvaluateFiles(std::vector<std::reference_wrapper<Detection>>& detections) {
+	void HuntT1015::EvaluateFiles(std::vector<std::shared_ptr<Detection>>& detections) {
 
 		for (auto name : vAccessibilityBinaries) {
 			FileSystem::File file{ FileSystem::File(L"C:\\Windows\\System32\\" + name) };
@@ -46,7 +46,7 @@ namespace Hunts {
 		}
 	}
 
-	std::vector<std::reference_wrapper<Detection>> HuntT1015::RunHunt(const Scope& scope){
+	std::vector<std::shared_ptr<Detection>> HuntT1015::RunHunt(const Scope& scope){
 		HUNT_INIT();
 
 		EvaluateRegistry(detections);

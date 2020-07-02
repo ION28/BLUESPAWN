@@ -7,7 +7,7 @@
 
 #include "scan/Detections.h"
 
-size_t ComputeHash(IN CONST std::unordered_map<std::wstring, std::wstring>& map) {
+size_t ComputeHash(IN CONST std::map<std::wstring, std::wstring>& map) {
     size_t hash{ 0 };
 
     std::hash<std::wstring> hasher{};
@@ -218,7 +218,7 @@ ProcessDetectionData::ProcessDetectionData(IN ProcessDetectionType type,
     auto tied{ std::tie(type, PID, TID, ProcessHandle, ProcessName, ProcessPath, ProcessCommand, ParentProcess,
                         BaseAddress, MemorySize, ImageName) };
 
-    serialization = std::unordered_map<std::wstring, std::wstring>{
+    serialization = std::map<std::wstring, std::wstring>{
         { L"Type", type == ProcessDetectionType::MaliciousImage ?
                        L"Image" :
                        type == ProcessDetectionType::MaliciousMemory ?
@@ -242,7 +242,7 @@ ProcessDetectionData::ProcessDetectionData(IN ProcessDetectionType type,
     hash = ComputeHash(serialization);
 }
 
-const std::unordered_map<std::wstring, std::wstring>& ProcessDetectionData::Serialize() CONST {
+const std::map<std::wstring, std::wstring>& ProcessDetectionData::Serialize() CONST {
     return serialization;
 }
 
@@ -280,7 +280,7 @@ FileDetectionData::FileDetectionData(IN CONST FileSystem::File& file,
         }
     }
 
-    serialization = std::unordered_map<std::wstring, std::wstring>{
+    serialization = std::map<std::wstring, std::wstring>{
         { L"Path", FilePath },
         { L"Name", FileName },
         { L"Exists", FileFound ? L"true" : L"false" },
@@ -316,7 +316,7 @@ FileDetectionData::FileDetectionData(IN CONST FileSystem::File& file,
 FileDetectionData::FileDetectionData(IN CONST std::wstring& path) :
     FileDetectionData(FileSystem::File{ path }, std::nullopt) {}
 
-const std::unordered_map<std::wstring, std::wstring>& FileDetectionData::Serialize() CONST {
+const std::map<std::wstring, std::wstring>& FileDetectionData::Serialize() CONST {
     return serialization;
 }
 
@@ -335,7 +335,7 @@ RegistryDetectionData::RegistryDetectionData(IN CONST Registry::RegistryKey& key
                                              IN CONST std::optional<AllocationWrapper>& data OPTIONAL) :
     KeyPath{ key.GetName() },
     key{ key }, value{ value }, type{ type }, data{ data } {
-    serialization = std::unordered_map<std::wstring, std::wstring>{
+    serialization = std::map<std::wstring, std::wstring>{
         { L"Key Path", key.GetName() },
         { L"Registry Entry Type", type == RegistryDetectionType::CommandReference ?
                                       L"Command" :
@@ -363,7 +363,7 @@ RegistryDetectionData::RegistryDetectionData(IN CONST Registry::RegistryValue& v
                                              IN RegistryDetectionType type OPTIONAL) :
     RegistryDetectionData{ value.key, value, type, value.key.GetRawValue(value.wValueName) } {}
 
-const std::unordered_map<std::wstring, std::wstring>& RegistryDetectionData::Serialize() CONST {
+const std::map<std::wstring, std::wstring>& RegistryDetectionData::Serialize() CONST {
     return serialization;
 }
 
@@ -377,7 +377,7 @@ ServiceDetectionData::ServiceDetectionData(IN CONST std::optional<std::wstring>&
                                            IN CONST std::optional<std::wstring>& Description OPTIONAL) :
     ServiceName{ ServiceName },
     DisplayName{ DisplayName }, FilePath{ FilePath }, Description{ Description } {
-    serialization = std::unordered_map<std::wstring, std::wstring>{};
+    serialization = std::map<std::wstring, std::wstring>{};
     if(ServiceName) { serialization.emplace(L"Service Name", *ServiceName); }
     if(FilePath) { serialization.emplace(L"Service Executable", *FilePath); }
     if(DisplayName) { serialization.emplace(L"Display Name", *DisplayName); }
@@ -386,7 +386,7 @@ ServiceDetectionData::ServiceDetectionData(IN CONST std::optional<std::wstring>&
     hash = ComputeHash(serialization);
 }
 
-const std::unordered_map<std::wstring, std::wstring>& ServiceDetectionData::Serialize() CONST {
+const std::map<std::wstring, std::wstring>& ServiceDetectionData::Serialize() CONST {
     return serialization;
 }
 
@@ -395,14 +395,14 @@ size_t ServiceDetectionData::Hash() CONST {
 }
 
 OtherDetectionData::OtherDetectionData(IN CONST std::wstring& DetectionType,
-                                       IN CONST std::unordered_map<std::wstring, std::wstring>& DetectionProperties) :
+                                       IN CONST std::map<std::wstring, std::wstring>& DetectionProperties) :
     DetectionType{ DetectionType },
     DetectionProperties{ DetectionProperties }, serialization(DetectionProperties.begin(), DetectionProperties.end()) {
     serialization.emplace(L"Detection Type", DetectionType);
     hash = ComputeHash(serialization);
 }
 
-const std::unordered_map<std::wstring, std::wstring>& OtherDetectionData::Serialize() CONST {
+const std::map<std::wstring, std::wstring>& OtherDetectionData::Serialize() CONST {
     return serialization;
 }
 
@@ -441,14 +441,15 @@ Detection::Detection(IN CONST DetectionData& data,
     }
 
     hash = std::visit(hasher, data);
-    serialization = std::visit(serializer, data);
+    auto tmp{ std::visit(serializer, data) };
+    serialization = std::map<std::wstring, std::wstring>(tmp.begin(), tmp.end());
 }
 
 Detection::Detection(IN CONST Detection& detection) :
     data{ detection.data }, DetectionStale{ detection.DetectionStale }, type{ detection.type }, dwID{ detection.dwID },
     remediator{ detection.remediator }, context{ detection.context }, hash{ detection.hash }, 
     serialization{ detection.serialization } {
-    info.associations = std::make_unique<std::unordered_map<std::reference_wrapper<Detection>, Association>>(
+    info.associations = std::make_unique<std::unordered_map<std::shared_ptr<Detection>, Association>>(
         *detection.info.associations);
     info.bAssociativeStale = detection.info.bAssociativeStale;
     info.cAssociativeCertainty = detection.info.cAssociativeCertainty;
@@ -465,7 +466,7 @@ Detection& Detection::operator=(IN CONST Detection& detection) {
     hash = detection.hash;
     serialization = detection.serialization;
     info = {};
-    info.associations = std::make_unique<std::unordered_map<std::reference_wrapper<Detection>, Association>>(
+    info.associations = std::make_unique<std::unordered_map<std::shared_ptr<Detection>, Association>>(
         *detection.info.associations);
     info.bAssociativeStale = detection.info.bAssociativeStale;
     info.cAssociativeCertainty = detection.info.cAssociativeCertainty;
@@ -478,9 +479,9 @@ bool Detection::operator==(IN CONST Detection& detection) CONST {
 
     if(type == DetectionType::ProcessDetection) {
         return std::get<ProcessDetectionData>(data) == std::get<ProcessDetectionData>(detection.data);
-    } else if(type == DetectionType::ProcessDetection) {
+    } else if(type == DetectionType::ServiceDetection) {
         return std::get<ServiceDetectionData>(data) == std::get<ServiceDetectionData>(detection.data);
-    } else if(type == DetectionType::ProcessDetection) {
+    } else if(type == DetectionType::RegistryDetection) {
         return std::get<RegistryDetectionData>(data) == std::get<RegistryDetectionData>(detection.data);
     } else if(type == DetectionType::FileDetection) {
         return std::get<FileDetectionData>(data) == std::get<FileDetectionData>(detection.data);
@@ -493,20 +494,20 @@ Detection::operator PCRITICAL_SECTION() {
     return hGuard;
 }
 
-const std::unordered_map<std::wstring, std::wstring>& Detection::Serialize() CONST {
-    return std::visit(serializer, data);
+const std::map<std::wstring, std::wstring>& Detection::Serialize() CONST {
+    return serialization;
 };
 
 size_t std::hash<Detection>::operator()(IN CONST Detection& detection) CONST {
-    return std::visit(detection.hasher, detection.data);
+    return detection.hash;
 }
 
 size_t
-std::hash<std::reference_wrapper<Detection>>::operator()(IN CONST std::reference_wrapper<Detection>& detection) CONST {
-    return detection.get().hash;
+std::hash<std::shared_ptr<Detection>>::operator()(IN CONST std::shared_ptr<Detection>& detection) CONST {
+    return detection->hash;
 }
 
-bool std::equal_to<std::reference_wrapper<Detection>>::operator()(
-    IN CONST std::reference_wrapper<Detection>& _Left, IN CONST std::reference_wrapper<Detection>& _Right) CONST {
-    return _Left.get() == _Right.get();
+bool std::equal_to<std::shared_ptr<Detection>>::operator()(
+    IN CONST std::shared_ptr<Detection>& _Left, IN CONST std::shared_ptr<Detection>& _Right) CONST {
+    return *_Left == *_Right;
 }

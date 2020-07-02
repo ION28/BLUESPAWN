@@ -266,7 +266,7 @@ struct ProcessDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::unordered_map<std::wstring, std::wstring>& Serialize() CONST;
+	const std::map<std::wstring, std::wstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -290,7 +290,7 @@ private:
 	size_t hash = 0;
 
 	/// Record the serialization of the data
-	std::unordered_map<std::wstring, std::wstring> serialization = {};
+	std::map<std::wstring, std::wstring> serialization = {};
 
 	/// Raw constructor for a ProcessDetectionData
 	ProcessDetectionData(
@@ -381,7 +381,7 @@ struct FileDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::unordered_map<std::wstring, std::wstring>& Serialize() CONST;
+	const std::map<std::wstring, std::wstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -405,7 +405,7 @@ private:
 	size_t hash = 0;
 
 	/// Record the serialization of the data
-	std::unordered_map<std::wstring, std::wstring> serialization = {};
+	std::map<std::wstring, std::wstring> serialization = {};
 };
 
 /**
@@ -469,7 +469,7 @@ struct RegistryDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::unordered_map<std::wstring, std::wstring>& Serialize() CONST;
+	const std::map<std::wstring, std::wstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -493,7 +493,7 @@ private:
 	size_t hash = 0;
 
 	/// Record the serialization of the data
-	std::unordered_map<std::wstring, std::wstring> serialization = {};
+	std::map<std::wstring, std::wstring> serialization = {};
 };
 
 /**
@@ -537,7 +537,7 @@ struct ServiceDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::unordered_map<std::wstring, std::wstring>& Serialize() CONST;
+	const std::map<std::wstring, std::wstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -561,7 +561,7 @@ private:
 	size_t hash = 0;
 
 	/// Record the serialization of the data
-	std::unordered_map<std::wstring, std::wstring> serialization = {};
+	std::map<std::wstring, std::wstring> serialization = {};
 };
 
 /**
@@ -574,7 +574,7 @@ struct OtherDetectionData {
 	std::wstring DetectionType;
 
 	/// Stores data about the detection
-	std::unordered_map<std::wstring, std::wstring> DetectionProperties;
+	std::map<std::wstring, std::wstring> DetectionProperties;
 
 	/**
 	 * Creates an OtherDetectionData object, referencing something on the system identified as possibly malicious. 
@@ -585,7 +585,7 @@ struct OtherDetectionData {
 	 */
 	OtherDetectionData(
 		IN CONST std::wstring& DetectionType,
-		IN CONST std::unordered_map<std::wstring, std::wstring>& DetectionProperties
+		IN CONST std::map<std::wstring, std::wstring>& DetectionProperties
 	);
 
 	/**
@@ -594,7 +594,7 @@ struct OtherDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::unordered_map<std::wstring, std::wstring>& Serialize() CONST;
+	const std::map<std::wstring, std::wstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -618,14 +618,14 @@ private:
 	size_t hash = 0;
 
 	/// Record the serialization of the data
-	std::unordered_map<std::wstring, std::wstring> serialization = {};
+	std::map<std::wstring, std::wstring> serialization = {};
 };
 
 /// Stores contextual information around a detection
 struct DetectionContext {
 	
 	/// A set of the hunts that identified the detection
-	std::unordered_set<std::wstring> hunts;
+	std::set<std::wstring> hunts;
 	
 	/// The time at which the first evidence of the detection was created
 	std::optional<FILETIME> FirstEvidenceTime;
@@ -675,7 +675,7 @@ private:
 	size_t hash;
 
 	/// Record the serialization of the data
-	std::unordered_map<std::wstring, std::wstring> serialization;
+	std::map<std::wstring, std::wstring> serialization;
 
 	/// A shared counter to keep track of detection IDs and ensure each new detection gets assigned
 	/// a unique identifier.
@@ -683,19 +683,19 @@ private:
 
 	/// A struct used to serialize detection data
 	static struct {
-		const std::unordered_map<std::wstring, std::wstring>& operator()(ProcessDetectionData data){
+		std::map<std::wstring, std::wstring> operator()(ProcessDetectionData data){
 			return data.Serialize();
 		}
-		const std::unordered_map<std::wstring, std::wstring>& operator()(FileDetectionData data){
+		std::map<std::wstring, std::wstring> operator()(FileDetectionData data){
 			return data.Serialize(); 
 		}
-		const std::unordered_map<std::wstring, std::wstring>& operator()(RegistryDetectionData data){
+		std::map<std::wstring, std::wstring> operator()(RegistryDetectionData data){
 			return data.Serialize();
 		}
-		const std::unordered_map<std::wstring, std::wstring>& operator()(ServiceDetectionData data){
+		std::map<std::wstring, std::wstring> operator()(ServiceDetectionData data){
 			return data.Serialize();
 		}
-		const std::unordered_map<std::wstring, std::wstring>& operator()(OtherDetectionData data){
+		std::map<std::wstring, std::wstring> operator()(OtherDetectionData data){
 			return data.Serialize(); 
 		}
 	} serializer;
@@ -711,7 +711,7 @@ private:
 
 	/// Declare related hash classes to be friends
 	friend class std::hash<Detection>;
-	friend class std::hash<std::reference_wrapper<Detection>>;
+	friend class std::hash<std::shared_ptr<Detection>>;
 
 public:
 
@@ -787,7 +787,7 @@ public:
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::unordered_map<std::wstring, std::wstring>& Serialize() const;
+	const std::map<std::wstring, std::wstring>& Serialize() const;
 
 	/**
 	 * Implicit cast to a CRITICAL_SECTION pointer for use in synchronization functions
@@ -809,21 +809,21 @@ struct std::hash<Detection> {
 
 /// Template specialization defining how hashes of reference wrappers for Detection objects should be calculated
 template<>
-struct std::hash<std::reference_wrapper<Detection>> {
+struct std::hash<std::shared_ptr<Detection>> {
 
 	/// Hashes a detection using its data
 	size_t operator()(
-		IN CONST std::reference_wrapper<Detection>& detection
+		IN CONST std::shared_ptr<Detection>& detection
 	) const;
 };
 
 /// Template specialization defining how equality of reference wrappers for Detection objects should be calculated
 template<>
-struct std::equal_to<std::reference_wrapper<Detection>> {
+struct std::equal_to<std::shared_ptr<Detection>> {
 
 	/// Compares reference wrappers by comparing their wrapped value
 	bool operator()(
-		IN CONST std::reference_wrapper<Detection>& _Left,
-		IN CONST std::reference_wrapper<Detection>& _Right
+		IN CONST std::shared_ptr<Detection>& _Left,
+		IN CONST std::shared_ptr<Detection>& _Right
 	) const;
 };

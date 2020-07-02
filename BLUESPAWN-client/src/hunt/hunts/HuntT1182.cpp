@@ -15,7 +15,7 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
     }
 
-    std::vector<std::reference_wrapper<Detection>> HuntT1182::RunHunt(const Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1182::RunHunt(const Scope& scope) {
         HUNT_INIT();
         Registry::RegistryKey key{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager" };
         if(key.ValueExists(L"AppCertDLLs")) {

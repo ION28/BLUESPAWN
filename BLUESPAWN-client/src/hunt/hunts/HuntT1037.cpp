@@ -15,7 +15,7 @@ namespace Hunts{
 	}
 
 
-	std::vector<std::reference_wrapper<Detection>> HuntT1037::RunHunt(const Scope& scope) {
+	std::vector<std::shared_ptr<Detection>> HuntT1037::RunHunt(const Scope& scope) {
 		HUNT_INIT();
 
 		for(auto& detection : CheckValues(HKEY_CURRENT_USER, L"Environment", {

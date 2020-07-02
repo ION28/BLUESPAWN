@@ -34,16 +34,19 @@ public:
 	 *
 	 * @return A vector of possibly malicious items. 
 	 */
-	static std::vector<Promise<std::vector<std::reference_wrapper<Detection>>>> RunHunts(
+	static std::vector<Promise<std::vector<std::shared_ptr<Detection>>>> RunHunts(
 		IN CONST Scope& scope = {} OPTIONAL, 
 		IN CONST bool async = false OPTIONAL
 	);
 
 	/**
-	 * Runs a specified hunt, returning a promise for its result
+	 * Queues a specified hunt, returning a promise for its result
+	 *
+	 * @param hunt The hunt to queue
+	 * @param An optional scope object representing the limitations of the hunt
 	 */
-	static Promise<std::vector<std::reference_wrapper<Detection>>> RunHunt(
-		IN Hunt& hunt, 
+	static Promise<std::vector<std::shared_ptr<Detection>>> RunHunt(
+		IN Hunt* hunt, 
 		IN CONST Scope& scope = {} OPTIONAL
 	);
 

@@ -29,16 +29,17 @@ namespace Log {
 		return (bool) dynamic_cast<const CLISink*>(&sink);
 	}
 
-	void CLISink::RecordDetection(IN CONST std::reference_wrapper<Detection>& detection, IN RecordType type){
+	void CLISink::RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN RecordType type){
 		AcquireMutex mutex{ hMutex };
 
 		if(type == RecordType::PreScan && Bluespawn::EnablePreScanDetections || type == RecordType::PostScan){
 			SetConsoleColor(CLISink::PrependColors[4]);
 			std::wcout << CLISink::MessagePrepends[4] << (type == RecordType::PreScan ? L"[Pre-Scan] " : L" ");
+			SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
 
-			EnterCriticalSection(detection.get());
-			Detection copy{ detection.get() };
-			LeaveCriticalSection(detection.get());
+			EnterCriticalSection(*detection);
+			Detection copy{ *detection };
+			LeaveCriticalSection(*detection);
 
 			std::wcout << L"Detection ID: " << copy.dwID << std::endl;
 
@@ -81,11 +82,11 @@ namespace Log {
 		}
 	}
 
-	void CLISink::RecordAssociation(IN CONST std::reference_wrapper<Detection>& first, 
-									IN CONST std::reference_wrapper<Detection>& second, IN CONST Association& a){
+	void CLISink::RecordAssociation(IN CONST std::shared_ptr<Detection>& first, 
+									IN CONST std::shared_ptr<Detection>& second, IN CONST Association& a){
 		AcquireMutex mutex{ hMutex };
 
-		std::cout << "Detections with IDs " << first.get().dwID << " and " << second.get().dwID << " are associated "
+		std::cout << "Detections with IDs " << first->dwID << " and " << second->dwID << " are associated "
 			<< " with strength " << static_cast<double>(a) << std::endl;
 	}
 }

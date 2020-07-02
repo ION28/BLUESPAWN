@@ -8,7 +8,7 @@
 
 #include <TlHelp32.h>
 
-std::unordered_map<std::reference_wrapper<Detection>, Association> ProcessScanner::SearchCommand(
+std::unordered_map<std::shared_ptr<Detection>, Association> ProcessScanner::SearchCommand(
 	IN CONST std::wstring& ProcessCommand){
 
 	LOG_ERROR(L"Unable to properly scan command `" << ProcessCommand << L"`; function not implemented");
@@ -16,14 +16,14 @@ std::unordered_map<std::reference_wrapper<Detection>, Association> ProcessScanne
 	return {};
 }
 
-std::unordered_map<std::reference_wrapper<Detection>, Association> ProcessScanner::GetAssociatedDetections(
+std::unordered_map<std::shared_ptr<Detection>, Association> ProcessScanner::GetAssociatedDetections(
 	IN CONST Detection& detection){
 
 	if(detection.type != DetectionType::ProcessDetection){
 		return {};
 	}
 
-	std::unordered_map<std::reference_wrapper<Detection>, Association> detections{};
+	std::unordered_map<std::shared_ptr<Detection>, Association> detections{};
 	ProcessDetectionData data{ std::get<ProcessDetectionData>(detection.data) };
 	
 	if(data.type == ProcessDetectionType::MaliciousProcess && data.ProcessCommand){

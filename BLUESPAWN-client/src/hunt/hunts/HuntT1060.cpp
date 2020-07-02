@@ -32,7 +32,7 @@ namespace Hunts {
         };
     }
 
-    std::vector<std::reference_wrapper<Detection>> HuntT1060::RunHunt(const Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1060::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
         for(auto& key : RunKeys) {

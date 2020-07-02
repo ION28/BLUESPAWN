@@ -23,7 +23,7 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::Persistence;
     }
 
-    std::vector<std::reference_wrapper<Detection>> HuntT1004::RunHunt(IN CONST Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1004::RunHunt(IN CONST Scope& scope) {
         HUNT_INIT();
 
         // clang-format off

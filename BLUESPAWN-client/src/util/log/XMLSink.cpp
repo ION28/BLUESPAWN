@@ -7,6 +7,14 @@
 
 namespace Log{
 
+	std::wstring ToWstringPad(DWORD value, size_t length = 2){
+		wchar_t* buf = new wchar_t[length + 1];
+		swprintf(buf, (L"%0" + std::to_wstring(length) + L"d").c_str(), value);
+		std::wstring str = buf;
+		delete[] buf;
+		return str;
+	}
+
 	void UpdateLog(XMLSink* sink){
 		HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, L"Local\\FlushLogs") };
 		while(true){
@@ -20,7 +28,8 @@ namespace Log{
 		thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr) }{
 		SYSTEMTIME time{};
 		GetLocalTime(&time);
-		wFileName = L"bluespawn-" + FormatWindowsTime(time) + L".xml";
+		wFileName = L"bluespawn-" + ToWstringPad(time.wMonth) + L"-" + ToWstringPad(time.wDay) + L"-" + ToWstringPad(time.wYear, 4) + L"-"
+			+ ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + L"-" + ToWstringPad(time.wSecond) + L".xml";
 		XMLDoc.InsertEndChild(Root);
 		ResumeThread(thread);
 	}
@@ -72,12 +81,12 @@ namespace Log{
 		to->InsertEndChild(assocations);
 	}
 
-	void XMLSink::RecordDetection(IN CONST std::reference_wrapper<Detection>& detection, IN RecordType type){
+	void XMLSink::RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN RecordType type){
 		BeginCriticalSection _{ hGuard };
 
-		EnterCriticalSection(detection.get());
-		Detection copy{ detection.get() };
-		LeaveCriticalSection(detection.get());
+		EnterCriticalSection(*detection);
+		Detection copy{ *detection };
+		LeaveCriticalSection(*detection);
 
 		tinyxml2::XMLElement* detect{ nullptr };
 		if(detections.find(copy.dwID) != detections.end()){
@@ -135,24 +144,24 @@ namespace Log{
 			for(const auto& det : assoc){
 				auto elem{ XMLDoc.NewElement("association") };
 				elem->SetAttribute("strength", static_cast<double>(det.second));
-				elem->SetText(std::to_string(det.first.get().dwID).c_str());
+				elem->SetText(std::to_string(det.first->dwID).c_str());
 				assocations->InsertEndChild(elem);
 			}
 			detect->InsertEndChild(assocations);
 		}
 	}
 
-	void XMLSink::RecordAssociation(IN CONST std::reference_wrapper<Detection>& first,
-									IN CONST std::reference_wrapper<Detection>& second,
+	void XMLSink::RecordAssociation(IN CONST std::shared_ptr<Detection>& first,
+									IN CONST std::shared_ptr<Detection>& second,
 									IN CONST Association& strength){
 		BeginCriticalSection _{ hGuard };
 
-		if(detections.find(first.get().dwID) != detections.end()){
-			AddAssociation(XMLDoc, detections.at(first.get().dwID), second.get().dwID, strength);
+		if(detections.find(first->dwID) != detections.end()){
+			AddAssociation(XMLDoc, detections.at(first->dwID), second->dwID, strength);
 		}
 
-		if(detections.find(second.get().dwID) != detections.end()){
-			AddAssociation(XMLDoc, detections.at(second.get().dwID), first.get().dwID, strength);
+		if(detections.find(second->dwID) != detections.end()){
+			AddAssociation(XMLDoc, detections.at(second->dwID), first->dwID, strength);
 		}
 	}
 

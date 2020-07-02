@@ -19,7 +19,7 @@ std::wstring Hunt::GetName() {
 	return name;
 }
 
-std::vector<std::reference_wrapper<Detection>> Hunt::RunHunt(IN CONST Scope& scope){
+std::vector<std::shared_ptr<Detection>> Hunt::RunHunt(IN CONST Scope& scope){
 	return {};
 }
 

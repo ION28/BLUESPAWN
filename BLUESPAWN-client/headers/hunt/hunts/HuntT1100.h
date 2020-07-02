@@ -26,6 +26,6 @@ namespace Hunts {
 		void AddDirectoryToSearch(const std::wstring& sFileName);
 		void AddFileExtensionToSearch(const std::wstring& sFileExtension);
 
-		virtual std::vector<std::reference_wrapper<Detection>> RunHunt(const Scope& scope);
+		virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope);
 	};
 }

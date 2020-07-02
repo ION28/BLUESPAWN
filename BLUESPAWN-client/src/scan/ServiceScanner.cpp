@@ -7,11 +7,11 @@
 #include "scan/ProcessScanner.h"
 #include "user/bluespawn.h"
 
-std::unordered_map<std::reference_wrapper<Detection>, Association>
+std::unordered_map<std::shared_ptr<Detection>, Association>
 ServiceScanner::GetAssociatedDetections(IN CONST Detection& detection) {
     if(detection.type != DetectionType::ServiceDetection) { return {}; }
 
-    std::unordered_map<std::reference_wrapper<Detection>, Association> detections{};
+    std::unordered_map<std::shared_ptr<Detection>, Association> detections{};
     ServiceDetectionData data{ std::get<ServiceDetectionData>(detection.data) };
 
     if(data.FilePath) {

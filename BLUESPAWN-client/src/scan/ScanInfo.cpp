@@ -31,10 +31,10 @@ volatile std::atomic<DWORD> Detection::IDCounter{ 1 };
 ScanInfo::ScanInfo() : 
 	certainty{ Certainty::None },
 	cAssociativeCertainty{ Certainty::None },
-	associations{ std::make_unique<std::unordered_map<std::reference_wrapper<Detection>, Association>>() },
+	associations{ std::make_unique<std::unordered_map<std::shared_ptr<Detection>, Association>>() },
 	bAssociativeStale{ true }{}
 
-std::unordered_map<std::reference_wrapper<Detection>, Association> ScanInfo::GetAssociations(){
+std::unordered_map<std::shared_ptr<Detection>, Association> ScanInfo::GetAssociations(){
 	EnterCriticalSection(hGuard);
 	auto copy{ *associations };
 	LeaveCriticalSection(hGuard);
@@ -47,7 +47,7 @@ Certainty ScanInfo::GetCertainty(){
 		
 		EnterCriticalSection(hGuard);
 		for(auto& pair : *associations){
-			cAssociativeCertainty = cAssociativeCertainty + (pair.first.get().info.certainty * pair.second);
+			cAssociativeCertainty = cAssociativeCertainty + (pair.first->info.certainty * pair.second);
 		}
 		LeaveCriticalSection(hGuard);
 
@@ -56,7 +56,7 @@ Certainty ScanInfo::GetCertainty(){
 	return certainty + cAssociativeCertainty; 
 };
 
-void ScanInfo::AddAssociation(IN CONST std::reference_wrapper<Detection>& node, IN CONST Association& a){
+void ScanInfo::AddAssociation(IN CONST std::shared_ptr<Detection>& node, IN CONST Association& a){
 	EnterCriticalSection(hGuard);
 	bAssociativeStale = true;
 	if(associations->find(node) == associations->end()){

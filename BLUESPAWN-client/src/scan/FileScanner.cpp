@@ -61,7 +61,7 @@ std::vector<std::wstring> FileScanner::ExtractStrings(IN CONST AllocationWrapper
 
 std::vector<std::wstring> FileScanner::ExtractFilePaths(IN CONST std::vector<std::wstring>& strings){
 	std::vector<std::wstring> filepaths{};
-	std::wregex regex{ L"[a-zA-Z]:([/\\\\][a-zA-Z0-9\\. @_-]+)+" };
+	std::wregex regex{ L"[a-zA-Z]:([/\\\\][a-zA-Z0-9(). @_-]+)+" };
 	for(auto& string : strings){
 		std::wsmatch match{};
 		if(std::regex_search(string, match, regex)){
@@ -76,6 +76,8 @@ std::vector<std::wstring> FileScanner::ExtractFilePaths(IN CONST std::vector<std
 }
 
 void FileScanner::UpdateModules(){
+	BeginCriticalSection _{ hGuard };
+
 	FILETIME time{};
 	GetSystemTimeAsFileTime(&time);
 
@@ -129,18 +131,24 @@ bool FileScanner::PerformQuickScan(IN CONST std::wstring& string){
 	} else return false;
 }
 
-std::unordered_map<std::reference_wrapper<Detection>, Association> FileScanner::GetAssociatedDetections(
+std::unordered_map<std::shared_ptr<Detection>, Association> FileScanner::GetAssociatedDetections(
 	IN CONST Detection& detection){
 	
 	if(detection.type != DetectionType::FileDetection){
 		return {};
 	}
 
-	std::unordered_map<std::reference_wrapper<Detection>, Association> detections{};
+	std::unordered_map<std::shared_ptr<Detection>, Association> detections{};
 
 	auto data{ std::get<FileDetectionData>(detection.data) };
+
 	if(data.FileFound){
 		UpdateModules();
+
+		EnterCriticalSection(hGuard);
+		auto hashes{ this->hashes };
+		auto modules{ this->modules };
+		LeaveCriticalSection(hGuard);
 
 		if(data.SHA256){
 			if(hashes.count(*data.SHA256)){

@@ -16,7 +16,7 @@ class HuntRegister;
               (long) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() }
 
 #define HUNT_INIT()                                              \
-    std::vector<std::reference_wrapper<Detection>> detections{}; \
+    std::vector<std::shared_ptr<Detection>> detections{}; \
     LOG_INFO(1, "Beginning hunt for " << name);
 
 #define HUNT_END()                             \
@@ -112,7 +112,7 @@ public:
      *
      * @return A vector of references to the detections identified.
      */
-	virtual std::vector<std::reference_wrapper<Detection>> RunHunt(
+	virtual std::vector<std::shared_ptr<Detection>> RunHunt(
         IN CONST Scope& scope
     );
 

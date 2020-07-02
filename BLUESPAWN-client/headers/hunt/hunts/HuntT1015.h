@@ -14,12 +14,12 @@ namespace Hunts {
 		
 		std::wstring wsIFEO = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options";
 
-		void HuntT1015::EvaluateRegistry(std::vector<std::reference_wrapper<Detection>>& detections);
-		void HuntT1015::EvaluateFiles(std::vector<std::reference_wrapper<Detection>>& detections);
+		void HuntT1015::EvaluateRegistry(std::vector<std::shared_ptr<Detection>>& detections);
+		void HuntT1015::EvaluateFiles(std::vector<std::shared_ptr<Detection>>& detections);
 	public:
 		HuntT1015();
 
-		virtual std::vector<std::reference_wrapper<Detection>> RunHunt(const Scope& scope) override;
+		virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
 		virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

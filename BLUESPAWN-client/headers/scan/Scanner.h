@@ -9,7 +9,7 @@ class Scanner {
 public:
 
 	/// A static vector of publically accessible scanners
-	static std::vector<Scanner> scanners;
+	static std::vector<std::shared_ptr<Scanner>> scanners;
 
 	/**
 	 * Gets a vector of detections associated with the provided detection
@@ -18,7 +18,7 @@ public:
 	 *
 	 * @return A vector of detections associated with the provided detection
 	 */
-	virtual std::unordered_map<std::reference_wrapper<Detection>, Association> GetAssociatedDetections(
+	virtual std::unordered_map<std::shared_ptr<Detection>, Association> GetAssociatedDetections(
 		IN CONST Detection& detection
 	);
 

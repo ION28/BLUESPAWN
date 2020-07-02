@@ -48,7 +48,7 @@ class Bluespawn {
 		static MitigationRegister mitigationRecord;
 		static Aggressiveness aggressiveness;
 		static DetectionRegister detections;
-		static std::vector<std::unique_ptr<DetectionSink>> detectionSinks;
+		static std::vector<std::shared_ptr<DetectionSink>> detectionSinks;
 		static bool EnablePreScanDetections;
 
 		static ReactionManager reaction;

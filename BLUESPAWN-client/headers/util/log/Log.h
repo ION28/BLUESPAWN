@@ -43,7 +43,7 @@ namespace Log {
 
 	// A vector containing the set of sinks to be used when LOG_ERROR, LOG_WARNING, etc are used.
 	// This vector is updated by the AddSink and RemoveSink functions.
-	extern std::vector<std::unique_ptr<LogSink>> _LogSinks;
+	extern std::vector<std::shared_ptr<LogSink>> _LogSinks;
 
 	// A dummy class to indicate the termination of a log message.
 	class LogTerminator {};
@@ -156,7 +156,7 @@ namespace Log {
 	 * @param levels A vector of the log levels that will be logged to the sink
 	 */
 	void AddSink(
-		IN std::unique_ptr<LogSink>&& sink,
+		IN CONST std::shared_ptr<LogSink>& sink,
 		IN CONST std::vector<std::reference_wrapper<LogLevel>>& levels
 	);
 

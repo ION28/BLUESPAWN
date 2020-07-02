@@ -23,7 +23,7 @@ namespace Hunts {
         web_exts.emplace_back(sFileExtension);
     }
 
-    std::vector<std::reference_wrapper<Detection>> HuntT1100::RunHunt(const Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1100::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
         //PHP regex credit to: https://github.com/emposha/PHP-Shell-Detector

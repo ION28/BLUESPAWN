@@ -19,8 +19,24 @@ void ThreadPool::ThreadFunction(){
 
 			try{
 				function();
+
+				EnterCriticalSection(hGuard);
+				count--;
+				if(count == 0){
+					SetEvent(hEvent);
+				}
+				LeaveCriticalSection(hGuard);
+
 			} catch(std::exception e){
+				EnterCriticalSection(hGuard);
+				count--;
+				if(count == 0){
+					SetEvent(hEvent);
+				}
+				LeaveCriticalSection(hGuard);
+
 				auto functions{ vExceptionHandlers };
+				auto x{ e.what() };
 
 				// Defer handling the exceptions until later
 				EnqueueTask([functions, e](){
@@ -39,8 +55,11 @@ void ThreadPool::ThreadFunction(){
 }
 
 ThreadPool::ThreadPool() :
-	hSemaphore{ CreateSemaphoreW(nullptr, 0, static_cast<LONG>(-1), nullptr) }{
+	hSemaphore{ CreateSemaphoreW(nullptr, 0, LONG_MAX, nullptr) },
+	hEvent{ CreateEventW(nullptr, true, true, nullptr) },
+	active{ true }{
 
+	auto error{ GetLastError() };
 	// https://stackoverflow.com/questions/457577/catching-access-violation-exceptions
 	_set_se_translator([](unsigned int u, EXCEPTION_POINTERS* pExp){
 		std::string error = "Structured Exception: ";
@@ -68,9 +87,12 @@ ThreadPool::~ThreadPool(){
 }
 
 void ThreadPool::EnqueueTask(IN CONST std::function<void()>& function){
+	ResetEvent(hEvent);
+
 	auto lock{ BeginCriticalSection(hGuard) };
 
 	tasks.emplace(function);
+	count++;
 
 	ReleaseSemaphore(hSemaphore, 1, nullptr);
 }
@@ -82,4 +104,20 @@ ThreadPool& ThreadPool::GetInstance(){
 void ThreadPool::AddExceptionHandler(
 	IN CONST std::function<void(const std::exception & e)>& function){
 	vExceptionHandlers.emplace_back(function);
+}
+
+void ThreadPool::Wait() const {
+	while(true){
+		auto status{ WaitForSingleObject(hEvent, INFINITE) };
+		if(status == WAIT_OBJECT_0){
+			EnterCriticalSection(hGuard);
+			if(count == 0){
+				LeaveCriticalSection(hGuard);
+				return;
+			}
+			LeaveCriticalSection(hGuard);
+		} else{
+			throw std::exception{ "Error waiting for threadpool to finish" };
+		}
+	}
 }

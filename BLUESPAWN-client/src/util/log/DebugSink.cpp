@@ -27,14 +27,14 @@ namespace Log{
 		return (bool) dynamic_cast<const DebugSink*>(&sink);
 	}
 
-	void DebugSink::RecordDetection(IN CONST std::reference_wrapper<Detection>& detection, IN RecordType type){
+	void DebugSink::RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN RecordType type){
 		BeginCriticalSection _{ hGuard };
 
 		if(type == RecordType::PreScan && Bluespawn::EnablePreScanDetections || type == RecordType::PostScan){
 
-			EnterCriticalSection(detection.get());
-			Detection copy{ detection.get() };
-			LeaveCriticalSection(detection.get());
+			EnterCriticalSection(*detection);
+			Detection copy{ *detection };
+			LeaveCriticalSection(*detection);
 
 			DETECTION_DEBUG_STREAM(L" Detection Logged at " << FormatWindowsTime(copy.context.DetectionCreatedTime));
 			if(copy.context.note){
@@ -44,9 +44,9 @@ namespace Log{
 				DETECTION_DEBUG_STREAM(L" First Evidence: " << FormatWindowsTime(*copy.context.FirstEvidenceTime));
 			}
 
-			if(detection.get().context.hunts.size()){
+			if(detection->context.hunts.size()){
 				std::wstringstream hunts{};
-				for(auto& hunt : detection.get().context.hunts){
+				for(auto& hunt : detection->context.hunts){
 					hunts << hunt << L", ";
 				}
 				DETECTION_DEBUG_STREAM(L" Associated Hunts: " << hunts.str());
@@ -72,11 +72,11 @@ namespace Log{
 		}
 	}
 
-	void DebugSink::RecordAssociation(IN CONST std::reference_wrapper<Detection>& first,
-									IN CONST std::reference_wrapper<Detection>& second, IN CONST Association& a){
+	void DebugSink::RecordAssociation(IN CONST std::shared_ptr<Detection>& first,
+									IN CONST std::shared_ptr<Detection>& second, IN CONST Association& a){
 		BeginCriticalSection _{ hGuard };
 
-		DEBUG_STREAM(L"[Detection][ID " << first.get().dwID << L"]" << L" Associated with " << second.get().dwID << 
+		DEBUG_STREAM(L"[Detection][ID " << first->dwID << L"]" << L" Associated with " << second->dwID << 
 					 L" with strength " << static_cast<double>(a));
 	}
 }

@@ -52,7 +52,7 @@ namespace Hunts {
         return queryResults;
     }
 
-    std::vector<std::reference_wrapper<Detection>> HuntT1053::RunHunt(const Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1053::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
         auto queryResults = Get4698Events();

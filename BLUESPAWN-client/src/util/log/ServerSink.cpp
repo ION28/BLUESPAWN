@@ -48,7 +48,7 @@ namespace Log {
 		return gpbInfo;
 	}
 
-	std::vector<gpb::FileReactionData> ServerSink::GetFileReactions(const std::vector<std::reference_wrapper<Detection>>& detections) {
+	std::vector<gpb::FileReactionData> ServerSink::GetFileReactions(const std::vector<std::shared_ptr<Detection>>& detections) {
 		std::vector<gpb::FileReactionData> fileDetections;
 
 		for (auto& detection : detections) {
@@ -65,20 +65,20 @@ namespace Log {
 		return fileDetections;
 	}
 
-	std::vector<gpb::RegistryReactionData> ServerSink::GetRegistryReactions(const std::vector<std::reference_wrapper<Detection>>& detections) {
+	std::vector<gpb::RegistryReactionData> ServerSink::GetRegistryReactions(const std::vector<std::shared_ptr<Detection>>& detections) {
 		return std::vector<gpb::RegistryReactionData>();
 	}
 
-	std::vector<gpb::ProcessReactionData> ServerSink::GetProcessReactions(const std::vector<std::reference_wrapper<Detection>>& detections) {
+	std::vector<gpb::ProcessReactionData> ServerSink::GetProcessReactions(const std::vector<std::shared_ptr<Detection>>& detections) {
 		return std::vector<gpb::ProcessReactionData>();
 	}
 
-	std::vector<gpb::ServiceReactionData> ServerSink::GetServiceReactions(const std::vector<std::reference_wrapper<Detection>>& detections) {
+	std::vector<gpb::ServiceReactionData> ServerSink::GetServiceReactions(const std::vector<std::shared_ptr<Detection>>& detections) {
 		return std::vector<gpb::ServiceReactionData>();
 	}
 
 	void ServerSink::LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info, 
-		const std::vector<std::reference_wrapper<Detection>>& detections){
+		const std::vector<std::shared_ptr<Detection>>& detections){
 		if (!level.Enabled())
 			return;
 

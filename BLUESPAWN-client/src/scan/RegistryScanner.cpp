@@ -29,7 +29,7 @@ std::vector<std::wstring> RegistryScanner::ExtractRegistryKeys(IN CONST std::vec
 	return keys;
 }
 
-std::unordered_map<std::reference_wrapper<Detection>, Association> RegistryScanner::GetAssociatedDetections(
+std::unordered_map<std::shared_ptr<Detection>, Association> RegistryScanner::GetAssociatedDetections(
 	IN CONST Detection& detection){
 	if(detection.type != DetectionType::RegistryDetection || detection.DetectionStale){
 		return {};
@@ -40,7 +40,7 @@ std::unordered_map<std::reference_wrapper<Detection>, Association> RegistryScann
 		return {};
 	}
 
-	std::unordered_map<std::reference_wrapper<Detection>, Association> detections{};
+	std::unordered_map<std::shared_ptr<Detection>, Association> detections{};
 
 	if(!data.value){
 		if(Bluespawn::aggressiveness == Aggressiveness::Intensive){

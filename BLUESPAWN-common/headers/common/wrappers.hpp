@@ -21,7 +21,7 @@ public:
 		WrappedObject{ object },
 		BadValue{ BadValue },
 		ReferenceCounter{ nullptr, [object, BadValue, freeFunction](LPVOID memory){
-			if((!BadValue || object != BadValue) && object){ freeFunction(object); }
+			if((!BadValue || BadValue != object) && object){ freeFunction(object); }
 		} }{}
 
 		operator T() const{ return WrappedObject; }
@@ -71,30 +71,33 @@ public:
 	}
 };
 
+
 class CriticalSection {
-	CRITICAL_SECTION section;
-	std::shared_ptr<CRITICAL_SECTION> tracker;
+	PCRITICAL_SECTION section;
+	std::shared_ptr<CRITICAL_SECTION> counter;
 
 public:
-	CriticalSection() :
-		section{ nullptr, 0, 0, nullptr, nullptr, 0 },
-		tracker{ &section, [](PCRITICAL_SECTION section){ DeleteCriticalSection(section); } }{
-		InitializeCriticalSection(&section);
+	CriticalSection() : section{ new CRITICAL_SECTION{} }{
+		InitializeCriticalSection(section);
+		counter = { section, [](PCRITICAL_SECTION section) mutable{
+			DeleteCriticalSection(section); 
+			delete section; } 
+		};
 	}
 
-	operator PCRITICAL_SECTION() const{ return const_cast<LPCRITICAL_SECTION>(&section); }
-	operator CRITICAL_SECTION() const{ return section; }
+	operator LPCRITICAL_SECTION() const { return const_cast<LPCRITICAL_SECTION>(section); }
 };
 
 class BeginCriticalSection {
 	CriticalSection critsec;
-	std::shared_ptr<void> tracker;
 
 public:
 	explicit BeginCriticalSection(const CriticalSection& section) :
-		critsec{ section },
-		tracker{ nullptr, [&](LPVOID nul){ LeaveCriticalSection(critsec); } }{
+		critsec{ section }{
 		::EnterCriticalSection(critsec);
+	}
+	~BeginCriticalSection(){
+		::LeaveCriticalSection(critsec);
 	}
 };
 

@@ -28,10 +28,14 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::PrivilegeEscalation | (DWORD) Tactic::DefenseEvasion;
     }
 
-    bool ScanProcess(DWORD pid, std::vector<std::reference_wrapper<Detection>>& detections) { return false; }
+    bool ScanProcess(DWORD pid, std::vector<std::shared_ptr<Detection>>& detections) { return false; }
 
-    std::vector<std::reference_wrapper<Detection>> HuntT1055::RunHunt(const Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1055::RunHunt(const Scope& scope) {
         HUNT_INIT();
+
+        if(Bluespawn::aggressiveness == Aggressiveness::Cursory){
+            HUNT_END();
+        }
 
         DWORD processes[1024];
         DWORD ProcessCount = 0;

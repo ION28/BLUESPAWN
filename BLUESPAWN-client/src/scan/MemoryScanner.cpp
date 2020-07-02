@@ -12,14 +12,14 @@
 #include "scan/YaraScanner.h"
 #include "user/bluespawn.h"
 
-std::unordered_map<std::reference_wrapper<Detection>, Association>
+std::unordered_map<std::shared_ptr<Detection>, Association>
 MemoryScanner::GetAssociatedDetections(IN CONST Detection& detection) {
     if(detection.type != DetectionType::ProcessDetection || detection.DetectionStale) { return {}; }
 
     ProcessDetectionData data{ std::get<ProcessDetectionData>(detection.data) };
     if(!data.BaseAddress || !data.MemorySize) { return {}; }
 
-    std::unordered_map<std::reference_wrapper<Detection>, Association> detections{};
+    std::unordered_map<std::shared_ptr<Detection>, Association> detections{};
 
     if(data.ImageName) {
         if(data.type == ProcessDetectionType::MaliciousImage) {
