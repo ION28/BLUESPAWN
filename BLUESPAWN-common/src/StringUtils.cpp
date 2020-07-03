@@ -5,6 +5,7 @@
 #include <string>
 #include <codecvt>
 #include <algorithm>
+#include <vector>
 #include <map>
 #include <cmath>
 
@@ -104,3 +105,21 @@ T StringReplace(const T& string, const T& search, const T& replacement){
 
 template std::wstring StringReplace(const std::wstring& string, const std::wstring& search, const std::wstring& replacement);
 template std::string StringReplace(const std::string& string, const std::string& search, const std::string& replacement);
+template bool CompareIgnoreCase(const std::string& in, const std::string& in2);
+
+template<class T>
+std::vector<std::basic_string<T>> SplitString(const std::basic_string<T>& in, const std::basic_string<T>& delimiter){
+	std::vector<std::basic_string<T>> substrs{};
+	for(size_t i = 0; i < in.length();){
+		auto next{ in.find(delimiter, i) };
+		substrs.emplace_back(in.substr(i, next - i));
+		if(next == std::basic_string<T>::npos){
+			return std::move(substrs);
+		}
+		i = next + delimiter.length();
+	}
+	return substrs;
+}
+
+template std::vector<std::wstring> SplitString(const std::wstring& in, const std::wstring& delimiter);
+template std::vector<std::string> SplitString(const std::string& in, const std::string& delimiter);

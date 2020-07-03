@@ -8,6 +8,7 @@
 #include "util/processes/ProcessUtils.h"
 #include "reaction/SuspendProcess.h"
 #include "util/log/Log.h"
+#include "util/processes/ProcessUtils.h"
 
 LINK_FUNCTION(NtResumeProcess, NTDLL.DLL)
 

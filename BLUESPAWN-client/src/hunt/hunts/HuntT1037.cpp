@@ -52,6 +52,16 @@ namespace Hunts{
 		std::vector<std::unique_ptr<Event>> events;
 
 		Registry::GetRegistryEvents(events, HKEY_CURRENT_USER, L"Environment", true, true, false);
+		events.push_back(std::make_unique<FileEvent>(FileSystem::Folder(L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp")));
+		
+		auto userFolders = FileSystem::Folder(L"C:\\Users").GetSubdirectories(1);
+
+		for (auto userFolder : userFolders) {
+			auto folder = FileSystem::Folder(userFolder.GetFolderPath() + L"\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp");
+			if (folder.GetFolderExists()) {
+				events.push_back(std::make_unique<FileEvent>(folder));
+			}
+		}
 
 		return events;
 	}

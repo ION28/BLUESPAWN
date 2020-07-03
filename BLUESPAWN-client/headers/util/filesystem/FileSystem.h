@@ -37,12 +37,12 @@ enum class HashType {
 	SHA256_HASH
 };
 
-namespace FileSystem{
+namespace FileSystem {
 	/**
 	* Function to check if a file path is valid
 	*
 	* @param path A wstring containing the path to check
-	*
+	* 
 	* @return true if the path points to a valid file, false otherwise
 	*/
 	bool CheckFileExists(const std::wstring& path);
@@ -51,12 +51,12 @@ namespace FileSystem{
 	* Function to find a file named name.exe in a registry dependent search path
 	*
 	* @param name A wstring containing the name of the file for which to search
-	*
+	* 
 	* @return A wstring containing the full path to the file if found, or std::nullopt
-	*	if the file wasn't found.
+	*	if the file wasn't found. 
 	*/
 	std::optional<std::wstring> SearchPathExecutable(const std::wstring& name);
-
+	
 	struct FileAttribs {
 		std::wstring extension;
 	};
@@ -287,7 +287,7 @@ namespace FileSystem{
 		* Function to get the permissions a user or group has on a file
 		*
 		* @param owner An Owner object to check permissions for
-		* @return An ACCESS_MASK object
+		* @return An ACCESS_MASK object 
 		*/
 		ACCESS_MASK GetAccessPermissions(const Permissions::Owner& owner);
 
@@ -384,7 +384,7 @@ namespace FileSystem{
 
 		/*Getter for FolderPath field*/
 		std::wstring GetFolderPath() const;
-
+		
 		/**
 		* Function to move to the next file
 		*

@@ -25,6 +25,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="headers\common\DynamicLinker.h" />
+    <ClInclude Include="headers\common\Internals.h" />
     <ClInclude Include="headers\common\Promise.h" />
     <ClInclude Include="headers\common\StringUtils.h" />
     <ClInclude Include="headers\common\ThreadPool.h" />

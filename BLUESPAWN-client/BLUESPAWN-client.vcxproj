@@ -25,22 +25,39 @@
     <ClInclude Include="headers\hunt\HuntInfo.h" />
     <ClInclude Include="headers\hunt\HuntRegister.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1004.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1013.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1015.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1031.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1035.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1036.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1037.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1050.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1053.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1055.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1060.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1068.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1089.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1099.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1100.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1101.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1103.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1122.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1128.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1131.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1136.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1138.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1182.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1183.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1198.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1484.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1028-WFW.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateM1054-WSC.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV71769.h" />
+    <ClInclude Include="headers\mitigation\mitigations\MitigateV73511.h" />
+    <ClInclude Include="headers\monitor\EventListener.h" />
     <ClInclude Include="headers\reaction\CarveMemory.h" />
+    <ClInclude Include="headers\reaction\DeleteFile.h" />
+    <ClInclude Include="headers\reaction\QuarantineFile.h" />
     <ClInclude Include="headers\reaction\Reaction.h" />
     <ClInclude Include="headers\reaction\RemoveValue.h" />
     <ClInclude Include="headers\reaction\SuspendProcess.h" />
@@ -151,6 +168,12 @@
     </ClInclude>
     <ClInclude Include="headers\util\processes\Analyzer.h" />
     <ClInclude Include="headers\reaction\ReactionManager.h" />
+    <ClInclude Include="headers\reaction\Detections.h" />
+    <ClInclude Include="headers\reaction\Log.h" />
+    <ClInclude Include="headers\reaction\Reaction.h" />
+    <ClInclude Include="headers\util\processes\ParseCobalt.h" />
+    <ClInclude Include="headers\util\processes\CheckLolbin.h" />
+    <ClInclude Include="headers\util\processes\CommandParser.h" />
     <ClInclude Include="headers\util\processes\PERemover.h" />
     <ClInclude Include="headers\util\processes\ProcessChecker.h" />
     <ClInclude Include="headers\util\processes\ProcessUtils.h" />
@@ -160,23 +183,40 @@
     <ClCompile Include="src\hunt\Hunt.cpp" />
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1004.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1013.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1015.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1031.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1035.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1036.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1037.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1050.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1053.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1055.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1060.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1068.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1089.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1099.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1100.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1101.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1103.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1122.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1128.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1131.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1136.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1138.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1182.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1183.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1198.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1484.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1028-WFW.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateM1054-WSC.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV71769.cpp" />
+    <ClCompile Include="src\mitigation\mitigations\MitigateV73511.cpp" />
+    <ClCompile Include="src\monitor\EventListener.cpp" />
     <ClCompile Include="src\reaction\CarveMemory.cpp" />
     <ClCompile Include="src\scan\Detection.cpp" />
+    <ClCompile Include="src\reaction\DeleteFile.cpp" />
+    <ClCompile Include="src\reaction\QuarantineFile.cpp" />
     <ClCompile Include="src\reaction\RemoveValue.cpp" />
     <ClCompile Include="src\reaction\SuspendProcess.cpp" />
     <ClCompile Include="src\hunt\RegistryHunt.cpp" />
@@ -279,6 +319,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\util\processes\Analyzer.cpp" />
+    <ClCompile Include="src\reaction\ReactLog.cpp" />
+    <ClCompile Include="src\reaction\Reaction.cpp" />
+    <ClCompile Include="src\util\processes\ParseCobalt.cpp" />
+    <ClCompile Include="src\util\processes\CheckLolbin.cpp" />
+    <ClCompile Include="src\util\processes\CommandParser.cpp" />
     <ClCompile Include="src\reaction\ReactionManager.cpp" />
     <ClCompile Include="src\util\processes\PERemover.cpp" />
     <ClCompile Include="src\util\processes\ProcessUtils.cpp" />
@@ -300,7 +345,18 @@
     <None Include="resources\indicators" />
     <None Include="resources\severe" />
     <None Include="resources\severe2" />
+    <None Include="resources\SIP" />
+    <None Include="resources\TrustProviders" />
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="BLUESPAWN-client.exe.manifest" />
+  </ItemGroup>
+  <PropertyGroup>
+    <GenerateManifest>false</GenerateManifest>
+    <EmbedManifest>
+    </EmbedManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <BuildLog>
       <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
@@ -311,10 +367,20 @@
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreaded</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MultiThreadedDebug</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebug</RuntimeLibrary>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Async</ExceptionHandling>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Adding manifest to BLUESPAWN-client.exe</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{159B2E72-9553-4E17-9BEC-CB92FCA8D0B0}</ProjectGuid>

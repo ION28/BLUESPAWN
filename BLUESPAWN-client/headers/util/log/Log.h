@@ -9,6 +9,7 @@
 #include "LogLevel.h"
 #include "Loggable.h"
 #include "LogSink.h"
+#include "common/Utils.h"
 
 // A generic macro to log a message with a given set of sinks at a given level
 #define LOG(LEVEL, ...) \
@@ -23,6 +24,13 @@
    LOG_ERROR("System Error Code 0x" << std::uppercase << std::hex << ERROR_ID << ": " << Log::FormatErrorMessage(ERROR_ID));
 
 // A macro that evaluates to a string describing the code in GetLastError()
+#define SYSTEM_ERROR \
+	"System Error Code 0x" << std::uppercase << std::hex << GetLastError() << ": " << Log::FormatErrorMessage(GetLastError())
+
+// A macro to print out system error information
+#define LOG_SYSTEM_ERROR(ERROR_ID) \
+   LOG(Log::_LogCurrentSinks, Log::LogLevel::LogError, "System Error Code 0x" << std::uppercase << std::hex << ERROR_ID << ": " << Log::FormatErrorMessage(ERROR_ID) << Log::endlog);
+
 #define SYSTEM_ERROR \
 	"System Error Code 0x" << std::uppercase << std::hex << GetLastError() << ": " << Log::FormatErrorMessage(GetLastError())
 

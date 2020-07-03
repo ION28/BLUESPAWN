@@ -113,27 +113,26 @@ public:
 
 	AllocationWrapper(LPVOID memory, SIZE_T size, AllocationFunction AllocationType = STACK_ALLOC) :
 		pointer{ reinterpret_cast<PCHAR>(memory) },
-		Memory{
-			size && memory ? std::optional<std::shared_ptr<char[]>>{
-{
-reinterpret_cast<PCHAR>(memory), [AllocationType](char* value){
-	if(AllocationType == CPP_ALLOC)
-		delete value;
-	else if(AllocationType == CPP_ARRAY_ALLOC)
-		delete[] value;
-	else if(AllocationType == MALLOC)
-		free(value);
-	else if(AllocationType == HEAP_ALLOC)
-		HeapFree(GetProcessHeap(), 0, value);
-	else if(AllocationType == VIRTUAL_ALLOC)
-		VirtualFree(value, 0, MEM_RELEASE);
-	else if(AllocationType == GLOBAL_ALLOC)
-		GlobalFree(value);
-	else if(AllocationType == LOCAL_ALLOC)
-		LocalFree(value);
-}
-}} : std::nullopt
-	},
+		Memory{ 
+			size && memory ? std::optional<std::shared_ptr<char[]>>{{
+				reinterpret_cast<PCHAR>(memory), [AllocationType](char* value){
+					if(AllocationType == CPP_ALLOC)
+						delete value;
+					else if(AllocationType == CPP_ARRAY_ALLOC)
+						delete[] value;
+					else if(AllocationType == MALLOC)
+						free(value);
+					else if(AllocationType == HEAP_ALLOC)
+						HeapFree(GetProcessHeap(), 0, value);
+					else if(AllocationType == VIRTUAL_ALLOC)
+						VirtualFree(value, 0, MEM_RELEASE);
+					else if(AllocationType == GLOBAL_ALLOC)
+						GlobalFree(value);
+					else if(AllocationType == LOCAL_ALLOC)
+						LocalFree(value);
+				}
+			}} : std::nullopt
+	    },
 		AllocationSize{ size }{}
 
 CHAR operator[](int i) const{
@@ -214,10 +213,18 @@ bool SetByte(SIZE_T offset, char value){
 	return false;
 }
 
-template<class T = LPVOID>
-T* GetAsPointer(){
-	return reinterpret_cast<T*>(pointer);
-}
+	bool SetByte(SIZE_T offset, char value){
+		if(offset < AllocationSize){
+			pointer[offset] = value;
+			return true;
+		}
+		return false;
+	}
+
+	template<class T = LPVOID>
+	T* GetAsPointer(){ 
+		return reinterpret_cast<T*>(pointer); 
+	}
 };
 
 template<class T = CHAR>

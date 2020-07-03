@@ -6,7 +6,7 @@
 namespace Hunts {
 
 	/**
-	 * HuntT1004 examines AppInit DLLs related registry keys that can be used for
+	 * HuntT1103 examines AppInit DLLs related registry keys that can be used for
 	 * persistence and privilege escalation.
 	 */
 	class HuntT1103 : public Hunt {

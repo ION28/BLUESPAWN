@@ -18,29 +18,28 @@ namespace Hunts {
     std::vector<std::shared_ptr<Detection>> HuntT1101::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
-        Registry::RegistryKey key{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
-        if(key.ValueExists(L"Security Packages")) {
-            for(auto package : *key.GetValue<std::vector<std::wstring>>(L"Security Packages")) {
-                if(okSecPackages.find(package) == okSecPackages.end()) {
-                    CREATE_DETECTION(
-                        Certainty::Moderate,
-                        RegistryDetectionData{ key, RegistryValue{ key, L"Security Packages", std::move(package) },
-                                               RegistryDetectionType::FileReference });
-                }
-            }
-        }
+		auto lsa = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
+		auto lsa2 = RegistryKey(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig");
 
-        key = { HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig" };
-        if(key.ValueExists(L"Security Packages")) {
-            for(auto package : *key.GetValue<std::vector<std::wstring>>(L"Security Packages")) {
-                if(okSecPackages.find(package) == okSecPackages.end()) {
-                    CREATE_DETECTION(
-                        Certainty::Moderate,
-                        RegistryDetectionData{ key, RegistryValue{ key, L"Security Packages", std::move(package) },
-                                               RegistryDetectionType::FileReference });
-                }
-            }
-        }
+		for (auto key : { lsa, lsa2 }) {
+			auto Packages = key.GetValue<std::vector<std::wstring>>(L"Security Packages");
+			if (Packages) {
+				for (auto Package : Packages.value()) {
+					if (Package != L"\"\"") {
+						auto filepath = FileSystem::SearchPathExecutable(Package + L".dll");
+
+						if (filepath) {
+							FileSystem::File file = FileSystem::File(filepath.value());
+							if (file.GetFileExists() && !file.GetFileSigned()) {
+								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ key, L"Security Packages", key.GetValue<std::vector<std::wstring>>(L"Security Packages").value() }));
+								reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+								detections += 2;
+							}
+						}
+					}
+				}
+			}
+		}
 
         HUNT_END();
     }

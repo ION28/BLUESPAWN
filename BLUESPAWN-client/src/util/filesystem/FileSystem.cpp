@@ -108,23 +108,24 @@ namespace FileSystem{
 			hCatInfo = CryptCATAdminEnumCatalogFromHash(hCatAdmin, pbHash, dwHashLength, 0, &hCatInfo);
 		}
 	end:
-		if(hCatInfo != NULL) CryptCATAdminReleaseCatalogContext(&hCatAdmin, &hCatInfo, 0);
-		if(hCatAdmin != NULL) CryptCATAdminReleaseContext(&hCatAdmin, 0);
-		if(pbHash != NULL) HeapFree(GetProcessHeap(), 0, pbHash);
+		if (hCatInfo != NULL) CryptCATAdminReleaseCatalogContext(&hCatAdmin, &hCatInfo, 0);
+		if (hCatAdmin != NULL) CryptCATAdminReleaseContext(&hCatAdmin, 0);
+		if (pbHash != NULL) HeapFree(GetProcessHeap(), 0, pbHash);
 		return catalogfile;
 	}
 
-	bool File::GetFileInSystemCatalogs() const{
+
+	bool File::GetFileInSystemCatalogs() const {
 		return GetCatalog(hFile) != std::nullopt;
 	}
 
-	std::optional<std::wstring> File::CalculateHashType(HashType sHashType) const{
-		if(!bFileExists){
+	std::optional<std::wstring> File::CalculateHashType(HashType sHashType) const {
+		if (!bFileExists) {
 			LOG_ERROR("Can't get hash of " << FilePath << ". File doesn't exist");
 			SetLastError(ERROR_FILE_NOT_FOUND);
 			return std::nullopt;
 		}
-		if(!bReadAccess){
+		if (!bReadAccess) {
 			LOG_ERROR("Can't get hash of " << FilePath << ". Insufficient permissions.");
 			SetLastError(ERROR_ACCESS_DENIED);
 			return std::nullopt;
@@ -134,71 +135,74 @@ namespace FileSystem{
 
 		// Get handle to the crypto provider
 		HCRYPTPROV hProv{};
-		if(!CryptAcquireContext(&hProv,
-								nullptr,
-								nullptr,
-								PROV_RSA_AES,
-								CRYPT_VERIFYCONTEXT)){
+		if (!CryptAcquireContext(&hProv,
+			nullptr,
+			nullptr,
+			PROV_RSA_AES,
+			CRYPT_VERIFYCONTEXT)) {
 			LOG_ERROR("CryptAcquireContext failed: " << GetLastError() << " while getting hash of " << FilePath);
 			return std::nullopt;
 		}
-		auto provider{ GenericWrapper<HCRYPTPROV>(hProv, [hProv](auto v){ CryptReleaseContext(hProv, 0); }) };
-
+		auto provider{ GenericWrapper<HCRYPTPROV>(hProv, [hProv](auto v) { CryptReleaseContext(hProv, 0); }) };
+		
 		HCRYPTHASH hHash = 0;
 		auto rgbHash = AllocationWrapper{ nullptr, 0 };
 		DWORD cbHash = 0;
-		if(sHashType == HashType::SHA1_HASH){
+		if (sHashType == HashType::SHA1_HASH) {
 			rgbHash = AllocationWrapper{ new BYTE[SHA1LEN], SHA1LEN, AllocationWrapper::CPP_ARRAY_ALLOC };
 			cbHash = SHA1LEN;
-			if(!CryptCreateHash(hProv, CALG_SHA1, 0, 0, &hHash)){
+			if (!CryptCreateHash(hProv, CALG_SHA1, 0, 0, &hHash)) {
 				LOG_ERROR("CryptCreateHash failed: " << GetLastError() << " while getting hash of " << FilePath);
 				return std::nullopt;
 			}
-		} else if(sHashType == HashType::SHA256_HASH){
+		}
+		else if (sHashType == HashType::SHA256_HASH) {
 			rgbHash = AllocationWrapper{ new BYTE[SHA256LEN], SHA256LEN, AllocationWrapper::CPP_ARRAY_ALLOC };
 			cbHash = SHA256LEN;
-			if(!CryptCreateHash(hProv, CALG_SHA_256, 0, 0, &hHash)){
+			if (!CryptCreateHash(hProv, CALG_SHA_256, 0, 0, &hHash)) {
 				LOG_ERROR("CryptCreateHash failed: " << GetLastError() << " while getting hash of " << FilePath);
 				LOG_SYSTEM_ERROR(GetLastError());
 				return std::nullopt;
 			}
-		} else{
+		}
+		else {
 			rgbHash = AllocationWrapper{ new BYTE[MD5LEN], MD5LEN, AllocationWrapper::CPP_ARRAY_ALLOC };
 			cbHash = MD5LEN;
-			if(!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash)){
+			if (!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash)) {
 				LOG_ERROR("CryptCreateHash failed: " << GetLastError() << " while getting hash of " << FilePath);
 				return std::nullopt;
 			}
 		}
 		auto HashData{ GenericWrapper<HCRYPTHASH>(hHash, CryptDestroyHash) };
-
+		
 		DWORD cbRead{};
 		std::wstring digits{ L"0123456789abcdef" };
 		std::vector<BYTE> file(BUFSIZE);
 		bool bResult{ false };
 		while((bResult = ReadFile(hFile, file.data(), file.size(), &cbRead, nullptr)) && cbRead){
-			if(!CryptHashData(hHash, file.data(), cbRead, 0)){
+			if (!CryptHashData(hHash, file.data(), cbRead, 0)) {
 				LOG_ERROR("CryptHashData failed: " << GetLastError() << " while getting hash of " << FilePath);
 				return std::nullopt;
 			}
 		}
 		SetFilePointer(0);
 
-		if(!bResult){
+		if (!bResult) {
 			LOG_ERROR("ReadFile failed: " << GetLastError() << " while getting hash of " << FilePath);
 			return std::nullopt;
 		}
 
 		std::wstring buffer{};
 		std::wstring rgbDigits{ L"0123456789abcdef" };
-		if(CryptGetHashParam(hHash, HP_HASHVAL, reinterpret_cast<PBYTE>(LPVOID(rgbHash)), &cbHash, 0)){
-			for(DWORD i = 0; i < cbHash; i++){
+		if (CryptGetHashParam(hHash, HP_HASHVAL, reinterpret_cast<PBYTE>(LPVOID(rgbHash)), &cbHash, 0)) {
+			for (DWORD i = 0; i < cbHash; i++) {
 				buffer += rgbDigits[(rgbHash[i] >> 4) & 0xf];
 				buffer += rgbDigits[rgbHash[i] & 0xf];
 			}
 			LOG_VERBOSE(3, "Successfully got hash of " << FilePath);
 			return buffer;
-		} else{
+		}
+		else {
 			LOG_ERROR("CryptGetHashParam failed: " << GetLastError() << " while getting hash of " << FilePath);
 		}
 
@@ -535,6 +539,9 @@ namespace FileSystem{
 		if(!GetFileSigned()){
 			return std::nullopt;
 		}
+		
+		auto signer{ reinterpret_cast<PCMSG_SIGNER_INFO>(info.data())->Issuer };
+		DWORD dwSize = CertNameToStrW(X509_ASN_ENCODING, &signer, CERT_SIMPLE_NAME_STR, nullptr, 0);
 
 		if(File::GetFileInSystemCatalogs()){
 			auto catalog{ GetCatalog(hFile) };
@@ -698,14 +705,14 @@ namespace FileSystem{
 		return FilePath;
 	}
 
-	std::optional<Permissions::Owner> File::GetFileOwner() const{
-		if(!bFileExists){
+	std::optional<Permissions::Owner> File::GetFileOwner() const {
+		if (!bFileExists) {
 			LOG_ERROR("Can't get owner of nonexistent file " << FilePath);
 			return std::nullopt;
 		}
 		PSID psOwnerSID = NULL;
 		PISECURITY_DESCRIPTOR pDesc = NULL;
-		if(GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psOwnerSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS){
+		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psOwnerSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR *>(&pDesc)) != ERROR_SUCCESS) {
 			LOG_ERROR("Error getting file owner for file " << FilePath << ". Error: " << GetLastError());
 			return std::nullopt;
 		}
@@ -715,18 +722,18 @@ namespace FileSystem{
 		return Permissions::Owner(secDesc);
 	}
 
-	bool File::SetFileOwner(const Permissions::Owner& owner){
-		if(!bFileExists){
+	bool File::SetFileOwner(const Permissions::Owner& owner) {
+		if (!bFileExists) {
 			LOG_ERROR("Can't set owner of nonexistent file " << FilePath);
 			SetLastError(ERROR_FILE_NOT_FOUND);
 			return false;
 		}
-		if(!this->bWriteAccess){
+		if (!this->bWriteAccess) {
 			LOG_ERROR("Can't write owner of file " << FilePath << ". Lack permissions");
 			SetLastError(ERROR_ACCESS_DENIED);
 			return false;
 		}
-		if(SetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS){
+		if (SetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
 			LOG_ERROR("Error setting the file owner for file " << FilePath << " to " << owner << ". Error: " << GetLastError());
 			return false;
 		}
@@ -734,15 +741,15 @@ namespace FileSystem{
 		return true;
 	}
 
-	ACCESS_MASK File::GetAccessPermissions(const Permissions::Owner& owner){
-		if(!bFileExists){
+	ACCESS_MASK File::GetAccessPermissions(const Permissions::Owner& owner) {
+		if (!bFileExists) {
 			LOG_ERROR("Can't get permissions of nonexistent file " << FilePath);
 			SetLastError(ERROR_FILE_NOT_FOUND);
 			return 0;
 		}
 		PACL paDACL = NULL;
 		PISECURITY_DESCRIPTOR pDesc = NULL;
-		if(GetSecurityInfo(hFile, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS){
+		if (GetSecurityInfo(hFile, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
 			LOG_ERROR("Error getting permissions on file " << FilePath << " for owner " << owner << ". Error: " << GetLastError());
 			return 0;
 		}
@@ -755,29 +762,29 @@ namespace FileSystem{
 		return Permissions::GetOwnerRightsFromACL(owner, secDesc);
 	}
 
-	ACCESS_MASK File::GetEveryonePermissions(){
+	ACCESS_MASK File::GetEveryonePermissions() {
 		Permissions::Owner everyone(L"Everyone");
 		return this->GetAccessPermissions(everyone);
 	}
 
-	bool File::TakeOwnership(){
+	bool File::TakeOwnership() {
 		std::optional<Permissions::Owner> BluespawnOwner = Permissions::GetProcessOwner();
-		if(BluespawnOwner == std::nullopt){
+		if (BluespawnOwner == std::nullopt) {
 			return false;
 		}
 		return this->SetFileOwner(*BluespawnOwner);
 	}
 
-	bool File::GrantPermissions(const Permissions::Owner& owner, const ACCESS_MASK& amAccess){
+	bool File::GrantPermissions(const Permissions::Owner& owner, const ACCESS_MASK& amAccess) {
 		return Permissions::UpdateObjectACL(FilePath, SE_FILE_OBJECT, owner, amAccess);
 	}
 
-	bool File::DenyPermissions(const Permissions::Owner& owner, const ACCESS_MASK& amAccess){
+	bool File::DenyPermissions(const Permissions::Owner& owner, const ACCESS_MASK& amAccess) {
 		return Permissions::UpdateObjectACL(FilePath, SE_FILE_OBJECT, owner, amAccess, true);
 	}
 
-	bool File::Quarantine(){
-		if(!bFileExists){
+	bool File::Quarantine() {
+		if (!bFileExists) {
 			LOG_ERROR("Can't quarantine file " << FilePath << ". File doesn't exist");
 			SetLastError(ERROR_FILE_NOT_FOUND);
 			return false;
@@ -787,52 +794,55 @@ namespace FileSystem{
 		return DenyPermissions(Permissions::Owner(L"Everyone"), amEveryoneDeniedAccess);
 	}
 
-	std::optional<FILETIME> File::GetCreationTime() const{
-		if(!bFileExists){
+	std::optional<FILETIME> File::GetCreationTime() const {
+		if (!bFileExists) {
 			LOG_ERROR("Can't get creation time of " << FilePath << ", file doesn't exist");
 			SetLastError(ERROR_FILE_NOT_FOUND);
 			return std::nullopt;
 		}
 		FILETIME fReturnInfo;
-		if(GetFileTime(hFile, &fReturnInfo, nullptr, nullptr)){
+		if (GetFileTime(hFile, &fReturnInfo, nullptr, nullptr)) {
 			return fReturnInfo;
-		} else{
+		}
+		else {
 			LOG_ERROR("Error getting creation time of " << FilePath << ". (Error: " << GetLastError() << ")");
 			return std::nullopt;
 		}
 	}
 
-	std::optional<FILETIME> File::GetModifiedTime() const{
-		if(!bFileExists){
+	std::optional<FILETIME> File::GetModifiedTime() const {
+		if (!bFileExists) {
 			LOG_ERROR("Can't get last modified time of " << FilePath << ", file doesn't exist");
 			SetLastError(ERROR_FILE_NOT_FOUND);
 			return std::nullopt;
 		}
 		FILETIME fReturnInfo;
-		if(GetFileTime(hFile, nullptr, nullptr, &fReturnInfo)){
+		if (GetFileTime(hFile, nullptr, nullptr, &fReturnInfo)) {
 			return fReturnInfo;
-		} else{
+		}
+		else {
 			LOG_ERROR("Error getting last modified time of " << FilePath << ". (Error: " << GetLastError() << ")");
 			return std::nullopt;
 		}
 	}
 
-	std::optional<FILETIME> File::GetAccessTime() const{
-		if(!bFileExists){
+	std::optional<FILETIME> File::GetAccessTime() const {
+		if (!bFileExists) {
 			LOG_ERROR("Can't get last access time of " << FilePath << ", file doesn't exist");
 			SetLastError(ERROR_FILE_NOT_FOUND);
 			return std::nullopt;
 		}
 		FILETIME fReturnInfo;
-		if(GetFileTime(hFile, nullptr, &fReturnInfo, nullptr)){
+		if (GetFileTime(hFile, nullptr, &fReturnInfo, nullptr)) {
 			return fReturnInfo;
-		} else{
+		}
+		else {
 			LOG_ERROR("Error getting last access time of " << FilePath << ". (Error: " << GetLastError() << ")");
 			return std::nullopt;
 		}
 	}
 
-	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr }{
+	Folder::Folder(const std::wstring& path) : hCurFile{ nullptr } {
 		FolderPath = ExpandEnvStringsW(path);
 		std::wstring searchName = FolderPath;
 		searchName += L"\\*";
@@ -880,6 +890,14 @@ namespace FileSystem{
 			bIsFile = true;
 		}
 		return true;
+	}
+	
+	bool Folder::GetFolderExists() const {
+		return bFolderExists;
+	}
+
+	bool Folder::GetCurIsFile() const {
+		return bIsFile;
 	}
 
 	bool Folder::GetFolderExists() const{
@@ -1007,14 +1025,14 @@ namespace FileSystem{
 		return toRet;
 	}
 
-	std::optional<Permissions::Owner> Folder::GetFolderOwner() const{
-		if(!bFolderExists){
+	std::optional<Permissions::Owner> Folder::GetFolderOwner() const {
+		if (!bFolderExists) {
 			LOG_ERROR("Can't get owner of nonexistent folder " << FolderPath);
 			return std::nullopt;
 		}
 		PSID psOwnerSID = NULL;
 		PISECURITY_DESCRIPTOR pDesc = NULL;
-		if(GetNamedSecurityInfoW((LPWSTR) FolderPath.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psOwnerSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS){
+		if (GetNamedSecurityInfoW((LPWSTR) FolderPath.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &psOwnerSID, nullptr, nullptr, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
 			LOG_ERROR("Error getting file owner for folder " << FolderPath << ". Error: " << GetLastError());
 			return std::nullopt;
 		}
@@ -1024,12 +1042,12 @@ namespace FileSystem{
 		return Permissions::Owner(secDesc);
 	}
 
-	bool Folder::SetFolderOwner(const Permissions::Owner& owner){
-		if(!bFolderExists){
+	bool Folder::SetFolderOwner(const Permissions::Owner& owner) {
+		if (!bFolderExists) {
 			LOG_ERROR("Can't write owner of folder " << FolderPath << ". Folder doesn't exist");
 			return false;
 		}
-		if(SetNamedSecurityInfoW((LPWSTR) FolderPath.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS){
+		if (SetNamedSecurityInfoW((LPWSTR)FolderPath.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, owner.GetSID(), nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
 			LOG_ERROR("Error setting the folder owner for folder " << FolderPath << " to " << owner << ". Error: " << GetLastError());
 			return false;
 		}
@@ -1037,14 +1055,14 @@ namespace FileSystem{
 		return true;
 	}
 
-	ACCESS_MASK Folder::GetAccessPermissions(const Permissions::Owner& owner){
-		if(!bFolderExists){
+	ACCESS_MASK Folder::GetAccessPermissions(const Permissions::Owner& owner) {
+		if (!bFolderExists) {
 			LOG_ERROR("Can't get permissions of nonexistent folder " << FolderPath);
 			return 0;
 		}
 		PACL paDACL = NULL;
 		PISECURITY_DESCRIPTOR pDesc = NULL;
-		if(GetNamedSecurityInfoW((LPWSTR) FolderPath.c_str(), SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS){
+		if (GetNamedSecurityInfoW((LPWSTR) FolderPath.c_str(), SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, reinterpret_cast<PSECURITY_DESCRIPTOR*>(&pDesc)) != ERROR_SUCCESS) {
 			LOG_ERROR("Error getting permissions on file " << FolderPath << " for owner " << owner << ". Error: " << GetLastError());
 			return 0;
 		}
@@ -1056,14 +1074,14 @@ namespace FileSystem{
 		return Permissions::GetOwnerRightsFromACL(owner, secDesc);
 	}
 
-	ACCESS_MASK Folder::GetEveryonePermissions(){
+	ACCESS_MASK Folder::GetEveryonePermissions() {
 		Permissions::Owner everyone(L"Everyone");
 		return this->GetAccessPermissions(everyone);
 	}
 
-	bool Folder::TakeOwnership(){
+	bool Folder::TakeOwnership() {
 		std::optional<Permissions::Owner> BluespawnOwner = Permissions::GetProcessOwner();
-		if(BluespawnOwner == std::nullopt){
+		if (BluespawnOwner == std::nullopt) {
 			return false;
 		}
 		return this->SetFolderOwner(*BluespawnOwner);

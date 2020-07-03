@@ -1,0 +1,57 @@
+name: Deploy Project Website to bluespawn.cloud
+on:
+  push:
+    branches:
+    - master
+    - develop
+  pull_request:
+    branches:
+    - master
+    - develop
+
+jobs:
+  build:
+    name: Update Project site
+    runs-on: ubuntu-latest
+    steps:
+    - name: SSH into server and update
+      uses: appleboy/ssh-action@master
+      with:
+        host: bluespawn.cloud
+        username: ubuntu
+        key: ${{ secrets.PRIVATE_KEY }}
+        port: 22
+        script: |
+          cd ~/BLUESPAWN
+          git fetch --all
+          git checkout ${{ github.ref }}
+          git pull origin ${{ github.ref }}
+          source ~/venv/bin/activate
+          cd docs
+          pip install -r requirements.txt
+          python3 manage.py makemigrations
+          python3 manage.py migrate
+          sudo service uwsgi restart
+          sudo /etc/init.d/nginx restart
+      if: github.event_name == 'push'
+
+    - name: SSH into server and update
+      uses: appleboy/ssh-action@master
+      with:
+        host: bluespawn.cloud
+        username: ubuntu
+        key: ${{ secrets.PRIVATE_KEY }}
+        port: 22
+        script: |
+          cd ~/BLUESPAWN
+          git fetch --all
+          git checkout ${{ github.head_ref }}
+          git pull origin ${{ github.head_ref }}
+          source ~/venv/bin/activate
+          cd docs
+          pip install -r requirements.txt
+          python3 manage.py makemigrations
+          python3 manage.py migrate
+          sudo service uwsgi restart
+          sudo /etc/init.d/nginx restart
+      if: github.event_name == 'pull_request'

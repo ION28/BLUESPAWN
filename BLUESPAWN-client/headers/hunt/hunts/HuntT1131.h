@@ -10,9 +10,6 @@ namespace Hunts {
 	 * hunt for persistence.
 	 */
 	class HuntT1131 : public Hunt {
-	private:
-		std::unordered_set<std::wstring> okAuthPackages = { L"msv1_0", L"SshdPinAuthLsa" };
-		std::unordered_set<std::wstring> okNotifPackages = { L"scecli" };
 	public:
 		HuntT1131();
 

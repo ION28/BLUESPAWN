@@ -33,6 +33,8 @@ namespace Hunts {
                 },
                 true, false) };
 
+            // TODO: Fix data type of detections
+
             for(const auto& detection : values) {
                 if(detection.wValueName == L"GlobalFlag") {
                     CREATE_DETECTION_WITH_CONTEXT(

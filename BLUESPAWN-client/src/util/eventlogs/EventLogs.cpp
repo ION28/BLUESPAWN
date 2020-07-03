@@ -1,6 +1,7 @@
 #include "util/eventlogs/EventLogs.h"
 #include "common/StringUtils.h"
 #include "util/log/Log.h"
+#include "common/Utils.h"
 
 #include <string>
 
@@ -145,7 +146,7 @@ namespace EventLogs {
 
 		pItem.SetEventID(std::stoul(*eventIDStr));
 		pItem.SetEventRecordID(std::stoul(*eventRecordIDStr));
-		pItem.SetTimeCreated(*timeCreated);
+		pItem.SetTimeCreated(FormatWindowsTime(*timeCreated));
 		pItem.SetChannel(*channel);
 		pItem.SetXML(*rawXML);
 

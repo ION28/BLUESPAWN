@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <common\Utils.h>
 
 namespace Log{
 

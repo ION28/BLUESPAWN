@@ -54,13 +54,13 @@ typedef struct _RTL_USER_PROCESS_PARAMETERS_ {
 } RTL_USER_PROCESS_PARAMETERS_, * PRTL_USER_PROCESS_PARAMETERS_;
 
 bool HookIsOkay(const Hook& hook){
-	// Once Detours is set up, this will become significantly more complicated...
-	return false;
+    // Once Detours is set up, this will become significantly more complicated...
+    return false;
 }
 
 std::vector<LPVOID> GetExecutableNonImageSections(DWORD pid){
-	// Make use of APIs in PE Sieve...
-	return {};
+    // Make use of APIs in PE Sieve...
+    return {};
 }
 
 std::wstring GetProcessCommandline(const HandleWrapper& process){
@@ -91,21 +91,21 @@ std::wstring GetProcessCommandline(const HandleWrapper& process){
             cmdline.SetByte(dwLength + 1, 0);
 
             return std::wstring{ reinterpret_cast<PWCHAR>(LPVOID(cmdline)) };
-		} else {
-			LOG_ERROR("Unable to query information from process with PID " << GetProcessId(process) << " to find its command line (error " << status << ")");
+        } else{
+            LOG_ERROR("Unable to query information from process with PID " << GetProcessId(process) << " to find its command line (error " << status << ")");
             return {};
-		}
-	} else {
-		LOG_ERROR("Unable to get command line of invalid process");
-		return {};
-	}
+        }
+    } else{
+        LOG_ERROR("Unable to get command line of invalid process");
+        return {};
+    }
 }
 
 std::wstring GetProcessCommandline(DWORD dwPID){
     HandleWrapper process{ OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, false, dwPID) };
     if(process){
         return GetProcessCommandline(process);
-    } else {
+    } else{
         LOG_ERROR("Unable to open process with PID " << dwPID << " to find its command line (error " << GetLastError() << ")");
         return {};
     }

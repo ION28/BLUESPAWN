@@ -96,4 +96,20 @@ namespace Hunts {
 
         HUNT_END();
     }
+
+    std::vector<std::unique_ptr<Event>> HuntT1100::GetMonitoringEvents() {
+		std::vector<std::unique_ptr<Event>> events;
+
+		for (auto dir : web_directories) {
+			auto folder = FileSystem::Folder{ dir };
+			if (folder.GetFolderExists()) {
+				events.push_back(std::make_unique<FileEvent>(folder));
+				for (auto subdir : folder.GetSubdirectories()) {
+					events.push_back(std::make_unique<FileEvent>(subdir));
+				}
+			}
+		}
+
+		return events;
+	}
 }   // namespace Hunts

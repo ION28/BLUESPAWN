@@ -1,0 +1,53 @@
+server {
+
+	root /var/www/bluespawn.cloud/html;
+	index index.html;
+
+	server_name bluespawn.cloud www.bluespawn.cloud;
+	
+	location / {
+		# django running in uWSGI
+		uwsgi_pass unix:///run/uwsgi/app/django/socket;
+		include uwsgi_params;
+		uwsgi_read_timeout 300s;
+		client_max_body_size 5M;
+	}
+
+	location /static/ {
+		alias /home/ubuntu/BLUESPAWN/docs/BLUESPAWN/static/;
+	}
+
+	location /media/ {
+		alias /home/ubuntu/BLUESPAWN/docs/media/;
+	}
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/bluespawn.cloud/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/bluespawn.cloud/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+
+}
+server {
+    if ($host = www.bluespawn.cloud) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    if ($host = bluespawn.cloud) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+	listen 80;
+	listen [::]:80;
+
+	server_name bluespawn.cloud www.bluespawn.cloud;
+    return 404; # managed by Certbot
+
+
+
+
+}

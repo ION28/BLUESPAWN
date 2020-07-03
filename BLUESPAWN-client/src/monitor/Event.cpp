@@ -1,6 +1,8 @@
 #include "monitor/Event.h"
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
+#include "monitor/EventListener.h"
+#include "user/bluespawn.h"
 
 Event::Event(EventType type) : type(type) {}
 
@@ -52,104 +54,6 @@ bool EventLogEvent::operator==(const Event& e) const {
 	} else return false;
 }
 
-/************************
-***   RegistryEvent   ***
-*************************/
-void RegistryEvent::DispatchRegistryThread(){
-	std::optional<RegistryEvent>* RegistryEvents = new std::optional<RegistryEvent>[MAXIMUM_WAIT_OBJECTS - 1]{};
-	RegistryEvent::hListener = CreateEventW(nullptr, false, false, nullptr);
-	RegistryEvents[0] = *RegistryEvent::subscribe;
-	RegistryEvent::subscribe = std::nullopt;
-	RegistryEventThreadArgs ThreadArgs = { *RegistryEvent::hListener, RegistryEvents };
-	HandleWrapper thread = CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(RegistryEvent::RegistryEventThreadFunction), &ThreadArgs, 0, nullptr);
-	WaitForSingleObject(RegistryEvent::hSubscribed, INFINITE);
-}
-
-void RegistryEvent::RegistryEventThreadFunction(RegistryEventThreadArgs* arguments){
-	RegistryEventThreadArgs args = *arguments;
-	SetEvent(RegistryEvent::hSubscribed);
-	int errors = 0;
-	while(true){
-		int count = args.Notify ? 1 : 0;
-		int idx = 0;
-		while(idx < MAXIMUM_WAIT_OBJECTS){
-			if(args.Events[idx++]){
-				count++;
-			}
-		}
-
-		if(count <= 1){
-			if(args.Notify && hListener == args.Notify){
-				hListener = std::nullopt;
-			}
-			delete[] args.Events;
-			return;
-		}
-
-		HANDLE* handles = new HANDLE[count];
-		int index = 0;
-		if(args.Notify){
-			handles[index++] = args.Notify;
-		}
-		int valid_idx = 0;
-		for(int i = 0; i < count; i++){
-			if(args.Events[i]){
-				handles[index++] = args.Events[i]->GetEvent();
-				if(i != valid_idx){
-					args.Events[valid_idx] = *args.Events[i];
-					args.Events[i] = std::nullopt;
-				}
-				valid_idx++;
-			}
-		}
-		
-		auto result = WaitForMultipleObjects(count, handles, false, INFINITE);
-		if(result == WAIT_OBJECT_0){
-			if(RegistryEvent::subscribe){
-				if(count == MAXIMUM_WAIT_OBJECTS){
-					DispatchRegistryThread();
-				} else {
-					args.Events[count - 1] = *RegistryEvent::subscribe;
-					RegistryEvent::subscribe = std::nullopt;
-					SetEvent(RegistryEvent::hSubscribed);
-				}
-			}
-			errors = 0;
-		} else if(result > WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + MAXIMUM_WAIT_OBJECTS) {
-			auto index = result - WAIT_OBJECT_0;
-
-			if(args.Events[index - 1]){
-				args.Events[index - 1]->RunCallbacks();
-				if(ERROR_SUCCESS != RegNotifyChangeKeyValue(args.Events[index - 1]->key, args.Events[index - 1]->WatchSubkeys,
-					REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_THREAD_AGNOSTIC, args.Events[index - 1]->hEvent, true)){
-					LOG_ERROR("Unable to reset listener on key " << args.Events[index - 1]->key << ". Unable to continue to monitor changes to this key.");
-					args.Events[index - 1] = std::nullopt;
-				}
-			}
-			errors = 0;
-		} else if(result == WAIT_ABANDONED_0){
-			args.Notify = INVALID_HANDLE_VALUE;
-		} else if(result > WAIT_ABANDONED_0 && result < WAIT_ABANDONED_0 + MAXIMUM_WAIT_OBJECTS) {
-			LOG_WARNING("Registry listener on " << args.Events[index - 1]->key << " appears to have been abandoned");
-			auto index = result - WAIT_ABANDONED_0;
-			args.Events[index - 1] = std::nullopt;
-			errors = 0;
-		} else {
-			errors += 1;
-			LOG_ERROR("Error " << GetLastError() << " occured in the registry monitor function");
-			if(errors > 5){
-				LOG_ERROR(5 << " consecutive errors occured in the registry monitor function; exiting (" << count << " monitor events discarded)");
-				return;
-			}
-		}
-	}
-}
-
-HandleWrapper RegistryEvent::hMutex = CreateMutexW(nullptr, false, nullptr);
-HandleWrapper RegistryEvent::hSubscribed = CreateEventW(nullptr, false, false, nullptr);
-std::optional<HandleWrapper> RegistryEvent::hListener = std::nullopt;
-std::optional<RegistryEvent> RegistryEvent::subscribe = std::nullopt;
-
 RegistryEvent::RegistryEvent(const Registry::RegistryKey& key, bool WatchSubkeys) :
 	Event(EventType::Registry),
 	key{ key },
@@ -158,32 +62,104 @@ RegistryEvent::RegistryEvent(const Registry::RegistryKey& key, bool WatchSubkeys
 
 bool RegistryEvent::Subscribe(){
 	LOG_VERBOSE(1, L"Subscribing to Registry Key " << key.ToString());
-	auto status = RegNotifyChangeKeyValue(key, WatchSubkeys, REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_THREAD_AGNOSTIC, hEvent, true);
-	if(status == ERROR_SUCCESS){
-		status = WaitForSingleObject(RegistryEvent::hMutex, INFINITE);
-		if(status == STATUS_WAIT_0){
-			RegistryEvent::subscribe = *this;
-			if(RegistryEvent::hListener){
-				SetEvent(*RegistryEvent::hListener);
-				WaitForSingleObject(RegistryEvent::hSubscribed, INFINITE);
-			} else {
-				DispatchRegistryThread();
-			}
-			ReleaseMutex(RegistryEvent::hMutex);
-		}
+	auto& manager{ EventListener::GetInstance() };
+
+	auto keypath{ key.GetName() };
+	auto status{ RegNotifyChangeKeyValue(key, WatchSubkeys, REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_THREAD_AGNOSTIC, hEvent, true) };
+	if(ERROR_SUCCESS != status){
+		LOG_ERROR("Failed to subscribe to changes to " << key << " (Error " << status << ")");
+		return false;
 	}
-	return status == ERROR_SUCCESS;
+
+	// Make class members locals so they can be captured
+	auto key{ this->key };
+	auto WatchSubkeys{ this->WatchSubkeys };
+	auto hEvent{ this->hEvent };
+
+	auto subscription = manager.Subscribe(hEvent, {
+		[key, WatchSubkeys, hEvent](){
+			auto status{ RegNotifyChangeKeyValue(key, WatchSubkeys, REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_THREAD_AGNOSTIC, hEvent, true) };
+			auto name{ key.GetName() };
+			if(ERROR_SUCCESS != status){
+				LOG_ERROR("Failed to resubscribe to changes to " << key << " (Error " << status << ")");
+			}
+		},
+		std::bind(&RegistryEvent::RunCallbacks, this)
+    });
+
+	if(!subscription){
+		LOG_ERROR("Failed to register subscription for changes to " << key);
+		return false;
+	}
+
+	return true;
 }
 
 bool RegistryEvent::operator==(const Event& e) const {
 	if(e.type == EventType::Registry && dynamic_cast<const RegistryEvent*>(&e)){
 		auto evt = dynamic_cast<const RegistryEvent*>(&e);
-		return evt->key == key && evt->WatchSubkeys == WatchSubkeys;
+		return evt->key.GetName() == key.GetName() && evt->WatchSubkeys == WatchSubkeys;
 	} else return false;
 }
 
 const HandleWrapper& RegistryEvent::GetEvent() const {
 	return hEvent;
+}
+
+const Registry::RegistryKey& RegistryEvent::GetKey() const{
+	return key;
+}
+
+FileEvent::FileEvent(const FileSystem::Folder& directory) :
+	Event(EventType::FileSystem),
+	directory{ directory },
+	hEvent{ nullptr }{}
+
+bool FileEvent::Subscribe(){
+	LOG_VERBOSE(1, L"Subscribing to File " << directory.GetFolderPath());
+
+	auto& manager{ EventListener::GetInstance() };
+
+	hEvent = GenericWrapper<HANDLE>{ FindFirstChangeNotificationW(directory.GetFolderPath().c_str(), false, 0x17F), FindCloseChangeNotification };
+	if(!hEvent){
+		LOG_ERROR("Failed to resubscribe to changes to " << directory.GetFolderPath() << " (Error " << GetLastError() << ")");
+		return false;
+	}
+
+	// Make local copies to be captured in the lambda
+	auto hEvent{ this->hEvent };
+	auto directory{ this->directory };
+
+	auto subscription = manager.Subscribe(hEvent, {
+		[directory, hEvent](){
+			auto status{ FindNextChangeNotification(hEvent) };
+			if(!status){
+				LOG_ERROR("Failed to resubscribe to changes to " << directory.GetFolderPath() << " (Error " << GetLastError() << ")");
+			}
+		},
+		std::bind(&FileEvent::RunCallbacks, this)
+	});
+	if(!subscription){
+		LOG_ERROR("Failed to register subscription for changes to " << directory.GetFolderPath());
+		return false;
+	}
+
+	return true;
+}
+
+bool FileEvent::operator==(const Event& e) const {
+	if(e.type == EventType::FileSystem && dynamic_cast<const FileEvent*>(&e)){
+		auto evt = dynamic_cast<const FileEvent*>(&e);
+		return evt->GetFolder().GetFolderPath() == directory.GetFolderPath();
+	} else return false;
+}
+
+const GenericWrapper<HANDLE>& FileEvent::GetEvent() const {
+	return hEvent;
+}
+
+const FileSystem::Folder& FileEvent::GetFolder() const {
+	return directory;
 }
 
 namespace Registry {

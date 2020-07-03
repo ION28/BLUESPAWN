@@ -25,16 +25,10 @@ namespace Mitigations {
 	bool MitigateM1042WSH::MitigationIsEnforced(SecurityLevel level) {
 		LOG_INFO(1, "Checking for presence of " << name);
 
-		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows Script Host\\Settings" };
-		std::wstring value = L"Enabled";
-
-		if (!key.ValueExists(value)) {
-			LOG_VERBOSE(1, L"Value for " << value << L" does not exist.");
-			return false;
-		}
-
-		if(key.GetValue<DWORD>(value) != 0){
-			LOG_VERBOSE(1, L"Value for " << value << L" is not set to 0.");
+		for (auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows Script Host\\Settings", {
+			{ L"Enabled", 0, true, CheckDwordEqual },
+		})) {
+			LOG_VERBOSE(1, L"Value for Enabled does not exist or is not set to 0.");
 			return false;
 		}
 
@@ -43,12 +37,16 @@ namespace Mitigations {
 	}
 
 	bool MitigateM1042WSH::EnforceMitigation(SecurityLevel level) {
-		auto key = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows Script Host\\Settings" };
-		std::wstring value = L"Enabled";
-		DWORD data = 0;
+		for (auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows Script Host\\Settings", {
+			{ L"Enabled", 0, true, CheckDwordEqual },
+		})) {
+			LOG_VERBOSE(1, L"Attempting to set Enabled to 0.");
+			if (!detection.key.SetValue<DWORD>(L"Enabled", 0)) {
+				return false;
+			}
+		}
 
-		LOG_VERBOSE(1, L"Attempting to set " << value << L" to 0.");
-		return key.SetValue<DWORD>(value, data);
+		return true;
 	}
 
 	bool MitigateM1042WSH::MitigationApplies(){

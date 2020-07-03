@@ -9,46 +9,92 @@
 using namespace Registry;
 
 namespace Hunts {
-    HuntT1131::HuntT1131() : Hunt(L"T1131 - Authentication Package") {
-        dwCategoriesAffected = (DWORD) Category::Configurations;
-        dwSourcesInvolved = (DWORD) DataSource::Registry;
-        dwTacticsUsed = (DWORD) Tactic::Persistence;
-    }
+	HuntT1131::HuntT1131() : Hunt(L"T1131 - Authentication Package") {
+		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
+		dwCategoriesAffected = (DWORD) Category::Configurations;
+		dwSourcesInvolved = (DWORD) DataSource::Registry;
+		dwTacticsUsed = (DWORD) Tactic::Persistence;
+	}
 
-    std::vector<std::shared_ptr<Detection>> HuntT1131::RunHunt(const Scope& scope) {
-        HUNT_INIT();
+	int HuntT1131::ScanCursory(const Scope& scope, Reaction reaction) {
+		LOG_INFO(L"Hunting for " << name << L" at level Cursory");
+		reaction.BeginHunt(GET_INFO());
 
-        Registry::RegistryKey key{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
-        if(key.ValueExists(L"Authentication Packages")) {
-            for(auto package : *key.GetValue<std::vector<std::wstring>>(L"Authentication Packages")) {
-                if(okAuthPackages.find(package) == okAuthPackages.end()) {
-                    CREATE_DETECTION(Certainty::Moderate,
-                                     RegistryDetectionData{
-                                         key, RegistryValue{ key, L"Authentication Packages", std::move(package) },
-                                         RegistryDetectionType::FileReference });
-                }
-            }
-        }
-        if(key.ValueExists(L"Notification Packages")) {
-            for(auto package : *key.GetValue<std::vector<std::wstring>>(L"Notification Packages")) {
-                if(okNotifPackages.find(package) == okNotifPackages.end()) {
-                    CREATE_DETECTION(
-                        Certainty::Moderate,
-                        RegistryDetectionData{ key, RegistryValue{ key, L"Notification Packages", std::move(package) },
-                                               RegistryDetectionType::FileReference });
-                }
-            }
-        }
+		int detections = 0;
 
-        HUNT_END();
-    }
+		// LSA Configuration
+		auto lsa = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
 
-    std::vector<std::unique_ptr<Event>> HuntT1131::GetMonitoringEvents() {
-        std::vector<std::unique_ptr<Event>> events;
+		for (auto PackageGroup : { L"Authentication Packages", L"Notification Packages" }) {
+			auto Packages = lsa.GetValue<std::vector<std::wstring>>(PackageGroup);
+			if (Packages) {
+				for (auto Package : Packages.value()) {
+					if (Package != L"\"\"") {
+						auto filepath = FileSystem::SearchPathExecutable(Package + L".dll");
 
-        events.push_back(std::make_unique<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\"
-                                                                                          L"Control\\Lsa" }));
+						if (filepath) {
+							FileSystem::File file = FileSystem::File(filepath.value());
+							if (file.GetFileExists() && !file.GetFileSigned()) {
+								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ lsa, PackageGroup, lsa.GetValue<std::vector<std::wstring>>(PackageGroup).value() }));
+								reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+								detections += 2;
+							}
+						}
+					}
+				}
+			}
+		}
 
-        return events;
-    }
-}   // namespace Hunts
+		// LSA Extensions Configuration
+		auto lsaext = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\LsaExtensionConfig" };
+
+		for (auto subkeyName : lsaext.EnumerateSubkeyNames()) {
+			if (subkeyName == L"Interfaces") {
+				for (auto subkey : RegistryKey{ lsaext, L"Interfaces" }.EnumerateSubkeys()) {
+					auto ext = subkey.GetValue<std::wstring>(L"Extension");
+					if (ext) {
+						auto filepath = FileSystem::SearchPathExecutable(ext.value());
+						if (filepath) {
+							FileSystem::File file = FileSystem::File(filepath.value());
+							if (file.GetFileExists() && !file.GetFileSigned()) {
+								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ subkey, L"Extension", subkey.GetValue<std::wstring>(L"Extension").value() }));
+								reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+								detections += 2;
+							}
+						}
+					}
+				}
+			}
+			else {
+				auto subkey = RegistryKey{ lsaext, subkeyName };
+				auto exts = subkey.GetValue<std::vector<std::wstring>>(L"Extensions");
+				if (exts) {
+					for (auto ext : exts.value()) {
+						auto filepath = FileSystem::SearchPathExecutable(ext);
+						if (filepath) {
+							FileSystem::File file = FileSystem::File(filepath.value());
+							if (file.GetFileExists() && !file.GetFileSigned()) {
+								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ subkey, L"Extensions", subkey.GetValue<std::wstring>(L"Extensions").value() }));
+								reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
+								detections += 2;
+							}
+						}
+					}
+				}
+			}
+		}
+
+
+		reaction.EndHunt();
+		return detections;
+	}
+
+	std::vector<std::shared_ptr<Event>> HuntT1131::GetMonitoringEvents() {
+		std::vector<std::shared_ptr<Event>> events;
+
+		events.push_back(std::make_unique<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" }));
+		events.push_back(std::make_unique<RegistryEvent>(RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\LsaExtensionConfig" }));
+
+		return events;
+	}
+}

@@ -41,8 +41,9 @@ class Bluespawn {
 
 		void AddReaction(std::unique_ptr<Reaction>&& reaction);
 		void EnableMode(BluespawnMode mode, int argument = 0);
-
 		void Run();
+		
+		void check_correct_arch();
 
 		static HuntRegister huntRecord;
 		static MitigationRegister mitigationRecord;
