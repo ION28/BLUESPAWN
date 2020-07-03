@@ -98,7 +98,7 @@ public:
 			throw std::exception("Waiting for value failed");
 		}
 
-		return value;
+		return members->value;
 	}
 
 	/**
@@ -192,7 +192,7 @@ public:
 	 * @return True if the promise has been invalidated; false otherwise.
 	 */
 	bool Invalidate(){
-		if(!guaranteed){
+		if(guaranteed){
 			throw std::exception("Invalidating a guaranteed promise");
 		}
 

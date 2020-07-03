@@ -134,6 +134,7 @@ namespace Log{
 		for(const auto& entry : copy.Serialize()){
 			auto elem{ XMLDoc.NewElement("property") };
 			elem->SetAttribute("name", WidestringToString(entry.first).c_str());
+			elem->SetText(WidestringToString(entry.second).c_str());
 			data->InsertEndChild(elem);
 		}
 		detect->InsertEndChild(data);

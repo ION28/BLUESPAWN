@@ -36,7 +36,6 @@ void ThreadPool::ThreadFunction(){
 				LeaveCriticalSection(hGuard);
 
 				auto functions{ vExceptionHandlers };
-				auto x{ e.what() };
 
 				// Defer handling the exceptions until later
 				EnqueueTask([functions, e](){
