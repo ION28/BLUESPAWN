@@ -93,19 +93,6 @@ class ScanInfo {
 	friend class Scanner;
 	friend class Detection;
 
-	/**
-	 * Adds an association between this node and the given node with the given strength. Note that
-	 * this only adds the association one way; node->AddAssociation(*this) must be called separately
-	 * for the association to be bidirectional (as all associations should be).
-	 *
-	 * @param node The node to add an association to. 
-	 * @param strength The strength of the association between the two nodes
-	 */
-	void AddAssociation(
-		IN CONST std::shared_ptr<Detection>& node, 
-		IN CONST Association& strength
-	);
-
 public:
 
 	/**
@@ -154,4 +141,17 @@ public:
 	 * @return hGuard
 	 */
 	operator LPCRITICAL_SECTION() const;
+
+	/**
+	 * Adds an association between this node and the given node with the given strength. Note that
+	 * this only adds the association one way; node->AddAssociation(*this) must be called separately
+	 * for the association to be bidirectional (as all associations should be).
+	 *
+	 * @param node The node to add an association to.
+	 * @param strength The strength of the association between the two nodes
+	 */
+	void AddAssociation(
+		IN CONST std::shared_ptr<Detection>& node,
+		IN CONST Association& strength
+	);
 };

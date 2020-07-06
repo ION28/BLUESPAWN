@@ -163,7 +163,7 @@ const FileSystem::Folder& FileEvent::GetFolder() const {
 }
 
 namespace Registry {
-	void GetRegistryEvents(IN std::vector<std::unique_ptr<Event>>& dest, IN HKEY hkHive, IN CONST std::wstring& path, 
+	void GetRegistryEvents(OUT std::vector<std::unique_ptr<Event>>& dest, IN HKEY hkHive, IN CONST std::wstring& path, 
 						   IN bool WatchWow64 OPTIONAL, IN bool WatchUsers OPTIONAL, IN bool WatchSubkeys OPTIONAL){
 		std::unordered_set<RegistryKey> vKeys{ RegistryKey{ hkHive, path } };
 		if(WatchWow64){

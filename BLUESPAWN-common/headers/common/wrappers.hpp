@@ -135,83 +135,75 @@ public:
 	    },
 		AllocationSize{ size }{}
 
-CHAR operator[](int i) const{
-	return Memory && i < AllocationSize ? pointer[i] : 0;
-}
-
-operator bool() const{
-	return Memory.has_value();
-}
-
-operator LPVOID() const{
-	return pointer;
-}
-
-DWORD GetSize() const{
-	return Memory.has_value() ? AllocationSize : 0;
-}
-
-template<class T>
-std::optional<T> operator*() const{
-	return Dereference();
-}
-
-template<class T>
-std::optional<T> Dereference() const{
-	if(AllocationSize < sizeof(T) || !Memory.has_value()){
-		return std::nullopt;
-	} else{
-		return *reinterpret_cast<T*>(pointer);
+	CHAR& operator[](int i) const{
+		return pointer[i];
 	}
-}
 
-std::optional<std::wstring> ReadWString() const{
-	if(Memory.has_value()){
-		SIZE_T size = wcsnlen(reinterpret_cast<PWCHAR>(pointer), AllocationSize / 2);
-		PWCHAR buffer = new WCHAR[size + 1];
-		CopyMemory(buffer, pointer, size * 2);
-		buffer[size] = 0;
-		auto str = std::wstring{ buffer };
-		delete[] buffer;
-		return str;
-	} else return std::nullopt;
-}
-
-std::optional<std::string> ReadString() const{
-	if(Memory.has_value()){
-		SIZE_T size = strnlen(reinterpret_cast<PCHAR>(pointer), AllocationSize);
-		PCHAR buffer = new CHAR[size + 1];
-		CopyMemory(buffer, pointer, size);
-		buffer[size] = 0;
-		auto str = std::string{ buffer };
-		delete[] buffer;
-		return str;
-	} else return std::nullopt;
-}
-
-bool CompareMemory(const AllocationWrapper& wrapper) const{
-	if(!wrapper && !Memory.has_value()){
-		return true;
-	} else if(!wrapper || !Memory.has_value()){
-		return false;
-	} else if(wrapper.AllocationSize == AllocationSize){
-		return RtlEqualMemory(wrapper.pointer, pointer, AllocationSize);
-	} else{
-		return false;
+	operator bool() const{
+		return Memory.has_value();
 	}
-}
 
-bool operator==(const AllocationWrapper& wrapper) const{
-	return CompareMemory(wrapper);
-}
-
-bool SetByte(SIZE_T offset, char value){
-	if(offset < AllocationSize){
-		pointer[offset] = value;
-		return true;
+	operator LPVOID() const{
+		return pointer;
 	}
-	return false;
-}
+
+	DWORD GetSize() const{
+		return Memory.has_value() ? AllocationSize : 0;
+	}
+
+	template<class T>
+	std::optional<T> operator*() const{
+		return Dereference();
+	}
+
+	template<class T>
+	std::optional<T> Dereference() const{
+		if(AllocationSize < sizeof(T) || !Memory.has_value()){
+			return std::nullopt;
+		} else{
+			return *reinterpret_cast<T*>(pointer);
+		}
+	}
+
+	std::optional<std::wstring> ReadWString() const{
+		if(Memory.has_value()){
+			SIZE_T size = wcsnlen(reinterpret_cast<PWCHAR>(pointer), AllocationSize / 2);
+			PWCHAR buffer = new WCHAR[size + 1];
+			CopyMemory(buffer, pointer, size * 2);
+			buffer[size] = 0;
+			auto str = std::wstring{ buffer };
+			delete[] buffer;
+			return str;
+		} else return std::nullopt;
+	}
+
+	std::optional<std::string> ReadString() const{
+		if(Memory.has_value()){
+			SIZE_T size = strnlen(reinterpret_cast<PCHAR>(pointer), AllocationSize);
+			PCHAR buffer = new CHAR[size + 1];
+			CopyMemory(buffer, pointer, size);
+			buffer[size] = 0;
+			auto str = std::string{ buffer };
+			delete[] buffer;
+			return str;
+		} else return std::nullopt;
+	}
+
+	bool CompareMemory(const AllocationWrapper& wrapper) const{
+		if(!wrapper && !Memory.has_value()){
+			return true;
+		} else if(!wrapper || !Memory.has_value()){
+			return false;
+		} else if(wrapper.AllocationSize == AllocationSize){
+			return RtlEqualMemory(wrapper.pointer, pointer, AllocationSize);
+		} else{
+			return false;
+		}
+	}
+
+	bool operator==(const AllocationWrapper& wrapper) const{
+		return CompareMemory(wrapper);
+	}
 
 	bool SetByte(SIZE_T offset, char value){
 		if(offset < AllocationSize){

@@ -136,7 +136,7 @@ namespace Registry {
 	 * @param WatchSubkeys Indicates whether all events generated should be triggered when any subkey is modified
 	 */
 	void GetRegistryEvents(
-		IN std::vector<std::unique_ptr<Event>>& dest,
+		OUT std::vector<std::unique_ptr<Event>>& dest,
 		IN HKEY hkHive, 
 		IN CONST std::wstring& path, 
 		IN bool WatchWow64 = true OPTIONAL, 

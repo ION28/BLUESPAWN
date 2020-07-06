@@ -27,13 +27,6 @@
 #define SYSTEM_ERROR \
 	"System Error Code 0x" << std::uppercase << std::hex << GetLastError() << ": " << Log::FormatErrorMessage(GetLastError())
 
-// A macro to print out system error information
-#define LOG_SYSTEM_ERROR(ERROR_ID) \
-   LOG(Log::_LogCurrentSinks, Log::LogLevel::LogError, "System Error Code 0x" << std::uppercase << std::hex << ERROR_ID << ": " << Log::FormatErrorMessage(ERROR_ID) << Log::endlog);
-
-#define SYSTEM_ERROR \
-	"System Error Code 0x" << std::uppercase << std::hex << GetLastError() << ": " << Log::FormatErrorMessage(GetLastError())
-
 // A macro to log a warning in the set of sinks specified by AddSink and RemoveSink
 #define LOG_WARNING(...) \
    LOG(Log::LogLevel::LogWarn, __VA_ARGS__ << Log::endlog)

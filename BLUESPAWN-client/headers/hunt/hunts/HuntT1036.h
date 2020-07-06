@@ -1,7 +1,6 @@
 #pragma once
+
 #include "../Hunt.h"
-#include "reaction/Reaction.h"
-#include "reaction/Log.h"
 
 namespace Hunts {
 
@@ -15,8 +14,6 @@ namespace Hunts {
 	 */
 	class HuntT1036 : public Hunt {
 	private:
-		std::vector<std::wstring> susExts = { L".bat", L".cmd", L".exe", L".dll", L".js", L".jse",
-					L".lnk", L".ps1", L".sct", L".vb", L".vbe", L".vbs", L".vbscript", L".hta" };
 
 		// Credit: https://twitter.com/mattifestation/status/1172520995472756737/photo/1
 		std::vector<std::wstring> writableFolders = {
@@ -41,7 +38,7 @@ namespace Hunts {
 	public:
 		HuntT1036();
 
-		virtual int ScanCursory(const Scope& scope, Reaction reaction) override;
-		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
+		virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
+		virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

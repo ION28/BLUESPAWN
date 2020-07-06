@@ -168,9 +168,6 @@
     </ClInclude>
     <ClInclude Include="headers\util\processes\Analyzer.h" />
     <ClInclude Include="headers\reaction\ReactionManager.h" />
-    <ClInclude Include="headers\reaction\Detections.h" />
-    <ClInclude Include="headers\reaction\Log.h" />
-    <ClInclude Include="headers\reaction\Reaction.h" />
     <ClInclude Include="headers\util\processes\ParseCobalt.h" />
     <ClInclude Include="headers\util\processes\CheckLolbin.h" />
     <ClInclude Include="headers\util\processes\CommandParser.h" />

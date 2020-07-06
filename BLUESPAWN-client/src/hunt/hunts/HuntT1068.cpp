@@ -1,74 +1,67 @@
 #include "hunt/hunts/HuntT1068.h"
 
-#include "util/log/Log.h"
+#include <regex>
+
 #include "util/configurations/Registry.h"
 #include "util/filesystem/FileSystem.h"
+#include "util/log/Log.h"
 
-#include <regex>
+#include "user/bluespawn.h"
 
 using namespace Registry;
 
 namespace Hunts {
 
-	HuntT1068::HuntT1068() : Hunt(L"T1068 - Exploitation for Privilege Escalation") {
-		dwSupportedScans = (DWORD) Aggressiveness::Cursory;
-		dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Files;
-		dwSourcesInvolved = (DWORD) DataSource::Registry | (DWORD) DataSource::FileSystem;
-		dwTacticsUsed = (DWORD) Tactic::PrivilegeEscalation;
-	}
+    HuntT1068::HuntT1068() : Hunt(L"T1068 - Exploitation for Privilege Escalation") {
+        dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Files;
+        dwSourcesInvolved = (DWORD) DataSource::Registry | (DWORD) DataSource::FileSystem;
+        dwTacticsUsed = (DWORD) Tactic::PrivilegeEscalation;
+    }
 
-	int HuntT1068::HuntCVE20201048(Reaction reaction) {
-		int detections = 0;
+    std::vector<std::shared_ptr<Detection>> HuntT1068::RunHunt(const Scope& scope) {
+        HUNT_INIT();
 
-		auto ports = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Ports", true };
-		auto printers = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Print\\Printers", true };
+        RegistryKey ports{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Ports", true };
+        RegistryKey printers{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Print\\Printers",
+                              true };
 
-		for (auto printer : printers.EnumerateSubkeys()) {
-			if (printer.ValueExists(L"Port")) {
-				auto filepath = FileSystem::File{ printer.GetValue<std::wstring>(L"Port").value() };
+        for(auto printer : printers.EnumerateSubkeys()) {
+            if(printer.ValueExists(L"Port")) {
+                auto value{ RegistryValue::Create(printer, L"Port") };
+                FileSystem::File filepath{ value->ToString() };
 
-				// Regex ensures the file is an actual drive and not, say, a COM port
-				if (std::regex_match(filepath.GetFilePath(), std::wregex(L"([a-zA-z]{1}:\\\\)(.*)")) && filepath.GetFileExists() && filepath.HasReadAccess()) {
-					reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ printer, L"Port", printer.GetValue<std::wstring>(L"Port").value() }));
-					reaction.FileIdentified(std::make_shared<FILE_DETECTION>(filepath));
-					detections += 2;
-				}
-			}
-		}
+                // Regex ensures the file is an actual drive and not, say, a COM port
+                if(std::regex_match(filepath.GetFilePath(), std::wregex(L"([a-zA-z]{1}:\\\\)(.*)")) &&
+                   filepath.GetFileExists() && filepath.HasReadAccess()) {
+                    CREATE_DETECTION(Certainty::Strong,
+                                     RegistryDetectionData{ *value, RegistryDetectionType::FileReference });
+                }
+            }
+        }
 
-		for (auto value : ports.EnumerateValues()) {
-			auto filepath = FileSystem::File{ value };
+        for(auto value : ports.EnumerateValues()) {
+            FileSystem::File filepath{ value };
 
-			// Regex ensures the file is an actual drive and not, say, a COM port
-			if (std::regex_match(filepath.GetFilePath(), std::wregex(L"([a-zA-z]{1}:\\\\)(.*)")) && filepath.GetFileExists() && filepath.HasReadAccess()) {
-				reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ ports, value, ports.GetValue<std::wstring>(value).value() }));
-				reaction.FileIdentified(std::make_shared<FILE_DETECTION>(filepath));
-				detections += 2;
-			}
-		}
+            // Regex ensures the file is an actual drive and not, say, a COM port
+            if(std::regex_match(filepath.GetFilePath(), std::wregex(L"([a-zA-z]{1}:\\\\)(.*)")) &&
+               filepath.GetFileExists() && filepath.HasReadAccess()) {
+                CREATE_DETECTION(Certainty::Strong, RegistryDetectionData{ *RegistryValue::Create(ports, value),
+                                                                           RegistryDetectionType::Unknown });
+                CREATE_DETECTION(Certainty::Strong, FileDetectionData{ filepath });
+            }
+        }
 
-		return detections;
-	}
+        HUNT_END();
+    }
 
-	int HuntT1068::ScanCursory(const Scope& scope, Reaction reaction){
-		LOG_INFO("Hunting for " << name << " at level Cursory");
-		reaction.BeginHunt(GET_INFO());
+    std::vector<std::unique_ptr<Event>> HuntT1068::GetMonitoringEvents() {
+        std::vector<std::unique_ptr<Event>> events;
 
-		int detections = 0;
+        // CVE-2020-1048
+        Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Print\\Printers",
+                                                           true, false, true);
+        Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Ports", true, false, false);
 
-		detections += HuntCVE20201048(reaction);
-
-		reaction.EndHunt();
-		return detections;
-	}
-
-	std::vector<std::shared_ptr<Event>> HuntT1068::GetMonitoringEvents() {
-		std::vector<std::shared_ptr<Event>> events;
-
-		// CVE-2020-1048
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Print\\Printers", true, false, true));
-		ADD_ALL_VECTOR(events, Registry::GetRegistryEvents(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Ports", true, false, false));
-
-		return events;
-	}
-}
+        return events;
+    }
+}   // namespace Hunts

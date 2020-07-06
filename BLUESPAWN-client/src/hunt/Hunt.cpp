@@ -5,9 +5,8 @@ HuntInfo::HuntInfo(const std::wstring& HuntName, DWORD HuntTactics, DWORD HuntCa
 	HuntName{ HuntName },
 	HuntTactics{ HuntTactics },
 	HuntCategories{ HuntCategories },
-	HuntDatasources{ HuntDatasources }{
-	GetSystemTime(&HuntStartTime);
-}
+	HuntDatasources{ HuntDatasources }, 
+	HuntStartTime{ HuntStartTime }{}
 
 Hunt::Hunt(IN CONST std::wstring& name) : 
 	name{ name }{

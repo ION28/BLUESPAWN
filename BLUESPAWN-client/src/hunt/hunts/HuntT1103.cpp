@@ -1,4 +1,5 @@
 #include "hunt/hunts/HuntT1103.h"
+
 #include "util/configurations/Registry.h"
 #include "util/log/Log.h"
 
@@ -17,8 +18,6 @@ namespace Hunts {
     std::vector<std::shared_ptr<Detection>> HuntT1103::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
-        // TODO: Fix data type of registry detections
-
         for(auto& detection :
             CheckValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows",
                         {
@@ -28,7 +27,9 @@ namespace Hunts {
                         },
                         true, false)) {
             CREATE_DETECTION(Certainty::Strong,
-                             RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
+                             RegistryDetectionData{ detection, detection.type == RegistryType::REG_DWORD_T ?
+                                                                   RegistryDetectionType::Configuration :
+                                                                   RegistryDetectionType::FileReference });
         }
 
         HUNT_END();

@@ -1,7 +1,5 @@
 #pragma once
 #include "../Hunt.h"
-#include "reaction/Reaction.h"
-#include "reaction/Log.h"
 
 namespace Hunts {
 
@@ -16,7 +14,7 @@ namespace Hunts {
 	public:
 		HuntT1013();
 
-		virtual int ScanCursory(const Scope& scope, Reaction reaction) override;
-		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
+		virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
+		virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

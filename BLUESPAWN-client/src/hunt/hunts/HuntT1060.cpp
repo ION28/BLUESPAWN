@@ -54,20 +54,16 @@ namespace Hunts {
                 HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
                 { { L"Startup", L"%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup",
                     false, CheckSzEqual } })) {
-            if(FileScanner::PerformQuickScan(std::get<std::wstring>(detection.data))) {
-                CREATE_DETECTION(Certainty::Moderate,
-                                 RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
-            }
+            CREATE_DETECTION(Certainty::Moderate,
+                             RegistryDetectionData{ detection, RegistryDetectionType::FolderReference });
         }
 
         for(auto& detection :
             CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",
                         { { L"Common Startup", L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup",
                             false, CheckSzEqual } })) {
-            if(FileScanner::PerformQuickScan(std::get<std::wstring>(detection.data))) {
-                CREATE_DETECTION(Certainty::Moderate,
-                                 RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
-            }
+            CREATE_DETECTION(Certainty::Moderate,
+                             RegistryDetectionData{ detection, RegistryDetectionType::FolderReference });
         }
 
         // TODO: Add back changes from develop

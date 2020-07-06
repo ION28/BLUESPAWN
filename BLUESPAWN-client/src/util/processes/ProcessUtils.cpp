@@ -113,33 +113,15 @@ std::wstring GetProcessCommandline(DWORD dwPID){
 
 std::wstring GetProcessImage(const HandleWrapper& process){
     if(process){
-        PROCESS_BASIC_INFORMATION information{};
-        NTSTATUS status = Linker::NtQueryInformationProcess(process, ProcessBasicInformation, &information, sizeof(information), nullptr);
-        if(NT_SUCCESS(status)){
-            auto peb = information.PebBaseAddress;
-            RTL_USER_PROCESS_PARAMETERS_ params{};
-            if(!ReadProcessMemory(process, &peb->ProcessParameters, &params, sizeof(params), nullptr)){
-                LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its image path (error " << GetLastError() << ")");
-                return {};
-            }
-
-            DWORD dwLength = params.DllPath.Length;
-            auto path = AllocationWrapper{ new WCHAR[dwLength / 2 + 1], dwLength + 2, AllocationWrapper::CPP_ARRAY_ALLOC };
-            if(!ReadProcessMemory(process, &peb->ProcessParameters, &params, sizeof(params), nullptr)){
-                LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its image path (error " << GetLastError() << ")");
-                return {};
-            }
-
-            if(!ReadProcessMemory(process, &params.DllPath.Buffer, path, dwLength, nullptr)){
-                LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its image path (error " << GetLastError() << ")");
-                return {};
-            }
-            path.SetByte(dwLength, 0);
-            path.SetByte(dwLength + 1, 0);
-
-            return std::wstring{ reinterpret_cast<PWCHAR>(LPVOID(path)) };
-        } else {
-            LOG_ERROR("Unable to query information from process with PID " << GetProcessId(process) << " to find its image path (error " << status << ")");
+        std::vector<WCHAR> name{};
+        DWORD dwSize{ 0 };
+        QueryFullProcessImageNameW(process, 0, name.data(), &dwSize);
+        dwSize += 1;
+        name.resize(dwSize);
+        if(QueryFullProcessImageNameW(process, 0, name.data(), &dwSize)){
+            return name.data();
+        } else{
+            LOG_ERROR("Unable to get image path of process - " << SYSTEM_ERROR);
             return {};
         }
     } else {

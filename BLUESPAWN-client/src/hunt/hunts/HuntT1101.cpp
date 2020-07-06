@@ -4,6 +4,7 @@
 #include "util/log/Log.h"
 
 #include "hunt/RegistryHunt.h"
+#include "scan/FileScanner.h"
 #include "user/bluespawn.h"
 
 using namespace Registry;
@@ -18,28 +19,41 @@ namespace Hunts {
     std::vector<std::shared_ptr<Detection>> HuntT1101::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
-		auto lsa = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
-		auto lsa2 = RegistryKey(HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig");
+        RegistryKey lsa{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
+        RegistryKey lsa2{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig" };
 
-		for (auto key : { lsa, lsa2 }) {
-			auto Packages = key.GetValue<std::vector<std::wstring>>(L"Security Packages");
-			if (Packages) {
-				for (auto Package : Packages.value()) {
-					if (Package != L"\"\"") {
-						auto filepath = FileSystem::SearchPathExecutable(Package + L".dll");
+        for(auto& key : { lsa, lsa2 }) {
+            auto packages{ key.GetValue<std::vector<std::wstring>>(L"Security Packages") };
+            if(packages) {
+                for(auto& package : *packages) {
+                    if(package != L"\"\"") {
+                        auto filepath = FileSystem::SearchPathExecutable(package + L".dll");
 
-						if (filepath) {
-							FileSystem::File file = FileSystem::File(filepath.value());
-							if (file.GetFileExists() && !file.GetFileSigned()) {
-								reaction.RegistryKeyIdentified(std::make_shared<REGISTRY_DETECTION>(RegistryValue{ key, L"Security Packages", key.GetValue<std::vector<std::wstring>>(L"Security Packages").value() }));
-								reaction.FileIdentified(std::make_shared<FILE_DETECTION>(file));
-								detections += 2;
-							}
-						}
-					}
-				}
-			}
-		}
+                        if(filepath && FileScanner::PerformQuickScan(*filepath)) {
+                            // Can't use a macro since we need the shared_ptr of the detection
+                            auto value{ Bluespawn::detections.AddDetection(
+                                Detection{ RegistryDetectionData{
+                                               RegistryValue{ key, L"Security Packages", std::move(package) },
+                                               RegistryDetectionType::FileReference },
+                                           DetectionContext{ GetName() } },
+                                Certainty::Moderate) };
+                            detections.emplace_back(value);
+
+                            // Since the security package is missing the dll extension, the scanner may not find the
+                            // associated file
+                            auto file{ Bluespawn::detections.AddDetection(Detection{ FileDetectionData{ *filepath },
+                                                                                     DetectionContext{ GetName() } },
+                                                                          Certainty::Weak) };
+                            detections.emplace_back(file);
+
+                            // Define the association ourself
+                            file->info.AddAssociation(value, Association::Certain);
+                            value->info.AddAssociation(file, Association::Certain);
+                        }
+                    }
+                }
+            }
+        }
 
         HUNT_END();
     }

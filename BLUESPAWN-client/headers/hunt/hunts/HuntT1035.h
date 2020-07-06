@@ -4,8 +4,6 @@
 #include <vector>
 
 #include "../Hunt.h"
-#include "reaction/Reaction.h"
-#include "reaction/Log.h"
 
 namespace Hunts {
 
@@ -17,14 +15,10 @@ namespace Hunts {
 	 * @scans Intensive Scan not supported.
 	 */
 	class HuntT1035 : public Hunt {
-	private:
-
-		int EvaluateService(Registry::RegistryKey key, Reaction& reaction);
-
 	public:
 		HuntT1035();
 
-		virtual int ScanNormal(const Scope& scope, Reaction reaction);
-		virtual std::vector<std::shared_ptr<Event>> GetMonitoringEvents() override;
+		virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
+		virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
 	};
 }

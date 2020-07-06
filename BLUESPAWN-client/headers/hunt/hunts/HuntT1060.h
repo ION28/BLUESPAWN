@@ -9,7 +9,6 @@ namespace Hunts {
 	class HuntT1060 : public Hunt {
 	private:
 		std::vector<std::wstring> RunKeys;
-		int EvaluateFile(const std::wstring& wLaunchString, Reaction& reaction);
 
 	public:
 		HuntT1060();

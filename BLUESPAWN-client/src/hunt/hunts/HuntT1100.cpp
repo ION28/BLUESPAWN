@@ -57,7 +57,8 @@ namespace Hunts {
                             CREATE_DETECTION(Certainty::Strong, FileDetectionData{ file });
                             LOG_INFO(1, L"Located likely web shell in file "
                                             << file.GetFilePath() << L" in text "
-                                            << StringToWidestring(sus_file.substr(match_index.position(), match_index.length())));
+                                            << StringToWidestring(
+                                                   sus_file.substr(match_index.position(), match_index.length())));
                             detected = true;
                             break;
                         }
@@ -66,7 +67,8 @@ namespace Hunts {
                             CREATE_DETECTION(Certainty::Strong, FileDetectionData{ file });
                             LOG_INFO(1, L"Located likely web shell in file "
                                             << file.GetFilePath() << L" in text "
-                                     << StringToWidestring(sus_file.substr(match_index.position(), match_index.length())));
+                                            << StringToWidestring(
+                                                   sus_file.substr(match_index.position(), match_index.length())));
                             detected = true;
                             break;
                         }
@@ -75,7 +77,8 @@ namespace Hunts {
                             CREATE_DETECTION(Certainty::Strong, FileDetectionData{ file });
                             LOG_INFO(1, L"Located likely web shell in file "
                                             << file.GetFilePath() << L" in text "
-                                     << StringToWidestring(sus_file.substr(match_index.position(), match_index.length())));
+                                            << StringToWidestring(
+                                                   sus_file.substr(match_index.position(), match_index.length())));
                             detected = true;
                             break;
                         }
@@ -98,18 +101,18 @@ namespace Hunts {
     }
 
     std::vector<std::unique_ptr<Event>> HuntT1100::GetMonitoringEvents() {
-		std::vector<std::unique_ptr<Event>> events;
+        std::vector<std::unique_ptr<Event>> events;
 
-		for (auto dir : web_directories) {
-			auto folder = FileSystem::Folder{ dir };
-			if (folder.GetFolderExists()) {
-				events.push_back(std::make_unique<FileEvent>(folder));
-				for (auto subdir : folder.GetSubdirectories()) {
-					events.push_back(std::make_unique<FileEvent>(subdir));
-				}
-			}
-		}
+        for(auto dir : web_directories) {
+            auto folder = FileSystem::Folder{ dir };
+            if(folder.GetFolderExists()) {
+                events.push_back(std::make_unique<FileEvent>(folder));
+                for(auto subdir : folder.GetSubdirectories()) {
+                    events.push_back(std::make_unique<FileEvent>(subdir));
+                }
+            }
+        }
 
-		return events;
-	}
+        return events;
+    }
 }   // namespace Hunts

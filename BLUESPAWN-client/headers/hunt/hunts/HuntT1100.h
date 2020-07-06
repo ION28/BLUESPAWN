@@ -27,5 +27,6 @@ namespace Hunts {
 		void AddFileExtensionToSearch(const std::wstring& sFileExtension);
 
 		virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope);
+		virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents();
 	};
 }

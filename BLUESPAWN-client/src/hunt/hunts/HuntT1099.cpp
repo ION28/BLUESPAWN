@@ -4,8 +4,8 @@
 
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
+#include "util/processes/ProcessUtils.h"
 
-#include "scan/YaraScanner.h"
 #include "user/bluespawn.h"
 
 namespace Hunts {
@@ -45,11 +45,15 @@ namespace Hunts {
                                                                        L"Data[@Name='TargetFilename']"));
             CREATE_DETECTION(Certainty::Strong, FileDetectionData{ file });
 
-            // Scan process?
-            /* HandleWrapper hProcess{ OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, std::stoi(query.GetProperty(L"Event/EventData/Data[@Name='ProcessId']"))) };
-			if(hProcess){
-				
-			} */
+            // Scan process
+            HandleWrapper hProcess{ OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false,
+                                                std::stoi(query.GetProperty(L"Event/EventData/"
+                                                                            L"Data[@Name='ProcessId']"))) };
+            if(hProcess) {
+                auto image{ GetProcessImage(hProcess) };
+                CREATE_DETECTION(Certainty::Moderate,
+                                 ProcessDetectionData::CreateProcessDetectionData(GetProcessId(hProcess), image));
+            }
         }
 
         HUNT_END();
