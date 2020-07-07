@@ -97,6 +97,9 @@ namespace Registry {
 	private:
 		static std::unordered_map<HKEY, int> _ReferenceCounts;
 
+		/// Guards accesses to _ReferenceCounts
+		static CriticalSection _hGuard;
+
 		HKEY hkBackingKey;
 
 		bool bKeyExists;

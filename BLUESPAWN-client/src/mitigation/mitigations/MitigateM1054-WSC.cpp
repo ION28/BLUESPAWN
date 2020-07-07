@@ -18,7 +18,7 @@ namespace Mitigations {
 		) {}
 
 	bool MitigateM1054WSC::MitigationIsEnforced(SecurityLevel level) {
-		LOG_INFO("Checking for presence of " << name);
+		LOG_INFO(1, "Checking for presence of " << name);
 
 		auto WindowsSecurityCenter = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Security Center" };
 		auto WindowsSecurityCenterWow64 = RegistryKey{ HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\Microsoft\\Security Center" };

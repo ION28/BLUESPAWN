@@ -57,9 +57,7 @@ namespace Hunts {
     }
 
     std::vector<std::shared_ptr<Detection>> HuntT1055::RunHunt(const Scope& scope) {
-        HUNT_INIT();
-
-        if(Bluespawn::aggressiveness == Aggressiveness::Cursory) { HUNT_END(); }
+        HUNT_INIT_LEVEL(Normal);
 
         DWORD processes[1024];
         DWORD ProcessCount = 0;

@@ -38,13 +38,15 @@ namespace Registry {
 		{HKEY_CURRENT_CONFIG, L"HKEY_CURRENT_CONFIG"},
 	};
 
-	std::map<HKEY, int> RegistryKey::_ReferenceCounts = {};
+	std::unordered_map<HKEY, int> RegistryKey::_ReferenceCounts{};
+	CriticalSection RegistryKey::_hGuard{};
 	
 	RegistryKey::RegistryKey(const RegistryKey& key) noexcept :
 		bKeyExists{ key.bKeyExists },
 		bWow64{ key.bWow64 },
 		hkBackingKey{ key.hkBackingKey }{
 
+		BeginCriticalSection _{ _hGuard };
 		if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
 			_ReferenceCounts[hkBackingKey] = 1;
 		} else {
@@ -57,6 +59,7 @@ namespace Registry {
 		this->bWow64 = key.bWow64;
 		this->hkBackingKey = key.hkBackingKey;
 
+		BeginCriticalSection _{ _hGuard };
 		if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
 			_ReferenceCounts[hkBackingKey] = 1;
 		} else {
@@ -98,7 +101,7 @@ namespace Registry {
 		bWow64{ false },
 		hkBackingKey{ key }{
 
-
+		BeginCriticalSection _{ _hGuard };
 		if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
 			_ReferenceCounts[hkBackingKey] = 1;
 		} else {
@@ -123,6 +126,7 @@ namespace Registry {
 		} else {
 			bKeyExists = true;
 
+			BeginCriticalSection _{ _hGuard };
 			if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
 				_ReferenceCounts[hkBackingKey] = 1;
 			} else {
@@ -164,6 +168,7 @@ namespace Registry {
 				}
 
 				if(status == ERROR_SUCCESS){
+					BeginCriticalSection _{ _hGuard };
 					if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
 						_ReferenceCounts[hkBackingKey] = 1;
 					} else {
@@ -179,11 +184,30 @@ namespace Registry {
 	}
 
 	RegistryKey::~RegistryKey(){
+		BeginCriticalSection _{ _hGuard };
 		if(_ReferenceCounts.find(hkBackingKey) != _ReferenceCounts.end()){
 			if(!--_ReferenceCounts[hkBackingKey] && !(ULONG_PTR(hkBackingKey) & 0xFFFFFFFF80000000)){
 				CloseHandle(hkBackingKey);
 			}
 		}
+	}
+
+	bool RegistryKey::CheckKeyExists(HKEY hive, const std::wstring& name, bool WoW64){
+		auto wLowerPath = ToLowerCase(name);
+
+		HKEY key{};
+		WoW64 = WoW64 || wLowerPath.find(L"wow6432node") != std::wstring::npos;
+		LSTATUS status = RegOpenKeyExW(hive, name.c_str(), 0,
+									   KEY_READ | KEY_NOTIFY | (WoW64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), &key);
+		if(status == ERROR_ACCESS_DENIED){ return true; }
+
+		if(status == ERROR_SUCCESS){
+			BeginCriticalSection _{ _hGuard };
+			if(_ReferenceCounts.find(key) == _ReferenceCounts.end()){ RegCloseKey(key); }
+			return true;
+		}
+
+		return false;
 	}
 
 	bool RegistryKey::Exists() const {
@@ -597,4 +621,8 @@ namespace Registry {
 	RegistryKey::operator HKEY() const {
 		return hkBackingKey;
 	}
+}
+
+size_t std::hash<Registry::RegistryKey>::operator()(IN CONST Registry::RegistryKey& key) const{
+	return reinterpret_cast<size_t>(static_cast<HKEY>(key));
 }

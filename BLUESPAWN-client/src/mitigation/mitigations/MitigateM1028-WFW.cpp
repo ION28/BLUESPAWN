@@ -20,7 +20,7 @@ namespace Mitigations {
 		) {}
 
 	bool MitigateM1028WFW::MitigationIsEnforced(SecurityLevel level) {
-		LOG_INFO("Checking for presence of " << name);
+		LOG_INFO(1, "Checking for presence of " << name);
 
 		auto DomainProfile = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\DomainProfile" };
 		auto StandardProfile = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile" };

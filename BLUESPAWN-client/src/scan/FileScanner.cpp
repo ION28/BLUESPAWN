@@ -127,7 +127,7 @@ void FileScanner::UpdateModules(){
 
 bool FileScanner::PerformQuickScan(IN CONST std::wstring& string){
 	if(FileSystem::CheckFileExists(string)){
-		return FileSystem::File{ string }.GetFileSigned();
+		return !FileSystem::File{ string }.GetFileSigned();
 	} else return false;
 }
 
@@ -167,7 +167,7 @@ std::unordered_map<std::shared_ptr<Detection>, Association> FileScanner::GetAsso
 			}
 		}
 
-		if(!detection.DetectionStale && data.FileHandle && Bluespawn::aggressiveness == Aggressiveness::Intensive){
+		if(!detection.DetectionStale && data.FileHandle && Bluespawn::aggressiveness == Aggressiveness::Intensive && false){
 			auto strings = ExtractStrings(data.FileHandle->Read(), 8);
 			auto filenames = ExtractFilePaths(strings);
 			for(auto& filename : filenames){

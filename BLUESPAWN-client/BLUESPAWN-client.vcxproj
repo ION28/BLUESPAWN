@@ -316,8 +316,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\util\processes\Analyzer.cpp" />
-    <ClCompile Include="src\reaction\ReactLog.cpp" />
-    <ClCompile Include="src\reaction\Reaction.cpp" />
     <ClCompile Include="src\util\processes\ParseCobalt.cpp" />
     <ClCompile Include="src\util\processes\CheckLolbin.cpp" />
     <ClCompile Include="src\util\processes\CommandParser.cpp" />

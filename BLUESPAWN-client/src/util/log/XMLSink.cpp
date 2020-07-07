@@ -4,7 +4,8 @@
 
 #include <chrono>
 #include <iostream>
-#include <common\Utils.h>
+#include "common/Utils.h"
+#include "user/bluespawn.h"
 
 namespace Log{
 
@@ -83,6 +84,10 @@ namespace Log{
 	}
 
 	void XMLSink::RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN RecordType type){
+		if(type == RecordType::PreScan && !Bluespawn::EnablePreScanDetections){
+			return;
+		}
+
 		BeginCriticalSection _{ hGuard };
 
 		EnterCriticalSection(*detection);

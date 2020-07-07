@@ -1,23 +1,30 @@
 #pragma once
-#include "Reaction.h"
+#include <optional>
 
-#include "hunt/HuntInfo.h"
-#include "user/iobase.h"
 #include "common/DynamicLinker.h"
 
-#include <optional>
+#include "Reaction.h"
+#include "hunt/HuntInfo.h"
+#include "user/iobase.h"
 
 namespace Reactions {
 
-	class DeleteFileReaction : public Reaction {
-	private:
-		const IOBase& io;
+    class DeleteFileReaction : public Reaction {
+        /**
+		 * Reacts to a file detection by deleting it, taking ownership if necessary
+		 *
+		 * @param detection The detection to which the reaction will be applied.
+		 */
+        virtual void React(IN Detection& detection);
 
-		/// Handlers for detections that log the detection
-		void DeleteFileIdentified(std::shared_ptr<FILE_DETECTION> detection);
-
-	public:
-		DeleteFileReaction(const IOBase& io);
-	};
-}
-
+        /**
+		 * Function to determine if this reaction applies to a detection. This ensures that
+		 * the detection is not stale and reference a file
+		 *
+		 * @param detection The detection to check
+		 *
+		 * @return True if this reaction applies; false otherwise
+		 */
+        virtual bool Applies(IN CONST Detection& detection);
+    };
+}   // namespace Reactions
