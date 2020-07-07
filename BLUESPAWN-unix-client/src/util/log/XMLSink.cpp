@@ -1,5 +1,6 @@
 #include "util/log/XMLSink.h"
 #include "common/StringUtils.h"
+#include "monitor/listen/Events.h"
 
 #include <chrono>
 #include <iostream>
@@ -10,7 +11,7 @@ namespace Log{
 
 	std::wstring ToWstringPad(unsigned int value, size_t length=2){
 		wchar_t* buf = new wchar_t[length + 1];
-		swprintf(buf, ("%0" + std::to_string(length) + "d").c_str(), value);
+		swprintf(buf, length + 1, (L"%0" + std::to_wstring(length) + L"d").c_str(), value);
 		std::wstring str = buf;
 		delete[] buf;
 		return str;
@@ -47,23 +48,12 @@ namespace Log{
 	XMLSink::~XMLSink(){
 		XMLDoc.SaveFile(wFileName.c_str());
 		//TerminateThread(thread, 0);
+		//TOOD
 	}
 
 	tinyxml2::XMLElement* CreateDetctionXML(const std::shared_ptr<DETECTION>& detection, tinyxml2::XMLDocument& XMLDoc){
 		auto detect = XMLDoc.NewElement("detection");
-		if(detection->Type == DetectionType::Registry){
-			detect->SetAttribute("type", "Registry");
-			auto RegistryDetection = std::static_pointer_cast<REGISTRY_DETECTION>(detection);
-			auto Key = XMLDoc.NewElement("key");
-			auto Value = XMLDoc.NewElement("value");
-			auto Data = XMLDoc.NewElement("data");
-			Key->SetText(WidestringToString(RegistryDetection->value.key.ToString()).c_str());
-			Value->SetText(WidestringToString(RegistryDetection->value.GetPrintableName()).c_str());
-			Data->SetText(WidestringToString(RegistryDetection->value.ToString()).c_str());
-			detect->InsertEndChild(Key);
-			detect->InsertEndChild(Value);
-			detect->InsertEndChild(Data);
-		} else if(detection->Type == DetectionType::File){
+		if(detection->Type == DetectionType::File){
 			detect->SetAttribute("type", "File");
 			auto FileDetection = std::static_pointer_cast<FILE_DETECTION>(detection);
 			auto Name = XMLDoc.NewElement("name");
@@ -74,14 +64,14 @@ namespace Log{
 			auto Created = XMLDoc.NewElement("created");
 			auto Modified = XMLDoc.NewElement("modified");
 			auto Accessed = XMLDoc.NewElement("accessed");
-			Name->SetText(WidestringToString(FileDetection->wsFileName).c_str());
-			Path->SetText(WidestringToString(FileDetection->wsFilePath).c_str());
-			MD5->SetText(WidestringToString(FileDetection->md5).c_str());
-			SHA1->SetText(WidestringToString(FileDetection->sha1).c_str());
-			SHA256->SetText(WidestringToString(FileDetection->sha256).c_str());
-			Created->SetText(WidestringToString(FileDetection->created).c_str());
-			Modified->SetText(WidestringToString(FileDetection->modified).c_str());
-			Accessed->SetText(WidestringToString(FileDetection->accessed).c_str());
+			Name->SetText(FileDetection->wsFileName.c_str());
+			Path->SetText(FileDetection->wsFilePath.c_str());
+			MD5->SetText(FileDetection->md5.c_str());
+			SHA1->SetText(FileDetection->sha1.c_str());
+			SHA256->SetText(FileDetection->sha256.c_str());
+			Created->SetText(FileDetection->created.c_str());
+			Modified->SetText(FileDetection->modified.c_str());
+			Accessed->SetText(FileDetection->accessed.c_str());
 			detect->InsertEndChild(Name);
 			detect->InsertEndChild(Path);
 			detect->InsertEndChild(MD5);
@@ -96,8 +86,8 @@ namespace Log{
 			auto Path = XMLDoc.NewElement("path");
 			auto Cmd = XMLDoc.NewElement("cmdline");
 			auto Pid = XMLDoc.NewElement("pid");
-			Path->SetText(WidestringToString(ProcessDetection->wsImagePath).c_str());
-			Cmd->SetText(WidestringToString(ProcessDetection->wsCmdline).c_str());
+			Path->SetText(ProcessDetection->wsImagePath.c_str());
+			Cmd->SetText(ProcessDetection->wsCmdline.c_str());
 			Pid->SetText(std::to_string(ProcessDetection->PID).c_str());
 			detect->InsertEndChild(Path);
 			detect->InsertEndChild(Cmd);
@@ -109,9 +99,9 @@ namespace Log{
 			auto Path = XMLDoc.NewElement("path");
 			auto Dll = XMLDoc.NewElement("dll");
 			auto Pid = XMLDoc.NewElement("pid");
-			Name->SetText(WidestringToString(ServiceDetection->wsServiceName).c_str());
-			Path->SetText(WidestringToString(ServiceDetection->wsServiceExecutablePath).c_str());
-			Dll->SetText(WidestringToString(ServiceDetection->wsServiceDll).c_str());
+			Name->SetText(ServiceDetection->wsServiceName.c_str());
+			Path->SetText(ServiceDetection->wsServiceExecutablePath.c_str());
+			Dll->SetText(ServiceDetection->wsServiceDll.c_str());
 			Pid->SetText(std::to_string(ServiceDetection->ServicePID).c_str());
 			detect->InsertEndChild(Name);
 			detect->InsertEndChild(Path);
@@ -127,19 +117,19 @@ namespace Log{
 			auto Raw = XMLDoc.NewElement("raw");
 			ID->SetText(std::to_string(EventDetection->eventID).c_str());
 			RecordID->SetText(std::to_string(EventDetection->eventRecordID).c_str());
-			Time->SetText(WidestringToString(EventDetection->timeCreated).c_str());
-			Channel->SetText(WidestringToString(EventDetection->channel).c_str());
-			Raw->SetText(WidestringToString(EventDetection->rawXML).c_str());
+			Time->SetText(EventDetection->timeCreated.c_str());
+			Channel->SetText(EventDetection->channel.c_str());
+			Raw->SetText(EventDetection->rawXML.c_str());
 			detect->InsertEndChild(ID);
 			detect->InsertEndChild(RecordID);
 			detect->InsertEndChild(Time);
 			detect->InsertEndChild(Channel);
 			detect->InsertEndChild(Raw);
 			for(auto key : EventDetection->params){
-				auto name = WidestringToString(key.first);
+				auto name = key.first;
 				auto idx1 = name.find("'") + 1;
 				auto tag = XMLDoc.NewElement(name.substr(idx1, name.find_last_of("'") - idx1).c_str());
-				tag->SetText(WidestringToString(key.second).c_str());
+				tag->SetText(key.second.c_str());
 				detect->InsertEndChild(tag);
 			}
 		}
@@ -155,11 +145,11 @@ namespace Log{
 			hunt->SetAttribute("categories", static_cast<int64_t>(info->HuntCategories));
 			hunt->SetAttribute("datasources", static_cast<int64_t>(info->HuntDatasources));
 			hunt->SetAttribute("tactics", static_cast<int64_t>(info->HuntTactics));
-			hunt->SetAttribute("time", SystemTimeToInteger(info->HuntStartTime));
-			hunt->SetAttribute("datetime", WidestringToString(FormatWindowsTime(info->HuntStartTime)).c_str());
+			hunt->SetAttribute("time", FormatStatTime(&info->HuntStartTime).c_str());
+			hunt->SetAttribute("datetime", FormatStatTime(&info->HuntStartTime).c_str());
 
 			auto name = XMLDoc.NewElement("name");
-			name->SetText(WidestringToString(info->HuntName).c_str());
+			name->SetText(info->HuntName.c_str());
 			hunt->InsertFirstChild(name);
 
 			if(message.length() > 0){
@@ -174,9 +164,9 @@ namespace Log{
 			Root->InsertEndChild(hunt);
 		} else if(level.Enabled()) {
 			auto msg = XMLDoc.NewElement(MessageTags[static_cast<unsigned int>(level.severity)].c_str());
-			SYSTEMTIME st;
-			GetSystemTime(&st);
-			msg->SetAttribute("time", SystemTimeToInteger(st));
+			time_t t = time(NULL);
+			struct tm * st = localtime(&t);
+			msg->SetAttribute("time", FormatStatTime(st).c_str());
 			msg->SetText(message.c_str());
 			Root->InsertEndChild(msg);
 		}
@@ -187,6 +177,6 @@ namespace Log{
 	}
 
 	void XMLSink::Flush(){
-		XMLDoc.SaveFile(WidestringToString(wFileName).c_str());
+		XMLDoc.SaveFile(wFileName.c_str());
 	}
 };

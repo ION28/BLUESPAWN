@@ -66,7 +66,7 @@ private:
 	FileEventAction action;
 	bool watchSubdirs; //if its a directory, watch anything in the subdirectories as well
 public:
-    FileEvent(const std::string& path, FileEventAction action, bool watchSubdirs = false);
+    FileEvent(const std::string& path, FileEventAction action, bool watchSubdirs=false);
 
 	std::string GetPath() const;
 

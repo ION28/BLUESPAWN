@@ -13,8 +13,6 @@
 #include "util/permissions/permissions.h"
 #include "reaction/Log.h"
 
-#include "monitor/ETW_Wrapper.h"
-
 #include <sys/auxv.h>
 #include <sys/utsname.h>
 

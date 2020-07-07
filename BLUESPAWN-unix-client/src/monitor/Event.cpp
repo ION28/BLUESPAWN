@@ -21,7 +21,7 @@ EventType Event::GetType() const{
     return this->type;
 }
 
-FileEvent::FileEvent(const std::string& path, FileEventAction action, bool watchSubdirs = false){
+FileEvent::FileEvent(const std::string& path, FileEventAction action, bool watchSubdirs) : Event(EventType::FileSystem){
 
 }
 
@@ -34,7 +34,7 @@ bool FileEvent::IsWatchingSubdirs() const {
 }
 
 bool FileEvent::Subscribe(){
-
+    return false;
 }
 
 FileEventAction FileEvent::GetAction() const{
@@ -42,10 +42,10 @@ FileEventAction FileEvent::GetAction() const{
 }
 
 bool FileEvent::operator==(const Event& e) const{
-    
+    return false;
 }
 
-ProcessEvent::ProcessEvent(ProcessEventAction action, std::optional<int> signo = std::nullopt){
+ProcessEvent::ProcessEvent(ProcessEventAction action, std::optional<int> signo) : Event(EventType::SystemCall){
 
 }
 
@@ -54,11 +54,11 @@ ProcessEventAction ProcessEvent::GetAction() const{
 }
 
 bool ProcessEvent::Subscribe(){
-
+    return false;
 }
 
 bool ProcessEvent::operator==(const Event& e) const{
-
+    return false;
 }
 
 std::optional<int> ProcessEvent::GetSignalNumber() const {

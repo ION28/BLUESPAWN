@@ -7,11 +7,14 @@
 #include <linux/ptrace.h>
 
 #include "util/ThreadsafeQueue.h"
+#include "monitor/Event.h"
 
 #define WAIT_OBJECT_0 0
 #define INFINITE -1
 
 namespace Events{
+
+class EventDetails;
 
 /**
  * A class capable of describing an event to subscribe to
@@ -19,21 +22,21 @@ namespace Events{
  */ 
 class EventHandle{
 private:
-    ThreadsafeQueue<EventDetails> signalQueue;
+    ThreadsafeQueue<Events::EventDetails> signalQueue;
 
-    EventDetails details;
+    Events::EventDetails &details;
 
 public:
 
-    EventHandle(EventDetails details);
+    EventHandle(Events::EventDetails &details);
 
     bool operator==(const EventHandle& e) const;
 
     bool HasSignal();
 
-    EventDetails PopSignal();
+    Events::EventDetails PopSignal();
 
-    void PushSignal(EventDetails details);
+    void PushSignal(Events::EventDetails details);
 
 
 
@@ -96,7 +99,7 @@ public:
 
     time_t GetTimestamp() const;
 
-    ProcessEventType GetProcessEventType() const;
+    ProcessEventAction GetProcessEventType() const;
 };
 
 };

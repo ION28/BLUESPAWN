@@ -13,4 +13,6 @@
     }
 
 
-std::string FormatStatTime(const struct statx_timestamp systemtime); 
+std::string FormatStatTime(const struct statx_timestamp * systemtime); 
+
+std::string FormatStatTime(const struct tm * ft);
