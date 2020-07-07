@@ -38,10 +38,14 @@ void DetectionRegister::AddDetectionAsync(IN CONST std::shared_ptr<Detection>& d
     if(queue.size() == 0) { SetEvent(hEvent); }
     LeaveCriticalSection(hQueueGuard);
 
-    for(auto& sink : Bluespawn::detectionSinks) { sink->RecordDetection(detection, RecordType::PostScan); }
-
     EnterCriticalSection(*detection);
-    Bluespawn::reaction.React(*detection);
+    if(detection->info.GetCertainty() >= threshold){
+        LeaveCriticalSection(*detection);
+        for(auto& sink : Bluespawn::detectionSinks){ sink->RecordDetection(detection, RecordType::PostScan); }
+
+        EnterCriticalSection(*detection);
+        Bluespawn::reaction.React(*detection);
+    }
     LeaveCriticalSection(*detection);
 }
 

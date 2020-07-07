@@ -30,16 +30,17 @@ namespace Log {
 	}
 
 	void CLISink::RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN RecordType type){
-		AcquireMutex mutex{ hMutex };
-
 		if(type == RecordType::PreScan && Bluespawn::EnablePreScanDetections || type == RecordType::PostScan){
-			SetConsoleColor(CLISink::PrependColors[4]);
-			std::wcout << CLISink::MessagePrepends[4] << (type == RecordType::PreScan ? L"[Pre-Scan] " : L" ");
-			SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
 
 			EnterCriticalSection(*detection);
 			Detection copy{ *detection };
 			LeaveCriticalSection(*detection);
+
+			AcquireMutex mutex{ hMutex };
+
+			SetConsoleColor(CLISink::PrependColors[4]);
+			std::wcout << CLISink::MessagePrepends[4] << (type == RecordType::PreScan ? L"[Pre-Scan] " : L" ");
+			SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
 
 			std::wcout << L"Detection ID: " << copy.dwID << std::endl;
 

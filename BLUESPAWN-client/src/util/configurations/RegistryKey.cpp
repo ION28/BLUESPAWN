@@ -38,20 +38,48 @@ namespace Registry {
 		{HKEY_CURRENT_CONFIG, L"HKEY_CURRENT_CONFIG"},
 	};
 
-	std::unordered_map<HKEY, int> RegistryKey::_ReferenceCounts{};
-	CriticalSection RegistryKey::_hGuard{};
-	
+	RegistryKey::Tracker::Tracker(){}
+
+	void RegistryKey::Tracker::Increment(IN HKEY hKey){
+		BeginCriticalSection _{ hGuard };
+		if(hKey){
+			if(counts.find(hKey) == counts.end()){
+				counts[hKey] = 1;
+			} else{
+				counts[hKey]++;
+			}
+		}
+	}
+
+	void RegistryKey::Tracker::Decrement(IN HKEY hKey){
+		BeginCriticalSection _{ hGuard };
+		if(hKey){
+			if(counts.find(hKey) != counts.end()){
+				if(!--counts[hKey] && !(ULONG_PTR(hKey) & 0xFFFFFFFF80000000)){
+					CloseHandle(hKey);
+				}
+			}
+		}
+	}
+
+	int RegistryKey::Tracker::Get(IN HKEY hKey){
+		BeginCriticalSection _{ hGuard };
+		if(counts.find(hKey) != counts.end()){
+			return counts[hKey];
+		} else{
+			return 0;
+		}
+	}
+
+	std::shared_ptr<RegistryKey::Tracker> RegistryKey::__tracker{ std::make_shared<RegistryKey::Tracker>() };
+
 	RegistryKey::RegistryKey(const RegistryKey& key) noexcept :
 		bKeyExists{ key.bKeyExists },
 		bWow64{ key.bWow64 },
-		hkBackingKey{ key.hkBackingKey }{
+		hkBackingKey{ key.hkBackingKey },
+		tracker{ __tracker }{
 
-		BeginCriticalSection _{ _hGuard };
-		if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
-			_ReferenceCounts[hkBackingKey] = 1;
-		} else {
-			_ReferenceCounts[hkBackingKey]++;
-		}
+		tracker->Increment(hkBackingKey);
 	}
 
 	RegistryKey& RegistryKey::operator=(const RegistryKey& key) noexcept {
@@ -59,12 +87,7 @@ namespace Registry {
 		this->bWow64 = key.bWow64;
 		this->hkBackingKey = key.hkBackingKey;
 
-		BeginCriticalSection _{ _hGuard };
-		if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
-			_ReferenceCounts[hkBackingKey] = 1;
-		} else {
-			_ReferenceCounts[hkBackingKey]++;
-		}
+		tracker->Increment(hkBackingKey);
 
 		return *this;
 	}
@@ -72,7 +95,8 @@ namespace Registry {
 	RegistryKey::RegistryKey(RegistryKey&& key) noexcept :
 		bKeyExists{ key.bKeyExists },
 		bWow64{ key.bWow64 },
-		hkBackingKey{ key.hkBackingKey }{
+		hkBackingKey{ key.hkBackingKey },
+		tracker{ __tracker }{
 
 		key.bKeyExists = false;
 		key.bWow64 = false;
@@ -99,17 +123,14 @@ namespace Registry {
 	RegistryKey::RegistryKey(HKEY key) :
 		bKeyExists{ true },
 		bWow64{ false },
-		hkBackingKey{ key }{
+		hkBackingKey{ key },
+		tracker{ __tracker }{
 
-		BeginCriticalSection _{ _hGuard };
-		if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
-			_ReferenceCounts[hkBackingKey] = 1;
-		} else {
-			_ReferenceCounts[hkBackingKey]++;
-		}
+		tracker->Increment(hkBackingKey);
 	}
 
-	RegistryKey::RegistryKey(HKEY hive, std::wstring path, bool WoW64){
+	RegistryKey::RegistryKey(HKEY hive, std::wstring path, bool WoW64) :
+		tracker{ __tracker }{
 		auto wLowerPath = ToLowerCase(path);
 
 		bWow64 = WoW64 || wLowerPath.find(L"wow6432node") != std::wstring::npos;
@@ -126,16 +147,12 @@ namespace Registry {
 		} else {
 			bKeyExists = true;
 
-			BeginCriticalSection _{ _hGuard };
-			if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
-				_ReferenceCounts[hkBackingKey] = 1;
-			} else {
-				_ReferenceCounts[hkBackingKey]++;
-			}
+			tracker->Increment(hkBackingKey);
 		}
 	}
 	
-	RegistryKey::RegistryKey(std::wstring name, bool WoW64){
+	RegistryKey::RegistryKey(std::wstring name, bool WoW64) :
+		tracker{ __tracker }{
 		name = ToUpperCase(name);
 
 		SIZE_T slash = name.find_first_of(L"/\\");
@@ -168,12 +185,7 @@ namespace Registry {
 				}
 
 				if(status == ERROR_SUCCESS){
-					BeginCriticalSection _{ _hGuard };
-					if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
-						_ReferenceCounts[hkBackingKey] = 1;
-					} else {
-						_ReferenceCounts[hkBackingKey]++;
-					}
+					tracker->Increment(hkBackingKey);
 
 					bKeyExists = true;
 				} else {
@@ -184,12 +196,7 @@ namespace Registry {
 	}
 
 	RegistryKey::~RegistryKey(){
-		BeginCriticalSection _{ _hGuard };
-		if(_ReferenceCounts.find(hkBackingKey) != _ReferenceCounts.end()){
-			if(!--_ReferenceCounts[hkBackingKey] && !(ULONG_PTR(hkBackingKey) & 0xFFFFFFFF80000000)){
-				CloseHandle(hkBackingKey);
-			}
-		}
+		tracker->Decrement(hkBackingKey);
 	}
 
 	bool RegistryKey::CheckKeyExists(HKEY hive, const std::wstring& name, bool WoW64){
@@ -202,8 +209,7 @@ namespace Registry {
 		if(status == ERROR_ACCESS_DENIED){ return true; }
 
 		if(status == ERROR_SUCCESS){
-			BeginCriticalSection _{ _hGuard };
-			if(_ReferenceCounts.find(key) == _ReferenceCounts.end()){ RegCloseKey(key); }
+			if(!__tracker->Get(key)){ RegCloseKey(key); }
 			return true;
 		}
 
@@ -245,11 +251,7 @@ namespace Registry {
 		if(status == ERROR_SUCCESS){
 			bKeyExists = true;
 
-			if(_ReferenceCounts.find(hkBackingKey) == _ReferenceCounts.end()){
-				_ReferenceCounts[hkBackingKey] = 1;
-			} else {
-				_ReferenceCounts[hkBackingKey]++;
-			}
+			tracker->Increment(hkBackingKey);
 
 			return true;
 		}
@@ -311,14 +313,14 @@ namespace Registry {
 		std::vector<CHAR> data(size);
 		status = Linker::NtQueryValueKey(hkBackingKey, &RegistryKeyName, 0, data.data(), size, &size);
 
-		auto KeyValueInfo{ reinterpret_cast<KEY_VALUE_BASIC_INFORMATION*>(data.data()) };
-
-		DWORD dwType = KeyValueInfo->Type;
-
-		if(!NT_SUCCESS(status)) {
+		if(!NT_SUCCESS(status)){
 			SetLastError(status);
 			return std::nullopt;
 		}
+
+		auto KeyValueInfo{ reinterpret_cast<KEY_VALUE_BASIC_INFORMATION*>(data.data()) };
+
+		DWORD dwType = KeyValueInfo->Type;
 
 		if(dwType == REG_SZ){
 			return RegistryType::REG_SZ_T;

@@ -274,7 +274,9 @@ FileDetectionData::FileDetectionData(IN CONST FileSystem::File& file,
                 if(FileClass.Exists()) {
                     Registry::RegistryKey shell{ FileClass, L"shell\\open\\command" };
                     auto command{ shell.GetValue<std::wstring>(L"") };
-                    if(command) { Executor = StringReplaceW(*command, L"%1", FilePath); }
+                    if(command) { 
+                        Executor = StringReplaceW(StringReplaceW(*command, L"%1", FilePath), L"%*", L"");
+                    }
                 }
             }
         }

@@ -6,52 +6,45 @@
 
 #include <Windows.h>
 
-#include "user/banners.h"
+#include <map>
 
-#include "util/log/Log.h"
-#include "util/log/DetectionSink.h"
 #include "util/configurations/Registry.h"
+#include "util/log/DetectionSink.h"
+#include "util/log/Log.h"
 
 #include "hunt/Hunt.h"
 #include "hunt/HuntRegister.h"
-
-#include "scan/DetectionRegister.h"
-
-#include "reaction/ReactionManager.h"
-
 #include "mitigation/Mitigation.h"
 #include "mitigation/MitigationRegister.h"
+#include "reaction/ReactionManager.h"
+#include "scan/DetectionRegister.h"
+#include "user/banners.h"
 
-#include <map>
-
-enum class BluespawnMode {
-	HUNT, SCAN, MONITOR, MITIGATE
-};
+enum class BluespawnMode { HUNT, SCAN, MONITOR, MITIGATE };
 
 class Bluespawn {
-	
-	std::map<BluespawnMode, int> modes;
+    std::map<BluespawnMode, int> modes;
 
-	void RunMitigations(bool enforce, bool force);
-	void RunHunts();
-	void RunMonitor();
+    void RunMitigations(bool enforce, bool force);
+    void RunHunts();
+    void RunMonitor();
 
-	public:
-		Bluespawn();
+    public:
+    Bluespawn();
 
-		void AddReaction(std::unique_ptr<Reaction>&& reaction);
-		void EnableMode(BluespawnMode mode, int argument = 0);
-		void Run();
-		
-		void check_correct_arch();
+    void AddReaction(std::unique_ptr<Reaction>&& reaction);
+    void EnableMode(BluespawnMode mode, int argument = 0);
+    void Run();
 
-		static HuntRegister huntRecord;
-		static MitigationRegister mitigationRecord;
-		static Aggressiveness aggressiveness;
-		static DetectionRegister detections;
-		static std::vector<std::shared_ptr<DetectionSink>> detectionSinks;
-		static bool EnablePreScanDetections;
+    void check_correct_arch();
 
-		static ReactionManager reaction;
-		static const IOBase& io;
+    static HuntRegister huntRecord;
+    static MitigationRegister mitigationRecord;
+    static Aggressiveness aggressiveness;
+    static DetectionRegister detections;
+    static std::vector<std::shared_ptr<DetectionSink>> detectionSinks;
+    static bool EnablePreScanDetections;
+
+    static ReactionManager reaction;
+    static const IOBase& io;
 };

@@ -88,11 +88,11 @@ namespace Log{
 			return;
 		}
 
-		BeginCriticalSection _{ hGuard };
-
 		EnterCriticalSection(*detection);
 		Detection copy{ *detection };
 		LeaveCriticalSection(*detection);
+
+		BeginCriticalSection _{ hGuard };
 
 		tinyxml2::XMLElement* detect{ nullptr };
 		if(detections.find(copy.dwID) != detections.end()){

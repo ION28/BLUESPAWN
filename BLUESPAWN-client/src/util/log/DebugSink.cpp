@@ -28,13 +28,14 @@ namespace Log{
 	}
 
 	void DebugSink::RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN RecordType type){
-		BeginCriticalSection _{ hGuard };
 
 		if(type == RecordType::PreScan && Bluespawn::EnablePreScanDetections || type == RecordType::PostScan){
 
 			EnterCriticalSection(*detection);
 			Detection copy{ *detection };
 			LeaveCriticalSection(*detection);
+
+			BeginCriticalSection _{ hGuard };
 
 			DETECTION_DEBUG_STREAM(L" Detection Logged at " << FormatWindowsTime(copy.context.DetectionCreatedTime));
 			if(copy.context.note){

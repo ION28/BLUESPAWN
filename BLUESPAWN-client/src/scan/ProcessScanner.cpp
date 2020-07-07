@@ -15,8 +15,15 @@
 std::unordered_map<std::shared_ptr<Detection>, Association>
 ProcessScanner::SearchCommand(IN CONST std::wstring& ProcessCommand) {
     LOG_ERROR(L"Unable to properly scan command `" << ProcessCommand << L"`; function not implemented");
+    std::unordered_map<std::shared_ptr<Detection>, Association> detections{};
 
-    return {};
+    auto image{ GetImagePathFromCommand(ProcessCommand) };
+    if(FileScanner::PerformQuickScan(image)) {
+        detections.emplace(Bluespawn::detections.AddDetection(Detection{ FileDetectionData{ image } }),
+                           Association::Strong);
+    }
+
+    return detections;
 }
 
 std::unordered_map<std::shared_ptr<Detection>, Association>
@@ -28,41 +35,44 @@ ProcessScanner::GetAssociatedDetections(IN CONST Detection& detection) {
     std::unordered_map<std::shared_ptr<Detection>, Association> detections{};
     ProcessDetectionData data{ std::get<ProcessDetectionData>(detection.data) };
 
-    if(data.type == ProcessDetectionType::MaliciousProcess && data.ProcessCommand) {
+    if((data.type == ProcessDetectionType::MaliciousProcess || data.type == ProcessDetectionType::MaliciousCommand) &&
+       data.ProcessCommand) {
         auto associated{ SearchCommand(*data.ProcessCommand) };
         for(auto& pair : associated) {
             detections.emplace(pair.first, pair.second);
         }
     }
 
-    HandleWrapper snapshot{ CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) };
+    if(data.type == ProcessDetectionType::MaliciousProcess){
+        HandleWrapper snapshot{ CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) };
 
-    PROCESSENTRY32W entry{};
-    entry.dwSize = sizeof(entry);
+        PROCESSENTRY32W entry{};
+        entry.dwSize = sizeof(entry);
 
-    if(Process32FirstW(snapshot, &entry)) {
-        do
-            if(entry.th32ParentProcessID == data.PID) {
-                detections.emplace(
-                    Bluespawn::detections.AddDetection(Detection{
-                        ProcessDetectionData::CreateProcessDetectionData(entry.th32ProcessID, entry.szExeFile) }),
-                    Association::Moderate);
-            } else if(entry.th32ProcessID == data.PID) {
-                HandleWrapper parent{ OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false,
-                                                  entry.th32ParentProcessID) };
-                if(parent) {
-                    detections.emplace(Bluespawn::detections.AddDetection(Detection{
-                                           ProcessDetectionData::CreateProcessDetectionData(entry.th32ParentProcessID,
-                                                                                            GetProcessImage(parent)) }),
-                                       Association::Weak);
-                } else {
+        if(Process32FirstW(snapshot, &entry)){
+            do {
+                if(entry.th32ParentProcessID == data.PID){
                     detections.emplace(
                         Bluespawn::detections.AddDetection(Detection{
-                            ProcessDetectionData::CreateProcessDetectionData(entry.th32ParentProcessID, L"Unknown") }),
-                        Association::Weak);
+                            ProcessDetectionData::CreateProcessDetectionData(entry.th32ProcessID, entry.szExeFile) }),
+                            Association::Moderate);
+                } else if(entry.th32ProcessID == data.PID){
+                    HandleWrapper parent{ OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false,
+                                                      entry.th32ParentProcessID) };
+                    if(parent){
+                        detections.emplace(Bluespawn::detections.AddDetection(Detection{
+                                               ProcessDetectionData::CreateProcessDetectionData(entry.th32ParentProcessID,
+                                                                                                GetProcessImage(parent)) }),
+                                                                                                Association::Weak);
+                    } else{
+                        detections.emplace(
+                            Bluespawn::detections.AddDetection(Detection{
+                                ProcessDetectionData::CreateProcessDetectionData(entry.th32ParentProcessID, L"Unknown") }),
+                                Association::Weak);
+                    }
                 }
-            }
-        while(Process32NextW(snapshot, &entry));
+            } while(Process32NextW(snapshot, &entry));
+        }
     }
 
     return detections;
@@ -80,10 +90,22 @@ bool ProcessScanner::PerformQuickScan(IN CONST std::wstring& in) {
     // Check if the file appears to use a "lolbin" to obfuscate its execution
     bool lolbin{ IsLolbinMalicious(in) };
 
-    return false;
+    return lolbin;
 }
 
 Certainty ProcessScanner::ScanDetection(IN CONST Detection& detection) {
     /// TODO: Implement check for LOLBins
+
+    if(detection.type != DetectionType::ProcessDetection) {
+        return Certainty::None;
+    }
+
+    ProcessDetectionData data{ std::get<ProcessDetectionData>(detection.data) };
+    if(data.type == ProcessDetectionType::MaliciousProcess && data.ProcessCommand) {
+        if(IsLolbinMalicious(*data.ProcessCommand)) {
+            return Certainty::Moderate;
+        }
+    }
+
     return Certainty::None;
 }

@@ -38,7 +38,6 @@
 #include "hunt/hunts/HuntT1183.h"
 #include "hunt/hunts/HuntT1198.h"
 #include "hunt/hunts/HuntT1484.h"
-
 #include "mitigation/mitigations/MitigateM1025.h"
 #include "mitigation/mitigations/MitigateM1028-WFW.h"
 #include "mitigation/mitigations/MitigateM1035-RDP.h"
@@ -81,8 +80,9 @@
 
 #pragma warning(pop)
 
-#include <iostream>
 #include <VersionHelpers.h>
+
+#include <iostream>
 
 DEFINE_FUNCTION(BOOL, IsWow64Process2, NTAPI, HANDLE hProcess, USHORT* pProcessMachine, USHORT* pNativeMachine);
 LINK_FUNCTION(IsWow64Process2, KERNEL32.DLL);
@@ -98,62 +98,61 @@ bool Bluespawn::EnablePreScanDetections{ false };
 
 std::map<std::string, std::unique_ptr<Reaction>> reactions{};
 
-Bluespawn::Bluespawn(){
+Bluespawn::Bluespawn() {
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1004>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1013>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1015>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1031>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1035>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1036>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1037>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1050>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1053>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1055>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1060>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1068>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1089>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1099>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1100>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1101>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1103>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1122>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1128>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1131>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1136>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1138>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1182>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1183>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1198>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1484>());
 
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1004>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1013>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1015>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1031>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1035>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1036>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1037>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1050>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1053>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1055>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1060>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1068>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1089>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1099>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1100>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1101>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1103>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1122>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1128>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1131>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1136>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1138>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1182>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1183>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1198>());
-	huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1484>());
-
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1025>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1028WFW>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1035RDP>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042LLMNR>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042NBT>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042WSH>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1047>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1054RDP>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1054WSC>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1093>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1153>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3338>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3340>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3344>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3379>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3479>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63597>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63687>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63753>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63817>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63825>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV71769>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73511>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
-	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1025>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1028WFW>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1035RDP>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042LLMNR>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042NBT>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042WSH>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1047>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1054RDP>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1054WSC>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1093>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1153>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3338>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3340>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3344>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3379>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3479>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63597>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63687>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63753>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63817>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63825>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV71769>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73511>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
+    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
 
     reactions.emplace("remove-value", std::make_unique<Reactions::RemoveValueReaction>());
     reactions.emplace("suspend", std::make_unique<Reactions::SuspendProcessReaction>());
@@ -211,8 +210,12 @@ void Bluespawn::Run() {
     if(modes.find(BluespawnMode::MITIGATE) != modes.end()) {
         RunMitigations(modes[BluespawnMode::MITIGATE] & 0x01, modes[BluespawnMode::MITIGATE] & 0x02);
     }
-    if(modes.find(BluespawnMode::HUNT) != modes.end()) { RunHunts(); }
-    if(modes.find(BluespawnMode::MONITOR) != modes.end()) { RunMonitor(); }
+    if(modes.find(BluespawnMode::HUNT) != modes.end()) {
+        RunHunts();
+    }
+    if(modes.find(BluespawnMode::MONITOR) != modes.end()) {
+        RunMonitor();
+    }
 
     ThreadPool::GetInstance().Wait();
     Bluespawn::detections.Wait();
@@ -235,21 +238,23 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 }
 
 void Bluespawn::check_correct_arch() {
-	BOOL bIsWow64 = FALSE;
-	if (IsWindows10OrGreater() && Linker::IsWow64Process2) {
-		USHORT ProcessMachine;
-		USHORT NativeMachine;
+    BOOL bIsWow64 = FALSE;
+    if(IsWindows10OrGreater() && Linker::IsWow64Process2) {
+        USHORT ProcessMachine;
+        USHORT NativeMachine;
         Linker::IsWow64Process2(GetCurrentProcess(), &ProcessMachine, &NativeMachine);
-        if (ProcessMachine != IMAGE_FILE_MACHINE_UNKNOWN) {
+        if(ProcessMachine != IMAGE_FILE_MACHINE_UNKNOWN) {
             bIsWow64 = TRUE;
         }
-    }
-    else {
+    } else {
         IsWow64Process(GetCurrentProcess(), &bIsWow64);
     }
-    if (bIsWow64) {
-        Bluespawn::io.AlertUser(L"Running the x86 version of BLUESPAWN on an x64 system! This configuration is not fully supported, so we recommend downloading the x64 version.", 5000, ImportanceLevel::MEDIUM);
-        LOG_WARNING("Running the x86 version of BLUESPAWN on an x64 system! This configuration is not fully supported, so we recommend downloading the x64 version.");
+    if(bIsWow64) {
+        Bluespawn::io.AlertUser(L"Running the x86 version of BLUESPAWN on an x64 system! This configuration is not "
+                                L"fully supported, so we recommend downloading the x64 version.",
+                                5000, ImportanceLevel::MEDIUM);
+        LOG_WARNING("Running the x86 version of BLUESPAWN on an x64 system! This configuration is not fully supported, "
+                    "so we recommend downloading the x64 version.");
     }
 }
 
@@ -260,7 +265,7 @@ void ParseLogSinks(const std::string& sinks) {
         auto sink{ sinks.substr(startIdx, endIdx - startIdx - 1) };
         sink_set.emplace(sink);
         startIdx = endIdx + 1;
-        if(endIdx == std::string::npos){
+        if(endIdx == std::string::npos) {
             break;
         }
     }
@@ -326,7 +331,7 @@ int main(int argc, char* argv[]) {
         ("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
         ("n,monitor", "Monitor the System for malicious activity, dispatching hunts as changes are detected.",
             cxxopts::value<std::string>()->implicit_value("Normal"))
-        ("m,mitigate", "Mitigates vulnerabilities by applying security settings. Available options are audit and enforce.", 
+        ("m,mitigate", "Mitigates vulnerabilities by applying security settings. Available options: audit, enforce", 
              cxxopts::value<std::string>()->implicit_value("audit"))
         ("s,scan", "Scans possible detections to decide if they are malicious and determine associated detections.",
             cxxopts::value<std::string>()->default_value("Normal"))
@@ -352,15 +357,27 @@ int main(int argc, char* argv[]) {
         }
 
         if(result.count("verbose")) {
-            if(result["verbose"].as<int>() >= 1) { Log::LogLevel::LogInfo1.Enable(); }
-            if(result["verbose"].as<int>() >= 2) { Log::LogLevel::LogInfo2.Enable(); }
-            if(result["verbose"].as<int>() >= 3) { Log::LogLevel::LogInfo3.Enable(); }
+            if(result["verbose"].as<int>() >= 1) {
+                Log::LogLevel::LogInfo1.Enable();
+            }
+            if(result["verbose"].as<int>() >= 2) {
+                Log::LogLevel::LogInfo2.Enable();
+            }
+            if(result["verbose"].as<int>() >= 3) {
+                Log::LogLevel::LogInfo3.Enable();
+            }
         }
 
         if(result.count("debug")) {
-            if(result["debug"].as<int>() >= 1) { Log::LogLevel::LogVerbose1.Enable(); }
-            if(result["debug"].as<int>() >= 2) { Log::LogLevel::LogVerbose2.Enable(); }
-            if(result["debug"].as<int>() >= 3) { Log::LogLevel::LogVerbose3.Enable(); }
+            if(result["debug"].as<int>() >= 1) {
+                Log::LogLevel::LogVerbose1.Enable();
+            }
+            if(result["debug"].as<int>() >= 2) {
+                Log::LogLevel::LogVerbose2.Enable();
+            }
+            if(result["debug"].as<int>() >= 3) {
+                Log::LogLevel::LogVerbose3.Enable();
+            }
         }
 
         ParseLogSinks(result["log"].as<std::string>());
@@ -388,7 +405,8 @@ int main(int argc, char* argv[]) {
         }
         if(result.count("mitigate")) {
             bool bForceEnforce = false;
-            if(result.count("force")) bForceEnforce = true;
+            if(result.count("force"))
+                bForceEnforce = true;
 
             MitigationMode mode = MitigationMode::Audit;
             if(result["mitigate"].as<std::string>() == "e" || result["mitigate"].as<std::string>() == "enforce")
@@ -397,8 +415,12 @@ int main(int argc, char* argv[]) {
             bluespawn.EnableMode(BluespawnMode::MITIGATE,
                                  (static_cast<DWORD>(bForceEnforce) << 1) | (static_cast<DWORD>(mode) << 0));
         }
-        if(result.count("hunt")) { bluespawn.EnableMode(BluespawnMode::HUNT); }
-        if(result.count("monitor")) { bluespawn.EnableMode(BluespawnMode::MONITOR); }
+        if(result.count("hunt")) {
+            bluespawn.EnableMode(BluespawnMode::HUNT);
+        }
+        if(result.count("monitor")) {
+            bluespawn.EnableMode(BluespawnMode::MONITOR);
+        }
 
         bluespawn.Run();
     } catch(cxxopts::OptionParseException e1) {

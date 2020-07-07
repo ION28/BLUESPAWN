@@ -95,10 +95,50 @@ namespace Registry {
 		RegistryKey& operator=(RegistryKey&& key) noexcept;
 
 	private:
-		static std::unordered_map<HKEY, int> _ReferenceCounts;
 
-		/// Guards accesses to _ReferenceCounts
-		static CriticalSection _hGuard;
+		/**
+		 * This class handles reference tracking for registry key handles
+		 */
+		class Tracker {
+		private:
+
+			/// A mapping of HKEYs to the number of references to that key
+			std::unordered_map<HKEY, int> counts;
+
+			/// A critical section guarding access to counts
+			CriticalSection hGuard;
+
+		public:
+
+			explicit Tracker();
+
+			/**
+			 * Increments the number of references for hKey
+			 *
+			 * @param hKey The handle to increment references for
+			 */
+			void Increment(IN HKEY hKey);
+
+			/**
+			 * Decrements the number of references for hKey, closing the handle if it reaches zero
+			 *
+			 * @param hKey The handle to decrement references for
+			 */
+			void Decrement(IN HKEY hKey);
+
+			/**
+			 * Gets the number of references to a given HKEY
+			 *
+			 * @param hKey The HKEY to check the number of references for
+			 *
+			 * @return The number of references to hKey
+			 */
+			int Get(IN HKEY hKey);
+		};
+
+		static std::shared_ptr<RegistryKey::Tracker> __tracker;
+
+		std::shared_ptr<Tracker> tracker;
 
 		HKEY hkBackingKey;
 

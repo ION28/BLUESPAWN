@@ -93,11 +93,12 @@ namespace Hunts {
                 }
             }
 
-            if((path.find(L".dll") != std::wstring::npos && FileScanner::PerformQuickScan(path)) ||
-               ProcessScanner::PerformQuickScan(pair.first)) {
+            auto dll{ path.find(L".dll") != std::wstring::npos };
+            if((dll && FileScanner::PerformQuickScan(path)) || (!dll && ProcessScanner::PerformQuickScan(pair.first))) {
                 for(auto& value : pair.second) {
                     CREATE_DETECTION(Certainty::Moderate,
-                                     RegistryDetectionData{ value, RegistryDetectionType::FileReference });
+                                     RegistryDetectionData{ value, dll ? RegistryDetectionType::FileReference :
+                                                                         RegistryDetectionType::CommandReference });
                 }
             }
         }
