@@ -8,7 +8,7 @@
 namespace Log {
 
 	void CLISink::SetConsoleColor(const MessageColor color){
-		printf("%s", GetColorStr(color));
+		printf("%s", GetColorStr(color).c_str());
 	}
 
 	CLISink::CLISink(){

@@ -17,10 +17,18 @@ namespace Log{
 		return str;
 	}
 
+	std::string ToStringPad(unsigned int value, size_t length=2){
+		char * buf = new char[length+1];
+		snprintf(buf, length + 1, ("%0" + std::to_string(length) + "d").c_str(), value);
+		std::string str = buf;
+		delete[] buf;
+		return str;
+	}
+
 	void UpdateLog(XMLSink* sink){
 		HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, "Local\\FlushLogs") };
 		while(true){
-			WaitForSingleObject(hRecordEvent, INFINITE);
+			Events::WaitForSingleObject(hRecordEvent, INFINITE);
 			sink->Flush();
 		}
 	}
@@ -29,10 +37,12 @@ namespace Log{
 		hMutex{ CreateMutexW(nullptr, false, nullptr) } ,
 		Root{ XMLDoc.NewElement("bluespawn") },
 		thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr) }{
-		SYSTEMTIME time{};
-		GetLocalTime(&time);
-		wFileName = "bluespawn-" + ToWstringPad(time.wMonth) + "-" + ToWstringPad(time.wDay) + "-" + ToWstringPad(time.wYear, 4) + "-"
-			+ ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + "-" + ToWstringPad(time.wSecond) + ".xml";
+		//SYSTEMTIME time{};
+		//GetLocalTime(&time);
+		time_t curr = time(NULL);
+		struct tm * time = localtime(&curr);
+		wFileName = "bluespawn-" + ToStringPad(time->tm_mon) + "-" + ToStringPad(time->tm_mday) + "-" + ToStringPad(time->tm_year, 4) + "-"
+			+ ToStringPad(time->tm_hour) + ToStringPad(time->tm_min) + "-" + ToStringPad(time->tm_sec) + ".xml";
 		XMLDoc.InsertEndChild(Root);
 		ResumeThread(thread);
 	}

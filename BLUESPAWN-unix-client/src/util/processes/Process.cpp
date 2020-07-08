@@ -38,7 +38,7 @@ namespace Process{
     }
 
     pid_t ProcessInfo::GetProcessId(){
-        this->pid;
+        return this->pid;
     }
 
     std::string ProcessInfo::GetProcessExecutable(){

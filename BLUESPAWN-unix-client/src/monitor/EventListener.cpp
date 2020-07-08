@@ -164,7 +164,7 @@ bool EventListener::SubEventListener::TryAddCallback(
 
 // Function adopted from https://stackoverflow.com/questions/20833453/comparing-stdfunctions-for-equality
 void* getAddress(std::function<void()> f){
-    return f.template target<void()>();
+    return reinterpret_cast<void*>(f.template target<void()>()); //TODO
 }
 
 bool EventListener::SubEventListener::TryRemoveCallback(

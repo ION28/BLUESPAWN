@@ -294,7 +294,7 @@ public:
 
 	AllocationWrapper ToAllocationWrapper(unsigned int size = -1){
 		if(size == -1) size = MemorySize;
-		size = std::min(reinterpret_cast<size_t>(size), MemorySize);
+		size = std::min(static_cast<size_t>(size), MemorySize);
 		AllocationWrapper wrapper{ malloc(size), size, AllocationWrapper::MALLOC };
 		memmove(wrapper, address, size);
 		return wrapper;

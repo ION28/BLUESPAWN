@@ -8,7 +8,7 @@ namespace Events{
         return this->details == e.details; //not sure if this method is actually needed
     }
 
-    EventHandle::EventHandle(EventDetails details) : details{ details }{}
+    EventHandle::EventHandle(Events::EventDetails &details) : details{ details }{}
 
     bool EventHandle::HasSignal() {
         return !signalQueue.empty();

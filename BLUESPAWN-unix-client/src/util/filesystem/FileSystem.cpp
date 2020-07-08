@@ -849,26 +849,6 @@ namespace FileSystem{
 		this->Close();
 	}
 
-	bool FileObject::SetFileOwner(const Permissions::Owner& owner) {
-		if (!bFileExists) {
-			LOG_ERROR("Can't write owner of folder " << FilePath << ". Folder doesn't exist");
-			return false;
-		}
-
-		if(owner.GetOwnerType() == Permissions::NONE || !owner.Exists()){
-			LOG_ERROR("Invalid owner type");
-			return false;
-		}
-
-		if(owner.GetOwnerType() == Permissions::USER){
-			const Permissions::User &user = reinterpret_cast<const Permissions::User&>(owner);
-			return fchown(hFile, owner.GetId(), user.GetGroup()) == 0;
-		}else{
-			return fchown(hFile, -1, owner.GetId()) == 0;
-		}
-		return false;
-	}
-
 	//NOTE: Make some sort of class heirarchy so that I dont have to reuse this method
 	bool FileObject::HasPermHelper(const Permissions::Owner &user, unsigned int userMask, unsigned int groupMask, unsigned int otherMask){
 		if(!bFileExists)

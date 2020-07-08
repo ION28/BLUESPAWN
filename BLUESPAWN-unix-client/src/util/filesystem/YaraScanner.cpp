@@ -7,6 +7,7 @@
 const YaraScanner YaraScanner::instance{};
 //TODO: port this - no resources on linux
 AllocationWrapper GetResourceRule(unsigned int identifier){
+	/*
 	auto hRsrcInfo = FindResourceW(nullptr, MAKEINTRESOURCE(identifier), "yararule");
 	if(!hRsrcInfo){
 		return { nullptr, 0 };
@@ -46,7 +47,8 @@ AllocationWrapper GetResourceRule(unsigned int identifier){
 		zip_source_close(lpZipSource);
 	}
 
-	return { nullptr, 0 };
+	return { nullptr, 0 };*/
+	return { nullptr, 0}; //TODO
 }
 
 struct AllocationWrapperStream {
@@ -56,8 +58,8 @@ struct AllocationWrapperStream {
 
 size_t ReadAllocationWrapper(void* dest, size_t size, size_t count, AllocationWrapperStream* data){
 	size_t desired_amnt = size * count;
-	size_t actual_amnt = min(desired_amnt, data->wrapper.GetSize() - data->offset);
-	memcpy(dest, ((void*) data->wrapper, actual_amnt);
+	size_t actual_amnt = std::min(desired_amnt, data->wrapper.GetSize() - data->offset);
+	memcpy(dest, (void*) data->wrapper, actual_amnt);
 
 	data->offset += actual_amnt;
 	return actual_amnt / size;
@@ -81,7 +83,7 @@ YaraScanner::YaraScanner() :
 	status{ YaraStatus::Success }{
 	yr_initialize();
 
-	auto hSevereYara = GetResourceRule(YaraSevere);
+    /*auto hSevereYara = GetResourceRule(YaraSevere);
 	if(!hSevereYara){
 		status = YaraStatus::RulesMissing;
 		return;
@@ -112,7 +114,8 @@ YaraScanner::YaraScanner() :
 	if(!Indicators){
 		status = YaraStatus::RulesInvalid;
 		return;
-	}
+	}*/
+	//TODO
 }
 
 YaraScanner::~YaraScanner(){

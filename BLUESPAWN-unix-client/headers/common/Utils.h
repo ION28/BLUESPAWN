@@ -16,3 +16,5 @@
 std::string FormatStatTime(const struct statx_timestamp * systemtime); 
 
 std::string FormatStatTime(const struct tm * ft);
+
+std::string FormatStatTime(const struct statx_timestamp ft);
