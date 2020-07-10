@@ -30,6 +30,8 @@ public:
 
     EventHandle(Events::EventDetails &details);
 
+    EventHandle();
+
     bool operator==(const EventHandle& e) const;
 
     bool HasSignal();
@@ -37,6 +39,8 @@ public:
     Events::EventDetails PopSignal();
 
     void PushSignal(Events::EventDetails details);
+
+    void PushSignal()
 
 
 
@@ -46,7 +50,7 @@ public:
 int WaitForMultipleObjects(int nCount, Events::EventHandle * lpHandles, bool bWaitAll, int dwMilliSeconds);
 
 //for compatibility with the WaitForSingleObjects on the hManager event handle
-bool WaitForSingleObject(std::atomic<bool> &hHandle, int dwMilliseconds);
+bool WaitForSingleObject(Events::EventHandle &hHandle, int dwMilliseconds);
 //holds dynamic event details
 enum class EventType{
     SystemCall,

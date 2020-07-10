@@ -25,32 +25,33 @@ namespace Log{
 		return str;
 	}
 
-	void UpdateLog(XMLSink* sink){
-		HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, "Local\\FlushLogs") };
+	void * UpdateLog(void * arg){
+		XMLSink * sink = (XMLSink*) arg;
+		Events::EventHandle handle = sink->GetEventHandle();
 		while(true){
-			Events::WaitForSingleObject(hRecordEvent, INFINITE);
+			Events::WaitForSingleObject(handle, INFINITE);
 			sink->Flush();
 		}
 	}
 
 	XMLSink::XMLSink() :
-		hMutex{ CreateMutexW(nullptr, false, nullptr) } ,
-		Root{ XMLDoc.NewElement("bluespawn") },
-		thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr) }{
+		Root{ XMLDoc.NewElement("bluespawn") }{
 		//SYSTEMTIME time{};
 		//GetLocalTime(&time);
+		pthread_mutex_init(&this->hMutex, NULL);
 		time_t curr = time(NULL);
 		struct tm * time = localtime(&curr);
 		wFileName = "bluespawn-" + ToStringPad(time->tm_mon) + "-" + ToStringPad(time->tm_mday) + "-" + ToStringPad(time->tm_year, 4) + "-"
 			+ ToStringPad(time->tm_hour) + ToStringPad(time->tm_min) + "-" + ToStringPad(time->tm_sec) + ".xml";
 		XMLDoc.InsertEndChild(Root);
-		ResumeThread(thread);
+		pthread_create(&this->thread, NULL, UpdateLog, this);
+		hRecordEvent = Events::EventHandle();
 	}
 
 	XMLSink::XMLSink(const std::string& wFileName) :
 		Root { XMLDoc.NewElement("bluespawn") },
 		wFileName{ wFileName }{
-		pthread_mutex_init(&hMutex, NULL);
+		pthread_mutex_init(&this->hMutex, NULL);
 		//TODO: init thread here
 		XMLDoc.InsertEndChild(Root);
 	}
@@ -59,6 +60,10 @@ namespace Log{
 		XMLDoc.SaveFile(wFileName.c_str());
 		//TerminateThread(thread, 0);
 		//TOOD
+	}
+
+	Events::EventHandle XMLSink::GetEventHandle(){
+		return this->hRecordEvent;
 	}
 
 	tinyxml2::XMLElement* CreateDetctionXML(const std::shared_ptr<DETECTION>& detection, tinyxml2::XMLDocument& XMLDoc){

@@ -2,6 +2,8 @@
 
 #include "LogSink.h"
 #include "../external/tinyxml2/tinyxml2.h"
+#include "../../monitor/listen/Events.h"
+#include <pthread.h>
 
 namespace Log {
 
@@ -19,6 +21,8 @@ namespace Log {
 		std::string MessageTags[5] = { "error", "warning", "info", "other", "hunt" };
 
 		pthread_t thread;
+
+		Events::EventHandle &hRecordEvent;
 
 	public:
 
@@ -67,5 +71,7 @@ namespace Log {
 		 * Flushes the log to the file.
 		 */
 		void Flush();
+
+		Events::EventHandle GetEventHandle();
 	};
 }

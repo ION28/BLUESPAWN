@@ -10,6 +10,10 @@ namespace Events{
 
     EventHandle::EventHandle(Events::EventDetails &details) : details{ details }{}
 
+    EventHandle::EventHandle() : details{ nullptr }{
+
+    }
+
     bool EventHandle::HasSignal() {
         return !signalQueue.empty();
     }
@@ -69,7 +73,7 @@ namespace Events{
         return nDone;
     }
 
-    bool WaitForSingleObject(std::atomic<bool> &hHandle, int dwMilliseconds){
+    bool WaitForSingleObject(Events::EventHandle &hHandle, int dwMilliseconds){
         bool inf = dwMilliseconds == -1;
 
         //NOTE: for the purposes of this function, we dont actually need to implement dwMilliseconds
@@ -78,12 +82,10 @@ namespace Events{
             return false;
         }
 
-        while(!hHandle)
+        while(!hHandle.HasSignal())
         {
             usleep(10);
         }
-
-        hHandle.store(false);
         return true;
     }
 

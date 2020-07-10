@@ -968,7 +968,7 @@ namespace FileSystem{
 			return std::nullopt;
 		}
 		struct statx statbuf;
-		if (statx(hFile, NULL, AT_EMPTY_PATH, STATX_BTIME, &statbuf) == 0) {
+		if (statx(hFile, "", AT_EMPTY_PATH, STATX_BTIME, &statbuf) == 0) {
 			return statbuf.stx_btime;
 		}else {
 			LOG_ERROR("Error getting creation time of " << FilePath << ". (Error: " << errno << ")");
@@ -983,7 +983,7 @@ namespace FileSystem{
 			return std::nullopt;
 		}
 		struct statx statbuf;
-		if (statx(hFile, NULL, AT_EMPTY_PATH, STATX_MTIME, &statbuf) == 0) {
+		if (statx(hFile, "", AT_EMPTY_PATH, STATX_MTIME, &statbuf) == 0) {
 			return statbuf.stx_mtime;
 		}else {
 			LOG_ERROR("Error getting modification time of " << FilePath << ". (Error: " << errno << ")");
@@ -998,7 +998,7 @@ namespace FileSystem{
 			return std::nullopt;
 		}
 		struct statx statbuf;
-		if (statx(hFile, NULL, AT_EMPTY_PATH, STATX_ATIME, &statbuf) == 0) {
+		if (statx(hFile, "", AT_EMPTY_PATH, STATX_ATIME, &statbuf) == 0) {
 			return statbuf.stx_atime;
 		}else {
 			LOG_ERROR("Error getting access time of " << FilePath << ". (Error: " << errno << ")");
