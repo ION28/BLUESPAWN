@@ -6,6 +6,8 @@
 #include <iostream>
 #include "common/Utils.h"
 #include <pthread.h>
+#include <signal.h>
+#include <stddef.h>
 
 namespace Log{
 
@@ -27,7 +29,7 @@ namespace Log{
 
 	void * UpdateLog(void * arg){
 		XMLSink * sink = (XMLSink*) arg;
-		Events::EventHandle handle = sink->GetEventHandle();
+		Events::EventHandle * handle = sink->GetEventHandle();
 		while(true){
 			Events::WaitForSingleObject(handle, INFINITE);
 			sink->Flush();
@@ -35,9 +37,8 @@ namespace Log{
 	}
 
 	XMLSink::XMLSink() :
-		Root{ XMLDoc.NewElement("bluespawn") }{
-		//SYSTEMTIME time{};
-		//GetLocalTime(&time);
+		Root{ XMLDoc.NewElement("bluespawn") },
+		hRecordEvent{Events::CreateEvent()}{
 		pthread_mutex_init(&this->hMutex, NULL);
 		time_t curr = time(NULL);
 		struct tm * time = localtime(&curr);
@@ -45,12 +46,12 @@ namespace Log{
 			+ ToStringPad(time->tm_hour) + ToStringPad(time->tm_min) + "-" + ToStringPad(time->tm_sec) + ".xml";
 		XMLDoc.InsertEndChild(Root);
 		pthread_create(&this->thread, NULL, UpdateLog, this);
-		hRecordEvent = Events::EventHandle();
 	}
 
 	XMLSink::XMLSink(const std::string& wFileName) :
 		Root { XMLDoc.NewElement("bluespawn") },
-		wFileName{ wFileName }{
+		wFileName{ wFileName },
+		hRecordEvent{Events::CreateEvent()}{
 		pthread_mutex_init(&this->hMutex, NULL);
 		//TODO: init thread here
 		XMLDoc.InsertEndChild(Root);
@@ -60,9 +61,12 @@ namespace Log{
 		XMLDoc.SaveFile(wFileName.c_str());
 		//TerminateThread(thread, 0);
 		//TOOD
+		pthread_kill(&this->thread, SIGKILL);
+		Events::CloseHandle(this->hRecordEvent);
+		pthread_mutex_destroy(&this->hMutex);
 	}
 
-	Events::EventHandle XMLSink::GetEventHandle(){
+	Events::EventHandle * XMLSink::GetEventHandle(){
 		return this->hRecordEvent;
 	}
 

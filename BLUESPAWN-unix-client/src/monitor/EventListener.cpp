@@ -117,7 +117,6 @@ bool EventListener::SubEventListener::TrySubscribe(
     if(dwSlotsFree > 0){
         // Set the manager event since we're writing to map 
         //SetEvent(hManager);
-        hManager.store(true);
 
         auto status{ Events::WaitForSingleObject(hManagerResponse, INFINITE) };
 
@@ -207,9 +206,7 @@ bool EventListener::SubEventListener::TryUnsubscribe(
     }
 
     // Set hManager before modifying events, map, or dwSlotsFree
-    //SetEvent(hManager);
-
-    hManager.store(true);
+    SetEvent(hManager);
 
     auto status{ Events::WaitForSingleObject(hManagerResponse, INFINITE) };
 

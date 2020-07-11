@@ -47,13 +47,13 @@ private:
 		/// Always set the manager event before modifying `events`, `dwSlotsFree`, or `map`
 		//HandleWrapper hManager;
 
-		std::atomic<bool> hManager; //if this is true, interrupt the wait on the manager thread
+        Events::EventHandle * hManager; //if this is true, interrupt the wait on the manager thread
 
 		/// A response event triggered whenever the manager trigger is processed. After setting 
 		/// hManager, always wait for a response before continuing
 		//HandleWrapper hManagerResponse;
 
-		std::atomic<bool> hManagerResponse; //triggered when hManager is done
+		Events::EventHandle * hManagerResponse; //triggered when hManager is done
 
 		/// A handle to the thread waiting on the events
 		std::thread hThread;

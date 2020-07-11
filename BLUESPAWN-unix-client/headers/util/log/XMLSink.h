@@ -22,7 +22,7 @@ namespace Log {
 
 		pthread_t thread;
 
-		Events::EventHandle &hRecordEvent;
+		Events::EventHandle * hRecordEvent;
 
 	public:
 
@@ -72,6 +72,6 @@ namespace Log {
 		 */
 		void Flush();
 
-		Events::EventHandle GetEventHandle();
+		Events::EventHandle * GetEventHandle();
 	};
 }

@@ -1,30 +1,41 @@
 #include "Events.h"
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
 
 namespace Events{
 
-    bool EventHandle::operator==(const EventHandle& e) const{
-        return this->details == e.details; //not sure if this method is actually needed
+    EventHandle::EventHandle(){
+        pthread_cond_init(&this->condition, NULL);
+        pthread_mutex_init(&this->mutex, NULL);
     }
 
-    EventHandle::EventHandle(Events::EventDetails &details) : details{ details }{}
-
-    EventHandle::EventHandle() : details{ nullptr }{
-
+    EventHandle::~EventHandle(){
+        pthread_cond_destroy(&this->condition);
+        pthread_mutex_destroy(&this->mutex);
     }
 
-    bool EventHandle::HasSignal() {
-        return !signalQueue.empty();
+    void EventHandle::Set(){
+        pthread_cond_signal(&this->condition);
     }
 
-    EventDetails EventHandle::PopSignal() {
-        return signalQueue.pop();
+    int EventHandle::Wait(int timeout, bool * done){
+        struct timespec spec = {timeout, 0};
+        time_t current = time(NULL);
+        pthread_mutex_lock(&this->mutex);
+        int result = 0;
+        if(timeout != INFINITE)
+            result = pthread_cond_timedwait(&this->condition, &this->mutex, &spec);
+        else
+            result = pthread_cond_wait(&this->condition, &this->mutex);
+
+        if(result == 0){
+            *done = true;
+        }
+        
+        return (int)(time(NULL) - current);
     }
 
-    void EventHandle::PushSignal(EventDetails details){
-        signalQueue.push(details);
-    }
 
     EventDetails::EventDetails(pid_t pid, long number, struct pt_regs * registers) : type{EventType::SystemCall}, pid{pid}, number{number}{
         if(!registers){
@@ -49,44 +60,56 @@ namespace Events{
     int WaitForMultipleObjects(int nCount, Events::EventHandle * lpHandles, bool bWaitAll, int dwMilliSeconds){
         //check through each handle
         //Again, dont really need the DW
+        bool infinite = dwMilliSeconds == INFINITE;
         bool * done = new bool[nCount];
         int nDone = 0;
         while(true){
             for(int i = 0; i < nCount; i++){
-                if(!done[i] && lpHandles[i].HasSignal()){
-                    done[i] = true;
-                    nDone ++;
+                if(!done[i]){
+                    bool odone = false;
+                    if(infinite)
+                        dwMilliSeconds -= lpHandles[i].Wait(dwMilliSeconds, &odone);
+                    else
+                        lpHandles[i].Wait(dwMilliSeconds, &odone);
 
-                    if(!bWaitAll){
-                        return i;
+                    if(odone){
+                        nDone++;
+                        done[i] = true;
+                        if(bWaitAll){
+                            break;
+                        }
                     }
-                }
+                    
+                    
+                    if(!infinite && dwMilliSeconds <= 0){
+                        break;
+                    }
 
+                }
             }
 
             if(bWaitAll && nDone == nCount){
                 break;
             }
-            usleep(10);
         }
 
         return nDone;
     }
 
-    bool WaitForSingleObject(Events::EventHandle &hHandle, int dwMilliseconds){
-        bool inf = dwMilliseconds == -1;
+    bool WaitForSingleObject(Events::EventHandle * hHandle, int dwMilliseconds){
+        return WaitForMultipleObjects(1, hHandle, true, dwMilliseconds);
+    }
 
-        //NOTE: for the purposes of this function, we dont actually need to implement dwMilliseconds
-        //Going to leave it in here for possible future compatibility though.
-        if(!inf){
-            return false;
-        }
+    Events::EventHandle * CreateEvent(){
+        return new Events::EventHandle();
+    }
 
-        while(!hHandle.HasSignal())
-        {
-            usleep(10);
-        }
-        return true;
+    void SetEvent(Events::EventHandle *handle){
+        handle->Set();
+    }
+
+    void CloseHandle(Events::EventHandle * handle){
+        delete handle;
     }
 
 

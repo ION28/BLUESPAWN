@@ -7,6 +7,7 @@
 #include <linux/ptrace.h>
 
 #include "util/ThreadsafeQueue.h"
+#include "util/ThreadsafeMap.h"
 #include "monitor/Event.h"
 
 #define WAIT_OBJECT_0 0
@@ -22,27 +23,17 @@ class EventDetails;
  */ 
 class EventHandle{
 private:
-    ThreadsafeQueue<Events::EventDetails> signalQueue;
-
-    Events::EventDetails &details;
-
+    pthread_cond_t condition;
+    pthread_mutex_t mutex;
 public:
-
-    EventHandle(Events::EventDetails &details);
 
     EventHandle();
 
-    bool operator==(const EventHandle& e) const;
+    ~EventHandle();
 
-    bool HasSignal();
+    void Set();
 
-    Events::EventDetails PopSignal();
-
-    void PushSignal(Events::EventDetails details);
-
-    void PushSignal()
-
-
+    int Wait(int timeout, bool * done);
 
 };
 
@@ -50,7 +41,13 @@ public:
 int WaitForMultipleObjects(int nCount, Events::EventHandle * lpHandles, bool bWaitAll, int dwMilliSeconds);
 
 //for compatibility with the WaitForSingleObjects on the hManager event handle
-bool WaitForSingleObject(Events::EventHandle &hHandle, int dwMilliseconds);
+bool WaitForSingleObject(Events::EventHandle * hHandle, int dwMilliseconds);
+
+Events::EventHandle * CreateEvent();
+
+void SetEvent(Events::EventHandle * handle);
+
+void CloseHandle(Events::EventHandle * handle);
 //holds dynamic event details
 enum class EventType{
     SystemCall,
