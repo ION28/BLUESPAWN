@@ -674,7 +674,7 @@ namespace Permissions {
 		return std::nullopt;
 	}
 
-	bool UpdateObjectACL(const std::wstring& wsObjectName, SE_OBJECT_TYPE seObjectType, const Owner& oOwner, ACCESS_MASK amDesiredAccess, bool bDeny = false) {
+	bool UpdateObjectACL(const std::wstring& wsObjectName, SE_OBJECT_TYPE seObjectType, const Owner& oOwner, ACCESS_MASK amDesiredAccess, bool bDeny) {
 		PACL pTempDACL{ NULL };
 		SecurityDescriptor sdOldDACL, sdNewDACL;
 		PSECURITY_DESCRIPTOR pSecDesc{ NULL };
