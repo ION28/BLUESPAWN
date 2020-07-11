@@ -18,6 +18,9 @@
 #include "util/log/Loggable.h"
 #include "common/wrappers.hpp"
 
+
+
+
 namespace Permissions {
 	/**
 	* Functions to check if an access mask includes a permission
@@ -114,16 +117,16 @@ namespace Permissions {
 		PACL GetSACL() const;
 	};
 
-	class LsaHandleWrapper : public GenericWrapper<LSA_HANDLE> {
-	public:
-		LsaHandleWrapper(LSA_HANDLE handle) :
-			GenericWrapper(handle, std::function<void(LSA_HANDLE)>(SafeCloseLsaHandle), nullptr) {};
-		static void SafeCloseLsaHandle(LSA_HANDLE handle);
-	};
-
 	/*Enum for storing type of Owner an Owner object is*/
 	enum OwnerType {
 		NONE, USER, GROUP 
+	};
+
+	class LsaHandleWrapper : public GenericWrapper<LSA_HANDLE> {
+	public:
+		LsaHandleWrapper(LSA_HANDLE handle);
+		LsaHandleWrapper(LSA_HANDLE handle, std::function<void(LSA_HANDLE)> fSafeClose);
+		static void SafeCloseLsaHandle(LSA_HANDLE handle);
 	};
 
 	class Owner : public Loggable {
@@ -141,6 +144,12 @@ namespace Permissions {
 		* to true if initialization succeeded.
 		*/
 		static void InitializePolicy();
+
+		/**
+		* Function de-initialize lPolicyHandle
+		* param handle - the handle to de initialize
+		*/
+		static void DeinitializePolicy(LSA_HANDLE handle);
 
 		//Let LsaHandleWrapper handle initialization tracking
 		friend void LsaHandleWrapper::SafeCloseLsaHandle(LSA_HANDLE handle);
@@ -163,11 +172,20 @@ namespace Permissions {
 		/**
 		* Function to convert a wstring to an LSA_UNICODE_STRING
 		* 
-		* @param str the wstring to conver
+		* @param str the wstring to convert
 		*
 		* @return an LSA_UNICODE_STRING corresponding to the given wstring
 		*/
 		static LSA_UNICODE_STRING Owner::WStringToLsaUnicodeString(IN const std::wstring& str);
+
+		/**
+		* Function to convert a LSA_UNICODE_STRING to a wstring
+		*
+		* @param str the LSA_UNICODE_STRING to convert
+		*
+		* @return a wstring corresponding to the given LSA_UNICODE_STRING
+		*/
+		static std::wstring Owner::LsaUnicodeStringToWString(IN const LSA_UNICODE_STRING& str);
 
 		/**
 		* Constructor for an owner object that sets wName, bExists, and otOwnerType, but no other fields
@@ -176,7 +194,7 @@ namespace Permissions {
 		* @param exists A boolean containing value to be copied ot bExists
 		* @param t An OwnerType containing value to be copied to otOwnerType
 		*/
-		Owner(IN const std::wstring& name, IN const bool& exists, IN const OwnerType& t);
+		Owner(IN const std::wstring& name, IN bool exists, IN OwnerType t);
 
 		/**
 		* Constructor for an owner object that sets sdSID, bExists, and otOwnerType, but no other fields
@@ -186,7 +204,7 @@ namespace Permissions {
 		* @param exists A boolean containing value to be copied ot bExists
 		* @param t An OwnerType containing value to be copied to otOwnerType
 		*/
-		Owner(IN const SecurityDescriptor& sid, IN const bool& exists, IN const OwnerType& t);
+		Owner(IN const SecurityDescriptor& sid, IN bool exists, IN OwnerType t);
 
 		/**
 		* Constructor for an owner object that sets all fields to given values. Performs no checking
@@ -199,7 +217,7 @@ namespace Permissions {
 		* @param exists A boolean containing value to be copied ot bExists
 		* @param t An OwnerType containing value to be copied to otOwnerType
 		*/
-		Owner(IN const std::wstring& name, IN const std::wstring& domain, IN const SecurityDescriptor& sid, IN const bool& exists, IN const OwnerType& t);
+		Owner(IN const std::wstring& name, IN const std::wstring& domain, IN const SecurityDescriptor& sid, IN bool exists, IN OwnerType t);
 
 
 	public:
@@ -268,7 +286,7 @@ namespace Permissions {
 		*     are a user, includes the privileges granted to them by the
 		*     groups they're in.
 		*/
-		std::vector<LSA_UNICODE_STRING> GetPrivileges();
+		std::vector<std::wstring> GetPrivileges();
 
 		/**
 		* Function to check if the owner has a certain privilege
@@ -279,17 +297,6 @@ namespace Permissions {
 		* @return true if the owner has the privilege, false otherwise
 		*/
 		bool HasPrivilege(IN const std::wstring& wPriv);
-
-		/**
-		* Function to check if a privilege is contained in a list of privileges
-		*
-		* @param vPrivList a vector containing the list of privileges to search through
-		* @param wPriv a wstring containing the name of the privilege to check for
-		*     Names should be from: https://docs.microsoft.com/en-us/windows/win32/secauthz/privilege-constants
-		*
-		* @return true if the privilege is is the list, false otherwise
-		*/
-		static bool PrivListHasPrivilege(IN const std::vector<LSA_UNICODE_STRING>& vPrivList, IN const std::wstring& wPriv) ;
 
 		/**
 		* Function to enumerate all owners with a given privilege
@@ -403,5 +410,5 @@ namespace Permissions {
 	*
 	* @return true if the objects ACL was updated. False otherwise. If false, GetLastError will contain the error. 
 	*/
-	bool UpdateObjectACL(const std::wstring& wsObjectName, const SE_OBJECT_TYPE& seObjectType, const Owner& oOwner, const ACCESS_MASK& amDesiredAccess, const bool& bDeny = false);
+	bool UpdateObjectACL(const std::wstring& wsObjectName, SE_OBJECT_TYPE seObjectType, const Owner& oOwner, ACCESS_MASK amDesiredAccess, bool bDeny = false);
 }

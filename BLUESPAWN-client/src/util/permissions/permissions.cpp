@@ -2,6 +2,7 @@
 #include "util/log/Log.h"
 #include <lm.h>
 
+
 namespace Permissions {
 
 	bool AccessIncludesAll(const ACCESS_MASK& access) {
@@ -164,6 +165,12 @@ namespace Permissions {
 	PSID SecurityDescriptor::GetUserSID() const { return this->lpUserSID; }
 	PSID SecurityDescriptor::GetGroupSID() const { return this->lpGroupSID; }
 
+	LsaHandleWrapper::LsaHandleWrapper(LSA_HANDLE handle) :
+		GenericWrapper(handle, std::function<void(LSA_HANDLE)>(SafeCloseLsaHandle), nullptr) {}
+
+	LsaHandleWrapper::LsaHandleWrapper(LSA_HANDLE handle, std::function<void(LSA_HANDLE)> fSafeClose) : 
+		GenericWrapper(handle, std::function<void(LSA_HANDLE)>(fSafeClose), nullptr) {}
+
 	bool Owner::bPolicyInitialized{ false };
 	LsaHandleWrapper Owner::lPolicyHandle{ nullptr };
 	const std::vector<std::wstring> Owner::vSuperUserPrivs{ SE_DEBUG_NAME, SE_IMPERSONATE_NAME, SE_TCB_NAME, SE_LOAD_DRIVER_NAME,
@@ -171,25 +178,30 @@ namespace Permissions {
 
 	void LsaHandleWrapper::SafeCloseLsaHandle(LSA_HANDLE handle) {
 		LsaClose(handle);
-		Owner::bPolicyInitialized = false;
 	}
 
 	void Owner::InitializePolicy() {
-		LSA_OBJECT_ATTRIBUTES lObjectAttr;
-		memset(&lObjectAttr, 0, sizeof(LSA_OBJECT_ATTRIBUTES));
-		HRESULT hr = LsaNtStatusToWinError(LsaOpenPolicy(nullptr, &lObjectAttr, GENERIC_ALL, &lPolicyHandle));
+		LSA_HANDLE lTempPolicyHandle;
+		LSA_OBJECT_ATTRIBUTES lObjectAttr{};
+		HRESULT hr = LsaNtStatusToWinError(LsaOpenPolicy(nullptr, &lObjectAttr, GENERIC_ALL, &lTempPolicyHandle));
 		if (hr != ERROR_SUCCESS) {
 			bPolicyInitialized = false;
 			LOG_ERROR("Couldn't open policy handle. (Error:" << hr << ")");
 			SetLastError(hr);
 		}
 		else {
+			lPolicyHandle = { lTempPolicyHandle, std::function<void(LSA_HANDLE)>(Owner::DeinitializePolicy) };
 			bPolicyInitialized = true;
 		}
 	}
 
+	void Owner::DeinitializePolicy(LSA_HANDLE handle) {
+		LsaClose(handle);
+		bPolicyInitialized = false;
+	}
+
 	LSA_UNICODE_STRING Owner::WStringToLsaUnicodeString(IN const std::wstring& str) {
-		LSA_UNICODE_STRING lsaWStr;
+		LSA_UNICODE_STRING lsaWStr{};
 		DWORD len = 0;
 
 		len = str.length();
@@ -199,6 +211,17 @@ namespace Permissions {
 		lsaWStr.Length = (USHORT)((len) * sizeof(WCHAR));
 		lsaWStr.MaximumLength = (USHORT)((len + 1) * sizeof(WCHAR));
 		return lsaWStr;
+	}
+
+	std::wstring Owner::LsaUnicodeStringToWString(IN const LSA_UNICODE_STRING& str) {
+		std::wstring toRet;
+		DWORD len = 0;
+
+		len = str.Length;
+		LPWSTR cstr = new WCHAR[len + 1];
+		memcpy(cstr, str.Buffer, (len + 1) * sizeof(WCHAR));
+		toRet = { cstr };
+		return toRet;
 	}
 
 	Owner::Owner(IN const std::wstring& name) : wName{ name }, bExists{ true } {
@@ -300,11 +323,11 @@ namespace Permissions {
 		}
 	}
 
-	Owner::Owner(IN const std::wstring& name, IN const bool& exists, IN const OwnerType& type) : wName{ name }, bExists{ exists }, otType{ type } {}
+	Owner::Owner(IN const std::wstring& name, IN bool exists, IN OwnerType type) : wName{ name }, bExists{ exists }, otType{ type } {}
 
-	Owner::Owner(IN const SecurityDescriptor& sid, IN const bool& exists, IN const OwnerType& type) : sdSID{ sid }, bExists{ exists }, otType{ type } {}
+	Owner::Owner(IN const SecurityDescriptor& sid, IN bool exists, IN OwnerType type) : sdSID{ sid }, bExists{ exists }, otType{ type } {}
 
-	Owner::Owner(IN const std::wstring& name, IN const std::wstring& domain, IN const SecurityDescriptor& sid, IN const bool& exists, IN const OwnerType& type) :
+	Owner::Owner(IN const std::wstring& name, IN const std::wstring& domain, IN const SecurityDescriptor& sid, IN bool exists, IN OwnerType type) :
 		wName{ name }, wDomainName{ domain }, sdSID{ sid }, bExists{ exists }, otType{ type } {}
 
 	bool Owner::Exists() const {
@@ -332,28 +355,28 @@ namespace Permissions {
 		return wName;
 	}
 
-	std::vector<LSA_UNICODE_STRING> Owner:: GetPrivileges() {
+	std::vector<std::wstring> Owner:: GetPrivileges() {
 		//Ensure policy handle is initialized
 		if (!bPolicyInitialized) {
 			InitializePolicy();
 			if (!bPolicyInitialized) {
 				LOG_ERROR("Error getting owner privliges, couldn't initialize policy handle.");
-				return std::vector<LSA_UNICODE_STRING>{ };
+				return std::vector<std::wstring>{ };
 			}
 		}
 		PLSA_UNICODE_STRING pReceivedPrivs{ nullptr };
 		ULONG uPrivCount{ 0 };
-		std::vector<LSA_UNICODE_STRING> vPrivs{ };
-		HRESULT hr = LsaNtStatusToWinError(LsaEnumerateAccountRights(lPolicyHandle, GetSID(), &pReceivedPrivs, &uPrivCount));
+		std::vector<std::wstring> vPrivs{ };
+		auto hr = LsaNtStatusToWinError(LsaEnumerateAccountRights(lPolicyHandle, GetSID(), &pReceivedPrivs, &uPrivCount));
 		AllocationWrapper awReceivedPrivsHandler{ pReceivedPrivs, 0, AllocationWrapper::NET_ALLOC };
 		if (hr != ERROR_SUCCESS && otType != OwnerType::USER) {
 			LOG_ERROR("Error getting owner privileges. (Error: " << GetLastError() << ")");
 			SetLastError(hr);
-			return std::vector<LSA_UNICODE_STRING>{ };
+			return std::vector<std::wstring>{ };
 		}
 		else if (hr == ERROR_SUCCESS) {
 			for (int i = 0; i < uPrivCount; i++) {
-				vPrivs.emplace_back(pReceivedPrivs[i]);
+				vPrivs.emplace_back(LsaUnicodeStringToWString(pReceivedPrivs[i]));
 			}
 		}
 		//Get privileges from groups that a user belongs to
@@ -362,14 +385,14 @@ namespace Permissions {
 			DWORD dEntriesRead{ 0 };
 			DWORD dEntriesTotal{ 0 };
 			NET_API_STATUS stat = NetUserGetLocalGroups(wDomainName.c_str(), wName.c_str(), 0, LG_INCLUDE_INDIRECT , reinterpret_cast<LPBYTE *>(&pGroupInfo), MAX_PREFERRED_LENGTH, &dEntriesRead, &dEntriesTotal);
-			AllocationWrapper awGroupInfoHandler{ pGroupInfo, 0, AllocationWrapper::NET_ALLOC };
+			AllocationWrapper awGroupInfoHandler{ pGroupInfo, sizeof(GROUP_USERS_INFO_0) * dEntriesRead, AllocationWrapper::NET_ALLOC };
 			if (stat != NERR_Success) {
 				LOG_ERROR("Error getting user groups. (Net Error: " << stat << ")");
 				return vPrivs;
 			}
 			//Add all privileges from groups to list of user's privileges
 			for (int i = 0; i < dEntriesRead; i++) {
-				Owner oGroup(pGroupInfo[i].grui0_name);
+				Owner oGroup{ pGroupInfo[i].grui0_name };
 				hr = LsaNtStatusToWinError(LsaEnumerateAccountRights(lPolicyHandle, oGroup.GetSID(), &pReceivedPrivs, &uPrivCount));
 				awReceivedPrivsHandler = { pReceivedPrivs, 0, AllocationWrapper::NET_ALLOC };
 				if (hr != ERROR_SUCCESS) {
@@ -377,7 +400,7 @@ namespace Permissions {
 				}
 				else if (hr == ERROR_SUCCESS) {
 					for (int i = 0; i < uPrivCount; i++) {
-						vPrivs.emplace_back(pReceivedPrivs[i]);
+						vPrivs.emplace_back(LsaUnicodeStringToWString(pReceivedPrivs[i]));
 					}
 				}
 			}
@@ -387,16 +410,13 @@ namespace Permissions {
 	}
 
 	bool Owner::HasPrivilege(IN const std::wstring& wPriv) {
-		auto OwnerPrivs = GetPrivileges();
-		return PrivListHasPrivilege(OwnerPrivs, wPriv);
-	}
-
-	bool Owner::PrivListHasPrivilege(IN const std::vector<LSA_UNICODE_STRING>& vPrivList, IN const std::wstring& wPriv) {
-		for (auto iter = vPrivList.begin(); iter != vPrivList.end(); iter++) {
-			if (wPriv.compare(iter->Buffer) == 0) return true;
+		auto vOwnerPrivs = GetPrivileges();
+		for (auto iter = vOwnerPrivs.begin(); iter != vOwnerPrivs.end(); iter++) {
+			if (wPriv.compare(WStringToLsaUnicodeString(*iter).Buffer) == 0) return true;
 		}
 		return false;
 	}
+
 
 	std::vector<Owner> Owner::GetOwnersWithPrivilege(IN const std::wstring& wPriv) {
 		//Ensure policy handle is initialized
@@ -410,7 +430,7 @@ namespace Permissions {
 		LSA_UNICODE_STRING lPrivName = WStringToLsaUnicodeString(wPriv);
 		PLSA_ENUMERATION_INFORMATION pOwners{ nullptr };
 		ULONG uNumOwners{ 0 };
-		HRESULT hr = LsaNtStatusToWinError(LsaEnumerateAccountsWithUserRight(lPolicyHandle, &lPrivName, reinterpret_cast<PVOID *>(&pOwners), &uNumOwners));
+		auto hr = LsaNtStatusToWinError(LsaEnumerateAccountsWithUserRight(lPolicyHandle, &lPrivName, reinterpret_cast<PVOID *>(&pOwners), &uNumOwners));
 		AllocationWrapper awOwnersHandler{ pOwners, 0, AllocationWrapper::NET_ALLOC };
 		if (hr != ERROR_SUCCESS) {
 			LOG_ERROR("Error getting accounts with user privilege. (Error: " << hr << ")");
@@ -422,8 +442,7 @@ namespace Permissions {
 			DWORD dwSidLen = GetLengthSid(pOwners[i].Sid);
 			SecurityDescriptor sdSID = SecurityDescriptor::CreateUserSID(dwSidLen);
 			memcpy(sdSID.GetUserSID(), pOwners[i].Sid, dwSidLen);
-			Owner o(sdSID);
-			vOwners.emplace_back(o);
+			vOwners.emplace_back(Owner{ sdSID });
 		}
 		SetLastError(ERROR_SUCCESS);
 		return vOwners;
@@ -439,7 +458,7 @@ namespace Permissions {
 			}
 		}
 		LSA_UNICODE_STRING lPrivName = WStringToLsaUnicodeString(wPriv);
-		HRESULT hr = LsaNtStatusToWinError(LsaRemoveAccountRights(lPolicyHandle, GetSID(), false, &lPrivName, 1));
+		auto hr = LsaNtStatusToWinError(LsaRemoveAccountRights(lPolicyHandle, GetSID(), false, &lPrivName, 1));
 		if (hr != ERROR_SUCCESS) {
 			LOG_ERROR("Error removing privilege from account. (Error: " << hr << ")");
 			SetLastError(hr);
@@ -451,7 +470,9 @@ namespace Permissions {
 	bool Owner::HasSuperUserPrivs() {
 		auto vOwnerPrivs = GetPrivileges();
 		for (auto priv : vSuperUserPrivs) {
-			if (PrivListHasPrivilege(vOwnerPrivs, priv)) return true;
+			for (auto iter = vOwnerPrivs.begin(); iter != vOwnerPrivs.end(); iter++) {
+				if (priv.compare(WStringToLsaUnicodeString(*iter).Buffer) == 0) return true;
+			}
 		}
 		return false;
 	}
@@ -469,7 +490,7 @@ namespace Permissions {
 		for (auto priv : vSuperUserPrivs) {
 			lSuperUserPrivs.emplace_back(WStringToLsaUnicodeString(priv));
 		}
-		HRESULT hr = LsaNtStatusToWinError(LsaRemoveAccountRights(lPolicyHandle, GetSID(), false, lSuperUserPrivs.data(), lSuperUserPrivs.size()));
+		auto hr = LsaNtStatusToWinError(LsaRemoveAccountRights(lPolicyHandle, GetSID(), false, lSuperUserPrivs.data(), lSuperUserPrivs.size()));
 		if (hr != ERROR_SUCCESS) {
 			LOG_ERROR("Error removing privilege from account. (Error: " << hr << ")");
 			SetLastError(hr);
