@@ -406,7 +406,7 @@ namespace Permissions {
 	* @param seObjectType An SE_OBJECT_TYPE desciribing the type of the object for which to update permissions
 	* @param oOwner An Owner object representing the owner for whom to update permissions
 	* @param amDesiredAccess An ACCESS_MASK containing the permissions to grant or deny to oOwner
-	* @param bDeny If false grant access to amDesiredAccess, if true deny access. Defaults to false
+	* @param bDeny If false, grant access to amDesiredAccess, if true deny access. Defaults to false
 	*
 	* @return true if the objects ACL was updated. False otherwise. If false, GetLastError will contain the error. 
 	*/
