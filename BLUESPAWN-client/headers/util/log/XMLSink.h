@@ -80,6 +80,15 @@ namespace Log {
 		void Flush();
 
 		/**
+		 * Updates the raw and combined certainty values associated with a detection
+		 * 
+		 * @param detection The detection to update
+		 */
+		virtual void UpdateCertainty(
+			IN CONST std::shared_ptr<Detection>& detection
+		);
+
+		/**
 		 * Records a detection to the XML document.
 		 *
 		 * @param detection The detection to record

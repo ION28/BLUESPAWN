@@ -71,5 +71,14 @@ namespace Log {
 			IN CONST std::shared_ptr<Detection>& second,
 			IN CONST Association& strength
 		);
+
+		/**
+		 * Updates the raw and combined certainty values associated with a detection
+		 *
+		 * @param detection The detection to update
+		 */
+		virtual void UpdateCertainty(
+			IN CONST std::shared_ptr<Detection>& detection
+		);
 	};
 }

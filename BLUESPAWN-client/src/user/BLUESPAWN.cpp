@@ -356,16 +356,14 @@ int main(int argc, char* argv[]) {
             return 0;
         }
 
-        if(result.count("verbose")) {
-            if(result["verbose"].as<int>() >= 1) {
-                Log::LogLevel::LogInfo1.Enable();
-            }
-            if(result["verbose"].as<int>() >= 2) {
-                Log::LogLevel::LogInfo2.Enable();
-            }
-            if(result["verbose"].as<int>() >= 3) {
-                Log::LogLevel::LogInfo3.Enable();
-            }
+        if(result["verbose"].as<int>() >= 1) {
+            Log::LogLevel::LogInfo1.Enable();
+        }
+        if(result["verbose"].as<int>() >= 2){
+            Log::LogLevel::LogInfo2.Enable();
+        }
+        if(result["verbose"].as<int>() >= 3){
+            Log::LogLevel::LogInfo3.Enable();
         }
 
         if(result.count("debug")) {

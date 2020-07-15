@@ -24,16 +24,12 @@ namespace Hunts {
 
         auto IFEO = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File "
                                                      L"Execution Options" };
-        for(auto subkey : IFEO.EnumerateSubkeys()) {
-            std::vector<RegistryValue> values{ CheckValues(
-                HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options",
-                {
+        for(auto name : IFEO.EnumerateSubkeyNames()) {
+            std::vector<RegistryValue> values{ CheckValues(HKEY_LOCAL_MACHINE,
+                L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\" + name, {
                     { L"Debugger", L"", false, CheckSzEmpty },
                     { L"GlobalFlag", 0, false, [](DWORD d1, DWORD d2) { return !(d1 & 0x200); } },
-                },
-                true, false) };
-
-            // TODO: Fix data type of detections
+                }, true, false) };
 
             for(const auto& detection : values) {
                 if(detection.wValueName == L"GlobalFlag") {
@@ -48,6 +44,7 @@ namespace Hunts {
                 }
             }
 
+            RegistryKey subkey{ IFEO, name };
             auto GFlags = subkey.GetValue<DWORD>(L"GlobalFlag");
             if(GFlags && *GFlags & 0x200) {
                 auto name = subkey.GetName();
@@ -58,12 +55,16 @@ namespace Hunts {
                     {
                         { L"ReportingMode", 0, false, CheckDwordEqual },
                         { L"MonitorProcess", L"", false, CheckSzEmpty },
-                    },
-                    true, false) };
+                    }, true, false) };
 
                 for(const auto& detection : values2) {
-                    CREATE_DETECTION(Certainty::Moderate,
-                                     RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
+                    if(detection.type == RegistryType::REG_DWORD_T) {
+                        CREATE_DETECTION(Certainty::Moderate,
+                                         RegistryDetectionData{ detection, RegistryDetectionType::Configuration });
+                    } else {
+                        CREATE_DETECTION(Certainty::Moderate,
+                                         RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
+                    }
                 }
             }
         }

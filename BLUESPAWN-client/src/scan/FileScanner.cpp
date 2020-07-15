@@ -149,7 +149,7 @@ FileScanner::GetAssociatedDetections(IN CONST Detection& detection) {
 
     if(data.Executor && ProcessScanner::PerformQuickScan(*data.Executor)) {
         detections.emplace(Bluespawn::detections.AddDetection(
-            Detection{ ProcessDetectionData::CreateCommandDetectionData(*data.Executor) }), Association::Certain);
+            Detection{ ProcessDetectionData::CreateCommandDetectionData(*data.Executor) }), Association::Strong);
     }
 
     if(data.FileFound) {

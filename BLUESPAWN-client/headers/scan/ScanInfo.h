@@ -116,6 +116,14 @@ public:
 	Certainty GetCertainty();
 
 	/**
+	 * Retrieves the certainty that the associated detection's data refers to something malicious. This function 
+	 * ignores assocaitivity certainty.
+	 *
+	 * @return The certainty that the detection this is a part of is malicious
+	 */
+	Certainty GetRawCertainty();
+
+	/**
 	 * Sets the degree of certainty that the detection referenced by this scan node is malicious. This does not affect 
 	 * the associative certainty of this ScanNode.
 	 *

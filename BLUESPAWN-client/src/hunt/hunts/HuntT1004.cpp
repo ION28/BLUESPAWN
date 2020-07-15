@@ -31,7 +31,7 @@ namespace Hunts {
             L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", { 
                 { L"Shell", L"explorer\\.exe,?", false, CheckSzRegexMatch },
                 { L"UserInit", L"(C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\)?(U|u)(SERINIT|"
-                    "userinit)\\.(exe|EXE),?", false, CheckSzRegexMatch } 
+                    "serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch } 
             }, true, true) };
         // clang-format on
 

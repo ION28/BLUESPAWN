@@ -16,7 +16,10 @@ class DetectionRegister {
 	/// A vector containing all detections made
 	std::vector<std::shared_ptr<Detection>> detections;
 
-	/// CriticalSection guarding accesses to `detections`
+	/// A mapping of detection IDs to their associated detections
+	std::unordered_map<DWORD, std::shared_ptr<Detection>> ids;
+
+	/// CriticalSection guarding accesses to `detections` and `ids`.
 	CriticalSection hGuard;
 
 	/// A set containing all detections scanned
@@ -88,6 +91,17 @@ public:
 	 */
 	std::vector<std::shared_ptr<Detection>> GetAllDetections(
 		IN CONST Certainty& level = Certainty::Moderate OPTIONAL
+	) CONST;
+	
+	/**
+	 * Gets a detection by its ID
+	 *
+	 * @param ID The ID of the detection to retrieve
+	 *
+	 * @return A pointer to the requested detection if available; nullptr otherwise.
+	 */
+	std::shared_ptr<Detection> GetByID(
+		IN DWORD ID
 	) CONST;
 
 	/**

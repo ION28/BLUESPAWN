@@ -496,6 +496,10 @@ Detection::operator PCRITICAL_SECTION() {
     return hGuard;
 }
 
+Detection::operator CriticalSection(){
+    return hGuard;
+}
+
 const std::map<std::wstring, std::wstring>& Detection::Serialize() CONST {
     return serialization;
 };

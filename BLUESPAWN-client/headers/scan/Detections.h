@@ -795,6 +795,13 @@ public:
 	 * @return hGuard
 	 */
 	operator LPCRITICAL_SECTION();
+
+	/**
+	 * Implicit cast to a CriticalSection pointer for use in synchronization functions
+	 *
+	 * @return hGuard
+	 */
+	operator CriticalSection();
 };
 
 /// Template specialization defining how hashes of Detection objects should be calculated

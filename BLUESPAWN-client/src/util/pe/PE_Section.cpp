@@ -20,11 +20,11 @@ PE_Section::PE_Section(const PE_Image& image, IMAGE_SECTION_HEADER SectionHeader
 }
 
 PE_Section::PE_Section(const PE_Section& copy) :
-	SectionHeader{ copy.SectionHeader },
-	SectionContent{ copy.SectionContent },
-	Signature{ copy.Signature },
-	AssociatedImage{ copy.AssociatedImage },
-	expanded{ copy.expanded }{}
+	SectionHeader{ detection->SectionHeader },
+	SectionContent{ detection->SectionContent },
+	Signature{ detection->Signature },
+	AssociatedImage{ detection->AssociatedImage },
+	expanded{ detection->expanded }{}
 
 bool PE_Section::ContainsOffset(DWORD offset) const {
 	return offset >= SectionHeader.PointerToRawData && offset < SectionHeader.PointerToRawData + SectionHeader.SizeOfRawData;

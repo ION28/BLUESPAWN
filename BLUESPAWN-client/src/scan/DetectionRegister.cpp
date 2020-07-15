@@ -14,7 +14,20 @@ void DetectionRegister::AddDetectionAsync(IN CONST std::shared_ptr<Detection>& d
                                           IN CONST Certainty& certainty) {
     EnterCriticalSection(*detection);
     detection->info.SetCertainty(certainty);
-    for(auto& scan : Scanner::scanners) { detection->info.AddCertainty(scan->ScanDetection(*detection)); }
+    for(auto& scan : Scanner::scanners) {
+        detection->info.AddCertainty(scan->ScanDetection(*detection));
+    }
+
+    auto associations{ detection->info.GetAssociations() };
+    LeaveCriticalSection(*detection);
+    for(auto& pair : associations){
+        pair.first->info.bAssociativeStale = true;
+        for(auto& sink : Bluespawn::detectionSinks){
+            sink->UpdateCertainty(pair.first);
+        }
+    }
+    EnterCriticalSection(*detection);
+
     if(detection->info.GetCertainty() >= threshold) {
         for(auto& scan : Scanner::scanners) {
             for(auto& pair : scan->GetAssociatedDetections(*detection)) {
@@ -23,11 +36,12 @@ void DetectionRegister::AddDetectionAsync(IN CONST std::shared_ptr<Detection>& d
 
                 auto first{ detection->dwID < pair.first->dwID ? detection : pair.first };
                 auto second{ detection->dwID < pair.first->dwID ? pair.first : detection };
-                for(auto& sink : Bluespawn::detectionSinks) { sink->RecordAssociation(first, second, pair.second); }
+                for(auto& sink : Bluespawn::detectionSinks) {
+                    sink->RecordAssociation(first, second, pair.second);
+                }
             }
         }
     }
-    LeaveCriticalSection(*detection);
 
     EnterCriticalSection(hScannedGuard);
     scanned.emplace(detection);
@@ -35,13 +49,16 @@ void DetectionRegister::AddDetectionAsync(IN CONST std::shared_ptr<Detection>& d
 
     EnterCriticalSection(hQueueGuard);
     queue.erase(detection);
-    if(queue.size() == 0) { SetEvent(hEvent); }
+    if(queue.size() == 0) {
+        SetEvent(hEvent);
+    }
     LeaveCriticalSection(hQueueGuard);
 
-    EnterCriticalSection(*detection);
-    if(detection->info.GetCertainty() >= threshold){
+    if(detection->info.GetCertainty() >= threshold) {
         LeaveCriticalSection(*detection);
-        for(auto& sink : Bluespawn::detectionSinks){ sink->RecordDetection(detection, RecordType::PostScan); }
+        for(auto& sink : Bluespawn::detectionSinks) {
+            sink->RecordDetection(detection, RecordType::PostScan);
+        }
 
         EnterCriticalSection(*detection);
         Bluespawn::reaction.React(*detection);
@@ -77,20 +94,37 @@ void DetectionRegister::UpdateDetectionCertainty(IN CONST std::shared_ptr<Detect
 
                     auto first{ detection->dwID < pair.first->dwID ? detection : pair.first };
                     auto second{ detection->dwID < pair.first->dwID ? pair.first : detection };
-                    for(auto& sink : Bluespawn::detectionSinks) { sink->RecordAssociation(first, second, pair.second); }
+                    for(auto& sink : Bluespawn::detectionSinks) {
+                        sink->RecordAssociation(first, second, pair.second);
+                    }
                 }
             }
+
+            LeaveCriticalSection(*detection);
+            for(auto& sink : Bluespawn::detectionSinks){
+                sink->RecordDetection(detection, RecordType::PostScan);
+            }
+
+            EnterCriticalSection(*detection);
+            Bluespawn::reaction.React(*detection);
+        } else if(!below && detection->info.GetCertainty() >= threshold){
+            LeaveCriticalSection(*detection);
+            for(auto& sink : Bluespawn::detectionSinks){
+                sink->UpdateCertainty(detection);
+            }
+            EnterCriticalSection(*detection);
         }
 
         // Existing associations' associativity scores are now stale
-        else {
-            for(auto& pair : *detection->info.associations) { pair.first->info.bAssociativeStale = true; }
+        for(auto& pair : detection->info.GetAssociations()) {
+            pair.first->info.bAssociativeStale = true;
+            for(auto& sink : Bluespawn::detectionSinks){
+                sink->UpdateCertainty(pair.first);
+            }
         }
-    }
+    } 
 
     LeaveCriticalSection(*detection);
-
-    for(auto& sink : Bluespawn::detectionSinks) { sink->RecordDetection(detection, RecordType::PostScan); }
 }
 
 std::shared_ptr<Detection> DetectionRegister::AddDetection(IN Detection&& raw, IN CONST Certainty& certainty) {
@@ -101,7 +135,9 @@ std::shared_ptr<Detection> DetectionRegister::AddDetection(IN Detection&& raw, I
     if(itr != scanned.end()) {
         LeaveCriticalSection(hScannedGuard);
         auto ref{ *itr };
-        for(auto& sink : Bluespawn::detectionSinks) { sink->RecordDetection(ref, RecordType::PreScan); }
+        for(auto& sink : Bluespawn::detectionSinks) {
+            sink->RecordDetection(ref, RecordType::PreScan);
+        }
         ThreadPool::GetInstance().EnqueueTask(
             std::bind(&DetectionRegister::UpdateDetectionCertainty, this, ref, certainty));
         return ref;
@@ -113,7 +149,9 @@ std::shared_ptr<Detection> DetectionRegister::AddDetection(IN Detection&& raw, I
     if(itr != queue.end()) {
         LeaveCriticalSection(hQueueGuard);
         auto ref{ *itr };
-        for(auto& sink : Bluespawn::detectionSinks) { sink->RecordDetection(ref, RecordType::PreScan); }
+        for(auto& sink : Bluespawn::detectionSinks) {
+            sink->RecordDetection(ref, RecordType::PreScan);
+        }
         ThreadPool::GetInstance().EnqueueTask(
             std::bind(&DetectionRegister::UpdateDetectionCertainty, this, ref, certainty));
         return ref;
@@ -123,9 +161,12 @@ std::shared_ptr<Detection> DetectionRegister::AddDetection(IN Detection&& raw, I
     EnterCriticalSection(hGuard);
     detections.emplace_back(detection);
     std::shared_ptr<Detection> ref{ detections[detections.size() - 1] };
+    ids.emplace(detection->dwID, ref);
     LeaveCriticalSection(hGuard);
 
-    for(auto& sink : Bluespawn::detectionSinks) { sink->RecordDetection(ref, RecordType::PreScan); }
+    for(auto& sink : Bluespawn::detectionSinks) {
+        sink->RecordDetection(ref, RecordType::PreScan);
+    }
 
     ResetEvent(hEvent);
 
@@ -141,12 +182,10 @@ std::shared_ptr<Detection> DetectionRegister::AddDetection(IN Detection&& raw, I
 void DetectionRegister::Wait() CONST {
     auto status{ WaitForSingleObject(hEvent, INFINITE) };
     if(status != ERROR_SUCCESS) {
-        EnterCriticalSection(hQueueGuard);
+        BeginCriticalSection _{ hQueueGuard };
         if(queue.size() != 0) {
-            LeaveCriticalSection(hQueueGuard);
             throw std::exception{ "Failed to wait for detection register to finish scans!" };
         }
-        LeaveCriticalSection(hQueueGuard);
     }
 }
 
@@ -156,11 +195,21 @@ DetectionRegister::operator HANDLE() CONST {
 
 std::vector<std::shared_ptr<Detection>> DetectionRegister::GetAllDetections(IN CONST Certainty& level OPTIONAL) CONST {
     Wait();
-    EnterCriticalSection(hScannedGuard);
+    BeginCriticalSection _{ hScannedGuard };
     std::vector<std::shared_ptr<Detection>> found{};
     for(auto detection : scanned) {
-        if(detection->info.certainty >= level) { found.emplace_back(detection); }
+        if(detection->info.certainty >= level) {
+            found.emplace_back(detection);
+        }
     }
-    LeaveCriticalSection(hScannedGuard);
     return found;
+}
+
+std::shared_ptr<Detection> DetectionRegister::GetByID(IN DWORD ID) CONST{
+    BeginCriticalSection _{ hGuard };
+    if(ids.find(ID) != ids.end()){
+        return ids.at(ID);
+    } else{
+        return nullptr;
+    }
 }

@@ -32,9 +32,7 @@ namespace Log {
 	void CLISink::RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN RecordType type){
 		if(type == RecordType::PreScan && Bluespawn::EnablePreScanDetections || type == RecordType::PostScan){
 
-			EnterCriticalSection(*detection);
-			Detection copy{ *detection };
-			LeaveCriticalSection(*detection);
+			BeginCriticalSection _{ *detection };
 
 			AcquireMutex mutex{ hMutex };
 
@@ -42,41 +40,41 @@ namespace Log {
 			std::wcout << CLISink::MessagePrepends[4] << (type == RecordType::PreScan ? L"[Pre-Scan] " : L" ");
 			SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
 
-			std::wcout << L"Detection ID: " << copy.dwID << std::endl;
+			std::wcout << L"Detection ID: " << detection->dwID << std::endl;
 
-			std::wcout << L"\tDetection Recorded at " << FormatWindowsTime(copy.context.DetectionCreatedTime)
+			std::wcout << L"\tDetection Recorded at " << FormatWindowsTime(detection->context.DetectionCreatedTime)
 				<< std::endl;
-			if(copy.context.note){
-				std::wcout << L"\tNote: " << *copy.context.note << std::endl;
+			if(detection->context.note){
+				std::wcout << L"\tNote: " << *detection->context.note << std::endl;
 			}
-			if(copy.context.FirstEvidenceTime){
-				std::wcout << L"\tFirst Evidence at " << FormatWindowsTime(*copy.context.FirstEvidenceTime) 
+			if(detection->context.FirstEvidenceTime){
+				std::wcout << L"\tFirst Evidence at " << FormatWindowsTime(*detection->context.FirstEvidenceTime) 
 					<< std::endl;
 			}
 
-			if(copy.context.hunts.size()){
+			if(detection->context.hunts.size()){
 				std::wcout << L"\tDetected by: ";
-				for(auto& hunt : copy.context.hunts){
+				for(auto& hunt : detection->context.hunts){
 					std::wcout << hunt << L", ";
 				}
 				std::wcout << std::endl;
 			}
 			
-			if(copy.DetectionStale){
+			if(detection->DetectionStale){
 				std::wcout << L"\tDetection is stale" << std::endl;
 			}
 
-			std::wcout << L"\tDetection type: " << (copy.type == DetectionType::FileDetection ? L"File" :
-													copy.type == DetectionType::ProcessDetection ? L"Process" :
-													copy.type == DetectionType::RegistryDetection ? L"Registry" :
-													copy.type == DetectionType::ServiceDetection ? L"Service" :
-													std::get<OtherDetectionData>(copy.data).DetectionType) 
+			std::wcout << L"\tDetection type: " << (detection->type == DetectionType::FileDetection ? L"File" :
+													detection->type == DetectionType::ProcessDetection ? L"Process" :
+													detection->type == DetectionType::RegistryDetection ? L"Registry" :
+													detection->type == DetectionType::ServiceDetection ? L"Service" :
+													std::get<OtherDetectionData>(detection->data).DetectionType) 
 				<< std::endl;
 
-			std::wcout << L"\tDetection Certainty: " << static_cast<double>(copy.info.GetCertainty()) << std::endl;
+			std::wcout << L"\tDetection Certainty: " << static_cast<double>(detection->info.GetCertainty()) << std::endl;
 			std::wcout << L"\tDetection Data: " << std::endl;
 
-			auto properties{ copy.Serialize() };
+			auto properties{ detection->Serialize() };
 			for(auto& pair : properties){
 				std::wcout << L"\t\t" << pair.first << ": " << pair.second << std::endl;
 			}
@@ -89,5 +87,13 @@ namespace Log {
 
 		std::cout << "Detections with IDs " << first->dwID << " and " << second->dwID << " are associated "
 			<< " with strength " << static_cast<double>(a) << std::endl;
+	}
+
+	void CLISink::UpdateCertainty(IN CONST std::shared_ptr<Detection>& detection){
+		AcquireMutex mutex{ hMutex };
+		BeginCriticalSection _{ *detection };
+
+		std::cout << "Detection with ID " << detection->dwID << " now has certainty " 
+			<< static_cast<double>(detection->info.GetCertainty()) << std::endl;
 	}
 }

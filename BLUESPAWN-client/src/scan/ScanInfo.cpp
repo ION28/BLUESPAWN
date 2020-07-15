@@ -35,29 +35,34 @@ ScanInfo::ScanInfo() :
 	bAssociativeStale{ true }{}
 
 std::unordered_map<std::shared_ptr<Detection>, Association> ScanInfo::GetAssociations(){
-	EnterCriticalSection(hGuard);
-	auto copy{ *associations };
-	LeaveCriticalSection(hGuard);
-	return copy;
+	BeginCriticalSection _{ hGuard };
+	return *associations;
 }
 
 Certainty ScanInfo::GetCertainty(){ 
+	BeginCriticalSection _{ hGuard };
 	if(bAssociativeStale){
 		cAssociativeCertainty = Certainty::None;
 		
-		EnterCriticalSection(hGuard);
 		for(auto& pair : *associations){
-			cAssociativeCertainty = cAssociativeCertainty + (pair.first->info.certainty * pair.second);
+			LeaveCriticalSection(hGuard);
+			auto raw{ pair.first->info.GetRawCertainty() };
+			EnterCriticalSection(hGuard);
+			cAssociativeCertainty = cAssociativeCertainty + (raw * pair.second);
 		}
-		LeaveCriticalSection(hGuard);
 
 		bAssociativeStale = false;
 	}
 	return certainty + cAssociativeCertainty; 
 };
 
+Certainty ScanInfo::GetRawCertainty(){
+	BeginCriticalSection _{ hGuard };
+	return certainty;
+};
+
 void ScanInfo::AddAssociation(IN CONST std::shared_ptr<Detection>& node, IN CONST Association& a){
-	EnterCriticalSection(hGuard);
+	BeginCriticalSection _{ hGuard };
 	bAssociativeStale = true;
 	if(associations->find(node) == associations->end()){
 		associations->emplace(node, a);
@@ -65,7 +70,6 @@ void ScanInfo::AddAssociation(IN CONST std::shared_ptr<Detection>& node, IN CONS
 		auto& assoc{ associations->at(node) };
 		assoc = assoc + a;
 	}
-	LeaveCriticalSection(hGuard);
 }
 
 void ScanInfo::SetCertainty(IN CONST Certainty& certainty){

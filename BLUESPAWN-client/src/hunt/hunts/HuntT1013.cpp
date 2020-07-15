@@ -27,8 +27,9 @@ namespace Hunts {
                 auto filepath{ FileSystem::SearchPathExecutable(monitor.GetValue<std::wstring>(L"Driver").value()) };
 
                 if(filepath && FileScanner::PerformQuickScan(*filepath)) {
-                    CREATE_DETECTION(Certainty::None, RegistryDetectionData{ *RegistryValue::Create(monitor, L"Driver"),
-                                                                             RegistryDetectionType::FileReference });
+                    CREATE_DETECTION(Certainty::Moderate,
+                                     RegistryDetectionData{ *RegistryValue::Create(monitor, L"Driver"),
+                                                            RegistryDetectionType::FileReference });
                 }
             }
         }

@@ -10,7 +10,7 @@
     OutputDebugStringW((std::wstringstream{} << __VA_ARGS__).str().c_str())
 
 #define DETECTION_DEBUG_STREAM(...)                                                                                  \
-    DEBUG_STREAM((type == RecordType::PreScan ? L"[Pre-Scan Detection]" : L"[Detection]") << L"[ID " << copy.dwID << \
+    DEBUG_STREAM((type == RecordType::PreScan ? L"[Pre-Scan Detection]" : L"[Detection]") << L"[ID " << detection->dwID << \
                  L"]" << __VA_ARGS__);
 
 namespace Log{
@@ -31,18 +31,15 @@ namespace Log{
 
 		if(type == RecordType::PreScan && Bluespawn::EnablePreScanDetections || type == RecordType::PostScan){
 
-			EnterCriticalSection(*detection);
-			Detection copy{ *detection };
-			LeaveCriticalSection(*detection);
-
+			BeginCriticalSection __{ *detection };
 			BeginCriticalSection _{ hGuard };
 
-			DETECTION_DEBUG_STREAM(L" Detection Logged at " << FormatWindowsTime(copy.context.DetectionCreatedTime));
-			if(copy.context.note){
-				DETECTION_DEBUG_STREAM(L" Note: " << *copy.context.note);
+			DETECTION_DEBUG_STREAM(L" Detection Logged at " << FormatWindowsTime(detection->context.DetectionCreatedTime));
+			if(detection->context.note){
+				DETECTION_DEBUG_STREAM(L" Note: " << *detection->context.note);
 			}
-			if(copy.context.FirstEvidenceTime){
-				DETECTION_DEBUG_STREAM(L" First Evidence: " << FormatWindowsTime(*copy.context.FirstEvidenceTime));
+			if(detection->context.FirstEvidenceTime){
+				DETECTION_DEBUG_STREAM(L" First Evidence: " << FormatWindowsTime(*detection->context.FirstEvidenceTime));
 			}
 
 			if(detection->context.hunts.size()){
@@ -53,20 +50,20 @@ namespace Log{
 				DETECTION_DEBUG_STREAM(L" Associated Hunts: " << hunts.str());
 			}
 
-			if(copy.DetectionStale){
+			if(detection->DetectionStale){
 				DETECTION_DEBUG_STREAM(L" Detection is Stale");
 			}
 
 			DETECTION_DEBUG_STREAM(L" Detection Type: " << 
-				(copy.type == DetectionType::FileDetection ? L"File" :
-				 copy.type == DetectionType::ProcessDetection ? L"Process" :
-				 copy.type == DetectionType::RegistryDetection ? L"Registry" :
-				 copy.type == DetectionType::ServiceDetection ? L"Service" :
-				 std::get<OtherDetectionData>(copy.data).DetectionType));
+				(detection->type == DetectionType::FileDetection ? L"File" :
+				 detection->type == DetectionType::ProcessDetection ? L"Process" :
+				 detection->type == DetectionType::RegistryDetection ? L"Registry" :
+				 detection->type == DetectionType::ServiceDetection ? L"Service" :
+				 std::get<OtherDetectionData>(detection->data).DetectionType));
 
-			DETECTION_DEBUG_STREAM(L" Detection Certainty: " << static_cast<double>(copy.info.GetCertainty()));
+			DETECTION_DEBUG_STREAM(L" Detection Certainty: " << static_cast<double>(detection->info.GetCertainty()));
 
-			auto properties{ copy.Serialize() };
+			auto properties{ detection->Serialize() };
 			for(auto& pair : properties){
 				DETECTION_DEBUG_STREAM(L"[Data] " << pair.first << L": " << pair.second);
 			}
@@ -79,5 +76,13 @@ namespace Log{
 
 		DEBUG_STREAM(L"[Detection][ID " << first->dwID << L"]" << L" Associated with " << second->dwID << 
 					 L" with strength " << static_cast<double>(a));
+	}
+
+	void DebugSink::UpdateCertainty(IN CONST std::shared_ptr<Detection>& detection){
+		BeginCriticalSection __{ *detection };
+		BeginCriticalSection _{ hGuard };
+
+		DEBUG_STREAM(L"[Detection][ID " << detection->dwID << L"]" << L" now has certainty "
+					 << static_cast<double>(detection->info.GetCertainty()));
 	}
 }

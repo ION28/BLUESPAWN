@@ -63,16 +63,23 @@ namespace Hunts {
 
             auto malicious{ Certainty::None };
 
+            bool svchost{ false };
             if(imagePath.find(L"svchost.exe") != std::wstring::npos) {
                 // svchost services are rarely if ever should have 7045 events
                 malicious = malicious + Certainty::Strong;
+                svchost = true;
             } else if(ServiceScanner::PerformQuickScan(std::nullopt, imageName, imagePath)) {
                 malicious = malicious + Certainty::Moderate;
             }
 
             if(malicious > Certainty::None) {
-                CREATE_DETECTION_WITH_CONTEXT(malicious, ServiceDetectionData{ std::nullopt, imageName, imagePath },
-                                              DetectionContext{ GetName(), ft });
+                // clang-format off
+                CREATE_DETECTION_WITH_CONTEXT(
+                    malicious, ServiceDetectionData{ std::nullopt, imageName, imagePath },
+                    DetectionContext{ GetName(), ft, svchost ? std::optional<std::wstring>{ 
+                    L"Most if not all svchost services should come preinstalled and therefore should not show up in "
+                    "the event logs. However, this can sometimes happen legitimately" } : std::nullopt });
+                // clang-format on
             }
         }
 
