@@ -294,9 +294,6 @@ private rule DodgyStrings
 		
     strings:
         $ = ".bash_history"
-        $ = "404 not found" nocase
-        $ = "file not found" nocase
-        $ = "forbidden" nocase
         $ = /AddType\s+application\/x-httpd-(php|cgi)/ nocase
         $ = /php_value\s*auto_prepend_file/ nocase
         $ = /SecFilterEngine\s+Off/ nocase  // disable modsec
@@ -319,8 +316,6 @@ private rule DodgyStrings
         $ = "b374k" fullword nocase
         $ = "backdoor" fullword nocase
         $ = /(c99|r57|fx29)shell/
-        $ = "cmd.exe" fullword nocase
-        $ = "powershell.exe" fullword nocase
         $ = /defac(ed|er|ement|ing)/ fullword nocase
         $ = "evilc0ders" fullword nocase
         $ = "exploit" fullword nocase
@@ -328,7 +323,6 @@ private rule DodgyStrings
         $ = "hashcrack" nocase
         $ = "id_rsa" fullword
         $ = "ipconfig" fullword nocase
-        $ = "kernel32.dll" fullword nocase
         $ = "kingdefacer" nocase
         $ = "Wireghoul" nocase fullword
         $ = "LD_PRELOAD" fullword
