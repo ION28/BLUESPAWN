@@ -76,7 +76,7 @@ namespace Permissions {
 		return amAccess;
 	}
 
-	bool UpdateObjectACL(const std::wstring& wsObjectName, const SE_OBJECT_TYPE& seObjectType, const Owner& oOwner, const ACCESS_MASK& amDesiredAccess, const bool& bDeny) {
+	bool UpdateObjectACL(const std::wstring& wsObjectName, SE_OBJECT_TYPE seObjectType, const Owner& oOwner, ACCESS_MASK amDesiredAccess, bool bDeny) {
 		PACL pOldDacl;
 		PSECURITY_DESCRIPTOR pDesc{ nullptr };
 		HRESULT hr = GetNamedSecurityInfoW(reinterpret_cast<LPCWSTR>(wsObjectName.c_str()), seObjectType, DACL_SECURITY_INFORMATION, nullptr, nullptr, &pOldDacl, nullptr, &pDesc);
@@ -673,55 +673,4 @@ namespace Permissions {
 		CloseHandle(hToken);
 		return std::nullopt;
 	}
-
-	bool UpdateObjectACL(const std::wstring& wsObjectName, SE_OBJECT_TYPE seObjectType, const Owner& oOwner, ACCESS_MASK amDesiredAccess, bool bDeny) {
-		PACL pTempDACL{ NULL };
-		SecurityDescriptor sdOldDACL, sdNewDACL;
-		PSECURITY_DESCRIPTOR pSecDesc{ NULL };
-		EXPLICIT_ACCESS ea{};
-		//Get old DACL
-		auto hr = GetNamedSecurityInfo(wsObjectName.c_str(), seObjectType, DACL_SECURITY_INFORMATION, NULL, NULL, &pTempDACL, NULL, &pSecDesc);
-		if (hr != ERROR_SUCCESS) {
-			LOG_ERROR("Error updating ACL for " << wsObjectName << ". Error: " << hr);
-			SetLastError(hr);
-			return false;
-		}
-		//Correct positional memory of the ACL is weird and doesn't naturally work with the SecurityDescriptor class.
-		//This gets the right data to the right place
-		sdOldDACL = SecurityDescriptor::CreateDACL(pTempDACL->AclSize);
-		memcpy(sdOldDACL.GetDACL(), pTempDACL, pTempDACL->AclSize);
-		LocalFree(pSecDesc);
-		//Build the explicit access struct
-		ea.grfAccessPermissions = amDesiredAccess;
-		if (bDeny) {
-			ea.grfAccessMode = DENY_ACCESS;
-		}
-		else {
-			ea.grfAccessMode = GRANT_ACCESS;
-		}
-		ea.grfInheritance = NO_INHERITANCE;
-		ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
-		ea.Trustee.ptstrName = LPWCH(oOwner.GetSID());
-		//Build the new ACL
-		hr = SetEntriesInAcl(1, &ea, sdOldDACL.GetDACL(), &pTempDACL);
-		if (hr != ERROR_SUCCESS) {
-			LOG_ERROR("Error creating new ACL. Error: " << hr);
-			SetLastError(hr);
-			return false;
-		}
-		//Correct positional memory of the ACL is weird and doesn't naturally work with the SecurityDescriptor class.
-		//This gets the right data to the right place
-		sdNewDACL = SecurityDescriptor::CreateDACL(pTempDACL->AclSize);
-		memcpy(sdNewDACL.GetDACL(), pTempDACL, pTempDACL->AclSize);
-		LocalFree(pTempDACL);
-
-		hr = SetNamedSecurityInfo(LPWSTR(wsObjectName.c_str()), seObjectType, DACL_SECURITY_INFORMATION, NULL, NULL, sdNewDACL.GetDACL(), NULL);
-		if (hr != ERROR_SUCCESS) {
-			LOG_ERROR("Error assigning new ACL to object " << wsObjectName << ". Error: " << hr);
-			SetLastError(hr);
-			return false;
-		}
-		return true;
-	}
-
 }
