@@ -302,7 +302,7 @@ FileDetectionData::FileDetectionData(IN CONST FileSystem::File& file,
             malicious += mal;
         }
         std::wstring identifier{};
-        for(auto& id : yara->vKnownBadRules) {
+        for(auto& id : yara->vIndicatorRules) {
             if(identifier.length()) identifier += L", ";
             identifier += id;
         }

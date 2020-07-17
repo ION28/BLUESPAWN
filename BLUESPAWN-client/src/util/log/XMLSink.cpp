@@ -68,7 +68,7 @@ namespace Log {
                     child->SetText(detection->info.GetCertainty());
                 }
                 if(child->Name() == std::string{ "raw-certainty" }){
-                    child->SetText(detection->info.GetRawCertainty());
+                    child->SetText(detection->info.GetIntrinsicCertainty());
                 }
             }
         }
@@ -145,7 +145,7 @@ namespace Log {
         }
 
         InsertElement(XMLDoc, detect, "certainty", std::to_wstring(detection->info.GetCertainty()));
-        InsertElement(XMLDoc, detect, "raw-certainty", std::to_wstring(detection->info.GetRawCertainty()));
+        InsertElement(XMLDoc, detect, "raw-certainty", std::to_wstring(detection->info.GetIntrinsicCertainty()));
 
         if(detection->context.hunts.size()) {
             auto hunts{ XMLDoc.NewElement("associated-hunts") };

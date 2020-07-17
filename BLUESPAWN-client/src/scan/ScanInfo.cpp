@@ -46,7 +46,7 @@ Certainty ScanInfo::GetCertainty(){
 		
 		for(auto& pair : *associations){
 			LeaveCriticalSection(hGuard);
-			auto raw{ pair.first->info.GetRawCertainty() };
+			auto raw{ pair.first->info.GetIntrinsicCertainty() };
 			EnterCriticalSection(hGuard);
 			cAssociativeCertainty = cAssociativeCertainty + (raw * pair.second);
 		}
@@ -56,7 +56,7 @@ Certainty ScanInfo::GetCertainty(){
 	return certainty + cAssociativeCertainty; 
 };
 
-Certainty ScanInfo::GetRawCertainty(){
+Certainty ScanInfo::GetIntrinsicCertainty(){
 	BeginCriticalSection _{ hGuard };
 	return certainty;
 };

@@ -2,12 +2,19 @@
 
 #include "common/wrappers.hpp"
 #include "util/log/Log.h"
+#include "common/ThreadPool.h"
 
 void EventListener::SubEventListener::HandleEventNotify(HANDLE hEvent){
+    std::vector<std::function<void()>> functions{};
     if(map.find(hEvent) != map.end()){
-        for(auto& func : map.at(hEvent)){
-            func();
+        for(auto& f : map.at(hEvent)){
+            functions.emplace_back(f);
         }
+    }
+    if(functions.size()){
+        ThreadPool::GetInstance().EnqueueTask([functions](){
+            std::for_each(functions.begin(), functions.end(), [](auto& f){ f(); });
+        });
     }
 }
 
@@ -111,6 +118,7 @@ bool EventListener::SubEventListener::TrySubscribe(
         // Set the manager event since we're writing to map 
         SetEvent(hManager);
 
+        LeaveCriticalSection(hSection);
         auto status{ WaitForSingleObject(hManagerResponse, 1000) };
 
         // Ensure the manager event has been processed before making changes
@@ -120,11 +128,14 @@ bool EventListener::SubEventListener::TrySubscribe(
                 // a single WaitForSingleObject with a timeout of INFINITE
                 status = WaitForSingleObject(hManagerResponse, 1000);
             } else {
+                EnterCriticalSection(hSection);
+
                 // An error occured; return failure
                 SetLastError(status);
                 return false;
             }
         }
+        EnterCriticalSection(hSection);
 
         events.emplace_back(hEvent);
         map.emplace(std::move(std::pair<HANDLE, std::vector<std::function<void()>>>{ hEvent, callbacks }));

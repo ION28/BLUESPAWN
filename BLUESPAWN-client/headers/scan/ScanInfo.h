@@ -101,7 +101,7 @@ public:
 	ScanInfo();
 
 	/**
-	 * Gets a map of the associations of this node. Acquire hGuard before reading from the map.
+	 * Gets a map of the associations of this node.
 	 *
 	 * @return The associations of this node
 	 */
@@ -121,7 +121,7 @@ public:
 	 *
 	 * @return The certainty that the detection this is a part of is malicious
 	 */
-	Certainty GetRawCertainty();
+	Certainty GetIntrinsicCertainty();
 
 	/**
 	 * Sets the degree of certainty that the detection referenced by this scan node is malicious. This does not affect 

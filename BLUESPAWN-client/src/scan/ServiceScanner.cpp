@@ -9,7 +9,9 @@
 
 std::unordered_map<std::shared_ptr<Detection>, Association>
 ServiceScanner::GetAssociatedDetections(IN CONST Detection& detection) {
-    if(detection.type != DetectionType::ServiceDetection) { return {}; }
+    if(detection.type != DetectionType::ServiceDetection) {
+        return {};
+    }
 
     std::unordered_map<std::shared_ptr<Detection>, Association> detections{};
     ServiceDetectionData data{ std::get<ServiceDetectionData>(detection.data) };
@@ -37,7 +39,9 @@ ServiceScanner::GetAssociatedDetections(IN CONST Detection& detection) {
         }
 
         if(name.length() || data.ServiceName) {
-            if(data.ServiceName) { name = *data.ServiceName; }
+            if(data.ServiceName) {
+                name = *data.ServiceName;
+            }
 
             Registry::RegistryKey ServicesKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services" };
 
@@ -66,7 +70,9 @@ ServiceScanner::GetAssociatedDetections(IN CONST Detection& detection) {
                         }
                     }
 
-                    for(auto subkey : key.EnumerateSubkeys()) { bfsQueue.emplace(subkey); }
+                    for(auto subkey : key.EnumerateSubkeys()) {
+                        bfsQueue.emplace(subkey);
+                    }
                 }
             }
         }
@@ -84,14 +90,22 @@ bool ServiceScanner::PerformQuickScan(IN CONST std::optional<std::wstring>& Serv
                                       IN CONST std::optional<std::wstring>& ServiceDisplayName,
                                       IN CONST std::optional<std::wstring>& ServicePath OPTIONAL) {
     if(ServicePath) {
-        if(ProcessScanner::PerformQuickScan(*ServicePath)) { return true; }
+        if(ProcessScanner::PerformQuickScan(*ServicePath)) {
+            return true;
+        }
 
-        if(ServicePath->find(L"mimidrv.sys") != std::wstring::npos) { return true; }
+        if(ServicePath->find(L"mimidrv.sys") != std::wstring::npos) {
+            return true;
+        }
     }
 
-    if(ServiceName && StringContainsKeywords(*ServiceName)) { return true; }
+    if(ServiceName && StringContainsKeywords(*ServiceName)) {
+        return true;
+    }
 
-    if(ServiceDisplayName && StringContainsKeywords(*ServiceDisplayName)) { return true; }
+    if(ServiceDisplayName && StringContainsKeywords(*ServiceDisplayName)) {
+        return true;
+    }
 
     return false;
 }
@@ -99,9 +113,12 @@ bool ServiceScanner::PerformQuickScan(IN CONST std::optional<std::wstring>& Serv
 Certainty ServiceScanner::ScanDetection(IN CONST Detection& detection) {
     if(detection.type == DetectionType::ServiceDetection) {
         ServiceDetectionData data{ std::get<ServiceDetectionData>(detection.data) };
-        if(data.ServiceName && StringContainsKeywords(*data.ServiceName)) return Certainty::Strong;
-        if(data.DisplayName && StringContainsKeywords(*data.DisplayName)) return Certainty::Strong;
-        if(data.FilePath && StringContainsKeywords(*data.FilePath)) return Certainty::Strong;
+        if(data.ServiceName && StringContainsKeywords(*data.ServiceName))
+            return Certainty::Strong;
+        if(data.DisplayName && StringContainsKeywords(*data.DisplayName))
+            return Certainty::Strong;
+        if(data.FilePath && StringContainsKeywords(*data.FilePath))
+            return Certainty::Strong;
     }
 
     return Certainty::None;

@@ -226,8 +226,6 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
 
     if(CompareIgnoreCase(help_category, std::string{ "hunt" })) {
         Bluespawn::io.InformUser(StringToWidestring(options.help({ "hunt" })));
-    } else if(CompareIgnoreCase(help_category, std::string{ "scan" })) {
-        Bluespawn::io.InformUser(StringToWidestring(options.help({ "scan" })));
     } else if(CompareIgnoreCase(help_category, std::string{ "monitor" })) {
         Bluespawn::io.InformUser(StringToWidestring(options.help({ "monitor" })));
     } else if(CompareIgnoreCase(help_category, std::string{ "mitigate" })) {
@@ -333,7 +331,7 @@ int main(int argc, char* argv[]) {
             cxxopts::value<std::string>()->implicit_value("Normal"))
         ("m,mitigate", "Mitigates vulnerabilities by applying security settings. Available options: audit, enforce", 
              cxxopts::value<std::string>()->implicit_value("audit"))
-        ("s,scan", "Scans possible detections to decide if they are malicious and determine associated detections.",
+        ("a,aggressiveness", "Sets the aggressiveness of BLUESPAWN. Options are intensive, normal, and cursory.",
             cxxopts::value<std::string>()->default_value("Normal"))
         ("help", "Help Information. You can also specify a category for help on a specific module such as hunt.",
             cxxopts::value<std::string>()->implicit_value("general"))
@@ -398,8 +396,8 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        if(result.count("scan")) {
-            bluespawn.EnableMode(BluespawnMode::SCAN, static_cast<DWORD>(GetAggressiveness(result["scan"])));
+        if(result.count("aggressiveness")) {
+            bluespawn.EnableMode(BluespawnMode::SCAN, static_cast<DWORD>(GetAggressiveness(result["aggressiveness"])));
         }
         if(result.count("mitigate")) {
             bool bForceEnforce = false;

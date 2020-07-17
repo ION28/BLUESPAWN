@@ -1,0 +1,39 @@
+<bluespawn>
+    <info detail="low" time="2020-07-17 16:02:54.90300Z">Beginning hunt for T1484 - Group Policy Modification</info>
+    <info detail="low" time="2020-07-17 16:02:54.90300Z">Beginning hunt for T1484 - Group Policy Modification</info>
+    <info detail="low" time="2020-07-17 16:03:01.5100Z">Beginning hunt for T1484 - Group Policy Modification</info>
+    <info detail="low" time="2020-07-17 16:03:01.5100Z">Beginning hunt for T1484 - Group Policy Modification</info>
+    <info detail="low" time="2020-07-17 16:03:31.74500Z">Beginning hunt for T1484 - Group Policy Modification</info>
+    <info detail="low" time="2020-07-17 16:03:31.74500Z">Beginning hunt for T1484 - Group Policy Modification</info>
+    <info detail="low" time="2020-07-17 16:03:52.58100Z">Beginning hunt for T1004 - Winlogon Helper DLL</info>
+    <detection type="Registry" id="1" time="2020-07-17 20:03:52.584Z">
+        <certainty>0.5</certainty>
+        <raw-certainty>0.5</raw-certainty>
+        <associated-hunts>
+            <hunt>T1004 - Winlogon Helper DLL</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Key Path">HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon</property>
+            <property name="Key Value Data">explorer.exe2</property>
+            <property name="Key Value Name">Shell</property>
+            <property name="Registry Entry Type">File</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">2</association>
+        </associated-detections>
+    </detection>
+    <detection type="File" id="2" time="2020-07-17 20:03:52.586Z">
+        <certainty>0.500000</certainty>
+        <raw-certainty>0.000000</raw-certainty>
+        <associated-data>
+            <property name="Exists">false</property>
+            <property name="Extension">.exe2</property>
+            <property name="Name">explorer.exe2</property>
+            <property name="Path">explorer.exe2</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">1</association>
+        </associated-detections>
+    </detection>
+    <info detail="low" time="2020-07-17 16:04:05.64500Z">Beginning hunt for T1004 - Winlogon Helper DLL</info>
+</bluespawn>

@@ -36,9 +36,12 @@ void DetectionRegister::AddDetectionAsync(IN CONST std::shared_ptr<Detection>& d
 
                 auto first{ detection->dwID < pair.first->dwID ? detection : pair.first };
                 auto second{ detection->dwID < pair.first->dwID ? pair.first : detection };
+
+                LeaveCriticalSection(*detection);
                 for(auto& sink : Bluespawn::detectionSinks) {
                     sink->RecordAssociation(first, second, pair.second);
                 }
+                EnterCriticalSection(*detection);
             }
         }
     }
@@ -138,8 +141,14 @@ std::shared_ptr<Detection> DetectionRegister::AddDetection(IN Detection&& raw, I
         for(auto& sink : Bluespawn::detectionSinks) {
             sink->RecordDetection(ref, RecordType::PreScan);
         }
-        ThreadPool::GetInstance().EnqueueTask(
-            std::bind(&DetectionRegister::UpdateDetectionCertainty, this, ref, certainty));
+
+        for(auto& hunt : raw.context.hunts){
+            if(ref->context.hunts.find(hunt) == ref->context.hunts.end()){
+                ThreadPool::GetInstance().EnqueueTask(
+                    std::bind(&DetectionRegister::UpdateDetectionCertainty, this, ref, certainty));
+                return ref;
+            }
+        }
         return ref;
     }
     LeaveCriticalSection(hScannedGuard);
@@ -152,8 +161,13 @@ std::shared_ptr<Detection> DetectionRegister::AddDetection(IN Detection&& raw, I
         for(auto& sink : Bluespawn::detectionSinks) {
             sink->RecordDetection(ref, RecordType::PreScan);
         }
-        ThreadPool::GetInstance().EnqueueTask(
-            std::bind(&DetectionRegister::UpdateDetectionCertainty, this, ref, certainty));
+        for(auto& hunt : raw.context.hunts){
+            if(ref->context.hunts.find(hunt) == ref->context.hunts.end()){
+                ThreadPool::GetInstance().EnqueueTask(
+                    std::bind(&DetectionRegister::UpdateDetectionCertainty, this, ref, certainty));
+                return ref;
+            }
+        }
         return ref;
     }
     LeaveCriticalSection(hQueueGuard);
