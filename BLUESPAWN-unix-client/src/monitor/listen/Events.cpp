@@ -1,6 +1,7 @@
 #include "Events.h"
 #include <unistd.h>
 #include <string.h>
+#include <limits.h>
 #include <time.h>
 
 namespace Events{
@@ -8,6 +9,16 @@ namespace Events{
     EventHandle::EventHandle(){
         pthread_cond_init(&this->condition, NULL);
         pthread_mutex_init(&this->mutex, NULL);
+        if(Events::currId == UINT_MAX){
+            //TODO: log error
+            srand(time(NULL));
+            this->id = rand();
+        }
+        else{
+            this->id = Events::currId;
+            Events::currId = Events::currId + 1;
+        }
+        
     }
 
     EventHandle::~EventHandle(){
@@ -20,12 +31,16 @@ namespace Events{
     }
 
     int EventHandle::Wait(int timeout, bool * done){
-        struct timespec spec = {timeout, 0};
         time_t current = time(NULL);
         pthread_mutex_lock(&this->mutex);
         int result = 0;
         if(timeout != INFINITE)
+        {
+            struct timespec spec;
+            clock_gettime(CLOCK_REALTIME, &spec);
+            spec.tv_sec += timeout;
             result = pthread_cond_timedwait(&this->condition, &this->mutex, &spec);
+        }
         else
             result = pthread_cond_wait(&this->condition, &this->mutex);
 
@@ -34,6 +49,10 @@ namespace Events{
         }
         
         return (int)(time(NULL) - current);
+    }
+
+    bool EventHandle::operator==(const EventHandle & other) const{
+        return this->id == other.id;
     }
 
 

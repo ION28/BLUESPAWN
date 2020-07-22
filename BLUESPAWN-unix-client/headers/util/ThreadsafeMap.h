@@ -6,7 +6,7 @@ template<typename K, typename V>
 class ThreadsafeMap{
 private:
     pthread_mutex_t mutex;
-    std::map map;
+    std::map<K, V> map;
 public:
     ThreadsafeMap();
 

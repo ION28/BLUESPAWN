@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <optional>
 #include <string>
+#include <atomic>
 #include <linux/ptrace.h>
 
 #include "util/ThreadsafeQueue.h"
@@ -17,6 +18,8 @@ namespace Events{
 
 class EventDetails;
 
+static std::atomic_uint currId = 0;
+
 /**
  * A class capable of describing an event to subscribe to
  * 
@@ -25,6 +28,7 @@ class EventHandle{
 private:
     pthread_cond_t condition;
     pthread_mutex_t mutex;
+    unsigned int id;
 public:
 
     EventHandle();
@@ -34,6 +38,8 @@ public:
     void Set();
 
     int Wait(int timeout, bool * done);
+
+    bool operator==(const EventHandle &other) const;
 
 };
 

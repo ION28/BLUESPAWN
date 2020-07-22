@@ -209,7 +209,7 @@ public:
 	 *
 	 * @return An optional containing the callbacks for the event if present; otherwise std::nullopt
 	 */
-	std::optional<std::vector<std::function<void()>>> GetSubscription(
+	std::optional<std::vector<std::function<void()>>> & GetSubscription(
 		const Events::EventHandle& hEvent
 	) const;
 

@@ -28,8 +28,7 @@ void EventListener::SubEventListener::ListenForEvents(){
             LOG_VERBOSE(3, "Manager event has been signalled; restarting wait");
 
             // Trigger manager response
-            //SetEvent(hManagerResponse);
-            hManagerResponse.store(true);
+            SetEvent(hManagerResponse);
 
             // If the thread should terminate, return
             if(terminate){
@@ -67,8 +66,8 @@ void EventListener::SubEventListener::ListenForEvents(){
 }
 
 EventListener::SubEventListener::SubEventListener() : 
-    hManager{ false },
-    hManagerResponse{ false },
+    hManager{ Events::CreateEvent() },
+    hManagerResponse{ Events::CreateEvent() },
     dwSlotsFree{ 0 }, //probably not needed
     dwFailureCount{ 0 },
     events{},
@@ -84,11 +83,14 @@ EventListener::SubEventListener::~SubEventListener(){
 
     // Set hManager, terminating the thread. No need to wait on the response; the join
     // will take care of waiting the appropriate amount of time.
-    //SetEvent(hManager);
-    hManager.store(true);
+    SetEvent(hManager);
+
 
     // Wait for the thread to finish
     hThread.join();
+
+    delete hManager;
+    delete hManagerResponse;
 
     pthread_mutex_destroy(&hSection);
 }
@@ -130,7 +132,7 @@ bool EventListener::SubEventListener::TrySubscribe(
     return false;
 }
 
-std::optional<std::vector<std::function<void()>>> EventListener::SubEventListener::GetSubscription(
+std::optional<std::vector<std::function<void()>>> & EventListener::SubEventListener::GetSubscription(
     const Events::EventHandle& hEvent
 ) const {
     // Enter a critical section before reading `map`
@@ -248,7 +250,7 @@ bool EventListener::Subscribe(
     }
     LOG_VERBOSE(1, "No sub-event listeners available; creating a new one");
     
-    auto& listener{ std::make_unique<SubEventListener>() };
+    auto& listener{ std::make_unique<EventListener::SubEventListener>() };
     auto success{ listener->TrySubscribe(hEvent, callbacks) };
     subeventlisteners.emplace_back(std::move(listener));
 

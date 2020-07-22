@@ -174,102 +174,50 @@ Making all in libyara
 make[1]: Entering directory '/home/aaron/Documents/BlueSpawn/BLUESPAWN-unix-client/external/yara/libyara'
 make  all-am
 make[2]: Entering directory '/home/aaron/Documents/BlueSpawn/BLUESPAWN-unix-client/external/yara/libyara'
-  CC       modules/tests/tests.lo
-  CC       modules/elf/elf.lo
-  CC       modules/math/math.lo
-  CC       modules/time/time.lo
-  CC       modules/pe/pe.lo
-  CC       modules/pe/pe_utils.lo
-  CC       modules/hash/hash.lo
-  CC       grammar.lo
-  CC       ahocorasick.lo
-  CC       arena.lo
-  CC       atoms.lo
-  CC       base64.lo
-  CC       bitmask.lo
-  CC       compiler.lo
-  CC       endian.lo
-  CC       exec.lo
-  CC       exefiles.lo
-  CC       filemap.lo
-  CC       hash.lo
-  CC       hex_grammar.lo
-  CC       hex_lexer.lo
-  CC       lexer.lo
-  CC       libyara.lo
-  CC       mem.lo
-  CC       modules.lo
-  CC       notebook.lo
-  CC       object.lo
-  CC       parser.lo
-  CC       proc.lo
-  CC       re.lo
-  CC       re_grammar.lo
-  CC       re_lexer.lo
-  CC       rules.lo
-  CC       scan.lo
-  CC       scanner.lo
-  CC       sizedstr.lo
-  CC       stack.lo
-  CC       stopwatch.lo
-  CC       strutils.lo
-  CC       stream.lo
-  CC       threading.lo
-  CC       proc/linux.lo
-  CCLD     libyara.la
-copying selected object files to avoid basename conflicts...
+make[2]: Nothing to be done for 'all-am'.
 make[2]: Leaving directory '/home/aaron/Documents/BlueSpawn/BLUESPAWN-unix-client/external/yara/libyara'
 make[1]: Leaving directory '/home/aaron/Documents/BlueSpawn/BLUESPAWN-unix-client/external/yara/libyara'
 make[1]: Entering directory '/home/aaron/Documents/BlueSpawn/BLUESPAWN-unix-client/external/yara'
-  CC       args.o
-  CC       threading.o
-  CC       yara.o
-  CCLD     yara
-  CC       yarac.o
-  CCLD     yarac
+make[1]: Nothing to be done for 'all-am'.
 make[1]: Leaving directory '/home/aaron/Documents/BlueSpawn/BLUESPAWN-unix-client/external/yara'
 src/monitor/EventListener.cpp: In member function ‘bool EventListener::Subscribe(const Events::EventHandle&, const std::vector<std::function<void()> >&)’:
-src/monitor/EventListener.cpp:254:58: error: cannot bind non-const lvalue reference of type ‘std::unique_ptr<EventListener::SubEventListener>&’ to an rvalue of type ‘std::_MakeUniq<EventListener::SubEventListener>::__single_object’ {aka ‘std::unique_ptr<EventListener::SubEventListener>’}
-  254 |     auto& listener{ std::make_unique<SubEventListener>() };
+src/monitor/EventListener.cpp:253:58: error: cannot bind non-const lvalue reference of type ‘std::unique_ptr<EventListener::SubEventListener>&’ to an rvalue of type ‘std::_MakeUniq<EventListener::SubEventListener>::__single_object’ {aka ‘std::unique_ptr<EventListener::SubEventListener>’}
+  253 |     auto& listener{ std::make_unique<SubEventListener>() };
       |                                                          ^
 src/monitor/EventListener.cpp: In member function ‘std::optional<std::vector<std::function<void()> > > EventListener::GetSubscription(const Events::EventHandle&) const’:
-src/monitor/EventListener.cpp:274:52: error: cannot bind non-const lvalue reference of type ‘std::optional<std::vector<std::function<void()> > >&’ to an rvalue of type ‘std::optional<std::vector<std::function<void()> > >’
-  274 |         if(auto& sub = sublistener->GetSubscription(hEvent)){
+src/monitor/EventListener.cpp:273:52: error: cannot bind non-const lvalue reference of type ‘std::optional<std::vector<std::function<void()> > >&’ to an rvalue of type ‘std::optional<std::vector<std::function<void()> > >’
+  273 |         if(auto& sub = sublistener->GetSubscription(hEvent)){
       |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~
 In file included from /usr/include/x86_64-linux-gnu/c++/9/bits/c++allocator.h:33,
                  from /usr/include/c++/9/bits/allocator.h:46,
                  from /usr/include/c++/9/vector:64,
                  from ./headers/monitor/EventListener.h:3,
                  from src/monitor/EventListener.cpp:1:
-/usr/include/c++/9/ext/new_allocator.h: In instantiation of ‘void __gnu_cxx::new_allocator<_Tp>::construct(_Up*, _Args&& ...) [with _Up = Events::EventHandle; _Args = {std::atomic<bool>&}; _Tp = Events::EventHandle]’:
-/usr/include/c++/9/bits/alloc_traits.h:482:2:   required from ‘static void std::allocator_traits<std::allocator<_Tp1> >::construct(std::allocator_traits<std::allocator<_Tp1> >::allocator_type&, _Up*, _Args&& ...) [with _Up = Events::EventHandle; _Args = {std::atomic<bool>&}; _Tp = Events::EventHandle; std::allocator_traits<std::allocator<_Tp1> >::allocator_type = std::allocator<Events::EventHandle>]’
-/usr/include/c++/9/bits/vector.tcc:115:30:   required from ‘std::vector<_Tp, _Alloc>::reference std::vector<_Tp, _Alloc>::emplace_back(_Args&& ...) [with _Args = {std::atomic<bool>&}; _Tp = Events::EventHandle; _Alloc = std::allocator<Events::EventHandle>; std::vector<_Tp, _Alloc>::reference = Events::EventHandle&]’
-src/monitor/EventListener.cpp:77:33:   required from here
-/usr/include/c++/9/ext/new_allocator.h:145:20: error: no matching function for call to ‘Events::EventHandle::EventHandle(std::atomic<bool>&)’
+/usr/include/c++/9/ext/new_allocator.h: In instantiation of ‘void __gnu_cxx::new_allocator<_Tp>::construct(_Up*, _Args&& ...) [with _Up = Events::EventHandle; _Args = {Events::EventHandle*&}; _Tp = Events::EventHandle]’:
+/usr/include/c++/9/bits/alloc_traits.h:482:2:   required from ‘static void std::allocator_traits<std::allocator<_Tp1> >::construct(std::allocator_traits<std::allocator<_Tp1> >::allocator_type&, _Up*, _Args&& ...) [with _Up = Events::EventHandle; _Args = {Events::EventHandle*&}; _Tp = Events::EventHandle; std::allocator_traits<std::allocator<_Tp1> >::allocator_type = std::allocator<Events::EventHandle>]’
+/usr/include/c++/9/bits/vector.tcc:115:30:   required from ‘std::vector<_Tp, _Alloc>::reference std::vector<_Tp, _Alloc>::emplace_back(_Args&& ...) [with _Args = {Events::EventHandle*&}; _Tp = Events::EventHandle; _Alloc = std::allocator<Events::EventHandle>; std::vector<_Tp, _Alloc>::reference = Events::EventHandle&]’
+src/monitor/EventListener.cpp:76:33:   required from here
+/usr/include/c++/9/ext/new_allocator.h:145:20: error: no matching function for call to ‘Events::EventHandle::EventHandle(Events::EventHandle*&)’
   145 |  noexcept(noexcept(::new((void *)__p)
       |                    ^~~~~~~~~~~~~~~~~~
   146 |        _Up(std::forward<_Args>(__args)...)))
       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In file included from ./headers/monitor/EventListener.h:9,
                  from src/monitor/EventListener.cpp:1:
-./headers/monitor/listen/Events.h:31:5: note: candidate: ‘Events::EventHandle::EventHandle(Events::EventDetails&)’
-   31 |     EventHandle(Events::EventDetails &details);
+./headers/monitor/listen/Events.h:34:5: note: candidate: ‘Events::EventHandle::EventHandle()’
+   34 |     EventHandle();
       |     ^~~~~~~~~~~
-./headers/monitor/listen/Events.h:31:39: note:   no known conversion for argument 1 from ‘std::atomic<bool>’ to ‘Events::EventDetails&’
-   31 |     EventHandle(Events::EventDetails &details);
-      |                 ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
-./headers/monitor/listen/Events.h:23:7: note: candidate: ‘Events::EventHandle::EventHandle(const Events::EventHandle&)’
-   23 | class EventHandle{
+./headers/monitor/listen/Events.h:34:5: note:   candidate expects 0 arguments, 1 provided
+./headers/monitor/listen/Events.h:27:7: note: candidate: ‘constexpr Events::EventHandle::EventHandle(const Events::EventHandle&)’
+   27 | class EventHandle{
       |       ^~~~~~~~~~~
-./headers/monitor/listen/Events.h:23:7: note:   no known conversion for argument 1 from ‘std::atomic<bool>’ to ‘const Events::EventHandle&’
-./headers/monitor/listen/Events.h:23:7: note: candidate: ‘Events::EventHandle::EventHandle(Events::EventHandle&&)’
-./headers/monitor/listen/Events.h:23:7: note:   no known conversion for argument 1 from ‘std::atomic<bool>’ to ‘Events::EventHandle&&’
+./headers/monitor/listen/Events.h:27:7: note:   no known conversion for argument 1 from ‘Events::EventHandle*’ to ‘const Events::EventHandle&’
 In file included from /usr/include/c++/9/functional:59,
                  from ./headers/common/wrappers.hpp:9,
                  from ./headers/monitor/EventListener.h:8,
                  from src/monitor/EventListener.cpp:1:
 /usr/include/c++/9/bits/std_function.h: In instantiation of ‘_Functor* std::function<_Res(_ArgTypes ...)>::target() [with _Functor = void(); _Res = void; _ArgTypes = {}]’:
-src/monitor/EventListener.cpp:167:62:   required from here
+src/monitor/EventListener.cpp:168:62:   required from here
 /usr/include/c++/9/bits/std_function.h:715:9: error: invalid use of const_cast with type ‘void (*)()’, which is a pointer or reference to a function type
   715 |  return const_cast<_Functor*>(__func);
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -777,7 +725,7 @@ In file included from ./headers/monitor/EventListener.h:5,
 In file included from /usr/include/c++/9/deque:67,
                  from /usr/include/c++/9/queue:60,
                  from ./headers/util/ThreadsafeQueue.h:3,
-                 from ./headers/monitor/listen/Events.h:9,
+                 from ./headers/monitor/listen/Events.h:10,
                  from ./headers/monitor/EventListener.h:9,
                  from src/monitor/EventListener.cpp:1:
 /usr/include/c++/9/bits/stl_deque.h:312:5: note: candidate: ‘template<class _Tp, class _Ref, class _Ptr> bool std::operator<(const std::_Deque_iterator<_Tp, _Ref, _Ptr>&, const std::_Deque_iterator<_Tp, _Ref, _Ptr>&)’
@@ -794,7 +742,7 @@ In file included from /usr/include/c++/9/bits/stl_tree.h:65,
 In file included from /usr/include/c++/9/deque:67,
                  from /usr/include/c++/9/queue:60,
                  from ./headers/util/ThreadsafeQueue.h:3,
-                 from ./headers/monitor/listen/Events.h:9,
+                 from ./headers/monitor/listen/Events.h:10,
                  from ./headers/monitor/EventListener.h:9,
                  from src/monitor/EventListener.cpp:1:
 /usr/include/c++/9/bits/stl_deque.h:320:5: note: candidate: ‘template<class _Tp, class _RefL, class _PtrL, class _RefR, class _PtrR> bool std::operator<(const std::_Deque_iterator<_Tp, _Ref, _Ptr>&, const std::_Deque_iterator<_Tp, _RefR, _PtrR>&)’
@@ -811,7 +759,7 @@ In file included from /usr/include/c++/9/bits/stl_tree.h:65,
 In file included from /usr/include/c++/9/deque:67,
                  from /usr/include/c++/9/queue:60,
                  from ./headers/util/ThreadsafeQueue.h:3,
-                 from ./headers/monitor/listen/Events.h:9,
+                 from ./headers/monitor/listen/Events.h:10,
                  from ./headers/monitor/EventListener.h:9,
                  from src/monitor/EventListener.cpp:1:
 /usr/include/c++/9/bits/stl_deque.h:2330:5: note: candidate: ‘template<class _Tp, class _Alloc> bool std::operator<(const std::deque<_Tp, _Alloc>&, const std::deque<_Tp, _Alloc>&)’
@@ -827,7 +775,7 @@ In file included from /usr/include/c++/9/bits/stl_tree.h:65,
       |                ~~~~^~~~~
 In file included from /usr/include/c++/9/queue:64,
                  from ./headers/util/ThreadsafeQueue.h:3,
-                 from ./headers/monitor/listen/Events.h:9,
+                 from ./headers/monitor/listen/Events.h:10,
                  from ./headers/monitor/EventListener.h:9,
                  from src/monitor/EventListener.cpp:1:
 /usr/include/c++/9/bits/stl_queue.h:356:5: note: candidate: ‘template<class _Tp, class _Seq> bool std::operator<(const std::queue<_Tp, _Seq>&, const std::queue<_Tp, _Seq>&)’
@@ -846,7 +794,7 @@ In file included from /usr/include/c++/9/set:61,
                  from ./headers/reaction/Detections.h:11,
                  from ./headers/reaction/Reaction.h:8,
                  from ./headers/monitor/Event.h:6,
-                 from ./headers/monitor/listen/Events.h:10,
+                 from ./headers/monitor/listen/Events.h:12,
                  from ./headers/monitor/EventListener.h:9,
                  from src/monitor/EventListener.cpp:1:
 /usr/include/c++/9/bits/stl_set.h:996:5: note: candidate: ‘template<class _Key, class _Compare, class _Alloc> bool std::operator<(const std::set<_Key, _Compare, _Allocator>&, const std::set<_Key, _Compare, _Allocator>&)’
@@ -865,7 +813,7 @@ In file included from /usr/include/c++/9/set:62,
                  from ./headers/reaction/Detections.h:11,
                  from ./headers/reaction/Reaction.h:8,
                  from ./headers/monitor/Event.h:6,
-                 from ./headers/monitor/listen/Events.h:10,
+                 from ./headers/monitor/listen/Events.h:12,
                  from ./headers/monitor/EventListener.h:9,
                  from src/monitor/EventListener.cpp:1:
 /usr/include/c++/9/bits/stl_multiset.h:981:5: note: candidate: ‘template<class _Key, class _Compare, class _Alloc> bool std::operator<(const std::multiset<_Key, _Compare, _Allocator>&, const std::multiset<_Key, _Compare, _Allocator>&)’
@@ -897,25 +845,6 @@ In file included from /usr/include/c++/9/bits/ios_base.h:46,
 /usr/include/c++/9/system_error:282:36: note:   no known conversion for argument 1 from ‘const Events::EventHandle’ to ‘const std::error_condition&’
   282 |   operator<(const error_condition& __lhs,
       |             ~~~~~~~~~~~~~~~~~~~~~~~^~~~~
-In file included from /usr/include/c++/9/vector:60,
-                 from ./headers/monitor/EventListener.h:3,
-                 from src/monitor/EventListener.cpp:1:
-/usr/include/c++/9/bits/stl_algobase.h: In instantiation of ‘static _OI std::__copy_move<true, false, std::random_access_iterator_tag>::__copy_m(_II, _II, _OI) [with _II = Events::EventHandle*; _OI = Events::EventHandle*]’:
-/usr/include/c++/9/bits/stl_algobase.h:404:30:   required from ‘_OI std::__copy_move_a(_II, _II, _OI) [with bool _IsMove = true; _II = Events::EventHandle*; _OI = Events::EventHandle*]’
-/usr/include/c++/9/bits/stl_algobase.h:441:30:   required from ‘_OI std::__copy_move_a2(_II, _II, _OI) [with bool _IsMove = true; _II = __gnu_cxx::__normal_iterator<Events::EventHandle*, std::vector<Events::EventHandle> >; _OI = __gnu_cxx::__normal_iterator<Events::EventHandle*, std::vector<Events::EventHandle> >]’
-/usr/include/c++/9/bits/stl_algobase.h:505:39:   required from ‘_OI std::move(_II, _II, _OI) [with _II = __gnu_cxx::__normal_iterator<Events::EventHandle*, std::vector<Events::EventHandle> >; _OI = __gnu_cxx::__normal_iterator<Events::EventHandle*, std::vector<Events::EventHandle> >]’
-/usr/include/c++/9/bits/vector.tcc:175:2:   required from ‘std::vector<_Tp, _Alloc>::iterator std::vector<_Tp, _Alloc>::_M_erase(std::vector<_Tp, _Alloc>::iterator) [with _Tp = Events::EventHandle; _Alloc = std::allocator<Events::EventHandle>; std::vector<_Tp, _Alloc>::iterator = __gnu_cxx::__normal_iterator<Events::EventHandle*, std::vector<Events::EventHandle> >; typename std::_Vector_base<_Tp, _Alloc>::pointer = Events::EventHandle*]’
-/usr/include/c++/9/bits/stl_vector.h:1428:58:   required from ‘std::vector<_Tp, _Alloc>::iterator std::vector<_Tp, _Alloc>::erase(std::vector<_Tp, _Alloc>::const_iterator) [with _Tp = Events::EventHandle; _Alloc = std::allocator<Events::EventHandle>; std::vector<_Tp, _Alloc>::iterator = __gnu_cxx::__normal_iterator<Events::EventHandle*, std::vector<Events::EventHandle> >; typename std::_Vector_base<_Tp, _Alloc>::pointer = Events::EventHandle*; std::vector<_Tp, _Alloc>::const_iterator = __gnu_cxx::__normal_iterator<const Events::EventHandle*, std::vector<Events::EventHandle> >; typename __gnu_cxx::__alloc_traits<typename std::_Vector_base<_Tp, _Alloc>::_Tp_alloc_type>::const_pointer = const Events::EventHandle*]’
-src/monitor/EventListener.cpp:219:46:   required from here
-/usr/include/c++/9/bits/stl_algobase.h:361:18: error: use of deleted function ‘Events::EventHandle& Events::EventHandle::operator=(Events::EventHandle&&)’
-  361 |        *__result = std::move(*__first);
-      |        ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~
-In file included from ./headers/monitor/EventListener.h:9,
-                 from src/monitor/EventListener.cpp:1:
-./headers/monitor/listen/Events.h:23:7: note: ‘Events::EventHandle& Events::EventHandle::operator=(Events::EventHandle&&)’ is implicitly deleted because the default definition would be ill-formed:
-   23 | class EventHandle{
-      |       ^~~~~~~~~~~
-./headers/monitor/listen/Events.h:23:7: error: non-static reference member ‘Events::EventDetails& Events::EventHandle::details’, can’t use default assignment operator
 In file included from ./headers/util/processes/ParseCobalt.h:3,
                  from src/util/processes/ParseCobalt.cpp:1:
 ./headers/common/wrappers.hpp: In instantiation of ‘T MemoryWrapper<T>::Dereference() const [with T = long unsigned int]’:
@@ -924,33 +853,17 @@ src/util/processes/ParseCobalt.cpp:70:59:   required from here
 ./headers/common/wrappers.hpp:188:21: error: ‘ReadProcessMemory’ was not declared in this scope
   188 |    ReadProcessMemory(process, address, &mem, sizeof(T), nullptr);
       |    ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/util/log/XMLSink.cpp: In function ‘void Log::UpdateLog(Log::XMLSink*)’:
-src/util/log/XMLSink.cpp:29:3: error: ‘HandleWrapper’ was not declared in this scope
-   29 |   HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, "Local\\FlushLogs") };
-      |   ^~~~~~~~~~~~~
-src/util/log/XMLSink.cpp:31:32: error: ‘hRecordEvent’ was not declared in this scope
-   31 |    Events::WaitForSingleObject(hRecordEvent, INFINITE);
-      |                                ^~~~~~~~~~~~
-src/util/log/XMLSink.cpp: In constructor ‘Log::XMLSink::XMLSink()’:
-src/util/log/XMLSink.cpp:37:11: error: ‘CreateMutexW’ was not declared in this scope
-   37 |   hMutex{ CreateMutexW(nullptr, false, nullptr) } ,
-      |           ^~~~~~~~~~~~
-src/util/log/XMLSink.cpp:39:36: error: ‘PTHREAD_START_ROUTINE’ was not declared in this scope; did you mean ‘PTHREAD_STACK_MIN’?
-   39 |   thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr) }{
-      |                                    ^~~~~~~~~~~~~~~~~~~~~
-      |                                    PTHREAD_STACK_MIN
-src/util/log/XMLSink.cpp:39:76: error: ‘CREATE_SUSPENDED’ was not declared in this scope
-   39 |   thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr) }{
-      |                                                                            ^~~~~~~~~~~~~~~~
-src/util/log/XMLSink.cpp:39:11: error: ‘CreateThread’ was not declared in this scope
-   39 |   thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr) }{
-      |           ^~~~~~~~~~~~
-src/util/log/XMLSink.cpp:39:103: error: cannot convert ‘<brace-enclosed initializer list>’ to ‘pthread_t’ {aka ‘long unsigned int’} in initialization
-   39 |   thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr) }{
-      |                                                                                                       ^
-src/util/log/XMLSink.cpp:47:3: error: ‘ResumeThread’ was not declared in this scope
-   47 |   ResumeThread(thread);
-      |   ^~~~~~~~~~~~
+src/util/log/XMLSink.cpp: In destructor ‘Log::XMLSink::~XMLSink()’:
+src/util/log/XMLSink.cpp:64:16: error: invalid conversion from ‘pthread_t*’ {aka ‘long unsigned int*’} to ‘pthread_t’ {aka ‘long unsigned int’} [-fpermissive]
+   64 |   pthread_kill(&this->thread, SIGKILL);
+      |                ^~~~~~~~~~~~~
+      |                |
+      |                pthread_t* {aka long unsigned int*}
+In file included from /usr/include/signal.h:359,
+                 from src/util/log/XMLSink.cpp:9:
+/usr/include/x86_64-linux-gnu/bits/sigthread.h:36:36: note:   initializing argument 1 of ‘int pthread_kill(pthread_t, int)’
+   36 | extern int pthread_kill (pthread_t __threadid, int __signo) __THROW;
+      |                          ~~~~~~~~~~^~~~~~~~~~
 In file included from src/util/filesystem/YaraScanner.cpp:4:
 ./headers/util/log/Log.h: In instantiation of ‘Log::LogMessage& Log::LogMessage::InnerLog(T, std::false_type) [with T = std::__cxx11::basic_string<wchar_t>; std::false_type = std::integral_constant<bool, false>]’:
 ./headers/util/log/Log.h:158:59:   required from ‘Log::LogMessage& Log::LogMessage::operator<<(T) [with T = std::__cxx11::basic_string<wchar_t>]’
@@ -1279,15 +1192,3 @@ In file included from /usr/include/c++/9/istream:39,
 ./headers/util/log/Log.h:158:59:   required from ‘Log::LogMessage& Log::LogMessage::operator<<(T) [with T = std::__cxx11::basic_string<wchar_t>]’
 src/util/filesystem/YaraScanner.cpp:197:3:   required from here
 /usr/include/c++/9/ostream:691:5: error: no type named ‘type’ in ‘struct std::enable_if<false, std::basic_ostream<char>&>’
-src/util/filesystem/FileSystem.cpp: In member function ‘std::optional<statx_timestamp> FileSystem::FileObject::GetCreationTime() const’:
-src/util/filesystem/FileSystem.cpp:971:62: warning: null argument where non-null required (argument 2) [-Wnonnull]
-  971 |   if (statx(hFile, NULL, AT_EMPTY_PATH, STATX_BTIME, &statbuf) == 0) {
-      |                                                              ^
-src/util/filesystem/FileSystem.cpp: In member function ‘std::optional<statx_timestamp> FileSystem::FileObject::GetModifiedTime() const’:
-src/util/filesystem/FileSystem.cpp:986:62: warning: null argument where non-null required (argument 2) [-Wnonnull]
-  986 |   if (statx(hFile, NULL, AT_EMPTY_PATH, STATX_MTIME, &statbuf) == 0) {
-      |                                                              ^
-src/util/filesystem/FileSystem.cpp: In member function ‘std::optional<statx_timestamp> FileSystem::FileObject::GetAccessTime() const’:
-src/util/filesystem/FileSystem.cpp:1001:62: warning: null argument where non-null required (argument 2) [-Wnonnull]
- 1001 |   if (statx(hFile, NULL, AT_EMPTY_PATH, STATX_ATIME, &statbuf) == 0) {
-      |                                                              ^
