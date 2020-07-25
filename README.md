@@ -88,7 +88,7 @@ Made with :heart: by the UVA Cyber Defense Team and the other awesome people in 
 * Calvin Krist ([Github](https://github.com/CalvinKrist), [Twitter](https://twitter.com/CalvinKrist))
 * Will Mayes ([Github](https://github.com/wtm99), [Twitter](https://twitter.com/will_mayes99))
 * David Smith ([Github](https://github.com/DavidSmith166))
-* Aaron Gdanski ([Github](https://github.com/aguilauno))
+* Aaron Gdanski ([Github](https://github.com/agski331))
 * Grant Matteo ([Github](https://github.com/GrantMatteo))
 
 ## Contributors

@@ -27,7 +27,7 @@
       <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UndefinePreprocessorDefinitions>UNICODE</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -78,50 +78,50 @@
     <ClCompile Include="external\pe-sieve\utils\process_privilege.cpp" />
     <ClCompile Include="external\pe-sieve\utils\process_util.cpp" />
     <ClCompile Include="external\pe-sieve\utils\workingset_enum.cpp" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\pe_sieve.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include\pe_sieve_types.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\params_info\pe_sieve_params_info.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\mapping_scanner.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\headers_scanner.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\code_scanner.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\module_scanner.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\workingset_scanner.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\artefact_scanner.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\scanner.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\module_scan_report.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\scan_report.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\module_data.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\mempage_data.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\pe_section.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\patch_list.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\patch_analyzer.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\scanned_modules.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\scanners\hook_targets_resolver.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\postprocessors\report_formatter.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\postprocessors\results_dumper.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\postprocessors\pe_buffer.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\postprocessors\pe_reconstructor.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\postprocessors\imp_rec\imp_reconstructor.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\postprocessors\imp_rec\iat_block.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\postprocessors\imp_rec\iat_finder.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\postprocessors\imp_rec\import_table_finder.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\utils\util.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\utils\path_converter.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\utils\process_util.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\utils\process_privilege.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\utils\process_minidump.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\utils\workingset_enum.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\utils\modules_enum.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\utils\artefacts_util.h" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\include\pe_sieve_api.h" />
-    <ClCompile Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\pe_sieve.cpp" />
-    <ClInclude Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\color_scheme.h" />
-    <ClCompile Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\params_info\pe_sieve_params_info.cpp" />
-    <ClCompile Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\dll_main.cpp" />
-    <None Include="$(SolutionDir)BLUESPAWN-client\external\pe-sieve\main.def" />
+    <ClInclude Include="external\pe-sieve\pe_sieve.h" />
+    <ClInclude Include="external\pe-sieve\include\pe_sieve_types.h" />
+    <ClInclude Include="external\pe-sieve\params_info\pe_sieve_params_info.h" />
+    <ClInclude Include="external\pe-sieve\scanners\mapping_scanner.h" />
+    <ClInclude Include="external\pe-sieve\scanners\headers_scanner.h" />
+    <ClInclude Include="external\pe-sieve\scanners\code_scanner.h" />
+    <ClInclude Include="external\pe-sieve\scanners\module_scanner.h" />
+    <ClInclude Include="external\pe-sieve\scanners\workingset_scanner.h" />
+    <ClInclude Include="external\pe-sieve\scanners\artefact_scanner.h" />
+    <ClInclude Include="external\pe-sieve\scanners\scanner.h" />
+    <ClInclude Include="external\pe-sieve\scanners\module_scan_report.h" />
+    <ClInclude Include="external\pe-sieve\scanners\scan_report.h" />
+    <ClInclude Include="external\pe-sieve\scanners\module_data.h" />
+    <ClInclude Include="external\pe-sieve\scanners\mempage_data.h" />
+    <ClInclude Include="external\pe-sieve\scanners\pe_section.h" />
+    <ClInclude Include="external\pe-sieve\scanners\patch_list.h" />
+    <ClInclude Include="external\pe-sieve\scanners\patch_analyzer.h" />
+    <ClInclude Include="external\pe-sieve\scanners\scanned_modules.h" />
+    <ClInclude Include="external\pe-sieve\scanners\hook_targets_resolver.h" />
+    <ClInclude Include="external\pe-sieve\postprocessors\report_formatter.h" />
+    <ClInclude Include="external\pe-sieve\postprocessors\results_dumper.h" />
+    <ClInclude Include="external\pe-sieve\postprocessors\pe_buffer.h" />
+    <ClInclude Include="external\pe-sieve\postprocessors\pe_reconstructor.h" />
+    <ClInclude Include="external\pe-sieve\postprocessors\imp_rec\imp_reconstructor.h" />
+    <ClInclude Include="external\pe-sieve\postprocessors\imp_rec\iat_block.h" />
+    <ClInclude Include="external\pe-sieve\postprocessors\imp_rec\iat_finder.h" />
+    <ClInclude Include="external\pe-sieve\postprocessors\imp_rec\import_table_finder.h" />
+    <ClInclude Include="external\pe-sieve\utils\util.h" />
+    <ClInclude Include="external\pe-sieve\utils\path_converter.h" />
+    <ClInclude Include="external\pe-sieve\utils\process_util.h" />
+    <ClInclude Include="external\pe-sieve\utils\process_privilege.h" />
+    <ClInclude Include="external\pe-sieve\utils\process_minidump.h" />
+    <ClInclude Include="external\pe-sieve\utils\workingset_enum.h" />
+    <ClInclude Include="external\pe-sieve\utils\modules_enum.h" />
+    <ClInclude Include="external\pe-sieve\utils\artefacts_util.h" />
+    <ClInclude Include="external\pe-sieve\include\pe_sieve_api.h" />
+    <ClCompile Include="external\pe-sieve\pe_sieve.cpp" />
+    <ClInclude Include="external\pe-sieve\color_scheme.h" />
+    <ClCompile Include="external\pe-sieve\params_info\pe_sieve_params_info.cpp" />
+    <ClCompile Include="external\pe-sieve\dll_main.cpp" />
+    <None Include="external\pe-sieve\main.def" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)BLUESPAWN-client\libpeconv.vcxproj">
+    <ProjectReference Include="$(SolutionDir)BLUESPAWN-win-client\libpeconv.vcxproj">
       <Project>{C9D09618-1DE6-3323-AED8-9B885AC8D9F3}</Project>
       <Name>libpeconv</Name>
     </ProjectReference>

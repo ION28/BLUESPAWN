@@ -65,8 +65,9 @@
 #include "mitigation/mitigations/MitigateV73511.h"
 #include "mitigation/mitigations/MitigateV73519.h"
 #include "mitigation/mitigations/MitigateV73585.h"
-#include "monitor/ETW_Wrapper.h"
 #include "reaction/CarveMemory.h"
+#include "reaction/DeleteFile.h"
+#include "reaction/QuarantineFile.h"
 #include "reaction/RemoveValue.h"
 #include "reaction/SuspendProcess.h"
 #include "user/CLI.h"
@@ -154,9 +155,11 @@ Bluespawn::Bluespawn() {
     mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
     mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
 
+    reactions.emplace("carve-memory", std::make_unique<Reactions::CarveMemoryReaction>());
+    reactions.emplace("delete-file", std::make_unique<Reactions::DeleteFileReaction>());
+    reactions.emplace("quarantine-file", std::make_unique<Reactions::QuarantineFileReaction>());
     reactions.emplace("remove-value", std::make_unique<Reactions::RemoveValueReaction>());
     reactions.emplace("suspend", std::make_unique<Reactions::SuspendProcessReaction>());
-    reactions.emplace("carve-memory", std::make_unique<Reactions::CarveMemoryReaction>());
 }
 
 void Bluespawn::RunHunts() {
@@ -206,6 +209,8 @@ void Bluespawn::EnableMode(BluespawnMode mode, int option) {
 void Bluespawn::Run() {
     if(modes.find(BluespawnMode::SCAN) != modes.end()) {
         aggressiveness = static_cast<Aggressiveness>(modes.at(BluespawnMode::SCAN));
+    } else {
+        aggressiveness = Aggressiveness::Normal;
     }
     if(modes.find(BluespawnMode::MITIGATE) != modes.end()) {
         RunMitigations(modes[BluespawnMode::MITIGATE] & 0x01, modes[BluespawnMode::MITIGATE] & 0x02);
@@ -260,7 +265,7 @@ void ParseLogSinks(const std::string& sinks) {
     std::set<std::string> sink_set;
     for(unsigned startIdx = 0; startIdx < sinks.size();) {
         auto endIdx{ sinks.find(',', startIdx) };
-        auto sink{ sinks.substr(startIdx, endIdx - startIdx - 1) };
+        auto sink{ sinks.substr(startIdx, endIdx - startIdx) };
         sink_set.emplace(sink);
         startIdx = endIdx + 1;
         if(endIdx == std::string::npos) {
@@ -357,10 +362,10 @@ int main(int argc, char* argv[]) {
         if(result["verbose"].as<int>() >= 1) {
             Log::LogLevel::LogInfo1.Enable();
         }
-        if(result["verbose"].as<int>() >= 2){
+        if(result["verbose"].as<int>() >= 2) {
             Log::LogLevel::LogInfo2.Enable();
         }
-        if(result["verbose"].as<int>() >= 3){
+        if(result["verbose"].as<int>() >= 3) {
             Log::LogLevel::LogInfo3.Enable();
         }
 
@@ -385,6 +390,9 @@ int main(int argc, char* argv[]) {
             auto sink{ UserReactions.substr(startIdx, endIdx - startIdx) };
             reaction_set.emplace(sink);
             startIdx = endIdx + 1;
+            if(endIdx == std::string::npos) {
+                break;
+            }
         }
 
         for(auto reaction : reaction_set) {
