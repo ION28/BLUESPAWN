@@ -8,8 +8,10 @@ BLUESPAWN helps blue teams monitor systems in real-time against active attackers
 ## What is BLUESPAWN
 BLUESPAWN is an **active defense** and **endpoint detection and response tool** which means it can be used by defenders to quickly **detect**, **identify**, and **eliminate** malicious activity and malware across a network.
 
-## Get Involved
+## Get Involved & Contribute to the project
 Want to help make BLUESPAWN even more effective at locating and stopping malware? Join us on [the BLUESPAWN Discord Server](https://discord.gg/JMxPPfZ) and help with development or even just suggest a feature or report a bug. No experience required - there's no better way to learn about development or security than by just jumping right in!
+
+If you'd like to help contribute code, you can check out our wiki page on [setting up your development environment](https://github.com/ION28/BLUESPAWN/wiki/Setting-up-your-Development-Environment). Please feel free to reach out to us in Discord if you run into any problems getting set up! We generally track bugs and new features through Issues and coordinate in chat when doing any development work.
 
 ## Why we made BLUESPAWN
 We've created and open-sourced this for a number of reasons which include the following:
