@@ -1,6 +1,6 @@
 # BLUESPAWN
 
-[![Client build](https://github.com/ION28/BLUESPAWN/workflows/BLUESPAWN%20client%20build/badge.svg)](https://github.com/ION28/BLUESPAWN/actions) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d070613d09404e14b47f69147a99064e)](https://www.codacy.com/manual/ION28/BLUESPAWN?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ION28/BLUESPAWN&amp;utm_campaign=Badge_Grade) ![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN?color=yellow) ![Platform](https://img.shields.io/badge/platform-x86%20%7C%20x64-lightgrey) ![Operating System](https://img.shields.io/badge/os-Windows%207%2F08%2B-blue) ![Discord](https://img.shields.io/discord/713926524167913544?color=blueviolet&label=Discord&logo=Discord&logoColor=white)
+[![Client build](https://github.com/ION28/BLUESPAWN/workflows/BLUESPAWN%20client%20build/badge.svg)](https://github.com/ION28/BLUESPAWN/actions) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d070613d09404e14b47f69147a99064e)](https://www.codacy.com/manual/ION28/BLUESPAWN?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ION28/BLUESPAWN&amp;utm_campaign=Badge_Grade) ![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN?color=yellow) ![Platform](https://img.shields.io/badge/platform-x86%20%7C%20x64-lightgrey) ![Operating System](https://img.shields.io/badge/os-Windows%207%2F08%2B-blue) [![Discord](https://img.shields.io/discord/713926524167913544?color=blueviolet&label=Discord&logo=Discord&logoColor=white)](https://discord.gg/JMxPPfZ)
 
 ## Our Mission
 BLUESPAWN helps blue teams monitor systems in real-time against active attackers by detecting anomalous activity
@@ -29,6 +29,7 @@ Visit [this map](https://bluespawn.cloud/coverage/) to see current coverage capa
 
 > Note 2: BLUESPAWN is meant to be run by a security professional in most cases and as such, will detect on non-malicious activity sometimes. While BLUESPAWN helps to quickly surface potentially bad things, it expects the user to use the available information to make the final determination.
 
+0. Check out the [Wiki pages](https://github.com/ION28/BLUESPAWN/wiki) to learn more about the available [command line options](https://github.com/ION28/BLUESPAWN/wiki/Getting-Started), [examples](https://github.com/ION28/BLUESPAWN/wiki/Examples), and more.
 1. Download the latest release from [this page](https://github.com/ION28/BLUESPAWN/releases)
 2. Open an Administrative Command Prompt
 3. Run the following command to see the available options
@@ -87,12 +88,13 @@ Made with :heart: by the UVA Cyber Defense Team and the other awesome people in 
 * Calvin Krist ([Github](https://github.com/CalvinKrist), [Twitter](https://twitter.com/CalvinKrist))
 * Will Mayes ([Github](https://github.com/wtm99), [Twitter](https://twitter.com/will_mayes99))
 * David Smith ([Github](https://github.com/DavidSmith166))
+* Aaron Gdanski ([Github](https://github.com/aguilauno))
 * Grant Matteo ([Github](https://github.com/GrantMatteo))
 
 ## Contributors
 Thanks to all of the folks listed below for their contributions to BLUESPAWN!
 
-* Alexander Kluth ([Github](https://github.com/alexclooze))
+* Alexander Kluth ([Github](https://github.com/akluth))
 
 Want to help? Take a look at the current issues, add ideas for new features, write some code, and create a pull request!
 
