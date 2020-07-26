@@ -2,7 +2,7 @@
 
 #include <unordered_set>
 
-#include "common/ThreadPool.h"
+#include "util/ThreadPool.h"
 
 #include "scan/Scanner.h"
 #include "user/bluespawn.h"

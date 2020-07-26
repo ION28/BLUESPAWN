@@ -63,8 +63,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct COMPILER_RESULTS
 {
-  int errors;
-  int warnings;
+    int errors;
+    int warnings;
 
 } COMPILER_RESULTS;
 
@@ -114,233 +114,206 @@ static void report_error(
     int line_number,
     const YR_RULE* rule,
     const char* message,
-    void* user_data)
-{
-  char* msg_type;
+    void* user_data){
+    char* msg_type;
 
-  if (error_level == YARA_ERROR_LEVEL_ERROR)
-  {
-    msg_type = "error";
-  }
-  else if (!ignore_warnings)
-  {
-    COMPILER_RESULTS* compiler_results = (COMPILER_RESULTS*) user_data;
-    compiler_results->warnings++;
-    msg_type = "warning";
-  }
-  else
-  {
-    return;
-  }
+    if(error_level == YARA_ERROR_LEVEL_ERROR){
+        msg_type = "error";
+    } else if(!ignore_warnings){
+        COMPILER_RESULTS* compiler_results = (COMPILER_RESULTS*) user_data;
+        compiler_results->warnings++;
+        msg_type = "warning";
+    } else{
+        return;
+    }
 
-  if (rule != NULL)
-  {
-    fprintf(
-        stderr,
-        "%s(%d): %s in rule \"%s\": %s\n",
-        file_name,
-        line_number,
-        msg_type,
-        rule->identifier,
-        message);
-  }
-  else
-  {
-    fprintf(
-        stderr,
-        "%s(%d): %s: %s\n",
-        file_name,
-        line_number,
-        msg_type,
-        message);
-  }
+    if(rule != NULL){
+        fprintf(
+            stderr,
+            "%s(%d): %s in rule \"%s\": %s\n",
+            file_name,
+            line_number,
+            msg_type,
+            rule->identifier,
+            message);
+    } else{
+        fprintf(
+            stderr,
+            "%s(%d): %s: %s\n",
+            file_name,
+            line_number,
+            msg_type,
+            message);
+    }
 }
 
 
 static bool define_external_variables(
-    YR_COMPILER* compiler)
-{
-  for (int i = 0; ext_vars[i] != NULL; i++)
-  {
-    char* equal_sign = strchr(ext_vars[i], '=');
+    YR_COMPILER* compiler){
+    for(int i = 0; ext_vars[i] != NULL; i++){
+        char* equal_sign = strchr(ext_vars[i], '=');
 
-    if (!equal_sign)
-    {
-      fprintf(stderr, "error: wrong syntax for `-d` option.\n");
-      return false;
+        if(!equal_sign){
+            fprintf(stderr, "error: wrong syntax for `-d` option.\n");
+            return false;
+        }
+
+        // Replace the equal sign with null character to split the external
+        // variable definition (i.e: myvar=somevalue) in two strings: identifier
+        // and value.
+
+        *equal_sign = '\0';
+
+        char* identifier = ext_vars[i];
+        char* value = equal_sign + 1;
+
+        if(is_float(value)){
+            yr_compiler_define_float_variable(
+                compiler,
+                identifier,
+                atof(value));
+        } else if(is_integer(value)){
+            yr_compiler_define_integer_variable(
+                compiler,
+                identifier,
+                atoi(value));
+        } else if(strcmp(value, "true") == 0 || strcmp(value, "false") == 0){
+            yr_compiler_define_boolean_variable(
+                compiler,
+                identifier,
+                strcmp(value, "true") == 0);
+        } else{
+            yr_compiler_define_string_variable(
+                compiler,
+                identifier,
+                value);
+        }
     }
 
-    // Replace the equal sign with null character to split the external
-    // variable definition (i.e: myvar=somevalue) in two strings: identifier
-    // and value.
-
-    *equal_sign = '\0';
-
-    char* identifier = ext_vars[i];
-    char* value = equal_sign + 1;
-
-    if (is_float(value))
-    {
-      yr_compiler_define_float_variable(
-          compiler,
-          identifier,
-          atof(value));
-    }
-    else if (is_integer(value))
-    {
-      yr_compiler_define_integer_variable(
-          compiler,
-          identifier,
-          atoi(value));
-    }
-    else if (strcmp(value, "true") == 0 || strcmp(value, "false") == 0)
-    {
-      yr_compiler_define_boolean_variable(
-          compiler,
-          identifier,
-          strcmp(value, "true") == 0);
-    }
-    else
-    {
-      yr_compiler_define_string_variable(
-          compiler,
-          identifier,
-          value);
-    }
-  }
-
-  return true;
+    return true;
 }
 
 
 int main(
     int argc,
-    const char** argv)
-{
-  COMPILER_RESULTS cr;
+    const char** argv){
+    COMPILER_RESULTS cr;
 
-  YR_COMPILER* compiler = NULL;
-  YR_RULES* rules = NULL;
+    YR_COMPILER* compiler = NULL;
+    YR_RULES* rules = NULL;
 
-  int result;
+    int result;
 
-  argc = args_parse(options, argc, argv);
+    argc = args_parse(options, argc, argv);
 
-  if (show_version)
-  {
-    printf("%s\n", YR_VERSION);
-    return EXIT_SUCCESS;
-  }
-
-  if (show_help)
-  {
-    printf("%s\n\n", USAGE_STRING);
-
-    args_print_usage(options, 40);
-    printf("\nSend bug reports and suggestions to: vmalvarez@virustotal.com\n");
-
-    return EXIT_SUCCESS;
-  }
-
-  if (argc < 2)
-  {
-    fprintf(stderr, "yarac: wrong number of arguments\n");
-    fprintf(stderr, "%s\n\n", USAGE_STRING);
-    fprintf(stderr, "Try `--help` for more options\n");
-
-    exit_with_code(EXIT_FAILURE);
-  }
-
-  result = yr_initialize();
-
-  if (result != ERROR_SUCCESS)
-    exit_with_code(EXIT_FAILURE);
-
-  if (yr_compiler_create(&compiler) != ERROR_SUCCESS)
-    exit_with_code(EXIT_FAILURE);
-
-  if (!define_external_variables(compiler))
-    exit_with_code(EXIT_FAILURE);
-
-  if (atom_quality_table != NULL)
-  {
-    result = yr_compiler_load_atom_quality_table(
-        compiler, atom_quality_table, 0);
-
-    if (result != ERROR_SUCCESS)
-    {
-      fprintf(stderr, "error loading atom quality table\n");
-      exit_with_code(EXIT_FAILURE);
+    if(show_version){
+        printf("%s\n", YR_VERSION);
+        return EXIT_SUCCESS;
     }
-  }
 
-  cr.errors = 0;
-  cr.warnings = 0;
+    if(show_help){
+        printf("%s\n\n", USAGE_STRING);
 
-  yr_set_configuration(YR_CONFIG_MAX_STRINGS_PER_RULE, &max_strings_per_rule);
+        args_print_usage(options, 40);
+        printf("\nSend bug reports and suggestions to: vmalvarez@virustotal.com\n");
 
-  if (!compile_files(compiler, argc, argv))
-    exit_with_code(EXIT_FAILURE);
+        return EXIT_SUCCESS;
+    }
 
-  if (cr.errors > 0)
-    exit_with_code(EXIT_FAILURE);
+    if(argc < 2){
+        fprintf(stderr, "yarac: wrong number of arguments\n");
+        fprintf(stderr, "%s\n\n", USAGE_STRING);
+        fprintf(stderr, "Try `--help` for more options\n");
 
-  if (fail_on_warnings && cr.warnings > 0)
-    exit_with_code(EXIT_FAILURE);
+        exit_with_code(EXIT_FAILURE);
+    }
 
-  result = yr_compiler_get_rules(compiler, &rules);
+    result = yr_initialize();
 
-  if (result != ERROR_SUCCESS)
-  {
-    fprintf(stderr, "error: %d\n", result);
-    exit_with_code(EXIT_FAILURE);
-  }
+    if(result != ERROR_SUCCESS)
+        exit_with_code(EXIT_FAILURE);
 
-  result = yr_rules_save(rules, argv[argc - 1]);
+    if(yr_compiler_create(&compiler) != ERROR_SUCCESS)
+        exit_with_code(EXIT_FAILURE);
 
-  if (result != ERROR_SUCCESS)
-  {
-    fprintf(stderr, "error: %d\n", result);
-    exit_with_code(EXIT_FAILURE);
-  } 
-  /// BEGIN MODIFICATIONS
-  else {
-      std::string name = std::string{ argv[argc - 1] } +".z";
-      int err{};
-      auto zip = zip_open(name.c_str(), ZIP_CREATE, &err);
-      if(zip){
-          auto source = zip_source_file(zip, argv[argc - 1], 0, 0);
-          if(source){
-              if(-1 == zip_file_add(zip, "data", source, ZIP_FL_OVERWRITE)){
-                  zip_close(zip);
-                  zip_source_close(source);
-                  goto _exit;
-              }
-              zip_source_close(source);
-              zip_close(zip);
-              MoveFileExA(name.c_str(), argv[argc - 1], MOVEFILE_REPLACE_EXISTING);
-          }
-          if(!source){
-              zip_close(zip);
-              goto _exit;
-          }
-      } else {
-          goto _exit;
-      }
-  }
-  /// END MODIFICATIONS
+    if(!define_external_variables(compiler))
+        exit_with_code(EXIT_FAILURE);
 
-  result = EXIT_SUCCESS;
+    if(atom_quality_table != NULL){
+        result = yr_compiler_load_atom_quality_table(
+            compiler, atom_quality_table, 0);
+
+        if(result != ERROR_SUCCESS){
+            fprintf(stderr, "error loading atom quality table\n");
+            exit_with_code(EXIT_FAILURE);
+        }
+    }
+
+    cr.errors = 0;
+    cr.warnings = 0;
+
+    yr_set_configuration(YR_CONFIG_MAX_STRINGS_PER_RULE, &max_strings_per_rule);
+
+    if(!compile_files(compiler, argc, argv))
+        exit_with_code(EXIT_FAILURE);
+
+    if(cr.errors > 0)
+        exit_with_code(EXIT_FAILURE);
+
+    if(fail_on_warnings && cr.warnings > 0)
+        exit_with_code(EXIT_FAILURE);
+
+    result = yr_compiler_get_rules(compiler, &rules);
+
+    if(result != ERROR_SUCCESS){
+        fprintf(stderr, "error: %d\n", result);
+        exit_with_code(EXIT_FAILURE);
+    }
+
+    result = yr_rules_save(rules, argv[argc - 1]);
+
+    if(result != ERROR_SUCCESS){
+        fprintf(stderr, "error: %d\n", result);
+        exit_with_code(EXIT_FAILURE);
+    }
+    /// BEGIN MODIFICATIONS
+    else{
+        std::string name = std::string{ argv[argc - 1] } + ".z";
+        int err{};
+        auto zip = zip_open(name.c_str(), ZIP_CREATE, &err);
+        if(zip){
+            auto source = zip_source_file(zip, argv[argc - 1], 0, 0);
+            if(source){
+                if(-1 == zip_file_add(zip, "data", source, ZIP_FL_OVERWRITE)){
+                    zip_close(zip);
+                    zip_source_close(source);
+                    goto _exit;
+                }
+                zip_source_close(source);
+                zip_close(zip);
+                MoveFileExA(name.c_str(), argv[argc - 1], MOVEFILE_REPLACE_EXISTING);
+            }
+            if(!source){
+                zip_close(zip);
+                goto _exit;
+            }
+        } else{
+            goto _exit;
+        }
+    }
+    /// END MODIFICATIONS
+
+    result = EXIT_SUCCESS;
 
 _exit:
 
-  if (compiler != NULL)
-    yr_compiler_destroy(compiler);
+    if(compiler != NULL)
+        yr_compiler_destroy(compiler);
 
-  if (rules != NULL)
-    yr_rules_destroy(rules);
+    if(rules != NULL)
+        yr_rules_destroy(rules);
 
-  yr_finalize();
+    yr_finalize();
 
-  return result;
+    return result;
 }

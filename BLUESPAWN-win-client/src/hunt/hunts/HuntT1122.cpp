@@ -2,8 +2,8 @@
 
 #include <algorithm>
 
-#include "common/StringUtils.h"
-#include "common/Utils.h"
+#include "util/StringUtils.h"
+#include "util/Utils.h"
 
 #include "util/configurations/Registry.h"
 #include "util/filesystem/Filesystem.h"

@@ -2,8 +2,8 @@
 
 #include <algorithm>
 
-#include "common/ThreadPool.h"
-#include "common/Utils.h"
+#include "util/ThreadPool.h"
+#include "util/Utils.h"
 
 #include "util/configurations/Registry.h"
 #include "util/eventlogs/EventLogs.h"

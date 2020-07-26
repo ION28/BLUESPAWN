@@ -5,7 +5,7 @@
 #include <optional>
 #include <functional>
 
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 
 // https://stackoverflow.com/questions/6534041/how-to-check-whether-operator-exists
 // Used to avoid a requirement for all types used in a promise to have an == operator

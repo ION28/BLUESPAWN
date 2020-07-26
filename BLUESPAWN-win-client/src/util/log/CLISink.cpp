@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "common/Utils.h"
+#include "util/Utils.h"
 
 #include "user/bluespawn.h"
 
@@ -99,8 +99,8 @@ namespace Log {
     }
 
     void CLISink::UpdateCertainty(IN CONST std::shared_ptr<Detection>& detection) {
-        AcquireMutex mutex{ hMutex };
         BeginCriticalSection _{ *detection };
+        AcquireMutex mutex{ hMutex };
 
         SetConsoleColor(CLISink::PrependColors[4]);
         std::wcout << CLISink::MessagePrepends[4];

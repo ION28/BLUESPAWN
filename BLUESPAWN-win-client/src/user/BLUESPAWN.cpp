@@ -3,9 +3,9 @@
 #include <iostream>
 #include <memory>
 
-#include "common/DynamicLinker.h"
-#include "common/StringUtils.h"
-#include "common/ThreadPool.h"
+#include "util/DynamicLinker.h"
+#include "util/StringUtils.h"
+#include "util/ThreadPool.h"
 
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/CLISink.h"

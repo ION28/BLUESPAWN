@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "common/StringUtils.h"
+#include "util/StringUtils.h"
 
 namespace Log {
     std::vector<std::shared_ptr<Log::LogSink>> _LogSinks;

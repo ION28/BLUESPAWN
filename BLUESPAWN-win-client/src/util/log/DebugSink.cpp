@@ -4,7 +4,7 @@
 
 #include "util/log/DebugSink.h"
 #include "user/bluespawn.h"
-#include "common/Utils.h"
+#include "util/Utils.h"
 
 #define DEBUG_STREAM(...) \
     OutputDebugStringW((std::wstringstream{} << __VA_ARGS__).str().c_str())

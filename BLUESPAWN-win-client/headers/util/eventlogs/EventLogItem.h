@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <Windows.h>
 #include <winevt.h>
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 
 namespace EventLogs {
 

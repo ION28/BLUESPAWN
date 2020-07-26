@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "util/pe/PE_Section.h"
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 
 struct Relocation_Block;
 

@@ -1,5 +1,5 @@
 #pragma once
 
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 
 bool DumpBeaconInformation(const MemoryWrapper<>& memory);

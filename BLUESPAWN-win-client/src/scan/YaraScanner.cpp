@@ -1,7 +1,7 @@
 #include "scan/YaraScanner.h"
 #include "../resources/resource.h"
-#include "common/wrappers.hpp"
-#include "common/StringUtils.h"
+#include "util/wrappers.hpp"
+#include "util/StringUtils.h"
 #include "util/log/Log.h"
 
 #include <zip.h>

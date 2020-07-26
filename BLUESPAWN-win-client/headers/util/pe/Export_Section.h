@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "common/DynamicLinker.h"
+#include "util/DynamicLinker.h"
 
 DEFINE_FUNCTION(NTSTATUS, LdrpPreprocessDllName, NTAPI, __in PUNICODE_STRING input, __out PUNICODE_STRING output, PULONG_PTR zero1, PULONG_PTR zero2);
 

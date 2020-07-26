@@ -3,7 +3,7 @@
 
 #include "reaction/RemoveValue.h"
 #include "util/configurations/Registry.h"
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 #include "user/bluespawn.h"
 #include "util/log/Log.h"
 

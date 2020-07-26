@@ -1,4 +1,4 @@
-#include "common/DynamicLinker.h"
+#include "util/DynamicLinker.h"
 
 #include <Windows.h>
 #include <winternl.h>

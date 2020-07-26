@@ -8,8 +8,8 @@
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
 
-#include "common/wrappers.hpp"
-#include "common/StringUtils.h"
+#include "util/wrappers.hpp"
+#include "util/StringUtils.h"
 
 std::optional<AllocationWrapper> FindBeaconInfoQuick(const MemoryWrapper<>& memory){
 	IMAGE_DOS_HEADER hdr{};

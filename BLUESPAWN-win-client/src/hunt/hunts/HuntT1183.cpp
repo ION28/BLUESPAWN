@@ -1,7 +1,7 @@
 #include "hunt/hunts/HuntT1183.h"
 
-#include "common/ThreadPool.h"
-#include "common/Utils.h"
+#include "util/ThreadPool.h"
+#include "util/Utils.h"
 
 #include "util/configurations/Registry.h"
 #include "util/log/Log.h"

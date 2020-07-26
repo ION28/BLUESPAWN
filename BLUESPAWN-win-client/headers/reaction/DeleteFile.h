@@ -1,7 +1,7 @@
 #pragma once
 #include <optional>
 
-#include "common/DynamicLinker.h"
+#include "util/DynamicLinker.h"
 
 #include "Reaction.h"
 #include "hunt/HuntInfo.h"

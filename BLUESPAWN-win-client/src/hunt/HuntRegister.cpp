@@ -3,14 +3,13 @@
 #include <functional>
 #include <iostream>
 
-#include "common/Promise.h"
-#include "common/ThreadPool.h"
-#include "common/Utils.h"
-
 #include "util/log/Log.h"
 
 #include "monitor/EventManager.h"
 #include "user/bluespawn.h"
+#include "util/Utils.h"
+#include "util/ThreadPool.h"
+#include "util/Promise.h"
 
 decltype(HuntRegister::vRegisteredHunts) HuntRegister::vRegisteredHunts{};
 

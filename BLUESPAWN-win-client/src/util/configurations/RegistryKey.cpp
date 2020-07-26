@@ -3,8 +3,8 @@
 #include <iostream>
 #include <optional>
 
-#include "common/StringUtils.h"
-#include "common/Internals.h"
+#include "util/StringUtils.h"
+#include "util/Internals.h"
 
 #include "util/configurations/Registry.h"
 

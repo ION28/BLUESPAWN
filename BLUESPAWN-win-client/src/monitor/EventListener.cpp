@@ -1,8 +1,8 @@
 #include "monitor/EventListener.h"
 
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 #include "util/log/Log.h"
-#include "common/ThreadPool.h"
+#include "util/ThreadPool.h"
 
 void EventListener::SubEventListener::HandleEventNotify(HANDLE hEvent){
     std::vector<std::function<void()>> functions{};

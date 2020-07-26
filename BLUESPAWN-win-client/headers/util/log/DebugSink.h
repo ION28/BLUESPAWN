@@ -3,7 +3,7 @@
 #include "LogSink.h"
 #include "DetectionSink.h"
 
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 
 namespace Log {
 

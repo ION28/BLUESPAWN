@@ -6,8 +6,8 @@
 #include <vector>
 #include <thread>
 
-#include "common/Promise.h"
-#include "common/wrappers.hpp"
+#include "util/Promise.h"
+#include "util/wrappers.hpp"
 
 class ThreadPool {
 private:

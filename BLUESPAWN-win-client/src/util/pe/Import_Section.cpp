@@ -1,7 +1,7 @@
 #include "util/pe/Import_Section.h"
 #include "util/pe/PE_Image.h"
 #include "util/pe/Image_Loader.h"
-#include "common/StringUtils.h"
+#include "util/StringUtils.h"
 
 #include <queue>
 

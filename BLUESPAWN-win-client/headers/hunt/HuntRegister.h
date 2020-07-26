@@ -5,11 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "common/Promise.h"
-
 #include "Hunt.h"
 #include "Scope.h"
 
+#include "util/Promise.h"
 /**
  * HuntRegister is a class meant to be used to manage running hunts and monitoring.
  * Rather than make HuntRegister a singleton, all members are instead static.

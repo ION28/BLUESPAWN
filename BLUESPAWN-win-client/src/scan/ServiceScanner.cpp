@@ -2,7 +2,7 @@
 
 #include <queue>
 
-#include "common/StringUtils.h"
+#include "util/StringUtils.h"
 
 #include "scan/ProcessScanner.h"
 #include "user/bluespawn.h"

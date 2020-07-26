@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "util/log/ServerSink.h"
-#include "common/StringUtils.h"
+#include "util/StringUtils.h"
 
 #ifndef GRPC_BROKEN
 

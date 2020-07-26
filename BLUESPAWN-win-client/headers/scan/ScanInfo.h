@@ -14,7 +14,7 @@ class Detection;
 template<>
 struct std::hash<std::shared_ptr<Detection>>;
 
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 
 /// Represents the degree of certainty that a detection is malicious
 class Certainty {

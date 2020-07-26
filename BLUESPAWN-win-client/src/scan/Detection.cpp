@@ -1,7 +1,7 @@
 #include <sstream>
 
-#include "common/StringUtils.h"
-#include "common/Utils.h"
+#include "util/StringUtils.h"
+#include "util/Utils.h"
 
 #include "util/processes/ProcessUtils.h"
 

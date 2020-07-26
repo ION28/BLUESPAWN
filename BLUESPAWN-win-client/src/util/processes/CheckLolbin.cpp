@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "common/StringUtils.h"
+#include "util/StringUtils.h"
 
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"

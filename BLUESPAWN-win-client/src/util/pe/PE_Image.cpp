@@ -1,6 +1,6 @@
 #include "util/pe/PE_Image.h"
 #include "util/pe/PE_Section.h"
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 
 bool PE_Image::ValidatePE() const {
 	MemoryWrapper<> PESignature = { new BYTE[2]{0x4D, 0x5A}, 2 };

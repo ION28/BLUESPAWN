@@ -5,8 +5,8 @@
 #include <vector>
 #include <string>
 
-#include "common/wrappers.hpp"
-#include "common/dynamiclinker.h"
+#include "util/wrappers.hpp"
+#include "util/dynamiclinker.h"
 
 #include "util/pe/Image_Loader.h"
 #include "util/filesystem/FileSystem.h"

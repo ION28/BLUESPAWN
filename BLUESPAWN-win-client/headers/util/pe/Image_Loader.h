@@ -2,8 +2,8 @@
 
 #include <Windows.h>
 
-#include "common/wrappers.hpp"
-#include "common/DynamicLinker.h"
+#include "util/wrappers.hpp"
+#include "util/DynamicLinker.h"
 
 #include "util/pe/PE_Image.h"
 

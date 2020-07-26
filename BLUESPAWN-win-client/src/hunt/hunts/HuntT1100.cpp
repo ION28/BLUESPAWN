@@ -1,6 +1,6 @@
 #include "hunt/hunts/HuntT1100.h"
 
-#include "common/StringUtils.h"
+#include "util/StringUtils.h"
 
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"

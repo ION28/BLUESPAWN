@@ -2,8 +2,8 @@
 #include "util/pe/PE_Image.h"
 #include "util/pe/Image_Loader.h"
 
-#include "common/DynamicLinker.h"
-#include "common/StringUtils.h"
+#include "util/DynamicLinker.h"
+#include "util/StringUtils.h"
 #include "util/log/Log.h"
 
 #include <Windows.h>

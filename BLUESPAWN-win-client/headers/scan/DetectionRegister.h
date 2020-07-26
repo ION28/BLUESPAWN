@@ -6,7 +6,7 @@
 
 #include "scan/Detections.h"
 
-#include "common/Promise.h"
+#include "util/Promise.h"
 
 /**
  * Keeps track of all detections found so far

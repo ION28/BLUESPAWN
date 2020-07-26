@@ -1,6 +1,6 @@
 #include "hunt/hunts/HuntT1060.h"
 
-#include "common/Utils.h"
+#include "util/Utils.h"
 
 #include "util/configurations/Registry.h"
 #include "util/log/Log.h"

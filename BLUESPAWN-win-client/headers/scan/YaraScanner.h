@@ -2,7 +2,7 @@
 
 #include "yara.h"
 #include "util/filesystem/FileSystem.h"
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 
 #include <vector>
 #include <string>

@@ -8,9 +8,9 @@
 #include <set>
 
 #include "util/log/Loggable.h"
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 #include "util/permissions/permissions.h"
-#include "common/DynamicLinker.h"
+#include "util/DynamicLinker.h"
 
 #define BUFSIZE 1024
 #define MD5LEN  16

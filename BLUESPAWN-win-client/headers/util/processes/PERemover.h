@@ -4,8 +4,8 @@
 
 #include <string>
 
-#include "Common/wrappers.hpp"
-#include "Common/dynamiclinker.h"
+#include "util/wrappers.hpp"
+#include "util/dynamiclinker.h"
 
 DEFINE_FUNCTION(NTSTATUS, NtResumeProcess, NTAPI, IN HANDLE ProcessHandle);
 

@@ -4,8 +4,8 @@
 
 #include <regex>
 
-#include "common/StringUtils.h"
-#include "common/wrappers.hpp"
+#include "util/StringUtils.h"
+#include "util/wrappers.hpp"
 
 #include "util/filesystem/FileSystem.h"
 #include "util/processes/ProcessUtils.h"

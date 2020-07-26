@@ -3,8 +3,8 @@
 #include <iostream>
 #include <set>
 
-#include "common/StringUtils.h"
-#include "common/Utils.h"
+#include "util/StringUtils.h"
+#include "util/Utils.h"
 
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"

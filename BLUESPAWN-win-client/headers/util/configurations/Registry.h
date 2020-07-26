@@ -8,8 +8,8 @@
 #include <optional>
 #include <type_traits>
 
-#include "common/DynamicLinker.h"
-#include "common/wrappers.hpp"
+#include "util/DynamicLinker.h"
+#include "util/wrappers.hpp"
 
 #include "util/log/Loggable.h"
 

@@ -14,8 +14,8 @@
 #include <string>
 #include <vector>
 
-#include "common/StringUtils.h"
-#include "common/wrappers.hpp"
+#include "util/StringUtils.h"
+#include "util/wrappers.hpp"
 
 #include "util/log/Log.h"
 

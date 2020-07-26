@@ -1,6 +1,6 @@
 #pragma once
-#include "common/DynamicLinker.h"
-#include "common/Promise.h"
+#include "util/DynamicLinker.h"
+#include "util/Promise.h"
 
 #include "hunt/Hunt.h"
 #include "pe_sieve.h"

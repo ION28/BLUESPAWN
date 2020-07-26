@@ -1,15 +1,17 @@
 #include "hunt/hunts/HuntT1055.h"
 
 #include <Psapi.h>
+#pragma pack(push,8)
+#include <TlHelp32.h>
+#pragma pack(pop)
 #include <Windows.h>
 
-#include "common/StringUtils.h"
-#include "common/ThreadPool.h"
-#include "common/wrappers.hpp"
-
+#include "util/StringUtils.h"
+#include "util/ThreadPool.h"
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/Log.h"
 #include "util/processes/ProcessUtils.h"
+#include "util/wrappers.hpp"
 
 #include "pe_sieve.h"
 #include "pe_sieve_types.h"
@@ -44,8 +46,8 @@ namespace Hunts {
             if(summary.suspicious && !summary.errors) {
                 std::wstring path = StringToWidestring(report->scan_report->mainImagePath);
 
-                for(auto module : report->scan_report->module_reports) {
-                    if(module->status & SCAN_SUSPICIOUS) {
+                for(auto module : report->scan_report->moduleReports) {
+                    if(module->status == pesieve::SCAN_SUSPICIOUS) {
                         CREATE_DETECTION(Certainty::Strong, ProcessDetectionData::CreateMemoryDetectionData(
                                                                 report->scan_report->getPid(), path, module->module,
                                                                 static_cast<DWORD>(module->moduleSize),
@@ -59,45 +61,58 @@ namespace Hunts {
     std::vector<std::shared_ptr<Detection>> HuntT1055::RunHunt(const Scope& scope) {
         HUNT_INIT_LEVEL(Normal);
 
-        DWORD processes[1024];
-        DWORD ProcessCount = 0;
-        ZeroMemory(processes, sizeof(processes));
-        auto success{ EnumProcesses(processes, sizeof(processes), &ProcessCount) };
-        if(success) {
-            std::vector<Promise<GenericWrapper<pesieve::ReportEx*>>> results{};
+        HandleWrapper snapshot{ CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) };
+        if(snapshot) {
+            PROCESSENTRY32W info{};
+            info.dwSize = sizeof(info);
+            if(Process32FirstW(snapshot, &info)) {
+                std::vector<Promise<GenericWrapper<pesieve::ReportEx*>>> results{};
+                do {
+                    if(scope.ProcessIsInScope(info.th32ProcessID)) {
+                        auto pid{ info.th32ProcessID };
+                        if(info.szExeFile == std::wstring{ L"vmmem" }) {
+                            LOG_WARNING(L"Skipping scans for process with PID " << pid << ".");
+                            continue;
+                        }
 
-            ProcessCount /= sizeof(DWORD);
-            for(int i = 0; i < ProcessCount; i++) {
-                if(scope.ProcessIsInScope(processes[i])) {
-                    auto pid{ processes[i] };
-                    results.emplace_back(
-                        ThreadPool::GetInstance().RequestPromise<GenericWrapper<pesieve::ReportEx*>>([pid]() {
-                            pesieve::t_params params{ pid,
-                                                      3,
-                                                      pesieve::PE_IMPREC_NONE,
-                                                      true,
-                                                      pesieve::OUT_NO_DIR,
-                                                      true,
-                                                      false,
-                                                      false,
-                                                      false,
-                                                      pesieve::PE_DUMP_AUTO,
-                                                      false,
-                                                      0 };
+                        results.emplace_back(
+                            ThreadPool::GetInstance().RequestPromise<GenericWrapper<pesieve::ReportEx*>>([pid]() {
+                                pesieve::t_params params{ pid,
+                                                          3,
+                                                          Bluespawn::aggressiveness == Aggressiveness::Intensive ?
+                                                              pesieve::PE_DNET_NONE :
+                                                              pesieve::PE_DNET_SKIP_MAPPING,
+                                                          pesieve::PE_IMPREC_NONE,
+                                                          true,
+                                                          pesieve::OUT_NO_DIR,
+                                                          true,
+                                                          false,
+                                                          Bluespawn::aggressiveness == Aggressiveness::Intensive ?
+                                                              pesieve::PE_IATS_FILTERED :
+                                                              pesieve::PE_IATS_NONE,
+                                                          pesieve::PE_DATA_SCAN_NO_DEP,
+                                                          false,
+                                                          pesieve::PE_DUMP_AUTO,
+                                                          false,
+                                                          0 };
 
-                            WRAP(pesieve::ReportEx*, report, scan_and_dump(params), delete data);
-                            if(!report) {
-                                LOG_WARNING("Unable to scan process " << pid << " due to an error in PE-Sieve.dll");
-                                throw std::exception{ "Failed to scan process" };
-                            }
+                                WRAP(pesieve::ReportEx*, report, scan_and_dump(params), delete data);
+                                if(!report) {
+                                    LOG_WARNING("Unable to scan process " << pid << " due to an error in PE-Sieve.dll");
+                                    throw std::exception{ "Failed to scan process" };
+                                }
 
-                            return report;
-                        }));
+                                return report;
+                            }));
+                    }
+                } while(Process32NextW(snapshot, &info));
+
+                for(auto& promise : results) {
+                    HandleReport(detections, promise);
                 }
-            }
-
-            for(auto& promise : results){
-                HandleReport(detections, promise);
+            } else {
+                auto error{ GetLastError() };
+                LOG_ERROR("Unable to enumerate processes - Process related hunts will not run." << GetLastError());
             }
         } else {
             LOG_ERROR("Unable to enumerate processes - Process related hunts will not run.");

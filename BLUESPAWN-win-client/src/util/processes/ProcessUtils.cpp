@@ -4,7 +4,7 @@
 
 #include "util/filesystem/FileSystem.h"
 #include "shlwapi.h"
-#include "common/StringUtils.h"
+#include "util/StringUtils.h"
 
 #include "util/log/Log.h"
 
@@ -131,7 +131,7 @@ std::wstring GetProcessImage(const HandleWrapper& process){
 }
 
 std::wstring GetProcessImage(DWORD dwPID){
-    HandleWrapper process{ OpenProcess(PROCESS_QUERY_INFORMATION, false, dwPID) };
+    HandleWrapper process{ OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, dwPID) };
     if(process){
         return GetProcessImage(process);
     } else {

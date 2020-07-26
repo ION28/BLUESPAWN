@@ -2,7 +2,7 @@
 
 #include <TlHelp32.h>
 
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 
 #include "util/configurations/Registry.h"
 #include "util/filesystem/FileSystem.h"

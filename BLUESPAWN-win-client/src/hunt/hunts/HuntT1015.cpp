@@ -6,7 +6,7 @@
 #include "scan/YaraScanner.h"
 #include "user/bluespawn.h"
 
-#include "common/Utils.h"
+#include "util/Utils.h"
 
 using namespace Registry;
 

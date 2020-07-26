@@ -9,7 +9,7 @@
 #include "LogLevel.h"
 #include "Loggable.h"
 #include "LogSink.h"
-#include "common/Utils.h"
+#include "util/Utils.h"
 
 // A generic macro to log a message with a given set of sinks at a given level
 #define LOG(LEVEL, ...) \

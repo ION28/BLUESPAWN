@@ -7,7 +7,7 @@
 #include <map>
 #include <optional>
 
-#include "common/Wrappers.hpp"
+#include "util/Wrappers.hpp"
 
 #include "util/pe/PE_Section.h"
 #include "Relocation_Section.h"

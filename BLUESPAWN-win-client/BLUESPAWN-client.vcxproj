@@ -19,8 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="external\pe-sieve\include\pe_sieve_types.h" />
-    <ClInclude Include="external\tinyxml2\tinyxml2.h" />
     <ClInclude Include="headers\hunt\Hunt.h" />
     <ClInclude Include="headers\hunt\HuntInfo.h" />
     <ClInclude Include="headers\hunt\HuntRegister.h" />
@@ -109,6 +107,13 @@
     <ClInclude Include="headers\user\bluespawn.h" />
     <ClInclude Include="headers\user\CLI.h" />
     <ClInclude Include="headers\user\iobase.h" />
+    <ClInclude Include="headers\util\DynamicLinker.h" />
+    <ClInclude Include="headers\util\Internals.h" />
+    <ClInclude Include="headers\util\Promise.h" />
+    <ClInclude Include="headers\util\StringUtils.h" />
+    <ClInclude Include="headers\util\ThreadPool.h" />
+    <ClInclude Include="headers\util\Utils.h" />
+    <ClInclude Include="headers\util\wrappers.hpp" />
     <ClInclude Include="headers\util\configurations\CollectInfo.h" />
     <ClInclude Include="headers\util\configurations\Registry.h" />
     <ClInclude Include="headers\util\configurations\RegistryValue.h" />
@@ -263,6 +268,7 @@
     <ClCompile Include="src\user\BLUESPAWN.cpp" />
     <ClCompile Include="src\user\CLI.cpp" />
     <ClCompile Include="src\util\configurations\CollectInfo.cpp" />
+    <ClCompile Include="src\util\DynamicLinker.cpp" />
     <ClCompile Include="src\util\eventlogs\EventLogItem.cpp" />
     <ClCompile Include="src\util\eventlogs\EventLogs.cpp" />
     <ClCompile Include="src\util\configurations\RegistryKey.cpp" />
@@ -322,12 +328,12 @@
     <ClCompile Include="src\reaction\ReactionManager.cpp" />
     <ClCompile Include="src\util\processes\PERemover.cpp" />
     <ClCompile Include="src\util\processes\ProcessUtils.cpp" />
+    <ClCompile Include="src\util\StringUtils.cpp" />
+    <ClCompile Include="src\util\ThreadPool.cpp" />
+    <ClCompile Include="src\util\Utils.cpp" />
     <ClInclude Include="resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BLUESPAWN-common\CommonLib.vcxproj">
-      <Project>{25ae1d80-3e17-4e1d-bfb4-8afb375ebaf1}</Project>
-    </ProjectReference>
     <ProjectReference Include="pe-sieve.vcxproj">
       <Project>{bec01f8e-5892-3f6f-a741-5bbd1d0f4ef9}</Project>
     </ProjectReference>
@@ -352,15 +358,12 @@
     </EmbedManifest>
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>BLUESPAWN-client</TargetName>
-  </PropertyGroup>
   <ItemDefinitionGroup>
     <BuildLog>
       <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-win-client\external\cxxopts\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreaded</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebug</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -393,7 +396,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\config\buildsettings.props" />
     <Import Project="..\config\buildstructure.props" />
-    <Import Project="..\BLUESPAWN-common\CommonLib.props" />
   </ImportGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "reaction/SuspendProcess.h"
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 #include "util/log/Log.h"
 #include "user/bluespawn.h"
 

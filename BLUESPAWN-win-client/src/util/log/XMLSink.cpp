@@ -3,8 +3,8 @@
 #include <chrono>
 #include <iostream>
 
-#include "common/StringUtils.h"
-#include "common/Utils.h"
+#include "util/StringUtils.h"
+#include "util/Utils.h"
 
 #include "user/bluespawn.h"
 

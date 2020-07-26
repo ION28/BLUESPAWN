@@ -2,7 +2,7 @@
 #include "Registry.h"
 #include "util/log/Loggable.h"
 
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 
 #include <vector>
 #include <unordered_set>

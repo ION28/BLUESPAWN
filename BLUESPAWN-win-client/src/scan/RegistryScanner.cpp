@@ -1,7 +1,7 @@
 #include "scan/RegistryScanner.h"
 
-#include "common/wrappers.hpp"
-#include "common/StringUtils.h"
+#include "util/wrappers.hpp"
+#include "util/StringUtils.h"
 #include "util/configurations/RegistryValue.h"
 #include "util/processes/ProcessUtils.h"
 #include "scan/YaraScanner.h"

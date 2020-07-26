@@ -8,7 +8,7 @@
 #include <vector>
 #include "util/eventlogs/EventSubscription.h"
 #include "util/eventlogs/EventLogItem.h"
-#include "common/wrappers.hpp"
+#include "util/wrappers.hpp"
 #include "XpathQuery.h"
 
 #pragma comment(lib, "wevtapi.lib")

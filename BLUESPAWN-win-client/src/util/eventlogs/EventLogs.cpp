@@ -1,7 +1,7 @@
 #include "util/eventlogs/EventLogs.h"
-#include "common/StringUtils.h"
+#include "util/StringUtils.h"
 #include "util/log/Log.h"
-#include "common/Utils.h"
+#include "util/Utils.h"
 
 #include <string>
 
