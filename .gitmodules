@@ -1,24 +1,3 @@
-[submodule "BLUESPAWN-win-client/external/cxxopts"]
-	path = BLUESPAWN-win-client/external/cxxopts
-	url = https://github.com/jarro2783/cxxopts
-[submodule "BLUESPAWN-win-client/external/krabsetw"]
-	path = BLUESPAWN-win-client/external/krabsetw
-	url = https://github.com/microsoft/krabsetw
-[submodule "BLUESPAWN-win-client/external/pe-sieve"]
-	path = BLUESPAWN-win-client/external/pe-sieve
-	url = https://github.com/hasherezade/pe-sieve
-[submodule "BLUESPAWN-win-client/external/yara"]
-	path = BLUESPAWN-win-client/external/yara
-	url = https://github.com/VirusTotal/yara
-[submodule "BLUESPAWN-win-client/external/yara-rules"]
-	path = BLUESPAWN-win-client/external/yara-rules
-	url = https://github.com/Yara-Rules/rules.git
-[submodule "BLUESPAWN-win-client/external/tinyxml2"]
-	path = BLUESPAWN-win-client/external/tinyxml2
-	url = https://github.com/leethomason/tinyxml2
 [submodule "vcpkg"]
 	path = vcpkg
 	url = https://github.com/Microsoft/vcpkg.git
-[submodule "BLUESPAWN-win-client/external/signature-base"]
-	path = BLUESPAWN-win-client/external/signature-base
-	url = https://github.com/Neo23x0/signature-base
