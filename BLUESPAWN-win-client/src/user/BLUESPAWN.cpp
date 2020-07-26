@@ -169,7 +169,7 @@ void Bluespawn::RunHunts() {
     DWORD affectedThings = UINT_MAX;
     Scope scope{};
 
-    huntRecord.RunHunts(scope);
+    huntRecord.RunHunts(vIncludedHunts, vExcludedHunts, scope);
 }
 
 void Bluespawn::RunMitigations(bool enforce, bool force) {
@@ -189,7 +189,7 @@ void Bluespawn::RunMonitor() {
     Scope scope{};
 
     Bluespawn::io.InformUser(L"Monitoring the system");
-    huntRecord.SetupMonitoring();
+    huntRecord.SetupMonitoring(vIncludedHunts, vExcludedHunts);
 
     HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, L"Local\\FlushLogs") };
     while(true) {
@@ -204,6 +204,18 @@ void Bluespawn::AddReaction(std::unique_ptr<Reaction>&& reaction) {
 
 void Bluespawn::EnableMode(BluespawnMode mode, int option) {
     modes.emplace(mode, option);
+}
+
+void Bluespawn::SetIncludedHunts(std::vector<std::string> includedHunts) {
+    for(auto& id : includedHunts) {
+        Bluespawn::vIncludedHunts.emplace_back(StringToWidestring(id));
+    }
+}
+
+void Bluespawn::SetExcludedHunts(std::vector<std::string> excludedHunts) {
+    for(auto& id : excludedHunts) {
+        Bluespawn::vExcludedHunts.emplace_back(StringToWidestring(id));
+    }
 }
 
 void Bluespawn::Run() {
@@ -229,15 +241,17 @@ void Bluespawn::Run() {
 void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
     std::string help_category = result["help"].as<std::string>();
 
+    std::string output = "";
     if(CompareIgnoreCase(help_category, std::string{ "hunt" })) {
-        Bluespawn::io.InformUser(StringToWidestring(options.help({ "hunt" })));
+        output = options.help({ "hunt" });
     } else if(CompareIgnoreCase(help_category, std::string{ "monitor" })) {
-        Bluespawn::io.InformUser(StringToWidestring(options.help({ "monitor" })));
+        output = std::regex_replace(options.help({ "hunt" }), std::regex("hunt options"), "monitor options");
     } else if(CompareIgnoreCase(help_category, std::string{ "mitigate" })) {
-        Bluespawn::io.InformUser(StringToWidestring(options.help({ "mitigate" })));
+        output = options.help({ "mitigate" });
     } else {
-        Bluespawn::io.InformUser(StringToWidestring(options.help()));
+        output = std::regex_replace(options.help(), std::regex("hunt options"), "hunt/monitor options");
     }
+    Bluespawn::io.InformUser(StringToWidestring(output));
 }
 
 void Bluespawn::check_correct_arch() {
@@ -327,28 +341,40 @@ int main(int argc, char* argv[]) {
 
     bluespawn.check_correct_arch();
 
-    cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: A Windows based Active Defense Tool to empower Blue Teams");
+    cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: An Active Defense and EDR software to empower Blue Teams");
 
     // clang-format off
     options.add_options()
-        ("h,hunt", "Perform a Hunt Operation", cxxopts::value<bool>())
-        ("n,monitor", "Monitor the System for malicious activity, dispatching hunts as changes are detected.",
-            cxxopts::value<std::string>()->implicit_value("Normal"))
-        ("m,mitigate", "Mitigates vulnerabilities by applying security settings. Available options: audit, enforce", 
-             cxxopts::value<std::string>()->implicit_value("audit"))
-        ("a,aggressiveness", "Sets the aggressiveness of BLUESPAWN. Options are intensive, normal, and cursory.",
-            cxxopts::value<std::string>()->default_value("Normal"))
+        ("h,hunt", "Hunt for malicious activity on the system", cxxopts::value<bool>())
+        ("n,monitor", "Monitor the system for malicious activity, dispatching hunts as changes are detected.",
+            cxxopts::value<bool>())
+        ("m,mitigate", "Mitigate vulnerabilities by applying security settings.", 
+            cxxopts::value<bool>())
+        ("log", "Specify how BLUESPAWN should log events. Options are console, xml, and debug.",
+            cxxopts::value<std::string>()->default_value("console"))
         ("help", "Help Information. You can also specify a category for help on a specific module such as hunt.",
             cxxopts::value<std::string>()->implicit_value("general"))
-        ("log", "Specify how Bluespawn should log events. Options are console (default), xml, and debug.",
-            cxxopts::value<std::string>()->default_value("console"))
-        ("r,react", "Specifies how bluespawn should react to potential threats dicovered during hunts.",
-             cxxopts::value<std::string>()->default_value(""))
         ("v,verbose", "Verbosity", cxxopts::value<int>()->default_value("1"))
-        ("debug", "Enable Debug Output", cxxopts::value<int>()->default_value("0"));
-    
-    options.add_options("mitigate")(
-        "force", "Use this option to forcibly apply mitigations with no prompt", cxxopts::value<bool>());
+        ("debug", "Enable Debug Output", cxxopts::value<int>()->default_value("0"))
+        ;
+
+    options.add_options("hunt")
+		("a,aggressiveness", "Sets the aggressiveness of BLUESPAWN. Options are cursory, normal, and intensive.",
+            cxxopts::value<std::string>()->default_value("Normal"))
+		("hunts", "Only run the hunts specified. Provide as a comma separated list of Mitre ATT&CK Technique IDs.", 
+            cxxopts::value<std::vector<std::string>>())
+		("exclude-hunts", "Run all hunts except those specified. Provide as a comma separated list of Mitre ATT&CK Technique IDs.", 
+            cxxopts::value<std::vector<std::string>>())
+        ("r,react", "Specifies how BLUESPAWN should react to potential threats dicovered during hunts. Available reactions are remove-value, carve-memory, suspend, delete-file, and quarantine-file",
+            cxxopts::value<std::string>()->default_value(""))
+		;
+
+    options.add_options("mitigate")
+		("action", "Selects whether to audit or enforce each mitigations.",
+            cxxopts::value<std::string>()->default_value("audit")->implicit_value("audit"))
+        ("force", "Use this option to forcibly apply mitigations with no prompt", 
+            cxxopts::value<bool>())
+        ;
     // clang-format on
 
     try {
@@ -383,47 +409,58 @@ int main(int argc, char* argv[]) {
 
         ParseLogSinks(result["log"].as<std::string>());
 
-        auto UserReactions = result["react"].as<std::string>();
-        std::set<std::string> reaction_set;
-        for(unsigned startIdx = 0; startIdx < UserReactions.size();) {
-            auto endIdx{ UserReactions.find(',', startIdx) };
-            auto sink{ UserReactions.substr(startIdx, endIdx - startIdx) };
-            reaction_set.emplace(sink);
-            startIdx = endIdx + 1;
-            if(endIdx == std::string::npos) {
-                break;
+        if(result.count("hunt") || result.count("monitor")) {
+            if(result.count("hunt")) {
+                bluespawn.EnableMode(BluespawnMode::HUNT);
+            }
+            if(result.count("monitor")) {
+                bluespawn.EnableMode(BluespawnMode::MONITOR);
+            }
+
+            if(result.count("aggressiveness")) {
+                bluespawn.EnableMode(BluespawnMode::SCAN, static_cast<DWORD>(GetAggressiveness(result["aggressivenes"
+                                                                                                      "s"])));
+            }
+
+            if(result.count("hunts")) {
+                bluespawn.SetIncludedHunts(result["hunts"].as<std::vector<std::string>>());
+            } else if(result.count("exclude-hunts")) {
+                bluespawn.SetExcludedHunts(result["exclude-hunts"].as<std::vector<std::string>>());
+            }
+
+            auto UserReactions = result["react"].as<std::string>();
+            std::set<std::string> reaction_set;
+            for(unsigned startIdx = 0; startIdx < UserReactions.size();) {
+                auto endIdx{ UserReactions.find(',', startIdx) };
+                auto sink{ UserReactions.substr(startIdx, endIdx - startIdx) };
+                reaction_set.emplace(sink);
+                startIdx = endIdx + 1;
+                if(endIdx == std::string::npos) {
+                    break;
+                }
+            }
+
+            for(auto reaction : reaction_set) {
+                if(reactions.find(reaction) != reactions.end()) {
+                    bluespawn.AddReaction(std::move(reactions[reaction]));
+                } else {
+                    bluespawn.io.AlertUser(L"Unknown reaction \"" + StringToWidestring(reaction) + L"\"", INFINITY,
+                                           ImportanceLevel::MEDIUM);
+                }
             }
         }
 
-        for(auto reaction : reaction_set) {
-            if(reactions.find(reaction) != reactions.end()) {
-                bluespawn.AddReaction(std::move(reactions[reaction]));
-            } else {
-                bluespawn.io.AlertUser(L"Unknown reaction \"" + StringToWidestring(reaction) + L"\"", INFINITY,
-                                       ImportanceLevel::MEDIUM);
-            }
-        }
-
-        if(result.count("aggressiveness")) {
-            bluespawn.EnableMode(BluespawnMode::SCAN, static_cast<DWORD>(GetAggressiveness(result["aggressiveness"])));
-        }
         if(result.count("mitigate")) {
             bool bForceEnforce = false;
             if(result.count("force"))
                 bForceEnforce = true;
 
             MitigationMode mode = MitigationMode::Audit;
-            if(result["mitigate"].as<std::string>() == "e" || result["mitigate"].as<std::string>() == "enforce")
+            if(result["action"].as<std::string>() == "e" || result["action"].as<std::string>() == "enforce")
                 mode = MitigationMode::Enforce;
 
             bluespawn.EnableMode(BluespawnMode::MITIGATE,
                                  (static_cast<DWORD>(bForceEnforce) << 1) | (static_cast<DWORD>(mode) << 0));
-        }
-        if(result.count("hunt")) {
-            bluespawn.EnableMode(BluespawnMode::HUNT);
-        }
-        if(result.count("monitor")) {
-            bluespawn.EnableMode(BluespawnMode::MONITOR);
         }
 
         bluespawn.Run();

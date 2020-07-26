@@ -63,7 +63,7 @@ namespace Log {
                 std::wcout << L"\tDetection is stale" << std::endl;
             }
 
-            std::wcout << L"\tDetection type: "
+            std::wcout << L"\tDetection Type: "
                        << (detection->type == DetectionType::FileDetection ?
                                L"File" :
                                detection->type == DetectionType::ProcessDetection ?
