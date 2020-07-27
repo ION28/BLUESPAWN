@@ -10,7 +10,7 @@ ForEach($Technique in ($tests | ForEach-Object { $_.Technique } | get-unique)) {
 	$TechniqueTests = $tests | Where-Object { $_.Technique -eq $Technique }
 	$TechniqueTestCount = (($TechniqueTests | Measure).count)
 	
-	$TechniqueResults = $results.bluespawn.hunt | Where-Object { $_.name -like "$Technique*" }
+	$TechniqueResults = $results.bluespawn.detection."associated-hunts" | Where-Object { $_.hunt -like "$Technique*" }
 	$TechniqueDetectionCount = (($TechniqueResults.detection | Measure).count)
 	
 	if($TechniqueDetectionCount -ge $TechniqueTestCount) {

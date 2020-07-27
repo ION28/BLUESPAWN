@@ -1,0 +1,17 @@
+#pragma once
+#include "../Hunt.h"
+
+namespace Hunts {
+
+	/**
+	 * HuntT1182 examines AppCert DLLs related registry keys that can be used for
+	 * persistence and privilege escalation.
+	 */
+	class HuntT1182 : public Hunt {
+	public:
+		HuntT1182();
+
+		virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope);
+		virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
+	};
+}
