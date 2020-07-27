@@ -20,7 +20,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@main
 
     - name: Update submodules
       run: git submodule update --init --recursive
@@ -31,6 +31,13 @@ jobs:
         vcpkgArguments: '@../vcpkg_response_file.txt'
         vcpkgDirectory: 'vcpkg'
         appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
+
+    - name: Integrate vcpkg packages
+      shell: powershell
+      run: |
+        cd vcpkg
+        .\vcpkg.exe integrate install
+        cd ..
 
     - name: Build BLUESPAWN-client
       run: |
@@ -61,17 +68,17 @@ jobs:
       run: testing\run-hunt-results-comparison.ps1
       shell: powershell
 
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@main
       with:
         name: BLUESPAWN-client-${{ matrix.buildarch }}-${{ matrix.buildtype }}
         path: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe
 
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@main
       with:
         name: AtomicTestsResults-${{ matrix.buildarch }}-${{ matrix.buildtype }}.csv
         path: AtomicTestsResults.csv
 
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@main
       with:
         name: BLUESPAWNHuntResults-${{ matrix.buildarch }}-${{ matrix.buildtype }}.xml
         path: BLUESPAWNHuntResults.xml
