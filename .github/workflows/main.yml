@@ -28,7 +28,7 @@ jobs:
     - name: Restore from cache, and install vcpkg and project dependencies
       uses: lukka/run-vcpkg@v3
       with:
-        vcpkgArguments: '@vcpkg_response_file.txt'
+        vcpkgArguments: '@../vcpkg_response_file.txt'
         vcpkgDirectory: 'vcpkg'
         appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
 
