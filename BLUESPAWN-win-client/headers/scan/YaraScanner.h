@@ -1,57 +1,57 @@
 #pragma once
 
-#include "yara.h"
+#include <string>
+#include <vector>
+
 #include "util/filesystem/FileSystem.h"
 #include "util/wrappers.hpp"
 
-#include <vector>
-#include <string>
+#include "yara/types.h"
 
 enum class YaraStatus {
-	Success,
-	RulesMissing,
-	RulesInvalid,
-	Failure,
+    Success,
+    RulesMissing,
+    RulesInvalid,
+    Failure,
 };
 
 struct YaraScanResult {
-	std::vector<std::wstring> vKnownBadRules;
-	std::vector<std::wstring> vIndicatorRules;
+    std::vector<std::wstring> vKnownBadRules;
+    std::vector<std::wstring> vIndicatorRules;
 
-	YaraStatus status;
+    YaraStatus status;
 
-	operator bool();
-	bool operator!();
+    operator bool();
+    bool operator!();
 
-	void AddBadRule(IN CONST std::wstring& identifier);
-	void AddIndicatorRule(IN CONST std::wstring& identifier);
+    void AddBadRule(IN CONST std::wstring& identifier);
+    void AddIndicatorRule(IN CONST std::wstring& identifier);
 };
 
 class YaraScanner {
-private:
-	static const YaraScanner instance;
+    private:
+    static const YaraScanner instance;
 
-	YaraScanner();
-	
-	YR_RULES* KnownBad = nullptr;
-	YR_RULES* KnownBad2 = nullptr;
-	YR_RULES* Indicators = nullptr;
+    YaraScanner();
 
-	YaraStatus status;
+    YR_RULES* KnownBad = nullptr;
+    YR_RULES* KnownBad2 = nullptr;
+    YR_RULES* Indicators = nullptr;
 
-public:
+    YaraStatus status;
 
-	static const YaraScanner& GetInstance();
+    public:
+    static const YaraScanner& GetInstance();
 
-	~YaraScanner();
+    ~YaraScanner();
 
-	YaraScanResult ScanFile(const FileSystem::File& file) const;
-	YaraScanResult ScanMemory(LPVOID location, DWORD size) const;
-	YaraScanResult ScanMemory(const AllocationWrapper& allocation) const;
-	YaraScanResult ScanMemory(const MemoryWrapper<>& memory) const;
+    YaraScanResult ScanFile(const FileSystem::File& file) const;
+    YaraScanResult ScanMemory(LPVOID location, DWORD size) const;
+    YaraScanResult ScanMemory(const AllocationWrapper& allocation) const;
+    YaraScanResult ScanMemory(const MemoryWrapper<>& memory) const;
 
-	YaraScanner(const YaraScanner&) = delete;
-	YaraScanner operator=(const YaraScanner&) = delete;
-	YaraScanner(YaraScanner&&) = delete;
-	YaraScanner operator=(YaraScanner&&) = delete;
+    YaraScanner(const YaraScanner&) = delete;
+    YaraScanner operator=(const YaraScanner&) = delete;
+    YaraScanner(YaraScanner&&) = delete;
+    YaraScanner operator=(YaraScanner&&) = delete;
 };
