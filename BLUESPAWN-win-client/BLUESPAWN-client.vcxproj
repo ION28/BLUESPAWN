@@ -353,6 +353,7 @@
     <Manifest Include="BLUESPAWN-client.exe.manifest" />
   </ItemGroup>
   <PropertyGroup>
+    <TargetName>BLUESPAWN-client</TargetName>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>
     </EmbedManifest>

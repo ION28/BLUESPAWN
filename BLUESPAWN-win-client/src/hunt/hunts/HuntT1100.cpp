@@ -33,8 +33,6 @@ namespace Hunts {
             R"(\bcmd.exe\b|\bpowershell.exe\b|\bwscript.shell\b|\bprocessstartinfo\b|\bcreatenowindow\b|\bcmd\b|\beval request\b|\bexecute request\b|\boscriptnet\b|createobject\("scripting.filesystemobject"\))");
         jsp_indicators.assign(R"(\bcmd.exe\b|\bpowershell.exe\b|\bgetruntime\(\)\.exec\b)");
 
-        int identified = 0;
-
         for(std::wstring path : web_directories) {
             auto hWebRoot = FileSystem::Folder(path);
             FileSystem::FileSearchAttribs attribs;

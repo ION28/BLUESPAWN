@@ -22,8 +22,6 @@ namespace Hunts {
     std::vector<std::shared_ptr<Detection>> HuntT1128::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
-        auto netshKey = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Netsh", true };
-
         for(auto& helperDllValue : CheckKeyValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Netsh", true, false)) {
             if(FileScanner::PerformQuickScan(helperDllValue.ToString())) {
                 CREATE_DETECTION(Certainty::Moderate,
