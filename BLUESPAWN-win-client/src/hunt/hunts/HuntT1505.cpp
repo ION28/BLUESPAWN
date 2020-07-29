@@ -1,7 +1,6 @@
-#include "hunt/hunts/HuntT1100.h"
+#include "hunt/hunts/HuntT1505.h"
 
 #include "util/StringUtils.h"
-
 #include "util/filesystem/FileSystem.h"
 #include "util/log/Log.h"
 
@@ -9,23 +8,16 @@
 #include "user/bluespawn.h"
 
 namespace Hunts {
-    HuntT1100::HuntT1100() : Hunt(L"T1100 - Web Shells") {
-        std::smatch match_index;
-
+    HuntT1505::HuntT1505() : Hunt(L"T1505 - Server Software Component") {
         dwCategoriesAffected = (DWORD) Category::Files;
         dwSourcesInvolved = (DWORD) DataSource::FileSystem;
         dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
     }
 
-    void HuntT1100::AddDirectoryToSearch(const std::wstring& sFileName) { web_directories.emplace_back(sFileName); }
-
-    void HuntT1100::AddFileExtensionToSearch(const std::wstring& sFileExtension) {
-        web_exts.emplace_back(sFileExtension);
-    }
-
-    std::vector<std::shared_ptr<Detection>> HuntT1100::RunHunt(const Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1505::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
+        // Looks for T1505.003: Web Shell
         //PHP regex credit to: https://github.com/emposha/PHP-Shell-Detector
         php_vuln_functions.assign(
             R"(preg_replace.*\/e|`.*?\$.*?`|\bcreate_function\b|\bpassthru\b|\bshell_exec\b|\bexec\b|\bbase64_decode\b|\bedoced_46esab\b|\beval\b|\bsystem\b|\bproc_open\b|\bpopen\b|\bcurl_exec\b|\bcurl_multi_exec\b|\bparse_ini_file\b|\bshow_source\b)");
@@ -52,7 +44,8 @@ namespace Hunts {
                     std::string sus_file = ToLowerCaseA(*read.ReadString());
                     if(file_ext.compare(L".php") == 0) {
                         if(regex_search(sus_file, match_index, php_vuln_functions)) {
-                            CREATE_DETECTION(Certainty::Strong, FileDetectionData{ file });
+                            CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong, FileDetectionData{ file },
+                                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1505_003) });
                             LOG_INFO(1, L"Located likely web shell in file "
                                             << file.GetFilePath() << L" in text "
                                             << StringToWidestring(
@@ -62,7 +55,8 @@ namespace Hunts {
                         }
                     } else if(file_ext.substr(0, 4).compare(L".jsp") == 0) {
                         if(regex_search(sus_file, match_index, jsp_indicators)) {
-                            CREATE_DETECTION(Certainty::Strong, FileDetectionData{ file });
+                            CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong, FileDetectionData{ file },
+                                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1505_003) });
                             LOG_INFO(1, L"Located likely web shell in file "
                                             << file.GetFilePath() << L" in text "
                                             << StringToWidestring(
@@ -72,7 +66,8 @@ namespace Hunts {
                         }
                     } else if(file_ext.substr(0, 3).compare(L".as") == 0) {
                         if(regex_search(sus_file, match_index, asp_indicators)) {
-                            CREATE_DETECTION(Certainty::Strong, FileDetectionData{ file });
+                            CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong, FileDetectionData{ file },
+                                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1505_003) });
                             LOG_INFO(1, L"Located likely web shell in file "
                                             << file.GetFilePath() << L" in text "
                                             << StringToWidestring(
@@ -89,7 +84,8 @@ namespace Hunts {
                     const auto& yara = YaraScanner::GetInstance();
                     YaraScanResult result{ yara.ScanFile(file) };
                     if(!result && result.vKnownBadRules.size() > 0) {
-                        CREATE_DETECTION(Certainty::Strong, FileDetectionData{ file, result });
+                        CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong, FileDetectionData{ file, result },
+                                                      DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1505_003) });
                     }
                 }
             }
@@ -98,9 +94,10 @@ namespace Hunts {
         HUNT_END();
     }
 
-    std::vector<std::unique_ptr<Event>> HuntT1100::GetMonitoringEvents() {
+    std::vector<std::unique_ptr<Event>> HuntT1505::GetMonitoringEvents() {
         std::vector<std::unique_ptr<Event>> events;
 
+        // Looks for T1505.003: Web Shell
         for(auto dir : web_directories) {
             auto folder = FileSystem::Folder{ dir };
             if(folder.GetFolderExists()) {

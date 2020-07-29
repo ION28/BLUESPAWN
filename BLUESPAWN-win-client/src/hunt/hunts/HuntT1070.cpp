@@ -1,4 +1,4 @@
-#include "hunt/hunts/HuntT1099.h"
+#include "hunt/hunts/HuntT1070.h"
 
 #include <iostream>
 
@@ -10,15 +10,16 @@
 
 namespace Hunts {
 
-    HuntT1099::HuntT1099() : Hunt(L"T1099 - Timestomp") {
+    HuntT1070::HuntT1070() : Hunt(L"T1070 - Indicator Removal on Host") {
         dwCategoriesAffected = (DWORD) Category::Files | (DWORD) Category::Processes;
         dwSourcesInvolved = (DWORD) DataSource::EventLogs;
         dwTacticsUsed = (DWORD) Tactic::DefenseEvasion;
     }
 
-    std::vector<std::shared_ptr<Detection>> HuntT1099::RunHunt(const Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1070::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
+        // Looks for T1070.006 Timestomp
         // Create existance queries so interesting data is output
         std::vector<EventLogs::XpathQuery> queries;
         auto param1 = EventLogs::ParamList();
@@ -43,7 +44,8 @@ namespace Hunts {
         for(auto query : queryResults) {
             FileSystem::File file = FileSystem::File(query.GetProperty(L"Event/EventData/"
                                                                        L"Data[@Name='TargetFilename']"));
-            CREATE_DETECTION(Certainty::Strong, FileDetectionData{ file });
+            CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong, FileDetectionData{ file },
+                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1070_006) });
 
             // Scan process
             HandleWrapper hProcess{ OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false,
@@ -59,7 +61,7 @@ namespace Hunts {
         HUNT_END();
     }
 
-    std::vector<std::unique_ptr<Event>> HuntT1099::GetMonitoringEvents() {
+    std::vector<std::unique_ptr<Event>> HuntT1070::GetMonitoringEvents() {
         std::vector<std::unique_ptr<Event>> events{};
 
         events.push_back(std::make_unique<EventLogEvent>(L"Microsoft-Windows-Sysmon/Operational", 2));
