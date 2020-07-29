@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <algorithm>
+#include <sys/uio.h>
 
 template<class T>
 class GenericWrapper {
@@ -179,6 +180,30 @@ public:
 
 	MemoryWrapper(void* lpMemoryBase, size_t size = sizeof(T), pid_t process = getpid())
 		: address{ reinterpret_cast<T*>(lpMemoryBase) }, process{ process }, MemorySize{ size } {}
+
+	bool ReadProcessMemory(pid_t pid, void * lpBaseAddress, void * lpBuffer, size_t nSize, size_t * lpNumberOfBytesRead) const {
+        struct iovec local;
+        struct iovec remote;
+        local.iov_base = lpBuffer;
+        local.iov_len = nSize;
+        remote.iov_base = lpBaseAddress;
+        remote.iov_len = nSize;
+        *lpNumberOfBytesRead = process_vm_readv(pid, &local, 1, &remote, 1, 0);
+        return *lpNumberOfBytesRead != -1;
+    }
+    
+    bool WriteProcessMemory(pid_t pid, void * lpBaseAddress, void * lpBuffer, size_t nSize, size_t * lpNumberOfBytesWritten) const {
+        struct iovec local;
+        struct iovec remote;
+        local.iov_base = lpBuffer;
+        local.iov_base = lpBuffer;
+        local.iov_len = nSize;
+        remote.iov_base = lpBaseAddress;
+        remote.iov_len = nSize;
+        *lpNumberOfBytesWritten = process_vm_writev(pid, &local, 1, &remote, 1, 0);
+        return *lpNumberOfBytesWritten != -1;
+
+    }
 
 	T Dereference() const {
 		if(!process){

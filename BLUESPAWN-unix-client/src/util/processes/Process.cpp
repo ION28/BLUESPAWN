@@ -52,4 +52,29 @@ namespace Process{
     bool ProcessInfo::Error(){
         return this->error;
     }
+
+    bool ReadProcessMemory(pid_t pid, void * lpBaseAddress, void * lpBuffer, size_t nSize, size_t * lpNumberOfBytesRead){
+        struct iovec local;
+        struct iovec remote;
+        local.iov_base = lpBuffer;
+        local.iov_len = nSize;
+        remote.iov_base = lpBaseAddress;
+        remote.iov_len = nSize;
+        *lpNumberOfBytesRead = process_vm_readv(pid, &local, 1, &remote, 1, 0);
+        return *lpNumberOfBytesRead != -1;
+    }
+    
+    bool WriteProcessMemory(pid_t pid, void * lpBaseAddress, void * lpBuffer, size_t nSize, size_t * lpNumberOfBytesWritten){
+        struct iovec local;
+        struct iovec remote;
+        local.iov_base = lpBuffer;
+        local.iov_base = lpBuffer;
+        local.iov_len = nSize;
+        remote.iov_base = lpBaseAddress;
+        remote.iov_len = nSize;
+        *lpNumberOfBytesWritten = process_vm_writev(pid, &local, 1, &remote, 1, 0);
+        return *lpNumberOfBytesWritten != -1;
+
+    }
+
 }

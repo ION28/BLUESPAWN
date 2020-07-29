@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <sys/stat.h>
+#include <sys/uio.h>
 
 #include "util/log/Log.h"
 
@@ -45,4 +46,8 @@ namespace Process{
         bool Error();
 
     };
+
+    bool ReadProcessMemory(pid_t pid, void * lpBaseAddress, void * lpBuffer, size_t nSize, size_t * lpNumberOfBytesRead);
+
+    bool WriteProcessMemory(pid_t pid, void * lpBaseAddress, void * lpBuffer, size_t nSize, size_t * lpNumberOfBytesWritten);
 }

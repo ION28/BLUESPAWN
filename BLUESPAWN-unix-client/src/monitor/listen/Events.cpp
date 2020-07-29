@@ -10,7 +10,7 @@ namespace Events{
         pthread_cond_init(&this->condition, NULL);
         pthread_mutex_init(&this->mutex, NULL);
         if(Events::currId == UINT_MAX){
-            //TODO: log error
+            //TODO: fix this condition
             srand(time(NULL));
             this->id = rand();
         }

@@ -53,7 +53,7 @@ namespace Log{
 		wFileName{ wFileName },
 		hRecordEvent{Events::CreateEvent()}{
 		pthread_mutex_init(&this->hMutex, NULL);
-		//TODO: init thread here
+		pthread_create(&this->thread, NULL, UpdateLog, this);
 		XMLDoc.InsertEndChild(Root);
 	}
 
@@ -61,7 +61,7 @@ namespace Log{
 		XMLDoc.SaveFile(wFileName.c_str());
 		//TerminateThread(thread, 0);
 		//TOOD
-		pthread_kill(&this->thread, SIGKILL);
+		pthread_kill(this->thread, SIGKILL);
 		Events::CloseHandle(this->hRecordEvent);
 		pthread_mutex_destroy(&this->hMutex);
 	}

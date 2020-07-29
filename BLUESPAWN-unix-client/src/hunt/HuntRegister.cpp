@@ -57,6 +57,7 @@ bool CallFunctionSafe(const std::function<void()>& func){
 		return false;
 	}*/
 	//TODO: Purpose of this?
+	func();
 	return true;
 }
 
@@ -113,7 +114,8 @@ void HuntRegister::RunHunt(Hunt& hunt, const Scope& scope, Aggressiveness aggres
 }
 
 void HuntRegister::SetupMonitoring(Aggressiveness aggressiveness, const Reaction& reaction) {
-	auto& EvtManager = EventManager::GetInstance();
+	//auto& EvtManager = EventManager::GetInstance();
+	//TODO
 	for (auto name : vRegisteredHunts) {
 		auto level = getLevelForHunt(*name, aggressiveness);
 		if(name->SupportsScan(level)) {
@@ -135,10 +137,10 @@ void HuntRegister::SetupMonitoring(Aggressiveness aggressiveness, const Reaction
 				}
 
 				if(name->SupportsScan(level)) {
-					unsigned int status = EvtManager.SubscribeToEvent(event, callback);
+					/*unsigned int status = EvtManager.SubscribeToEvent(event, callback);
 					if(status != 0){
 						LOG_ERROR("Monitoring for " << name->GetName() << " failed with error code " << status);
-					}
+					}*/
 				}
 			}
 		}

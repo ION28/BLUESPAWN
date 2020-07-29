@@ -107,7 +107,7 @@ cleanup_stuff()
 compile_actual()
 {
     cd BLUESPAWN-unix-client
-    g++ -std=c++17 $incdirs $libs $cfiles -o "$orig_dir/build/bluespawn.out"
+    g++ -std=c++2a $incdirs $libs $cfiles -o "$orig_dir/build/bluespawn.out"
     cd ..  
 }
 
