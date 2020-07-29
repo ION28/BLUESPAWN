@@ -18,7 +18,7 @@ namespace Hunts {
     std::vector<std::shared_ptr<Detection>> HuntT1053::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
-        // Looks for T1053.005: Accessibility Features
+        // Looks for T1053.005: Scheduled Task
         std::vector<EventLogs::XpathQuery> queries;
         auto param1 = EventLogs::ParamList();
         auto param2 = EventLogs::ParamList();

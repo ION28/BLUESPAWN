@@ -468,9 +468,16 @@ rule obfuscatedFunctionality
     meta:
         author = "NSA Cybersecurity"
         description = "Obfuscation sometimes hides malicious functionality"
+		author2 = "BLUESPAWN Team"
+		additions = "updated to exclude EXE files"
 
     condition:
-        ObfuscatedPhp or chr_obfuscation or SuspiciousEncoding
+        // No MZ signature at offset 0
+		uint16(0) != 0x5A4D and
+		// No PE signature at offset stored in MZ header at 0x3C
+		uint32(uint32(0x3C)) != 0x00004550 
+		// Check for suspicious stuff
+        and (ObfuscatedPhp or chr_obfuscation or SuspiciousEncoding)
 }
 
 rule possibleIndicator
@@ -478,7 +485,14 @@ rule possibleIndicator
     meta:
         author = "NSA Cybersecurity"
         description = "Artifacts common to web shells and less common in benign files"
+		author2 = "BLUESPAWN Team"
+		additions = "updated to exclude EXE files"
 
     condition:
-        DodgyPhp or DangerousPhp or DodgyStrings
+        // No MZ signature at offset 0
+		uint16(0) != 0x5A4D and
+		// No PE signature at offset stored in MZ header at 0x3C
+		uint32(uint32(0x3C)) != 0x00004550 
+		// Check for suspicious stuff
+		and (DodgyPhp or DangerousPhp or DodgyStrings)
 }

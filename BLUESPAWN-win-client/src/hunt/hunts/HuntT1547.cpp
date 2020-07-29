@@ -72,6 +72,27 @@ namespace Hunts {
                                           DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_001) });
         }
 
+        std::vector<FileSystem::Folder> startup_directories = { FileSystem::Folder(
+            L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp") };
+        auto userFolders = FileSystem::Folder{ L"C:\\Users" }.GetSubdirectories(1);
+        for(auto userFolder : userFolders) {
+            FileSystem::Folder folder{ userFolder.GetFolderPath() + L"\\AppData\\Roaming\\Microsoft\\Windows\\Start "
+                                                                    L"Menu\\Programs\\StartUp" };
+            if(folder.GetFolderExists()) {
+                startup_directories.emplace_back(folder);
+            }
+        }
+        for(auto folder : startup_directories) {
+            LOG_VERBOSE(1, L"Scanning " << folder.GetFolderPath());
+            FileSystem::FileSearchAttribs searchFilters;
+            searchFilters.extensions = { L".bat", L".cmd", L".exe", L".dll", L".js",  L".jse",      L".lnk",
+                                         L".ps1", L".sct", L".vb",  L".vbe", L".vbs", L".vbscript", L".hta" };
+            for(auto value : folder.GetFiles(searchFilters, -1)) {
+                CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate, FileDetectionData{ value },
+                                              DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_001) });
+            }
+        }
+
         // Looks for T1547.002: Authentication Package
         // LSA Configuration
         auto lsa = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
@@ -239,6 +260,14 @@ namespace Hunts {
                           L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders");
         GetRegistryEvents(events, HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders");
+        auto userFolders = FileSystem::Folder(L"C:\\Users").GetSubdirectories(1);
+        for(auto userFolder : userFolders) {
+            FileSystem::Folder folder{ userFolder.GetFolderPath() + L"\\AppData\\Roaming\\Microsoft\\Windows\\Start "
+                                                                    L"Menu\\Programs\\StartUp" };
+            if(folder.GetFolderExists()) {
+                events.push_back(std::make_unique<FileEvent>(folder));
+            }
+        }
 
         // Looks for T1547.002 (Authentication Package) and T1547.005 (Security Support Provider)
         GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", true, false, false);
