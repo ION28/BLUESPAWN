@@ -1,4 +1,4 @@
-#include "hunt/hunts/HuntT1198.h"
+#include "hunt/hunts/HuntT1553.h"
 
 #include <map>
 #include <queue>
@@ -6,7 +6,6 @@
 
 #include "util/StringUtils.h"
 #include "util/Utils.h"
-
 #include "util/configurations/Registry.h"
 #include "util/filesystem/Filesystem.h"
 #include "util/log/Log.h"
@@ -20,7 +19,7 @@ using namespace Registry;
 
 namespace Hunts {
 
-    HuntT1198::HuntT1198() : Hunt(L"T1198 - SIP and Trust Provider Hijacking") {
+    HuntT1553::HuntT1553() : Hunt(L"T1553 - Subvert Trust Controls") {
         dwCategoriesAffected = (DWORD) Category::Configurations;
         dwSourcesInvolved = (DWORD) DataSource::Registry;
         dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::DefenseEvasion;
@@ -67,8 +66,10 @@ namespace Hunts {
         return map;
     }
 
-    std::vector<std::shared_ptr<Detection>> HuntT1198::RunHunt(const Scope& scope) {
+    std::vector<std::shared_ptr<Detection>> HuntT1553::RunHunt(const Scope& scope) {
         HUNT_INIT_LEVEL(Intensive)
+
+        // Looks for T1553.003: SIP and Trust Provider Hijacking
 
         std::unordered_map<std::wstring, std::vector<std::pair<RegistryValue, std::wstring>>> files{};
 
@@ -91,8 +92,10 @@ namespace Hunts {
                         if(entry.find(GUID) != entry.end()) {
                             auto& pair{ entry.at(GUID) };
                             if(func && func->ToString() != pair.second) {
-                                CREATE_DETECTION(Certainty::Strong,
-                                                 RegistryDetectionData{ *func, RegistryDetectionType::Configuration });
+                                CREATE_DETECTION_WITH_CONTEXT(
+                                    Certainty::Strong,
+                                    RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
+                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003) });
                             }
 
                             if(dll) {
@@ -113,14 +116,14 @@ namespace Hunts {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
-                                    DetectionContext{ GetName(), std::nullopt, message });
+                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
                             }
 
                             if(dll) {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *dll, RegistryDetectionType::FileReference },
-                                    DetectionContext{ GetName(), std::nullopt, message });
+                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
                             }
                         }
                     }
@@ -147,8 +150,10 @@ namespace Hunts {
                         if(entry.find(GUID) != entry.end()) {
                             auto& pair{ entry.at(GUID) };
                             if(func && func->ToString() != pair.second) {
-                                CREATE_DETECTION(Certainty::Strong,
-                                                 RegistryDetectionData{ *func, RegistryDetectionType::Configuration });
+                                CREATE_DETECTION_WITH_CONTEXT(
+                                    Certainty::Strong,
+                                    RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
+                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003) });
                             }
 
                             if(files.find(dll->ToString()) == files.end()) {
@@ -166,14 +171,14 @@ namespace Hunts {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
-                                    DetectionContext{ GetName(), std::nullopt, message });
+                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
                             }
 
                             if(dll) {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *dll, RegistryDetectionType::FileReference },
-                                    DetectionContext{ GetName(), std::nullopt, message });
+                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
                             }
                         }
                     }
@@ -191,7 +196,7 @@ namespace Hunts {
                 for(auto& value : pair.second) {
                     CREATE_DETECTION_WITH_CONTEXT(
                         Certainty::Weak, RegistryDetectionData{ value.first, RegistryDetectionType::FileReference },
-                        DetectionContext{ GetName(), std::nullopt, message });
+                        DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
                 }
             } else {
                 dllpath = ToLowerCaseW(*dllpath);
@@ -207,7 +212,7 @@ namespace Hunts {
                                       L" and may have been hijacked" };
                         CREATE_DETECTION_WITH_CONTEXT(
                             Certainty::Weak, RegistryDetectionData{ value.first, RegistryDetectionType::FileReference },
-                            DetectionContext{ GetName(), std::nullopt, message });
+                            DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
                     }
                 }
             }
@@ -231,14 +236,18 @@ namespace Hunts {
                             auto path{ FileSystem::SearchPathExecutable(*check.GetValue<std::wstring>(val)) };
                             if(path) {
                                 if(!FileSystem::File(*path).IsMicrosoftSigned()) {
-                                    CREATE_DETECTION(Certainty::Strong,
-                                                     RegistryDetectionData{ *RegistryValue::Create(check, val),
-                                                                            RegistryDetectionType::FileReference });
+                                    CREATE_DETECTION_WITH_CONTEXT(
+                                        Certainty::Strong,
+                                        RegistryDetectionData{ *RegistryValue::Create(check, val),
+                                                               RegistryDetectionType::FileReference },
+                                        DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003) });
                                 }
                             } else if(ToLowerCaseW(val).find(L"dll") != std::wstring::npos) {
-                                CREATE_DETECTION(Certainty::Strong,
-                                                 RegistryDetectionData{ *RegistryValue::Create(check, val),
-                                                                        RegistryDetectionType::FileReference });
+                                CREATE_DETECTION_WITH_CONTEXT(
+                                    Certainty::Strong,
+                                    RegistryDetectionData{ *RegistryValue::Create(check, val),
+                                                           RegistryDetectionType::FileReference },
+                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003) });
                             }
                         }
                     }
@@ -252,7 +261,7 @@ namespace Hunts {
         HUNT_END();
     }
 
-    std::vector<std::unique_ptr<Event>> HuntT1198::GetMonitoringEvents() {
+    std::vector<std::unique_ptr<Event>> HuntT1553::GetMonitoringEvents() {
         std::vector<std::unique_ptr<Event>> events;
 
         Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE,

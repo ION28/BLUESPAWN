@@ -44,6 +44,8 @@ class HuntRegister;
         },                                                      \
         certainty));
 
+#define ADD_SUBTECHNIQUE_CONTEXT(name) GetName() + L" Subtechnique " + name
+
 class Hunt {
     protected:
     /// The tactics used by the hunt, computed as a bitwise OR of entries in the enum Tactic
