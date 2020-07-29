@@ -154,6 +154,10 @@ ProcessDetectionData::CreateMemoryDetectionData(IN DWORD PID,
         return CreateMemoryDetectionData(hProcess, ProcessName, BaseAddress, MemorySize, ImageName, ProcessPath,
                                          ProcessCommand, std::move(ParentProcess));
     } else {
+        auto image{ ImageName };
+        if(image && !image->length()){
+            image = std::nullopt;
+        }
         return ProcessDetectionData{
             ProcessDetectionType::MaliciousMemory,
             PID,                        // PID
@@ -165,7 +169,7 @@ ProcessDetectionData::CreateMemoryDetectionData(IN DWORD PID,
             std::move(ParentProcess),   // ParentProcess
             BaseAddress,                // BaseAddress
             MemorySize,                 // MemorySize
-            ImageName                   // ImageName
+            image                       // ImageName
         };
     }
 }
@@ -183,6 +187,9 @@ ProcessDetectionData::CreateMemoryDetectionData(IN CONST HandleWrapper& ProcessH
     if(!image) {
         auto mapped{ GetMappedFile(ProcessHandle, BaseAddress) };
         if(mapped) { image = mapped->GetFilePath(); }
+    }
+    if(image && !image->length()){
+        image = std::nullopt;
     }
 
     return ProcessDetectionData{

@@ -10,35 +10,34 @@
 template<class T>
 class GenericWrapper {
 protected:
-	std::shared_ptr<void> ReferenceCounter;
-
-	T WrappedObject;
+	std::shared_ptr<T> ReferenceCounter;
 	std::optional<T> BadValue;
 
 public:
 
 	GenericWrapper(T object, std::function<void(T)> freeFunction = [](T object){ delete object; }, std::optional<T> BadValue = std::nullopt) :
-		WrappedObject{ object },
 		BadValue{ BadValue },
-		ReferenceCounter{ nullptr, [object, BadValue, freeFunction](LPVOID memory){
-			if((!BadValue || BadValue != object) && object){ freeFunction(object); }
+		ReferenceCounter{ new T(object), [BadValue, freeFunction](auto* object){
+			if((!BadValue || *BadValue != *object) && *object){ freeFunction(*object); }
+			delete object;
 		} }{}
 
-		operator T() const{ return WrappedObject; }
-		T operator *() const{ return WrappedObject; }
-		T operator ->() const{ return WrappedObject; }
-		T* operator &() const{ return const_cast<T*>(&WrappedObject); }
-		bool operator ==(T object) const{ return WrappedObject == object; }
-		bool operator !() const{ return !WrappedObject || WrappedObject == BadValue; }
+		operator T() const{ return *ReferenceCounter; }
+		T operator *() const{ return *ReferenceCounter; }
+		T operator ->() const{ return *ReferenceCounter; }
+		T* operator &() const{ return const_cast<T*>(&*ReferenceCounter); }
+		bool operator ==(T object) const{ return *ReferenceCounter == object; }
+		void reassign(T object){ *ReferenceCounter = object; }
+		bool operator !() const{ return !*ReferenceCounter || *ReferenceCounter == BadValue; }
 		operator bool() const{ return !operator!(); }
-		T Release(){ auto tmp = WrappedObject; WrappedObject = BadValue; return tmp; }
-		T Get() const{ return WrappedObject; }
+		T Release(){ auto tmp = *ReferenceCounter; *ReferenceCounter = BadValue; return tmp; }
+		T Get() const{ return *ReferenceCounter; }
 };
 
 class HandleWrapper : public GenericWrapper<HANDLE> {
 public:
 	HandleWrapper(HANDLE handle) :
-		GenericWrapper(handle, std::function<void(HANDLE)>(SafeCloseHandle), INVALID_HANDLE_VALUE){};
+		GenericWrapper(handle, SafeCloseHandle, INVALID_HANDLE_VALUE){};
 	static void SafeCloseHandle(HANDLE handle){
 		BY_HANDLE_FILE_INFORMATION hInfo;
 		if(GetFileInformationByHandle(handle, &hInfo)){
@@ -55,37 +54,36 @@ public:
 class FindWrapper : public GenericWrapper<HANDLE> {
 public:
 	FindWrapper(HANDLE handle) :
-		GenericWrapper(handle, std::function<void(HANDLE)>(FindClose), INVALID_HANDLE_VALUE){};
+		GenericWrapper(handle, FindClose, INVALID_HANDLE_VALUE){};
 };
 
 typedef HandleWrapper MutexType;
 class AcquireMutex {
-	MutexType hMutex;
-	std::shared_ptr<void> tracker;
+	std::shared_ptr<MutexType> tracker;
 
 public:
-	explicit AcquireMutex(const MutexType& mutex) :
-		hMutex{ mutex },
-		tracker{ nullptr, [&](LPVOID nul){ ReleaseMutex(hMutex); } }{
-		::WaitForSingleObject(hMutex, INFINITE);
+	explicit AcquireMutex(MutexType mutex) :
+		tracker{ new MutexType(mutex), [](auto* m){ ReleaseMutex(*m); } }{
+		::WaitForSingleObject(*tracker, INFINITE);
 	}
 };
 
 
 class CriticalSection {
-	PCRITICAL_SECTION section;
 	std::shared_ptr<CRITICAL_SECTION> counter;
 
 public:
-	CriticalSection() : section{ new CRITICAL_SECTION{} }{
-		InitializeCriticalSection(section);
-		counter = { section, [](PCRITICAL_SECTION section) mutable{
-			DeleteCriticalSection(section); 
-			delete section; } 
+	CriticalSection(){
+		counter = { 
+			new CRITICAL_SECTION{}, [](PCRITICAL_SECTION section) mutable {
+			    DeleteCriticalSection(section); 
+			    delete section; 
+		    }
 		};
+		InitializeCriticalSection(&*counter);
 	}
 
-	operator LPCRITICAL_SECTION() const { return const_cast<LPCRITICAL_SECTION>(section); }
+	operator LPCRITICAL_SECTION() const { return static_cast<LPCRITICAL_SECTION>(&*counter); }
 };
 
 class BeginCriticalSection {
@@ -141,6 +139,10 @@ public:
 
 	operator bool() const{
 		return Memory.has_value();
+	}
+
+	bool operator !() const{
+		return !static_cast<bool>(*this);
 	}
 
 	operator LPVOID() const{

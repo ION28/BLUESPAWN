@@ -72,19 +72,19 @@ std::wstring GetProcessCommandline(const HandleWrapper& process){
 
             ULONG_PTR pointer{};
             if(!ReadProcessMemory(process, &peb->ProcessParameters, &pointer, sizeof(pointer), nullptr)){
-                LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its command line (error " << GetLastError() << ")");
+                LOG_WARNING("Unable to read memory from process with PID " << GetProcessId(process) << " to find its command line (error " << GetLastError() << ")");
                 return {};
             }
             RTL_USER_PROCESS_PARAMETERS_ params{};
             if(!ReadProcessMemory(process, LPVOID(pointer), &params, sizeof(params), nullptr)){
-                LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its command line (error " << GetLastError() << ")");
+                LOG_WARNING("Unable to read memory from process with PID " << GetProcessId(process) << " to find its command line (error " << GetLastError() << ")");
                 return {};
             }
 
             DWORD dwLength = params.CommandLine.Length;
             auto cmdline = AllocationWrapper{ new WCHAR[dwLength / 2 + 1], dwLength + 2, AllocationWrapper::CPP_ARRAY_ALLOC };
             if(!ReadProcessMemory(process, params.CommandLine.Buffer, cmdline, dwLength, nullptr)){
-                LOG_ERROR("Unable to read memory from process with PID " << GetProcessId(process) << " to find its command line (error " << GetLastError() << ")");
+                LOG_WARNING("Unable to read memory from process with PID " << GetProcessId(process) << " to find its command line (error " << GetLastError() << ")");
                 return {};
             }
             cmdline.SetByte(dwLength, 0);
@@ -92,11 +92,11 @@ std::wstring GetProcessCommandline(const HandleWrapper& process){
 
             return std::wstring{ reinterpret_cast<PWCHAR>(LPVOID(cmdline)) };
         } else{
-            LOG_ERROR("Unable to query information from process with PID " << GetProcessId(process) << " to find its command line (error " << status << ")");
+            LOG_WARNING("Unable to query information from process with PID " << GetProcessId(process) << " to find its command line (error " << status << ")");
             return {};
         }
     } else{
-        LOG_ERROR("Unable to get command line of invalid process");
+        LOG_WARNING("Unable to get command line of invalid process");
         return {};
     }
 }
@@ -106,7 +106,7 @@ std::wstring GetProcessCommandline(DWORD dwPID){
     if(process){
         return GetProcessCommandline(process);
     } else{
-        LOG_ERROR("Unable to open process with PID " << dwPID << " to find its command line (error " << GetLastError() << ")");
+        LOG_WARNING("Unable to open process with PID " << dwPID << " to find its command line (error " << GetLastError() << ")");
         return {};
     }
 }
@@ -121,11 +121,11 @@ std::wstring GetProcessImage(const HandleWrapper& process){
         if(QueryFullProcessImageNameW(process, 0, name.data(), &dwSize)){
             return name.data();
         } else{
-            LOG_ERROR("Unable to get image path of process - " << SYSTEM_ERROR);
+            LOG_WARNING("Unable to get image path of process - " << SYSTEM_ERROR);
             return {};
         }
     } else {
-        LOG_ERROR("Unable to get image path of invalid process");
+        LOG_WARNING("Unable to get image path of invalid process");
         return {};
     }
 }
@@ -135,7 +135,7 @@ std::wstring GetProcessImage(DWORD dwPID){
     if(process){
         return GetProcessImage(process);
     } else {
-        LOG_ERROR("Unable to open process with PID " << dwPID << " to find its command line (error " << GetLastError() << ")");
+        LOG_WARNING("Unable to open process with PID " << dwPID << " to find its command line (error " << GetLastError() << ")");
         return {};
     }
 }
@@ -145,7 +145,7 @@ std::vector<std::wstring> EnumModules(DWORD dwPID){
     if(hProcess){
         return EnumModules(hProcess);
     } else {
-        LOG_ERROR("Unable to open process with PID " << dwPID << " to enumerate its modules (error " << GetLastError() << ")");
+        LOG_WARNING("Unable to open process with PID " << dwPID << " to enumerate its modules (error " << GetLastError() << ")");
         return {};
     }
 
@@ -168,11 +168,11 @@ std::vector<std::wstring> EnumModules(const HandleWrapper& hProcess){
             if(GetModuleFileNameExW(hProcess, mod, path, MAX_PATH)){
                 vModules.emplace_back(path);
             } else {
-                LOG_ERROR("Unable to get name of module at " << mod << " in process with PID " << GetProcessId(hProcess));
+                LOG_WARNING("Unable to get name of module at " << mod << " in process with PID " << GetProcessId(hProcess));
             }
         }
     } else {
-        LOG_ERROR("Unable to enumerate modules in process with PID " << GetProcessId(hProcess) << " (Error " << GetLastError() << ")");
+        LOG_WARNING("Unable to enumerate modules in process with PID " << GetProcessId(hProcess) << " (Error " << GetLastError() << ")");
     }
 
     return vModules;
@@ -183,7 +183,7 @@ LPVOID GetModuleAddress(DWORD dwPID, const std::wstring& wsModuleName){
     if(hProcess){
         return GetModuleAddress(hProcess, wsModuleName);
     } else {
-        LOG_ERROR("Unable to open process with PID " << dwPID << " to enumerate its modules (error " << GetLastError() << ")");
+        LOG_WARNING("Unable to open process with PID " << dwPID << " to enumerate its modules (error " << GetLastError() << ")");
         return {};
     }
 
@@ -206,14 +206,14 @@ LPVOID GetModuleAddress(const HandleWrapper& hProcess, const std::wstring& wsMod
                     return mod;
                 }
             } else {
-                LOG_ERROR("Unable to get name of module at " << mod << " in process with PID " << GetProcessId(hProcess));
+                LOG_WARNING("Unable to get name of module at " << mod << " in process with PID " << GetProcessId(hProcess));
             }
         }
     } else {
-        LOG_ERROR("Unable to enumerate modules in process with PID " << GetProcessId(hProcess) << " (Error " << GetLastError() << ")");
+        LOG_WARNING("Unable to enumerate modules in process with PID " << GetProcessId(hProcess) << " (Error " << GetLastError() << ")");
     }
 
-    LOG_ERROR("Unable to find address of module " << wsModuleName << " in process with PID " << GetProcessId(hProcess));
+    LOG_WARNING("Unable to find address of module " << wsModuleName << " in process with PID " << GetProcessId(hProcess));
     return nullptr;
 }
 
@@ -240,7 +240,7 @@ DWORD GetRegionSize(DWORD dwPID, LPVOID lpBaseAddress){
     if(hProcess){
         return GetRegionSize(hProcess, lpBaseAddress);
     } else {
-        LOG_ERROR("Unable to open process with PID " << dwPID << " to determine size of region at " << lpBaseAddress << " (error " << GetLastError() << ")");
+        LOG_WARNING("Unable to open process with PID " << dwPID << " to determine size of region at " << lpBaseAddress << " (error " << GetLastError() << ")");
         return {};
     }
 
@@ -251,7 +251,7 @@ std::optional<FileSystem::File> GetMappedFile(DWORD dwPID, LPVOID lpAllocationBa
     if(hProcess){
         return GetMappedFile(hProcess, lpAllocationBase);
     } else{
-        LOG_ERROR("Unable to open process with PID " << dwPID << " to determine size of region at " << lpAllocationBase << " (error " << GetLastError() << ")");
+        LOG_WARNING("Unable to open process with PID " << dwPID << " to determine size of region at " << lpAllocationBase << " (error " << GetLastError() << ")");
         return {};
     }
 }
@@ -278,10 +278,10 @@ namespace Utils::Process{
             if(::ReadProcessMemory(hProcess, lpBaseAddress, wrapper, dwSize, nullptr)){
                 return wrapper;
             } else {
-                LOG_ERROR("Unable to read memory at " << lpBaseAddress << " in process with PID " << GetProcessId(hProcess) << " (error " << GetLastError() << ")");
+                LOG_WARNING("Unable to read memory at " << lpBaseAddress << " in process with PID " << GetProcessId(hProcess) << " (error " << GetLastError() << ")");
             }
         } else {
-            LOG_ERROR("Unable to read memory from invalid process!");
+            LOG_WARNING("Unable to read memory from invalid process!");
         }
         return { nullptr, 0 };
     }
@@ -291,7 +291,7 @@ namespace Utils::Process{
         if(hProcess){
             return ReadProcessMemory(hProcess, lpBaseAddress, dwSize);
         } else {
-            LOG_ERROR("Unable to open process with PID " << dwPID << " to read memory at " << lpBaseAddress << " (error " << GetLastError() << ")");
+            LOG_WARNING("Unable to open process with PID " << dwPID << " to read memory at " << lpBaseAddress << " (error " << GetLastError() << ")");
             return { nullptr, 0 };
         }
     }
