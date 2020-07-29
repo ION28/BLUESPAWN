@@ -24,8 +24,7 @@ namespace Hunts {
                 for(auto value : f.GetFiles(std::nullopt, -1)) {
                     if(FileScanner::PerformQuickScan(value.GetFilePath())) {
                         CREATE_DETECTION_WITH_CONTEXT(Certainty::None, FileDetectionData{ value },
-                                                      DetectionContext{ GetName() + L" Subtechnique 005: Match "
-                                                                                    L"Legitimate Name or Location" });
+                                                      DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1036_005) });
                     }
                 }
             }

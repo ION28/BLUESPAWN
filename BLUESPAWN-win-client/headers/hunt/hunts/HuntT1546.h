@@ -18,9 +18,9 @@ namespace Hunts {
         private:
         std::wstring t1546_007 = L"007: Netsh Helper DLL";
         std::wstring t1546_008 = L"008: Accessibility Features";
-        std::wstring t1546_009 = L"008: AppCert DLLs";
+        std::wstring t1546_009 = L"009: AppCert DLLs";
         std::wstring t1546_010 = L"010: AppInit DLLs";
-        std::wstring t1546_011 = L"010: Application Shimming";
+        std::wstring t1546_011 = L"011: Application Shimming";
         std::wstring t1546_012 = L"012: Image File Execution Options Injection";
         std::wstring t1546_015 = L"015: Component Object Model Hijacking";
 
