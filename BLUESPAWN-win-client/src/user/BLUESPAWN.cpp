@@ -312,6 +312,10 @@ Aggressiveness GetAggressiveness(const cxxopts::OptionValue& value) {
     return aHuntLevel;
 }
 int main(int argc, char* argv[]) {
+    Log::LogLevel::LogError.Enable();
+    Log::LogLevel::LogWarn.Enable();
+    ThreadPool::GetInstance().AddExceptionHandler([](const auto& e){ LOG_ERROR(e.what()); });
+
     Bluespawn bluespawn{};
 
     print_banner();
