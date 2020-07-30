@@ -93,6 +93,10 @@ cleanup_stuff()
     #cleanup function
     #first cleanup externals
     rm -rf build
+    if [ -f "a.out" ];
+    then
+        rm a.out
+    fi
 
     cd BLUESPAWN-unix-client
     cd external/tinyxml2
