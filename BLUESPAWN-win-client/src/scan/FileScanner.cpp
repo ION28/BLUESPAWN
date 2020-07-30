@@ -202,7 +202,7 @@ bool IsPEFile(IN CONST FileSystem::File& file){
 
         auto headers{ file.Read(0x400) };
         MemoryWrapper<> memory{ static_cast<LPVOID>(headers), headers.GetSize() };
-        if(*memory.Convert<WORD>() != 0x5D4A){
+        if(*memory.Convert<WORD>() != 0x5A4D){
             return false;
         }
 
