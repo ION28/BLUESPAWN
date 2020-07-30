@@ -480,5 +480,5 @@ rule possibleIndicator
         description = "Artifacts common to web shells and less common in benign files"
 
     condition:
-        DodgyPhp or DangerousPhp or DodgyStrings
+		DodgyPhp or DangerousPhp or DodgyStrings
 }

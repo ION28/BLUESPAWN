@@ -53,8 +53,13 @@ namespace Log {
 
             if(detection->context.hunts.size()) {
                 std::wcout << L"\tDetected by: ";
+                short cnt = detection->context.hunts.size();
                 for(auto& hunt : detection->context.hunts) {
-                    std::wcout << hunt << L", ";
+                    cnt--;
+                    std::wcout << hunt;
+                    if(cnt > 0) {
+                        std::wcout << L", ";
+                    }
                 }
                 std::wcout << std::endl;
             }
