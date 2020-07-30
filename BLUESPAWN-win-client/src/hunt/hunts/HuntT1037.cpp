@@ -19,26 +19,31 @@ namespace Hunts {
         HUNT_INIT();
 
         // Looks for T1037.001: Logon Script (Windows)
-        for(auto& detection : CheckValues(HKEY_CURRENT_USER, L"Environment",
-                                          { { L"UserInitMprLogonScript", L"", false, CheckSzEmpty } }, true, true)) {
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong,
-                                          RegistryDetectionData{ detection.key, detection,
-                                                                 RegistryDetectionType::FileReference,
-                                                                 detection.key.GetRawValue(detection.wValueName) },
-                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1037_001) });
+        for(auto detection : CheckValues(HKEY_CURRENT_USER, L"Environment", { 
+            { L"UserInitMprLogonScript", L"", false, CheckSzEmpty } 
+        }, true, true)) {
+
+            // Moderate contextual certainty due to the infequency of use for this registry value in legitimate cases
+            CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate, RegistryDetectionData{ 
+                detection.key, 
+                detection,
+                RegistryDetectionType::FileReference,
+                detection.key.GetRawValue(detection.wValueName) 
+            }, DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1037_001) });
         }
 
-        std::vector<FileSystem::Folder> startup_directories = { FileSystem::Folder(
-            L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp") };
-        auto userFolders = FileSystem::Folder{ L"C:\\Users" }.GetSubdirectories(1);
+        std::vector<FileSystem::Folder> startupDirectories{};
+        auto userFolders{ FileSystem::Folder{ L"C:\\Users" }.GetSubdirectories(1) };
         for(auto userFolder : userFolders) {
-            FileSystem::Folder folder{ userFolder.GetFolderPath() + L"\\AppData\\Roaming\\Microsoft\\Windows\\Start "
-                                                                    L"Menu\\Programs\\StartUp" };
+            FileSystem::Folder folder{ 
+                userFolder.GetFolderPath() + L"\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp" };
             if(folder.GetFolderExists()) {
-                startup_directories.emplace_back(folder);
+                startupDirectories.emplace_back(folder);
             }
         }
-        for(auto folder : startup_directories) {
+
+        startupDirectories.emplace_back(L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp");
+        for(auto folder : startupDirectories) {
             LOG_VERBOSE(1, L"Scanning " << folder.GetFolderPath());
             for(auto value : folder.GetFiles(std::nullopt, -1)) {
                 CREATE_DETECTION(Certainty::None, FileDetectionData{ value });
