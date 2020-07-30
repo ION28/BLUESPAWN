@@ -9,9 +9,13 @@ ForEach($Technique in ($tests | ForEach-Object { $_.Technique } | get-unique)) {
 
 	$TechniqueTests = $tests | Where-Object { $_.Technique -eq $Technique }
 	$TechniqueTestCount = (($TechniqueTests | Measure).count)
+
+    $TechniqueMajor = $Technique.split(".")[0]
+    $TechniqueMinor = $Technique.split(".")[1]
 	
-	$TechniqueResults = $results.bluespawn.detection."associated-hunts" | Where-Object { $_.hunt -like "$Technique*" }
-	$TechniqueDetectionCount = (($TechniqueResults.detection | Measure).count)
+	$TechniqueResults = $results.bluespawn.detection."associated-hunts" | Where-Object { $_.hunt -like "$TechniqueMajor*" -and $_.hunt -like [string]"*$TechniqueMinor*" }
+
+	$TechniqueDetectionCount = (($TechniqueResults | Measure).count)
 	
 	if($TechniqueDetectionCount -ge $TechniqueTestCount) {
 		Write-Host "${TechniqueTestCount}/${TechniqueTestCount} Tests for Technique ${Technique}: PASSED"

@@ -32,42 +32,14 @@ namespace Hunts {
             }, DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1037_001) });
         }
 
-        std::vector<FileSystem::Folder> startupDirectories{};
-        auto userFolders{ FileSystem::Folder{ L"C:\\Users" }.GetSubdirectories(1) };
-        for(auto userFolder : userFolders) {
-            FileSystem::Folder folder{ 
-                userFolder.GetFolderPath() + L"\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp" };
-            if(folder.GetFolderExists()) {
-                startupDirectories.emplace_back(folder);
-            }
-        }
-
-        startupDirectories.emplace_back(L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp");
-        for(auto folder : startupDirectories) {
-            LOG_VERBOSE(1, L"Scanning " << folder.GetFolderPath());
-            for(auto value : folder.GetFiles(std::nullopt, -1)) {
-                CREATE_DETECTION(Certainty::None, FileDetectionData{ value });
-            }
-        }
-
         HUNT_END();
     }
 
     std::vector<std::unique_ptr<Event>> HuntT1037::GetMonitoringEvents() {
         std::vector<std::unique_ptr<Event>> events;
 
+        // Looks for T1037.001: Logon Script (Windows)
         Registry::GetRegistryEvents(events, HKEY_CURRENT_USER, L"Environment", true, true, false);
-        events.push_back(std::make_unique<FileEvent>(FileSystem::Folder{ L"C:\\ProgramData\\Microsoft\\Windows\\Start "
-                                                                         L"Menu\\Programs\\StartUp" }));
-
-        auto userFolders = FileSystem::Folder(L"C:\\Users").GetSubdirectories(1);
-        for(auto userFolder : userFolders) {
-            FileSystem::Folder folder{ userFolder.GetFolderPath() + L"\\AppData\\Roaming\\Microsoft\\Windows\\Start "
-                                                                    L"Menu\\Programs\\StartUp" };
-            if(folder.GetFolderExists()) {
-                events.push_back(std::make_unique<FileEvent>(folder));
-            }
-        }
 
         return events;
     }
