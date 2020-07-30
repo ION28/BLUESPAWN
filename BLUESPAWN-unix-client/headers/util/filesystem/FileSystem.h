@@ -4,6 +4,7 @@
 #include <vector>
 #include <optional>
 #include <set>
+#include <memory>
 
 #include "util/log/Loggable.h"
 #include "common/wrappers.hpp"
@@ -76,6 +77,8 @@ namespace FileSystem {
 		//Path of file
 		std::string FilePath;
 
+		std::shared_ptr<void> handler;
+
 		/**
 		 * helper function to check for masks on a file
 		 * @return true if the user would be able to access the file with one of the three masks provided
@@ -83,11 +86,6 @@ namespace FileSystem {
 		bool HasPermHelper(const Permissions::Owner &user, unsigned int userMask, unsigned int groupMask, unsigned int otherMask);
 
 	public:
-
-	    /**
-		 * Destructor - closes the file object
-		 */ 
-	    ~FileObject();
 
 		//NOTE: user refers to user or group
 	    /**
@@ -194,11 +192,6 @@ namespace FileSystem {
 		* @return true if the permissions were denied, false otherwise
 		*/
 		bool DenyPermissions(const ACCESS_MASK amAccess);
-
-		/**
-		 * Close the file object
-		 */ 
-		virtual void Close();
 
 		/**
 		 * NOTE: the only time this will return nullopt is if the path is "/"
@@ -407,8 +400,6 @@ namespace FileSystem {
 		* @return true if the file is quarantined, false otherwise
 		*/
 		bool Quarantine();
-
-		virtual void Close();
 	};
 
 	class Folder : public FileObject{
@@ -507,7 +498,5 @@ namespace FileSystem {
 		 *@return true if the contents of the file can be deleted by owner
 		 */ 
 		bool CanDeleteContents(const Permissions::Owner &owner);
-
-		virtual void Close();
 	};
 }

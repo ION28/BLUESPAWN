@@ -86,11 +86,6 @@ namespace FileSystem{
 		return std::nullopt;
 	}
 
-	void File::Close()
-	{
-		close(hFile);
-	}
-
 	std::optional<std::string> File::CalculateHashType(HashType sHashType) const {
 		if (!bFileExists) {
 			LOG_ERROR("Can't get hash of " << FilePath << ". File doesn't exist");
@@ -237,6 +232,8 @@ namespace FileSystem{
 			bReadAccess = true;
 		}
 
+		auto copy{ hFile };
+		handler = { nullptr, [copy](auto p){close(copy); }};
 	}
 
 	FileAttribs File::GetFileAttribs() const{
@@ -661,6 +658,9 @@ namespace FileSystem{
 			this->MoveToBeginning();
 		}
 
+		auto copy{ hDirectory };
+		handler = {nullptr, [copy](auto p){ closedir(copy);}};
+
 
 	}
 
@@ -835,18 +835,8 @@ namespace FileSystem{
 		return toRet;
 	}
 
-
-
-	void Folder::Close(){
-		closedir(hDirectory);
-	}
-
 	bool Folder::CanDeleteContents(const Permissions::Owner &user){
 		return CanExecute(user) && CanWrite(user);
-	}
-
-	FileObject::~FileObject(){
-		this->Close();
 	}
 
 	//NOTE: Make some sort of class heirarchy so that I dont have to reuse this method

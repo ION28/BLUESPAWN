@@ -8,9 +8,12 @@ cfiles="$cfiles src/common/DynamicLinker.cpp"
 cfiles="$cfiles src/hunt/Hunt.cpp"
 cfiles="$cfiles src/hunt/HuntRegister.cpp"
 cfiles="$cfiles src/hunt/Scope.cpp"
+cfiles="$cfiles src/mitigation/Mitigation.cpp"
+cfiles="$cfiles src/mitigation/MitigationRegister.cpp"
 cfiles="$cfiles src/monitor/EventManager.cpp"
 cfiles="$cfiles src/monitor/Event.cpp"
 cfiles="$cfiles src/monitor/EventListener.cpp"
+cfiles="$cfiles src/monitor/listen/Events.cpp"
 cfiles="$cfiles src/reaction/CarveMemory.cpp"
 cfiles="$cfiles src/reaction/QuarantineFile.cpp"
 cfiles="$cfiles src/reaction/SuspendProcess.cpp"
@@ -20,8 +23,6 @@ cfiles="$cfiles src/reaction/DeleteFile.cpp"
 cfiles="$cfiles src/user/BLUESPAWN.cpp"
 cfiles="$cfiles src/user/CLI.cpp"
 cfiles="$cfiles src/user/banners.cpp"
-cfiles="$cfiles src/mitigation/Mitigation.cpp"
-cfiles="$cfiles src/mitigation/MitigationRegister.cpp"
 cfiles="$cfiles src/util/configurations/CollectInfo.cpp"
 cfiles="$cfiles src/util/eventlogs/EventLogItem.cpp"
 cfiles="$cfiles src/util/eventlogs/EventSubscription.cpp"
@@ -38,11 +39,13 @@ cfiles="$cfiles src/util/log/XMLSink.cpp"
 cfiles="$cfiles src/util/log/LogLevel.cpp"
 cfiles="$cfiles src/util/log/HuntLogMessage.cpp"
 cfiles="$cfiles src/util/log/DebugSink.cpp"
+cfiles="$cfiles src/util/log/Log.cpp"
 cfiles="$cfiles src/util/filesystem/YaraScanner.cpp"
 cfiles="$cfiles src/util/filesystem/FileSystem.cpp"
 cfiles="$cfiles ../build/indicators.o ../build/severe.o"
+cfiles="$cfiles ../build/libyara.a ../build/libtinyxml2.a"
 incdirs="-I./headers/ -I./resources/ -I./external/tinyxml2/ -I./external/yara/libyara/include/ -I./external/cxxopts/include/"
-libs="-L.$orig_dir/build/tinyxml2.a -L$orig_dir/build/libyara.a"
+
 install_depends()
 {
     apt-get install make automake libtool gcc
@@ -107,7 +110,7 @@ cleanup_stuff()
 compile_actual()
 {
     cd BLUESPAWN-unix-client
-    g++ -std=c++2a $incdirs $libs $cfiles -o "$orig_dir/build/bluespawn.out"
+    g++ -std=c++2a $incdirs $cfiles -o "$orig_dir/build/bluespawn.out" -lcrypto -lpthread
     cd ..  
 }
 

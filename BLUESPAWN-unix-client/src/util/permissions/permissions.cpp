@@ -78,6 +78,35 @@ namespace Permissions {
 
 	Owner::Owner(const std::string& name, const bool& exists, const OwnerType& type, const uid_t id) : wName{ name }, bExists{ exists }, otType{ type }, id{ id } {}
 
+	Owner::Owner(){} 
+			
+	Owner::Owner(const std::string& name, const bool& exists, const OwnerType& type) : wName{ name }, bExists{ exists }, otType{ type }{
+		if(type == OwnerType::USER){
+			struct passwd * user = getpwnam(name.c_str());
+			if(!user){
+				LOG_VERBOSE(2, "User with id " << id << " does not exist.");
+				otType = OwnerType::NONE;
+				bExists = false;
+			}else{
+				bExists = true;
+				id = user->pw_uid;
+			}
+		}else if(type == OwnerType::GROUP){
+			struct group * group = getgrnam(name.c_str());
+			if(!group){
+				LOG_VERBOSE(2, "group with id " << id << " does not exist");
+				otType = OwnerType::NONE;
+				bExists = false;
+			}else{
+				bExists = true;
+				id = group->gr_gid;
+			}
+		}else{
+			LOG_ERROR("Invalid owner type");
+		}
+	}
+
+
 	bool Owner::operator==(const Owner& b) const{
 		return this->GetOwnerType() == b.GetOwnerType() && this->GetId() == b.GetId();
 	}
@@ -132,6 +161,10 @@ namespace Permissions {
 		SetupClass(user);
 	}
 
+	gid_t User::GetGroup() const{
+		return this->gid;
+	}
+
 	void User::SetupClass(const struct passwd * user){
 		otType = OwnerType::USER;
 		wName = std::string(user->pw_name);
@@ -141,48 +174,48 @@ namespace Permissions {
 		bExists = true;
 	}
 
-	bool User::Delete() const{
-		/**
-		 * Essentially an implementation of userdel.  Likely not going to work as coded but just a "sketch"
-		 */
+	// bool User::Delete() const{
+	// 	/**
+	// 	 * Essentially an implementation of userdel.  Likely not going to work as coded but just a "sketch"
+	// 	 */
 
-		if(this->GetId() == 0){
-			LOG_ERROR("Cannot delete " << this->GetName() << ": User is root");
-			return false;
-		}else if(this->GetId() < 1000){
-			//TODO: Ask the user if they actually want to delete this user
-			//UIDS below 1000 are usually reserved for system use
-			if(true){
-				return false;
-			}
-		}
+	// 	if(this->GetId() == 0){
+	// 		LOG_ERROR("Cannot delete " << this->GetName() << ": User is root");
+	// 		return false;
+	// 	}else if(this->GetId() < 1000){
+	// 		//TODO: Ask the user if they actually want to delete this user
+	// 		//UIDS below 1000 are usually reserved for system use
+	// 		if(true){
+	// 			return false;
+	// 		}
+	// 	}
 
-		//now attempt to open the needed files
-		lckpwdf();
-		FileSystem::File shadow = FileSystem::File(_PATH_SHADOW);
-		FileSystem::File group = FileSystem::File("/etc/group"); 
-		FileSystem::File passwd = FileSystem::File("/etc/passwd");
+	// 	//now attempt to open the needed files
+	// 	lckpwdf();
+	// 	FileSystem::File shadow = FileSystem::File(_PATH_SHADOW);
+	// 	FileSystem::File group = FileSystem::File("/etc/group"); 
+	// 	FileSystem::File passwd = FileSystem::File("/etc/passwd");
 
-		if(!shadow.GetFileExists() || !group.GetFileExists() || !passwd.GetFileExists()){
-			LOG_ERROR("Error deleting user " << this->GetName() << ": Unable to find important files");
-			ulckpwdf();
-			return false;
-		}
+	// 	if(!shadow.GetFileExists() || !group.GetFileExists() || !passwd.GetFileExists()){
+	// 		LOG_ERROR("Error deleting user " << this->GetName() << ": Unable to find important files");
+	// 		ulckpwdf();
+	// 		return false;
+	// 	}
 
-		if(!shadow.CanReadWrite(GetProcessOwner().value()) 
-			|| !passwd.CanReadWrite(GetProcessOwner().value()) 
-			|| !group.CanReadWrite(GetProcessOwner().value())){
-				LOG_ERROR("Unable to write or read to needed files.");
-				ulckpwdf();
-				return false;
-		}
+	// 	if(!shadow.CanReadWrite(GetProcessOwner().value()) 
+	// 		|| !passwd.CanReadWrite(GetProcessOwner().value()) 
+	// 		|| !group.CanReadWrite(GetProcessOwner().value())){
+	// 			LOG_ERROR("Unable to write or read to needed files.");
+	// 			ulckpwdf();
+	// 			return false;
+	// 	}
 
 		
 
 
-		ulckpwdf();
-		return true;
-	}
+	// 	ulckpwdf();
+	// 	return true;
+	// }
 
 	std::string User::GetHomeDir() const{
 		return this->homeDir;
@@ -236,9 +269,9 @@ namespace Permissions {
 		}
 	}
 
-	bool Group::Delete() const{
-		return false;
-	}
+	// bool Group::Delete() const{
+	//	return false;
+	// }
 
 	std::optional<Owner> GetProcessOwner() {
 		/**

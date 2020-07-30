@@ -1,20 +1,23 @@
 #include "util/log/Log.h"
+#include "common/StringUtils.h"
 #include <iostream>
 
 namespace Log {
 	std::vector<std::shared_ptr<Log::LogSink>> _LogCurrentSinks; 
 	LogTerminator endlog{};
 
-	LogMessage& LogMessage::operator<<(const std::string& message){
-		LPCWSTR lpwMessage = message.c_str();
-		LPSTR lpMessage = new CHAR[message.length() + 1]{};
-		WideCharToMultiByte(CP_ACP, 0, lpwMessage, static_cast<int>(message.length()), lpMessage, static_cast<int>(message.length()), 0, nullptr);
 
-		InternalStream << std::string(lpMessage);
+	LogMessage& LogMessage::operator<<(const std::string& message){
+		InternalStream << std::string(message);
 		return *this;
 	}
-	LogMessage& LogMessage::operator<<(PCWSTR pointer){
+
+	LogMessage& LogMessage::operator<<(char * pointer){
 		return operator<<(std::string(pointer));
+	}
+
+	LogMessage& LogMessage::operator<<(const std::wstring& message){
+		return operator<<(WidestringToString(message));
 	}
 	LogMessage& LogMessage::operator<<(const LogTerminator& terminator){
 		std::string message = InternalStream.str();

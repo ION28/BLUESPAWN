@@ -32,14 +32,12 @@ namespace Reactions{
 									LOG_ERROR("An error occurred while getting info for " << std::to_string(pid) << ".");
 								}else{
 									if(file == procInfo.GetProcessExecutable()){
-										procfolder.Close();
 										pids.emplace_back(pid);
 									}
 								}
 							}
 						}
 
-						procfolder.Close();
 					}
 				}
 			}while(procfs.MoveToNextFile());
@@ -47,7 +45,6 @@ namespace Reactions{
 			LOG_ERROR("Unable to open /proc - may not have permission");
 		}
 
-		procfs.Close();
 		return pids;
 	}
 

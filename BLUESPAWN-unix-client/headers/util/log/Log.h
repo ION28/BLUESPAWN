@@ -112,6 +112,8 @@ namespace Log {
 		 */
 		LogMessage& operator<<(const std::string& string);
 
+		LogMessage& operator<<(const std::wstring& message);
+
 		/**
 		 * StringStreams don't support wide strings, so this serves as a handler for
 		 * wide strings being logged.

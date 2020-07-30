@@ -1,4 +1,4 @@
-#include "Events.h"
+#include "monitor/listen/Events.h"
 #include <unistd.h>
 #include <string.h>
 #include <limits.h>
@@ -74,6 +74,8 @@ namespace Events{
         }else if(type == EventType::SystemCall){
             return number == other.number;
         }
+
+        return false;
     }
 
     int WaitForMultipleObjects(int nCount, Events::EventHandle * lpHandles, bool bWaitAll, int dwMilliSeconds){

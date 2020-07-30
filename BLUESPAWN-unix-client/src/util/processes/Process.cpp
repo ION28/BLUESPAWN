@@ -3,6 +3,7 @@
  * NOTE: Going to probably need a rewrite for BSD / MacOS compatibility
  */ 
 namespace Process{
+    
     ProcessInfo::ProcessInfo(pid_t pid){
         this->pid = pid;
         ReadProcExe();

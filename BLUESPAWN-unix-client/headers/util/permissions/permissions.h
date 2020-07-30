@@ -130,7 +130,7 @@ namespace Permissions{
 		 */
 		virtual std::string ToString() const;
 
-		virtual bool Delete() const;
+		//virtual bool Delete() const;
 	};
 
 	class User : public Owner {
@@ -162,7 +162,7 @@ namespace Permissions{
 		 */
 		gid_t GetGroup() const;
 
-		virtual bool Delete() const;
+		//virtual bool Delete() const;
 
 		std::string GetHomeDir() const;
 	};
@@ -195,7 +195,7 @@ namespace Permissions{
 		 */ 
 		std::vector<std::string> GetMembers() const;
 
-		virtual bool Delete() const;
+		//virtual bool Delete() const;
 	};
 
 	/**
