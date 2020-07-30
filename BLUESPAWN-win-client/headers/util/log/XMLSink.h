@@ -20,6 +20,9 @@ namespace Log {
 		/// The root element in the XML document
 		tinyxml2::XMLElement* Root;
 
+		/// The element to which logs will be added
+		tinyxml2::XMLElement* LogRoot;
+
 		/// The name of the file to which the XML will be written
 		std::wstring wFileName;
 

@@ -27,7 +27,7 @@ namespace Log {
     }
 
     XMLSink::XMLSink() :
-        Root{ XMLDoc.NewElement("bluespawn") }, thread{
+        Root{ XMLDoc.NewElement("bluespawn") }, LogRoot{ XMLDoc.NewElement("log-messages") }, thread{
             CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr)
         } {
         SYSTEMTIME time{};
@@ -36,13 +36,13 @@ namespace Log {
                     ToWstringPad(time.wYear, 4) + L"-" + ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + L"-" +
                     ToWstringPad(time.wSecond) + L".xml";
         XMLDoc.InsertEndChild(Root);
+        Root->InsertEndChild(LogRoot);
         ResumeThread(thread);
     }
 
     XMLSink::XMLSink(const std::wstring& wFileName) :
-        Root{ XMLDoc.NewElement("bluespawn") }, wFileName{ wFileName }, thread{
-            CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr)
-        } {
+        Root{ XMLDoc.NewElement("bluespawn") }, wFileName{ wFileName }, LogRoot{ XMLDoc.NewElement("log-messages") },
+        thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr) } {
         XMLDoc.InsertEndChild(Root);
     }
 
@@ -51,7 +51,9 @@ namespace Log {
         TerminateThread(thread, 0);
     }
 
-    void InsertElement(IN tinyxml2::XMLDocument& XMLDoc, IN tinyxml2::XMLElement* parent, IN CONST std::string& name,
+    void InsertElement(IN tinyxml2::XMLDocument& XMLDoc,
+                       IN tinyxml2::XMLElement* parent,
+                       IN CONST std::string& name,
                        IN CONST std::wstring& value) {
         auto elem{ XMLDoc.NewElement(name.c_str()) };
         elem->SetText(WidestringToString(value).c_str());
@@ -64,10 +66,10 @@ namespace Log {
         if(detections.find(detection->dwID) != detections.end()) {
             for(auto child{ detections.at(detection->dwID)->FirstChildElement() }; child;
                 child = child->NextSiblingElement()) {
-                if(child->Name() == std::string{ "certainty" }){
+                if(child->Name() == std::string{ "certainty" }) {
                     child->SetText(detection->info.GetCertainty());
                 }
-                if(child->Name() == std::string{ "raw-certainty" }){
+                if(child->Name() == std::string{ "raw-certainty" }) {
                     child->SetText(detection->info.GetIntrinsicCertainty());
                 }
             }
@@ -124,12 +126,17 @@ namespace Log {
             detect->SetAttribute("prescan", true);
         }
 
-        detect->SetAttribute("type", (detection->type == DetectionType::FileDetection ? "File" :
-                                      detection->type == DetectionType::ProcessDetection ? "Process" :
-                                      detection->type == DetectionType::RegistryDetection ? "Registry" :
-                                      detection->type == DetectionType::ServiceDetection ? "Service" :
-                                      WidestringToString(std::get<OtherDetectionData>(detection->data).DetectionType))
-                                         .c_str());
+        detect->SetAttribute("type",
+                             (detection->type == DetectionType::FileDetection ?
+                                  "File" :
+                                  detection->type == DetectionType::ProcessDetection ?
+                                  "Process" :
+                                  detection->type == DetectionType::RegistryDetection ?
+                                  "Registry" :
+                                  detection->type == DetectionType::ServiceDetection ?
+                                  "Service" :
+                                  WidestringToString(std::get<OtherDetectionData>(detection->data).DetectionType))
+                                 .c_str());
 
         detect->SetAttribute("id", std::to_string(detection->dwID).c_str());
         detect->SetAttribute("time",
@@ -210,7 +217,7 @@ namespace Log {
             msg->SetAttribute("time", WidestringToString(FormatWindowsTime(time)).c_str());
 
             msg->SetText(WidestringToString(message).c_str());
-            Root->InsertEndChild(msg);
+            LogRoot->InsertEndChild(msg);
         }
     }
 

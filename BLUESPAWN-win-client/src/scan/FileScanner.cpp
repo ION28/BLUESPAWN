@@ -139,7 +139,7 @@ bool FileScanner::PerformQuickScan(IN CONST std::wstring& string) {
 
 std::unordered_map<std::shared_ptr<Detection>, Association>
 FileScanner::GetAssociatedDetections(IN CONST Detection& detection) {
-    if(detection.type != DetectionType::FileDetection) {
+    if(detection.type != DetectionType::FileDetection || detection.info.certainty < Certainty::Moderate) {
         return {};
     }
 
@@ -178,25 +178,44 @@ FileScanner::GetAssociatedDetections(IN CONST Detection& detection) {
             }
         }
 
-        if(!detection.DetectionStale && data.FileHandle && Bluespawn::aggressiveness == Aggressiveness::Intensive &&
-           false) {
+        if(!detection.DetectionStale && data.FileHandle && Bluespawn::aggressiveness == Aggressiveness::Intensive) {
             auto strings = ExtractStrings(data.FileHandle->Read(), 8);
             auto filenames = ExtractFilePaths(strings);
             for(auto& filename : filenames) {
-                detections.emplace(Bluespawn::detections.AddDetection(Detection{ FileDetectionData{ filename } }),
-                                   Association::Moderate);
-            }
-
-            auto keynames = RegistryScanner::ExtractRegistryKeys(strings);
-            for(auto keyname : keynames) {
-                detections.emplace(Bluespawn::detections.AddDetection(
-                                       Detection{ RegistryDetectionData{ Registry::RegistryKey{ keyname } } }),
-                                   Association::Moderate);
+                if(FileScanner::PerformQuickScan(filename)){
+                    detections.emplace(Bluespawn::detections.AddDetection(Detection{ FileDetectionData{ filename } }),
+                                       Association::Weak);
+                }
             }
         }
     }
 
     return detections;
+}
+
+bool IsPEFile(IN CONST FileSystem::File& file){
+    if(file.GetFileExists()){
+        if(!file.HasReadAccess()){
+            LOG_WARNING(L"Unable to properly scan " << file << L" due to lack of read access.");
+            return false;
+        }
+
+        auto headers{ file.Read(0x400) };
+        MemoryWrapper<> memory{ static_cast<LPVOID>(headers), headers.GetSize() };
+        if(*memory.Convert<WORD>() != 0x5D4A){
+            return false;
+        }
+
+        DWORD offset{ *memory.GetOffset(0x3C).Convert<DWORD>() };
+        if(offset + 4 >= 0x400){
+            LOG_INFO(2, "File " << file << " may conform to the PE32+ standard, but it is not normal PE.");
+            return false;
+        }
+
+        return *memory.GetOffset(offset).Convert<DWORD>() == 0x4550UL;
+    } else{
+        return false;
+    }
 }
 
 Certainty FileScanner::ScanDetection(IN CONST Detection& detection) {
@@ -207,16 +226,24 @@ Certainty FileScanner::ScanDetection(IN CONST Detection& detection) {
             return Certainty::None;
         }
 
-        if(file.Executor) {
-            if(ProcessScanner::PerformQuickScan(*file.Executor)) {
+        if(IsPEFile(*file.FileHandle)){
+            if(file.FileHandle->IsMicrosoftSigned()){
+                return Certainty::None;
+            }
+            if(!*file.FileSigned){
                 certainty = certainty + Certainty::Moderate;
             }
-        }
-
-        if(file.yara) {
-            for(auto& rule : file.yara->vKnownBadRules) {
-                // Tune this!
-                certainty = certainty + Certainty::Moderate;
+            if(file.yara){
+                for(auto& rule : file.yara->vKnownBadRules){
+                    // Tune this!
+                    certainty = certainty + Certainty::Moderate;
+                }
+            }
+        } else{
+            if(file.Executor){
+                if(ProcessScanner::PerformQuickScan(*file.Executor)){
+                    certainty = certainty + Certainty::Moderate;
+                }
             }
         }
 

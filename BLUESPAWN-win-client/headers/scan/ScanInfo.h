@@ -90,7 +90,11 @@ class ScanInfo {
 	CriticalSection hGuard;
 
 	friend class DetectionRegister;
-	friend class Scanner;
+	friend class RegistryScanner;
+	friend class FileScanner;
+	friend class ProcessScanner;
+	friend class MemoryScanner;
+	friend class ServiceScanner;
 	friend class Detection;
 
 public:

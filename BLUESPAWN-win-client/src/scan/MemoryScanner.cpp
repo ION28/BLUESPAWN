@@ -1,10 +1,9 @@
 #include "scan/MemoryScanner.h"
 
-#include "util/wrappers.hpp"
-
 #include "util/configurations/Registry.h"
 #include "util/filesystem/FileSystem.h"
 #include "util/processes/ProcessUtils.h"
+#include "util/wrappers.hpp"
 
 #include "hunt/Hunt.h"
 #include "scan/FileScanner.h"
@@ -14,10 +13,14 @@
 
 std::unordered_map<std::shared_ptr<Detection>, Association>
 MemoryScanner::GetAssociatedDetections(IN CONST Detection& detection) {
-    if(detection.type != DetectionType::ProcessDetection || detection.DetectionStale) { return {}; }
+    if(detection.type != DetectionType::ProcessDetection || detection.DetectionStale) {
+        return {};
+    }
 
     ProcessDetectionData data{ std::get<ProcessDetectionData>(detection.data) };
-    if(!data.BaseAddress || !data.MemorySize) { return {}; }
+    if(!data.BaseAddress || !data.MemorySize) {
+        return {};
+    }
 
     std::unordered_map<std::shared_ptr<Detection>, Association> detections{};
 
@@ -29,29 +32,25 @@ MemoryScanner::GetAssociatedDetections(IN CONST Detection& detection) {
             detections.emplace(Bluespawn::detections.AddDetection(
                                    Detection{ FileDetectionData{ *data.ImageName },
                                               DetectionContext{ std::nullopt, detection.context.FirstEvidenceTime,
-                                                                L"This image appears to have been"
-                                                                " modified to behave maliciously, so while it's "
-                                                                "possible this file is malicious, this detection "
-                                                                "created to serve as an IoC" } }),
+                                                                L"This image appears to have been modified to behave "
+                                                                "maliciously, so while it's possible this file is "
+                                                                "malicious, this detection was created to serve as an "
+                                                                "IoC" } }),
                                Association::Moderate);
         }
     }
 
-    if(Bluespawn::aggressiveness > Aggressiveness::Normal && data.ProcessHandle) {
+    if(Bluespawn::aggressiveness > Aggressiveness::Normal && data.ProcessHandle &&
+       detection.info.certainty >= Certainty::Moderate) {
         auto memory{ Utils::Process::ReadProcessMemory(*data.ProcessHandle, *data.BaseAddress, *data.MemorySize) };
         if(memory) {
             auto strings = FileScanner::ExtractStrings(memory, 8);
             auto filenames = FileScanner::ExtractFilePaths(strings);
             for(auto& filename : filenames) {
-                detections.emplace(Bluespawn::detections.AddDetection(Detection{ FileDetectionData{ filename } }),
-                                   Association::Moderate);
-            }
-
-            auto keynames = RegistryScanner::ExtractRegistryKeys(strings);
-            for(auto keyname : keynames) {
-                detections.emplace(Bluespawn::detections.AddDetection(
-                                       Detection{ RegistryDetectionData{ Registry::RegistryKey{ keyname } } }),
-                                   Association::Moderate);
+                if(FileScanner::PerformQuickScan(filename)) {
+                    detections.emplace(Bluespawn::detections.AddDetection(Detection{ FileDetectionData{ filename } }),
+                                       Association::Weak);
+                }
             }
         }
     }
@@ -68,10 +67,14 @@ bool MemoryScanner::PerformQuickScan(IN CONST std::wstring& in) {
 #define IS_PAGE_WRITEABLE(prot) (prot & 0xCC)
 
 Certainty MemoryScanner::ScanDetection(IN CONST Detection& detection) {
-    if(detection.type != DetectionType::ProcessDetection || detection.DetectionStale) { return Certainty::None; }
+    if(detection.type != DetectionType::ProcessDetection || detection.DetectionStale) {
+        return Certainty::None;
+    }
 
     ProcessDetectionData data{ std::get<ProcessDetectionData>(detection.data) };
-    if(!data.BaseAddress || !data.MemorySize || !data.ProcessHandle) { return Certainty::None; }
+    if(!data.BaseAddress || !data.MemorySize || !data.ProcessHandle) {
+        return Certainty::None;
+    }
 
     Certainty certainty{ Certainty::None };
 

@@ -485,7 +485,7 @@ struct RegistryDetectionData {
 	 *
 	 * @return True if the data is equal to this; false otherwise
 	 */
-	bool operator==(const RegistryDetectionData& detection) const = default;
+	bool operator==(const RegistryDetectionData& detection) const;
 
 private:
 
