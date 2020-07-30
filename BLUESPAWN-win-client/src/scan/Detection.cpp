@@ -14,8 +14,13 @@ size_t ComputeHash(IN CONST std::map<std::wstring, std::wstring>& map) {
     for(auto& pair : map) {
         auto first{ hasher(pair.first) };
         auto second{ hasher(pair.second) };
+#ifdef _WIN64
         hash = ((hash << 35) | (hash >> 29)) ^ ((first >> 32) | ((first << 32) >> 32)) ^
                ((second << 32) | ((second >> 32) << 32));
+#else
+        hash = ((hash << 19) | (hash >> 13)) ^ ((first >> 16) | ((first << 16) >> 16)) ^
+            ((second << 16) | ((second >> 16) << 16));
+#endif
     }
 
     return hash;
@@ -27,7 +32,11 @@ size_t ComputeHash(IN CONST std::vector<std::wstring>& values){
     std::hash<std::wstring> hasher{};
     for(auto& val : values){
         auto first{ hasher(val) };
+#ifdef _WIN64
         hash = ((hash << 35) | (hash >> 29)) ^ ((first >> 32) | ((first << 32) >> 32));
+#else
+        hash = ((hash << 19) | (hash >> 14)) ^ ((first >> 16) | ((first << 16) >> 16));
+#endif
     }
 
     return hash;

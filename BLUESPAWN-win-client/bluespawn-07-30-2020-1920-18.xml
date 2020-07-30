@@ -1,0 +1,442 @@
+<bluespawn>
+    <log-messages>
+        <info detail="low" time="2020-07-30 19:20:23.800Z">Skipping hunt for T1036 - Masquerading; rerun BLUESPAWN at Intensive to run this hunt</info>
+        <info detail="low" time="2020-07-30 19:20:23.1200Z">Beginning hunt for T1037 - Boot or Logon Initialization Scripts</info>
+        <info detail="low" time="2020-07-30 19:20:23.1400Z">Beginning hunt for T1053 - Scheduled Task/Job</info>
+        <info detail="low" time="2020-07-30 19:20:23.1700Z">Beginning hunt for T1055 - Process Injection</info>
+        <info detail="low" time="2020-07-30 19:20:23.2000Z">Beginning hunt for T1068 - Exploitation for Privilege Escalation</info>
+        <info detail="low" time="2020-07-30 19:20:23.2200Z">Beginning hunt for T1070 - Indicator Removal on Host</info>
+        <warning time="2020-07-30 19:20:23.2500Z">EventLogs::QueryEvents: Unable to find channel Microsoft-Windows-Sysmon/Operational</warning>
+        <info detail="low" time="2020-07-30 19:20:23.2600Z">Beginning hunt for T1136 - Create Account</info>
+        <warning time="2020-07-30 19:20:23.3800Z">Unable to scan process 4 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:23.4000Z">Skipping scans for process with PID 8996.</warning>
+        <warning time="2020-07-30 19:20:23.4000Z">Skipping scans for process with PID 9020.</warning>
+        <warning time="2020-07-30 19:20:23.4300Z">Unable to scan process 72 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:23.4400Z">Unable to scan process 0 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:23.4600Z">Unable to scan process 780 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:23.4900Z">Skipping scans for process with PID 2092.</warning>
+        <warning time="2020-07-30 19:20:23.4900Z">Unable to scan process 132 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:23.5100Z">Unable to scan process 504 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:23.6900Z">Unable to scan process 876 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:23.7200Z">Unable to scan process 868 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:23.9100Z">Unable to scan process 940 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:27.4600Z">Unable to scan process 2832 due to an error in PE-Sieve.dll</warning>
+        <info detail="low" time="2020-07-30 19:20:29.63500Z">Beginning hunt for T1484 - Group Policy Modification</info>
+        <warning time="2020-07-30 19:20:29.83100Z">Unable to scan process 4972 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:30.76900Z">Unable to scan process 5388 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:31.63100Z">Unable to scan process 2592 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:32.17800Z">Skipped scanning 35 modules in process 5044. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:32.17800Z">Skipped scanning 46 modules in process 5068. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:32.88500Z">Unable to scan process 4868 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:32.89900Z">Unable to scan process 8240 due to an error in PE-Sieve.dll</warning>
+        <warning time="2020-07-30 19:20:33.5700Z">Unable to scan process 3128 due to an error in PE-Sieve.dll</warning>
+        <info detail="low" time="2020-07-30 19:20:33.48600Z">Beginning hunt for T1505 - Server Software Component</info>
+        <warning time="2020-07-30 19:20:36.65400Z">Skipped scanning 411 modules in process 6892. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:36.69200Z">Skipped scanning 37 modules in process 9416. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:39.2500Z">Skipped scanning 1 modules in process 11640. This is likely due to use of .NET</warning>
+        <info detail="low" time="2020-07-30 19:20:41.78700Z">Beginning hunt for T1543 - Create or Modify System Process</info>
+        <warning time="2020-07-30 19:20:42.89800Z">Skipped scanning 1 modules in process 13244. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:47.76000Z">Skipped scanning 9 modules in process 14016. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:47.76000Z">Skipped scanning 38 modules in process 13632. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:47.76200Z">Skipped scanning 3 modules in process 12372. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:47.76300Z">Skipped scanning 71 modules in process 9696. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:47.76400Z">Skipped scanning 7 modules in process 14372. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:47.76500Z">Skipped scanning 7 modules in process 13384. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:48.79100Z">Skipped scanning 10 modules in process 16336. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:20:48.79200Z">Skipped scanning 1 modules in process 15028. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.16200Z">Skipped scanning 217 modules in process 20344. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.16200Z">Skipped scanning 22 modules in process 16668. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.16300Z">Skipped scanning 40 modules in process 14916. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.16300Z">Skipped scanning 159 modules in process 5504. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.16400Z">Skipped scanning 238 modules in process 2264. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.16500Z">Skipped scanning 21 modules in process 13380. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.16500Z">Skipped scanning 21 modules in process 13564. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.16600Z">Skipped scanning 153 modules in process 8900. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.16700Z">Skipped scanning 164 modules in process 16016. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.16700Z">Skipped scanning 238 modules in process 17648. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.16800Z">Skipped scanning 125 modules in process 5224. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.48500Z">Skipped scanning 306 modules in process 12672. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:03.48600Z">Skipped scanning 136 modules in process 15964. This is likely due to use of .NET</warning>
+        <info detail="low" time="2020-07-30 19:21:07.83300Z">Beginning hunt for T1546 - Event Triggered Execution</info>
+        <info detail="low" time="2020-07-30 19:21:08.800Z">Beginning hunt for T1547 - Boot or Logon Autostart Execution</info>
+        <info detail="low" time="2020-07-30 19:21:08.52600Z">Skipping hunt for T1553 - Subvert Trust Controls; rerun BLUESPAWN at Intensive to run this hunt</info>
+        <info detail="low" time="2020-07-30 19:21:08.52600Z">Beginning hunt for T1562 - Impair Defenses</info>
+        <info detail="low" time="2020-07-30 19:21:08.52700Z">Beginning hunt for T1569 - Service Execution</info>
+        <error time="2020-07-30 19:21:08.83500Z">Unable to properly scan command `cmd.exe /C %windir%\NvContainerRecovery.bat NvContainerLocalSystem C:\ProgramData\NVIDIA\NvContainerRecoveryNvContainerLocalSystem.log`; function not implemented</error>
+        <error time="2020-07-30 19:21:08.85400Z">Unable to properly scan command `cmd.exe /C %windir%\NvContainerRecovery.bat NVDisplay.ContainerLocalSystem C:\ProgramData\NVIDIA\NvContainerRecoveryNVDisplay.ContainerLocalSystem.log`; function not implemented</error>
+        <error time="2020-07-30 19:21:08.87900Z">Unable to properly scan command `"C:\Program Files\vm-support.vbs"`; function not implemented</error>
+        <info detail="low" time="2020-07-30 19:21:08.91800Z">C:\Program Files\vm-support.vbs matches known malicious identifier possibleIndicator</info>
+        <error time="2020-07-30 19:21:08.95800Z">Unable to properly scan command `"C:\Program Files\OpenVPN Connect\agent_ovpnconnect_1582126374677.exe"`; function not implemented</error>
+        <warning time="2020-07-30 19:21:09.10800Z">Unable to open process with PID 0 to enumerate its modules (error 87)</warning>
+        <warning time="2020-07-30 19:21:09.10800Z">Unable to open process with PID 4 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:09.10800Z">Unable to open process with PID 72 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:09.10800Z">Unable to open process with PID 132 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:09.10900Z">Unable to open process with PID 504 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:09.10900Z">Unable to open process with PID 780 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:09.10900Z">Unable to open process with PID 868 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:09.10900Z">Unable to open process with PID 876 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:09.11000Z">Unable to open process with PID 940 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:09.11000Z">Unable to enumerate modules in process with PID 960 (Error 998)</warning>
+        <error time="2020-07-30 19:21:09.23400Z">Unable to properly scan command `"C:\Program Files\OpenVPN Connect\agent_ovpnconnect_1582126374677.exe" `; function not implemented</error>
+        <error time="2020-07-30 19:21:10.62100Z">Unable to properly scan command `%systemroot%\system32\msiexec.exe /V`; function not implemented</error>
+        <warning time="2020-07-30 19:21:10.82500Z">Unable to open process with PID 2832 to enumerate its modules (error 5)</warning>
+        <error time="2020-07-30 19:21:10.85600Z">Unable to properly scan command `"C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe"`; function not implemented</error>
+        <error time="2020-07-30 19:21:11.14900Z">Unable to properly scan command `"C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe" `; function not implemented</error>
+        <warning time="2020-07-30 19:21:11.14900Z">Skipped scanning 248 modules in process 17764. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:11.15000Z">Skipped scanning 22 modules in process 20160. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:11.15000Z">Skipped scanning 40 modules in process 2956. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:11.15100Z">Skipped scanning 150 modules in process 19500. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:11.15200Z">Skipped scanning 238 modules in process 24344. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:11.15200Z">Skipped scanning 159 modules in process 4548. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:11.15300Z">Skipped scanning 125 modules in process 23700. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:11.15300Z">Skipped scanning 150 modules in process 15488. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:11.15400Z">Skipped scanning 238 modules in process 23596. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:11.15500Z">Skipped scanning 160 modules in process 19652. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:11.15600Z">Unable to properly scan C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe due to lack of read access.</warning>
+        <warning time="2020-07-30 19:21:11.28700Z">Skipped scanning 306 modules in process 20460. This is likely due to use of .NET</warning>
+        <warning time="2020-07-30 19:21:12.10600Z">Unable to open process with PID 4972 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:12.63500Z">Unable to open process with PID 5388 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:12.93300Z">Unable to open process with PID 2592 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:13.14600Z">Unable to enumerate modules in process with PID 8996 (Error 299)</warning>
+        <warning time="2020-07-30 19:21:13.14600Z">Unable to enumerate modules in process with PID 9020 (Error 299)</warning>
+        <warning time="2020-07-30 19:21:13.30100Z">Unable to open process with PID 4868 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:13.33500Z">Unable to open process with PID 8240 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:13.41400Z">Unable to open process with PID 3128 to enumerate its modules (error 5)</warning>
+        <warning time="2020-07-30 19:21:13.59400Z">Unable to enumerate modules in process with PID 2092 (Error 299)</warning>
+        <warning time="2020-07-30 19:21:26.17000Z">Unable to find address of module c:\program files\openvpn connect\agent_ovpnconnect_1582126374677.exe in process with PID 4728</warning>
+        <warning time="2020-07-30 19:21:26.30800Z">Unable to find address of module c:\windows\system32\enppmon.dll in process with PID 4376</warning>
+    </log-messages>
+    <detection type="Registry" id="5" time="2020-07-30 23:20:42.340Z">
+        <certainty>0.5</certainty>
+        <raw-certainty>0.5</raw-certainty>
+        <associated-hunts>
+            <hunt>T1543 - Create or Modify System Process Subtechnique 003: Windows Service</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Key Path">HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\NvContainerLocalSystem</property>
+            <property name="Key Value Data">cmd.exe /C %windir%\NvContainerRecovery.bat NvContainerLocalSystem C:\ProgramData\NVIDIA\NvContainerRecoveryNvContainerLocalSystem.log</property>
+            <property name="Key Value Name">FailureCommand</property>
+            <property name="Registry Entry Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">16</association>
+        </associated-detections>
+    </detection>
+    <detection type="Registry" id="6" time="2020-07-30 23:20:42.369Z">
+        <certainty>0.5</certainty>
+        <raw-certainty>0.5</raw-certainty>
+        <associated-hunts>
+            <hunt>T1543 - Create or Modify System Process Subtechnique 003: Windows Service</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Key Path">HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\NVDisplay.ContainerLocalSystem</property>
+            <property name="Key Value Data">cmd.exe /C %windir%\NvContainerRecovery.bat NVDisplay.ContainerLocalSystem C:\ProgramData\NVIDIA\NvContainerRecoveryNVDisplay.ContainerLocalSystem.log</property>
+            <property name="Key Value Name">FailureCommand</property>
+            <property name="Registry Entry Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">17</association>
+        </associated-detections>
+    </detection>
+    <detection type="Registry" id="7" time="2020-07-30 23:20:42.507Z">
+        <certainty>0.5</certainty>
+        <raw-certainty>0.5</raw-certainty>
+        <associated-hunts>
+            <hunt>T1543 - Create or Modify System Process Subtechnique 003: Windows Service</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Key Path">HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\VMwareHostd</property>
+            <property name="Key Value Data">"C:\Program Files\vm-support.vbs"</property>
+            <property name="Key Value Name">FailureCommand</property>
+            <property name="Registry Entry Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">18</association>
+        </associated-detections>
+    </detection>
+    <detection type="Service" id="8" time="2020-07-30 23:20:46.933Z">
+        <first-evidence-time>1601-01-01 00:00:00.0Z</first-evidence-time>
+        <certainty>0.500000</certainty>
+        <raw-certainty>0.500000</raw-certainty>
+        <associated-hunts>
+            <hunt>T1543 - Create or Modify System Process Subtechnique 003: Windows Service</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Display Name">OpenVPN Access Client</property>
+            <property name="Service Executable">C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe</property>
+        </associated-data>
+    </detection>
+    <detection type="Service" id="9" time="2020-07-30 23:20:47.477Z">
+        <first-evidence-time>1601-01-01 00:00:00.0Z</first-evidence-time>
+        <certainty>0.500000</certainty>
+        <raw-certainty>0.500000</raw-certainty>
+        <associated-hunts>
+            <hunt>T1543 - Create or Modify System Process Subtechnique 003: Windows Service</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Display Name">OpenVPN Agent agent_ovpnconnect</property>
+            <property name="Service Executable">C:\Program Files\OpenVPN Connect\agent_ovpnconnect_1582126374677.exe</property>
+        </associated-data>
+    </detection>
+    <detection type="Service" id="10" time="2020-07-30 23:20:48.38Z">
+        <first-evidence-time>1601-01-01 00:00:00.0Z</first-evidence-time>
+        <note>Most if not all svchost services should come preinstalled and therefore should not show up in the event logs. However, this can sometimes happen legitimately</note>
+        <certainty>0.750000</certainty>
+        <raw-certainty>0.750000</raw-certainty>
+        <associated-hunts>
+            <hunt>T1543 - Create or Modify System Process Subtechnique 003: Windows Service</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Display Name">Printer Extensions and Notifications</property>
+            <property name="Service Executable">C:\WINDOWS\system32\svchost.exe</property>
+        </associated-data>
+    </detection>
+    <detection type="Registry" id="11" time="2020-07-30 23:21:07.849Z">
+        <certainty>1</certainty>
+        <raw-certainty>1</raw-certainty>
+        <associated-hunts>
+            <hunt>T1546 - Event Triggered Execution Subtechnique 008: Accessibility Features</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Key Path">HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\sethc.exe</property>
+            <property name="Key Value Data">1234</property>
+            <property name="Key Value Name">Debugger</property>
+            <property name="Registry Entry Type">Command</property>
+        </associated-data>
+    </detection>
+    <detection type="Registry" id="15" time="2020-07-30 23:21:08.640Z">
+        <certainty>0.5</certainty>
+        <raw-certainty>0.5</raw-certainty>
+        <associated-hunts>
+            <hunt>T1569 - Service Execution Subtechnique 002: Service Execution</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Key Path">HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\agent_ovpnconnect</property>
+            <property name="Key Value Data">"C:\Program Files\OpenVPN Connect\agent_ovpnconnect_1582126374677.exe"</property>
+            <property name="Key Value Name">ImagePath</property>
+            <property name="Registry Entry Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">19</association>
+        </associated-detections>
+    </detection>
+    <detection type="Process" id="16" time="2020-07-30 23:21:08.753Z">
+        <certainty>0.500000</certainty>
+        <raw-certainty>0.000000</raw-certainty>
+        <associated-data>
+            <property name="Process Command">cmd.exe /C %windir%\NvContainerRecovery.bat NvContainerLocalSystem C:\ProgramData\NVIDIA\NvContainerRecoveryNvContainerLocalSystem.log</property>
+            <property name="Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">5</association>
+        </associated-detections>
+    </detection>
+    <detection type="Process" id="17" time="2020-07-30 23:21:08.780Z">
+        <certainty>0.500000</certainty>
+        <raw-certainty>0.000000</raw-certainty>
+        <associated-data>
+            <property name="Process Command">cmd.exe /C %windir%\NvContainerRecovery.bat NVDisplay.ContainerLocalSystem C:\ProgramData\NVIDIA\NvContainerRecoveryNVDisplay.ContainerLocalSystem.log</property>
+            <property name="Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">6</association>
+        </associated-detections>
+    </detection>
+    <detection type="Process" id="18" time="2020-07-30 23:21:08.808Z">
+        <certainty>0.5</certainty>
+        <raw-certainty>0</raw-certainty>
+        <associated-data>
+            <property name="Process Command">"C:\Program Files\vm-support.vbs"</property>
+            <property name="Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">7</association>
+            <association strength="0.75">20</association>
+        </associated-detections>
+    </detection>
+    <detection type="Process" id="19" time="2020-07-30 23:21:08.834Z">
+        <certainty>0.6875</certainty>
+        <raw-certainty>0</raw-certainty>
+        <associated-data>
+            <property name="Process Command">"C:\Program Files\OpenVPN Connect\agent_ovpnconnect_1582126374677.exe"</property>
+            <property name="Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">15</association>
+            <association strength="0.75">21</association>
+        </associated-detections>
+    </detection>
+    <detection type="Registry" id="24" time="2020-07-30 23:21:09.815Z">
+        <certainty>0.75</certainty>
+        <raw-certainty>0.5</raw-certainty>
+        <associated-hunts>
+            <hunt>T1547 - Boot or Logon Autostart Execution Subtechnique 010: Port Monitors</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Key Path">HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\Print\Monitors\EpsonNet Print Port</property>
+            <property name="Key Value Data">enppmon.dll</property>
+            <property name="Key Value Name">Driver</property>
+            <property name="Registry Entry Type">File</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">25</association>
+        </associated-detections>
+    </detection>
+    <detection type="Registry" id="26" time="2020-07-30 23:21:10.588Z">
+        <certainty>0.5</certainty>
+        <raw-certainty>0.5</raw-certainty>
+        <associated-hunts>
+            <hunt>T1569 - Service Execution Subtechnique 002: Service Execution</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Key Path">HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\msiserver</property>
+            <property name="Key Value Data">%systemroot%\system32\msiexec.exe /V</property>
+            <property name="Key Value Name">ImagePath</property>
+            <property name="Registry Entry Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">27</association>
+        </associated-detections>
+    </detection>
+    <detection type="Process" id="27" time="2020-07-30 23:21:10.621Z">
+        <certainty>0.500000</certainty>
+        <raw-certainty>0.000000</raw-certainty>
+        <associated-data>
+            <property name="Process Command">%systemroot%\system32\msiexec.exe /V</property>
+            <property name="Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">26</association>
+        </associated-detections>
+    </detection>
+    <detection type="Registry" id="28" time="2020-07-30 23:21:10.842Z">
+        <certainty>0.5</certainty>
+        <raw-certainty>0.5</raw-certainty>
+        <associated-hunts>
+            <hunt>T1569 - Service Execution Subtechnique 002: Service Execution</hunt>
+        </associated-hunts>
+        <associated-data>
+            <property name="Key Path">HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\OpenVPNAccessClient</property>
+            <property name="Key Value Data">"C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe"</property>
+            <property name="Key Value Name">ImagePath</property>
+            <property name="Registry Entry Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">29</association>
+        </associated-detections>
+    </detection>
+    <detection type="Process" id="29" time="2020-07-30 23:21:10.855Z">
+        <certainty>0.6875</certainty>
+        <raw-certainty>0</raw-certainty>
+        <associated-data>
+            <property name="Process Command">"C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe"</property>
+            <property name="Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">28</association>
+            <association strength="0.75">30</association>
+        </associated-detections>
+    </detection>
+    <detection type="File" id="21" time="2020-07-30 23:21:09.41Z">
+        <certainty>0.500000</certainty>
+        <raw-certainty>0.500000</raw-certainty>
+        <associated-data>
+            <property name="Date Created">2020-02-19 21:37:26.0Z</property>
+            <property name="Exists">true</property>
+            <property name="Extension">.exe</property>
+            <property name="File Executor">"C:\Program Files\OpenVPN Connect\agent_ovpnconnect_1582126374677.exe" </property>
+            <property name="File Type">exefile</property>
+            <property name="Last Opened">2020-07-30 23:21:08.985Z</property>
+            <property name="MD5 Hash">059a5d155b4f6907d60070664cac4dd3</property>
+            <property name="Malicious Yara Rules"></property>
+            <property name="Name">C:\Program Files\OpenVPN Connect\agent_ovpnconnect_1582126374677.exe</property>
+            <property name="Other Yara Rules">network_tcp_listen, network_tcp_socket, win_registry, win_token, win_files_operation, Str_Win32_Winsock2_Library, Str_Win32_Wininet_Library, anti_dbg</property>
+            <property name="Path">C:\Program Files\OpenVPN Connect\agent_ovpnconnect_1582126374677.exe</property>
+            <property name="SHA1 Hash">0a3a4a30be7c4956496d1f595401d32b2f32339f</property>
+            <property name="SHA256 Hash">703572af4b13be30f2890dd97a896ac19221013d810d6b41f60eb7d8c3bb2c04</property>
+            <property name="Signed">false</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="0.75">19</association>
+            <association strength="0.9375">22</association>
+        </associated-detections>
+    </detection>
+    <detection type="Process" id="22" time="2020-07-30 23:21:09.99Z">
+        <certainty>0.468750</certainty>
+        <raw-certainty>0.000000</raw-certainty>
+        <associated-data>
+            <property name="Process Command">"C:\Program Files\OpenVPN Connect\agent_ovpnconnect_1582126374677.exe" </property>
+            <property name="Type">Command</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="0.9375">21</association>
+        </associated-detections>
+    </detection>
+    <detection type="File" id="30" time="2020-07-30 23:21:10.897Z">
+        <certainty>0.500000</certainty>
+        <raw-certainty>0.500000</raw-certainty>
+        <associated-data>
+            <property name="Date Created">2019-02-26 11:55:20.0Z</property>
+            <property name="Exists">true</property>
+            <property name="Extension">.exe</property>
+            <property name="File Executor">"C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe" </property>
+            <property name="File Type">exefile</property>
+            <property name="Last Opened">2020-07-30 23:21:10.875Z</property>
+            <property name="MD5 Hash">1be72964cd62e7c041114d6bf3c9d358</property>
+            <property name="Malicious Yara Rules"></property>
+            <property name="Name">C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe</property>
+            <property name="Other Yara Rules">SEH_Save, SEH_Init, Check_OutputDebugStringA_iat, anti_dbg</property>
+            <property name="Path">C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe</property>
+            <property name="SHA1 Hash">4ba4b3e9cbfe74a3348e6413aa2ce72e5216398e</property>
+            <property name="SHA256 Hash">e96d7f60afa330a0018c5c558c4af1f1b99d786fe2ea88f2e736924cf9202d3f</property>
+            <property name="Signed">false</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="0.75">29</association>
+            <association strength="0.75">31</association>
+        </associated-detections>
+    </detection>
+    <detection type="File" id="25" time="2020-07-30 23:21:10.25Z">
+        <certainty>0.750000</certainty>
+        <raw-certainty>0.500000</raw-certainty>
+        <associated-data>
+            <property name="Date Created">2016-09-14 18:31:00.0Z</property>
+            <property name="Exists">true</property>
+            <property name="Extension">.dll</property>
+            <property name="File Type">dllfile</property>
+            <property name="Last Opened">2020-07-30 23:21:09.965Z</property>
+            <property name="MD5 Hash">e47fa55865b9eef0f6c76b4f7386dd86</property>
+            <property name="Malicious Yara Rules"></property>
+            <property name="Name">C:\WINDOWS\SYSTEM32\enppmon.dll</property>
+            <property name="Other Yara Rules">screenshot, keylogger, win_registry, win_files_operation, Str_Win32_Winsock2_Library, anti_dbg, win_hook</property>
+            <property name="Path">C:\WINDOWS\SYSTEM32\enppmon.dll</property>
+            <property name="SHA1 Hash">6112a9fee0483c142767b126fdcb176a4cffd450</property>
+            <property name="SHA256 Hash">6ad7ac92989df885b14decba33eaa698a168535b692922b1523c41a54bf02630</property>
+            <property name="Signed">false</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="1">24</association>
+        </associated-detections>
+    </detection>
+    <detection type="File" id="32" time="2020-07-30 23:21:11.155Z">
+        <certainty>0.500000</certainty>
+        <raw-certainty>0.500000</raw-certainty>
+        <associated-data>
+            <property name="Exists">true</property>
+            <property name="Extension">.exe</property>
+            <property name="File Executor">"C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe" </property>
+            <property name="File Type">exefile</property>
+            <property name="MD5 Hash">d41d8cd98f00b204e9800998ecf8427e</property>
+            <property name="Malicious Yara Rules"></property>
+            <property name="Name">C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe</property>
+            <property name="Other Yara Rules"></property>
+            <property name="Path">C:\Program Files (x86)\OpenVPN Technologies\OpenVPN Client\core\capiws.exe</property>
+            <property name="SHA1 Hash">da39a3ee5e6b4b0d3255bfef95601890afd80709</property>
+            <property name="SHA256 Hash">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</property>
+            <property name="Signed">false</property>
+        </associated-data>
+        <associated-detections>
+            <association strength="0.9375">31</association>
+        </associated-detections>
+    </detection>
+</bluespawn>
