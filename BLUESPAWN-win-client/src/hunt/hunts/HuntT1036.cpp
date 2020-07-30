@@ -23,7 +23,8 @@ namespace Hunts {
                 LOG_INFO(2, L"Scanning " << f.GetFolderPath());
                 for(auto value : f.GetFiles(std::nullopt, -1)) {
                     if(FileScanner::PerformQuickScan(value.GetFilePath())) {
-                        CREATE_DETECTION(Certainty::None, FileDetectionData{ value });
+                        CREATE_DETECTION_WITH_CONTEXT(Certainty::None, FileDetectionData{ value },
+                                                      DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1036_005) });
                     }
                 }
             }

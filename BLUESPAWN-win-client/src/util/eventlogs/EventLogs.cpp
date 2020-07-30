@@ -124,7 +124,6 @@ namespace EventLogs {
 
     std::optional<EventLogItem> EventToEventLogItem(const EventWrapper& hEvent,
                                                     const std::vector<std::wstring>& params) {
-        DWORD status = ERROR_SUCCESS;
 
         std::optional<std::wstring> eventIDStr, eventRecordIDStr, timeCreated, channel, rawXML;
 
@@ -266,10 +265,8 @@ namespace EventLogs {
 
     bool OpenChannel(const std::wstring& channel) {
         EVT_HANDLE hChannel = NULL;
-        DWORD status = ERROR_SUCCESS;
         EVT_VARIANT ChannelProperty;
         DWORD dwBufferSize = sizeof(EVT_VARIANT);
-        DWORD dwBufferUsed = 0;
         hChannel = EvtOpenChannelConfig(NULL, channel.c_str(), 0);
         if(NULL == hChannel) {
             LOG_ERROR(L"EventLogs::OpenChannel: EvtOpenChannelConfig failed with " + std::to_wstring(GetLastError()) +

@@ -6,38 +6,26 @@
 #include "util/DynamicLinker.h"
 #include "util/StringUtils.h"
 #include "util/ThreadPool.h"
-
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/CLISink.h"
 #include "util/log/DebugSink.h"
 #include "util/log/XMLSink.h"
 
-#include "hunt/hunts/HuntT1004.h"
-#include "hunt/hunts/HuntT1013.h"
-#include "hunt/hunts/HuntT1015.h"
-#include "hunt/hunts/HuntT1031.h"
-#include "hunt/hunts/HuntT1035.h"
 #include "hunt/hunts/HuntT1036.h"
 #include "hunt/hunts/HuntT1037.h"
-#include "hunt/hunts/HuntT1050.h"
 #include "hunt/hunts/HuntT1053.h"
 #include "hunt/hunts/HuntT1055.h"
-#include "hunt/hunts/HuntT1060.h"
 #include "hunt/hunts/HuntT1068.h"
-#include "hunt/hunts/HuntT1089.h"
-#include "hunt/hunts/HuntT1099.h"
-#include "hunt/hunts/HuntT1100.h"
-#include "hunt/hunts/HuntT1101.h"
-#include "hunt/hunts/HuntT1103.h"
-#include "hunt/hunts/HuntT1122.h"
-#include "hunt/hunts/HuntT1128.h"
-#include "hunt/hunts/HuntT1131.h"
+#include "hunt/hunts/HuntT1070.h"
 #include "hunt/hunts/HuntT1136.h"
-#include "hunt/hunts/HuntT1138.h"
-#include "hunt/hunts/HuntT1182.h"
-#include "hunt/hunts/HuntT1183.h"
-#include "hunt/hunts/HuntT1198.h"
 #include "hunt/hunts/HuntT1484.h"
+#include "hunt/hunts/HuntT1505.h"
+#include "hunt/hunts/HuntT1543.h"
+#include "hunt/hunts/HuntT1546.h"
+#include "hunt/hunts/HuntT1547.h"
+#include "hunt/hunts/HuntT1553.h"
+#include "hunt/hunts/HuntT1562.h"
+#include "hunt/hunts/HuntT1569.h"
 #include "mitigation/mitigations/MitigateM1025.h"
 #include "mitigation/mitigations/MitigateM1028-WFW.h"
 #include "mitigation/mitigations/MitigateM1035-RDP.h"
@@ -100,32 +88,21 @@ bool Bluespawn::EnablePreScanDetections{ false };
 std::map<std::string, std::unique_ptr<Reaction>> reactions{};
 
 Bluespawn::Bluespawn() {
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1004>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1013>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1015>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1031>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1035>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1036>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1037>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1050>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1053>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1055>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1060>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1068>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1089>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1099>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1100>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1101>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1103>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1122>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1128>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1131>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1070>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1136>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1138>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1182>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1183>());
-    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1198>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1484>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1505>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1543>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1546>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1547>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1553>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1562>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1569>());
 
     mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1025>());
     mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1028WFW>());

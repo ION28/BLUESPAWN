@@ -1,20 +1,19 @@
 #pragma once
-#include "util/configurations/Registry.h"
-#include "util/filesystem/FileSystem.h"
 
 #include "../Hunt.h"
 
 namespace Hunts {
 
     /**
-	 * HuntT1037 examines the registry and filesystem for logon scripts
+	 * HuntT1562 looks for ways attacks impair defenses. Currently examines the registry for firewall
+	 * settings that allow applications to override the existing firewall rules.
 	 */
-    class HuntT1037 : public Hunt {
+    class HuntT1562 : public Hunt {
         private:
-        std::wstring t1037_001 = L"001: Logon Script (Windows)";
+        std::wstring t1562_004 = L"004: Disable or Modify System Firewall";
 
         public:
-        HuntT1037();
+        HuntT1562();
 
         virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
         virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
