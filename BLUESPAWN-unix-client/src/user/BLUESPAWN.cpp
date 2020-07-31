@@ -28,11 +28,14 @@
 #include <iostream>
 #include <cmath>
 
+#include "mitigation/mitigations/MitigateM1044.h"
+
 const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{ io };
 MitigationRegister Bluespawn::mitigationRecord{ io };
 
 Bluespawn::Bluespawn(){
+	mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1044>());
 }
 
 void Bluespawn::dispatch_hunt(Aggressiveness aHuntLevel, vector<string> vExcludedHunts, vector<string> vIncludedHunts) {

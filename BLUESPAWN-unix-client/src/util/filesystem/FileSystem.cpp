@@ -196,9 +196,16 @@ namespace FileSystem{
 		//first check if this is a directory - for the linux api going to make files and directories seperate
 
 		struct stat statbuf;
-
-		if(stat(path.c_str(), &statbuf) < 0){
-			LOG_ERROR("Unable to stat file " << FilePath << ".");
+		int statr = stat(path.c_str(), &statbuf);
+		if(statr < 0){
+			bReadAccess = false;
+			bWriteAccess = false;
+			if(errno != ENOENT){
+				LOG_ERROR("Unable to stat file " << FilePath << ".");
+				bFileExists = true;
+			}else{
+				bFileExists = false;
+			}
 			return;
 		}
 
@@ -245,7 +252,7 @@ namespace FileSystem{
 	}
 
 	bool File::HasReadAccess() const {
-			return bReadAccess;
+		return bReadAccess;
 	}
 
 	bool File::SetFilePointer(unsigned int pos) const{

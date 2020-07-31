@@ -202,10 +202,6 @@ namespace FileSystem {
 	};
 
 	class File : public Loggable, public FileObject{
-
-		//Whether or not this current file actually exists on the filesystem
-		bool bFileExists; 
-
 		//Whether or not the program has write access to the file
 		bool bWriteAccess;
 
