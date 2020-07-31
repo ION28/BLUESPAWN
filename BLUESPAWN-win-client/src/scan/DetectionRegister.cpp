@@ -28,21 +28,19 @@ void DetectionRegister::AddDetectionAsync(IN CONST std::shared_ptr<Detection>& d
     }
     EnterCriticalSection(*detection);
 
-    if(detection->info.GetCertainty() >= threshold) {
-        for(auto& scan : Scanner::scanners) {
-            for(auto& pair : scan->GetAssociatedDetections(*detection)) {
-                detection->info.AddAssociation(pair.first, pair.second);
-                pair.first->info.AddAssociation(detection, pair.second);
+    for(auto& scan : Scanner::scanners) {
+        for(auto& pair : scan->GetAssociatedDetections(*detection)){
+            detection->info.AddAssociation(pair.first, pair.second);
+            pair.first->info.AddAssociation(detection, pair.second);
 
-                auto first{ detection->dwID < pair.first->dwID ? detection : pair.first };
-                auto second{ detection->dwID < pair.first->dwID ? pair.first : detection };
+            auto first{ detection->dwID < pair.first->dwID ? detection : pair.first };
+            auto second{ detection->dwID < pair.first->dwID ? pair.first : detection };
 
-                LeaveCriticalSection(*detection);
-                for(auto& sink : Bluespawn::detectionSinks) {
-                    sink->RecordAssociation(first, second, pair.second);
-                }
-                EnterCriticalSection(*detection);
+            LeaveCriticalSection(*detection);
+            for(auto& sink : Bluespawn::detectionSinks){
+                sink->RecordAssociation(first, second, pair.second);
             }
+            EnterCriticalSection(*detection);
         }
     }
 
@@ -132,16 +130,15 @@ void DetectionRegister::UpdateDetectionCertainty(IN CONST std::shared_ptr<Detect
 
 std::shared_ptr<Detection> DetectionRegister::AddDetection(IN Detection&& raw, IN CONST Certainty& certainty) {
     auto detection{ std::make_shared<Detection>(raw) };
+    for(auto& sink : Bluespawn::detectionSinks){
+        sink->RecordDetection(detection, RecordType::PreScan);
+    }
 
     EnterCriticalSection(hScannedGuard);
     auto itr{ scanned.find(detection) };
     if(itr != scanned.end()) {
         LeaveCriticalSection(hScannedGuard);
         auto ref{ *itr };
-        for(auto& sink : Bluespawn::detectionSinks) {
-            sink->RecordDetection(ref, RecordType::PreScan);
-        }
-
         for(auto& hunt : raw.context.hunts){
             if(ref->context.hunts.find(hunt) == ref->context.hunts.end()){
                 ThreadPool::GetInstance().EnqueueTask(
@@ -158,9 +155,6 @@ std::shared_ptr<Detection> DetectionRegister::AddDetection(IN Detection&& raw, I
     if(itr != queue.end()) {
         LeaveCriticalSection(hQueueGuard);
         auto ref{ *itr };
-        for(auto& sink : Bluespawn::detectionSinks) {
-            sink->RecordDetection(ref, RecordType::PreScan);
-        }
         for(auto& hunt : raw.context.hunts){
             if(ref->context.hunts.find(hunt) == ref->context.hunts.end()){
                 ThreadPool::GetInstance().EnqueueTask(

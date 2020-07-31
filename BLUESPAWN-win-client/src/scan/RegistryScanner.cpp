@@ -6,6 +6,7 @@
 #include "util/processes/ProcessUtils.h"
 #include "scan/YaraScanner.h"
 #include "scan/ProcessScanner.h"
+#include "scan/FileScanner.h"
 #include "user/bluespawn.h"
 
 #include <regex>
@@ -58,13 +59,19 @@ std::unordered_map<std::shared_ptr<Detection>, Association> RegistryScanner::Get
 
 	/// TODO: Add more of these
 	if(data.type == RegistryDetectionType::CommandReference){
-		detections.emplace(Bluespawn::detections.AddDetection(Detection{
-			ProcessDetectionData::CreateCommandDetectionData(std::get<std::wstring>(data.value->data))
-		}), Association::Certain);
+		if(ProcessScanner::PerformQuickScan(std::get<std::wstring>(data.value->data))){
+			detections.emplace(Bluespawn::detections.AddDetection(Detection{
+				ProcessDetectionData::CreateCommandDetectionData(std::get<std::wstring>(data.value->data))
+			}), Association::Certain);
+		}
 	} else if(data.type == RegistryDetectionType::FileReference){
-		detections.emplace(Bluespawn::detections.AddDetection(Detection{
-	        FileDetectionData{ std::get<std::wstring>(data.value->data) }
-		}), Association::Certain);
+		auto name{ std::get<std::wstring>(data.value->data) };
+		auto path{ FileSystem::SearchPathExecutable(name) };
+		if(path && FileScanner::PerformQuickScan(*path)){
+			detections.emplace(Bluespawn::detections.AddDetection(Detection{
+				FileDetectionData{ *path }
+			}), Association::Certain);
+		}
 	}
 
 	return detections;

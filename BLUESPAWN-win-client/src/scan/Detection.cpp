@@ -14,8 +14,29 @@ size_t ComputeHash(IN CONST std::map<std::wstring, std::wstring>& map) {
     for(auto& pair : map) {
         auto first{ hasher(pair.first) };
         auto second{ hasher(pair.second) };
+#ifdef _WIN64
         hash = ((hash << 35) | (hash >> 29)) ^ ((first >> 32) | ((first << 32) >> 32)) ^
                ((second << 32) | ((second >> 32) << 32));
+#else
+        hash = ((hash << 19) | (hash >> 13)) ^ ((first >> 16) | ((first << 16) >> 16)) ^
+            ((second << 16) | ((second >> 16) << 16));
+#endif
+    }
+
+    return hash;
+}
+
+size_t ComputeHash(IN CONST std::vector<std::wstring>& values){
+    size_t hash{ 0 };
+
+    std::hash<std::wstring> hasher{};
+    for(auto& val : values){
+        auto first{ hasher(val) };
+#ifdef _WIN64
+        hash = ((hash << 35) | (hash >> 29)) ^ ((first >> 32) | ((first << 32) >> 32));
+#else
+        hash = ((hash << 19) | (hash >> 14)) ^ ((first >> 16) | ((first << 16) >> 16));
+#endif
     }
 
     return hash;
@@ -319,7 +340,7 @@ FileDetectionData::FileDetectionData(IN CONST FileSystem::File& file,
     if(FileSigned) serialization.emplace(L"Signed", *FileSigned ? L"true" : L"false");
     if(Signer) serialization.emplace(L"Signer", *Signer);
 
-    hash = ComputeHash(serialization);
+    hash = ComputeHash(std::vector<std::wstring>{ FilePath, SHA256 ? *SHA256 : L"" });
 }
 
 FileDetectionData::FileDetectionData(IN CONST std::wstring& path) :
@@ -365,7 +386,7 @@ RegistryDetectionData::RegistryDetectionData(IN CONST Registry::RegistryKey& key
         serialization.emplace(L"Key Value Data", value->ToString());
     }
 
-    hash = ComputeHash(serialization);
+    hash = ComputeHash(std::vector<std::wstring>{ KeyPath, value ? value->wValueName : L"" });
 }
 
 RegistryDetectionData::RegistryDetectionData(IN CONST Registry::RegistryValue& value,
@@ -378,6 +399,10 @@ const std::map<std::wstring, std::wstring>& RegistryDetectionData::Serialize() C
 
 size_t RegistryDetectionData::Hash() CONST {
     return hash;
+}
+
+bool RegistryDetectionData::operator==(IN CONST RegistryDetectionData& data) CONST {
+    return KeyPath == data.KeyPath && value->wValueName == data.value->wValueName;
 }
 
 ServiceDetectionData::ServiceDetectionData(IN CONST std::optional<std::wstring>& ServiceName OPTIONAL,

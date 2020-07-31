@@ -15,7 +15,7 @@ namespace Hunts {
     }
 
     std::vector<std::shared_ptr<Detection>> HuntT1036::RunHunt(const Scope& scope) {
-        HUNT_INIT();
+        HUNT_INIT_LEVEL(Intensive);
 
         for(auto folder : writableFolders) {
             auto f = FileSystem::Folder(folder);

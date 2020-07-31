@@ -19,13 +19,17 @@ namespace Hunts {
         HUNT_INIT();
 
         // Looks for T1037.001: Logon Script (Windows)
-        for(auto& detection : CheckValues(HKEY_CURRENT_USER, L"Environment",
-                                          { { L"UserInitMprLogonScript", L"", false, CheckSzEmpty } }, true, true)) {
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong,
-                                          RegistryDetectionData{ detection.key, detection,
-                                                                 RegistryDetectionType::FileReference,
-                                                                 detection.key.GetRawValue(detection.wValueName) },
-                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1037_001) });
+        for(auto detection : CheckValues(HKEY_CURRENT_USER, L"Environment", { 
+            { L"UserInitMprLogonScript", L"", false, CheckSzEmpty } 
+        }, true, true)) {
+
+            // Moderate contextual certainty due to the infequency of use for this registry value in legitimate cases
+            CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate, RegistryDetectionData{ 
+                detection.key, 
+                detection,
+                RegistryDetectionType::FileReference,
+                detection.key.GetRawValue(detection.wValueName) 
+            }, DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1037_001) });
         }
 
         HUNT_END();
@@ -36,8 +40,6 @@ namespace Hunts {
 
         // Looks for T1037.001: Logon Script (Windows)
         Registry::GetRegistryEvents(events, HKEY_CURRENT_USER, L"Environment", true, true, false);
-        events.push_back(std::make_unique<FileEvent>(FileSystem::Folder{ L"C:\\ProgramData\\Microsoft\\Windows\\Start "
-                                                                         L"Menu\\Programs\\StartUp" }));
 
         return events;
     }

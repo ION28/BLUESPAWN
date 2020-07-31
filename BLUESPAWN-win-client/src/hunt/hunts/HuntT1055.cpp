@@ -81,16 +81,18 @@ namespace Hunts {
                                                           3,
                                                           Bluespawn::aggressiveness == Aggressiveness::Intensive ?
                                                               pesieve::PE_DNET_NONE :
-                                                              pesieve::PE_DNET_SKIP_MAPPING,
+                                                              pesieve::PE_DNET_SKIP_HOOKS,
                                                           pesieve::PE_IMPREC_NONE,
                                                           true,
                                                           pesieve::OUT_NO_DIR,
-                                                          true,
-                                                          false,
+                                                          Bluespawn::aggressiveness != Aggressiveness::Intensive,
+                                                          Bluespawn::aggressiveness == Aggressiveness::Intensive,
                                                           Bluespawn::aggressiveness == Aggressiveness::Intensive ?
                                                               pesieve::PE_IATS_FILTERED :
                                                               pesieve::PE_IATS_NONE,
-                                                          pesieve::PE_DATA_SCAN_NO_DEP,
+                                                          Bluespawn::aggressiveness == Aggressiveness::Intensive ?
+                                                              pesieve::PE_DATA_SCAN_NO_DEP :
+                                                              pesieve::PE_DATA_NO_SCAN,
                                                           false,
                                                           pesieve::PE_DUMP_AUTO,
                                                           false,
