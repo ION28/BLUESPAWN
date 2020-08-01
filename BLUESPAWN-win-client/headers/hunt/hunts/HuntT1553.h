@@ -11,13 +11,13 @@ namespace Hunts {
 	 * establish persistence
 	 */
     class HuntT1553 : public Hunt {
-        private:
-        std::wstring t1553_003 = L"003: SIP and Trust Provider Hijacking";
 
         public:
         HuntT1553();
 
+        void Subtechnique003(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+
         virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
-        virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
+        virtual std::vector<std::pair<std::unique_ptr<Event>, Scope>> GetMonitoringEvents() override;
     };
 }   // namespace Hunts

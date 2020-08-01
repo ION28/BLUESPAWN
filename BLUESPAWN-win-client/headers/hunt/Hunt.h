@@ -2,6 +2,8 @@
 #include <Windows.h>
 
 #include <chrono>
+#include <iomanip>
+#include <sstream>
 #include <string>
 
 #include "HuntInfo.h"
@@ -22,12 +24,22 @@ class HuntRegister;
     std::vector<std::shared_ptr<Detection>> detections{}; \
     LOG_INFO(1, "Beginning hunt for " << name);
 
-#define HUNT_INIT_LEVEL(level)                                                                                \
-    if(Bluespawn::aggressiveness < Aggressiveness::##level) {                                                 \
-        LOG_INFO(1, "Skipping hunt for " << GetName() << "; rerun BLUESPAWN at " #level " to run this hunt"); \
-        return {};                                                                                            \
-    }                                                                                                         \
-    HUNT_INIT();
+#define SUBTECHNIQUE_INIT(id, desc)                                                                               \
+    if(!scope.Subtechniques || *scope.Subtechniques & (1 << id)) {                                                \
+        auto name{ (std::wstringstream{} << this->name << L" Subtechnique " << std::setfill(L'0') << std::setw(3) \
+                                         << id << L": " #desc)                                                    \
+                       .str() };
+#define SUBTECHNIQUE_END() }
+
+#define SUBSECTION_INIT(id, intensity)                                                                                \
+    if(!scope.Subsections || *scope.Subsections & (1 << id)) {                                                        \
+        if(Bluespawn::aggressiveness < Aggressiveness::##intensity) {                                                 \
+            LOG_INFO(1,                                                                                               \
+                     L"Skipping " << name << L" subsection " #id "; rerun bluespawn at " #intensity " to run this."); \
+        } else {
+#define SUBSECTION_END() \
+    }                    \
+    }
 
 #define HUNT_END()                             \
     LOG_INFO(2, "Finished hunt for " << name); \
@@ -35,7 +47,7 @@ class HuntRegister;
 
 #define CREATE_DETECTION(certainty, ...) \
     detections.emplace_back(             \
-        Bluespawn::detections.AddDetection(Detection{ __VA_ARGS__, DetectionContext{ GetName() } }, certainty));
+        Bluespawn::detections.AddDetection(Detection{ __VA_ARGS__, DetectionContext{ name } }, certainty));
 
 #define CREATE_DETECTION_WITH_CONTEXT(certainty, ...)           \
     detections.emplace_back(Bluespawn::detections.AddDetection( \
@@ -43,8 +55,6 @@ class HuntRegister;
             __VA_ARGS__,                                        \
         },                                                      \
         certainty));
-
-#define ADD_SUBTECHNIQUE_CONTEXT(name) GetName() + L" Subtechnique " + name
 
 class Hunt {
     protected:
@@ -118,5 +128,5 @@ class Hunt {
      *
      * @return a vector of event pointers
      */
-    virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents();
+    virtual std::vector<std::pair<std::unique_ptr<Event>, Scope>> GetMonitoringEvents();
 };

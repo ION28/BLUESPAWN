@@ -15,14 +15,6 @@ namespace Hunts {
      * T1546.015: examines CLSID registry values to detect COM hijacking
 	 */
     class HuntT1546 : public Hunt {
-        private:
-        std::wstring t1546_007 = L"007: Netsh Helper DLL";
-        std::wstring t1546_008 = L"008: Accessibility Features";
-        std::wstring t1546_009 = L"009: AppCert DLLs";
-        std::wstring t1546_010 = L"010: AppInit DLLs";
-        std::wstring t1546_011 = L"011: Application Shimming";
-        std::wstring t1546_012 = L"012: Image File Execution Options Injection";
-        std::wstring t1546_015 = L"015: Component Object Model Hijacking";
 
         std::vector<std::wstring> vAccessibilityBinaries = { L"sethc.exe",   L"utilman.exe",  L"osk.exe",
                                                              L"Magnify.exe", L"Narrator.exe", L"DisplaySwitch.exe",
@@ -33,7 +25,15 @@ namespace Hunts {
         public:
         HuntT1546();
 
+        void Subtechnique007(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+        void Subtechnique008(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+        void Subtechnique009(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+        void Subtechnique010(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+        void Subtechnique011(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+        void Subtechnique012(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+        void Subtechnique015(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+
         virtual std::vector<std::shared_ptr<Detection>> RunHunt(IN CONST Scope& scope) override;
-        virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
+        virtual std::vector<std::pair<std::unique_ptr<Event>, Scope>> GetMonitoringEvents() override;
     };
 }   // namespace Hunts

@@ -17,10 +17,10 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::DefenseEvasion;
     }
 
-    std::vector<std::shared_ptr<Detection>> HuntT1562::RunHunt(const Scope& scope) {
-        HUNT_INIT();
+    void HuntT1562::Subtechnique004(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(004, Disable or Modify System Firewall);
 
-        // Looks for T1562.004: Disable or Modify System Firewall
+        SUBSECTION_INIT(0, Normal);
         RegistryKey DomainProfile{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters"
                                                        L"\\FirewallPolicy\\DomainProfile" };
         RegistryKey StandardProfile{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameter"
@@ -32,11 +32,9 @@ namespace Hunts {
             RegistryKey allowedapps{ key, L"AuthorizedApplications\\List" };
             if(allowedapps.Exists()) {
                 for(auto ProgramException : allowedapps.EnumerateValues()) {
-                    CREATE_DETECTION_WITH_CONTEXT(
-                        Certainty::Strong,
-                        RegistryDetectionData{ *RegistryValue::Create(allowedapps, ProgramException),
-                                               RegistryDetectionType::Configuration },
-                        DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1562_004) });
+                    CREATE_DETECTION(Certainty::Strong,
+                                     RegistryDetectionData{ *RegistryValue::Create(allowedapps, ProgramException),
+                                                            RegistryDetectionType::Configuration });
                     if(FileScanner::PerformQuickScan(ProgramException)) {
                         CREATE_DETECTION(Certainty::Weak, FileDetectionData{ ProgramException });
                     }
@@ -46,29 +44,37 @@ namespace Hunts {
             auto ports = RegistryKey{ key, L"GloballyOpenPorts\\List" };
             if(ports.Exists()) {
                 for(auto PortsException : ports.EnumerateValues()) {
-                    CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong,
-                                                  RegistryDetectionData{ *RegistryValue::Create(ports, PortsException),
-                                                                         RegistryDetectionType::Configuration },
-                                                  DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1562_004) });
+                    CREATE_DETECTION(Certainty::Strong,
+                                     RegistryDetectionData{ *RegistryValue::Create(ports, PortsException),
+                                                            RegistryDetectionType::Configuration });
                 }
             }
         }
+        SUBSECTION_END();
+
+        SUBTECHNIQUE_END();
+    }
+
+    std::vector<std::shared_ptr<Detection>> HuntT1562::RunHunt(const Scope& scope) {
+        HUNT_INIT();
+
+        Subtechnique004(scope, detections);
 
         HUNT_END();
     }
 
-    std::vector<std::unique_ptr<Event>> HuntT1562::GetMonitoringEvents() {
-        std::vector<std::unique_ptr<Event>> events;
+    std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1562::GetMonitoringEvents() {
+        std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
-        Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE,
+        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_LOCAL_MACHINE,
                                     L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\Do"
                                     L"mainProfile",
                                     false, false, true);
-        Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE,
+        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_LOCAL_MACHINE,
                                     L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\St"
                                     L"andardProfile",
                                     false, false, true);
-        Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE,
+        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_LOCAL_MACHINE,
                                     L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\Pu"
                                     L"blicProfile",
                                     false, false, true);

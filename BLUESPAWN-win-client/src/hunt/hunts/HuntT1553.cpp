@@ -66,14 +66,13 @@ namespace Hunts {
         return map;
     }
 
-    std::vector<std::shared_ptr<Detection>> HuntT1553::RunHunt(const Scope& scope) {
-        HUNT_INIT_LEVEL(Intensive)
-
-        // Looks for T1553.003: SIP and Trust Provider Hijacking
+    void HuntT1553::Subtechnique003(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(3, SIP and Trust Provider Hijacking);
 
         std::unordered_map<std::wstring, std::vector<std::pair<RegistryValue, std::wstring>>> files{};
 
-        // Verify that the installed SIPs are good
+        // Verify SIPs
+        SUBSECTION_INIT(0, Intensive);
         auto goodSIP{ ParseResource(GoodSIP) };
         for(auto keypath : { L"SOFTWARE\\Microsoft\\Cryptography\\OID\\EncodingType 0",
                              L"SOFTWARE\\WoW6432Node\\Microsoft\\Cryptography\\OID\\EncodingType 0" }) {
@@ -92,10 +91,8 @@ namespace Hunts {
                         if(entry.find(GUID) != entry.end()) {
                             auto& pair{ entry.at(GUID) };
                             if(func && func->ToString() != pair.second) {
-                                CREATE_DETECTION_WITH_CONTEXT(
-                                    Certainty::Strong,
-                                    RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
-                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003) });
+                                CREATE_DETECTION(Certainty::Strong,
+                                                 RegistryDetectionData{ *func, RegistryDetectionType::Configuration });
                             }
 
                             if(dll) {
@@ -116,22 +113,24 @@ namespace Hunts {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
-                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
+                                    DetectionContext{ name, std::nullopt, message });
                             }
 
                             if(dll) {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *dll, RegistryDetectionType::FileReference },
-                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
+                                    DetectionContext{ name, std::nullopt, message });
                             }
                         }
                     }
                 }
             }
         }
+        SUBSECTION_END();
 
-        // Verify that the installed Trust Providers are good
+        // Verify trust providers
+        SUBSECTION_INIT(1, Intensive);
         auto goodTrustProviders{ ParseResource(GoodTrustProviders) };
         for(auto keypath : { L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust",
                              L"SOFTWARE\\WoW6432Node\\Microsoft\\Cryptography\\Providers\\Trust" }) {
@@ -150,10 +149,8 @@ namespace Hunts {
                         if(entry.find(GUID) != entry.end()) {
                             auto& pair{ entry.at(GUID) };
                             if(func && func->ToString() != pair.second) {
-                                CREATE_DETECTION_WITH_CONTEXT(
-                                    Certainty::Strong,
-                                    RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
-                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003) });
+                                CREATE_DETECTION(Certainty::Strong,
+                                                 RegistryDetectionData{ *func, RegistryDetectionType::Configuration });
                             }
 
                             if(files.find(dll->ToString()) == files.end()) {
@@ -171,22 +168,23 @@ namespace Hunts {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
-                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
+                                    DetectionContext{ name, std::nullopt, message });
                             }
 
                             if(dll) {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *dll, RegistryDetectionType::FileReference },
-                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
+                                    DetectionContext{ name, std::nullopt, message });
                             }
                         }
                     }
                 }
             }
         }
+        SUBSECTION_END();
 
-        // Verify the collection of DLLs
+        // Verify collection of DLLs
         for(auto& pair : files) {
             auto dllpath{ FileSystem::SearchPathExecutable(pair.first) };
             if(!dllpath) {
@@ -196,7 +194,7 @@ namespace Hunts {
                 for(auto& value : pair.second) {
                     CREATE_DETECTION_WITH_CONTEXT(
                         Certainty::Weak, RegistryDetectionData{ value.first, RegistryDetectionType::FileReference },
-                        DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
+                        DetectionContext{ name, std::nullopt, message });
                 }
             } else {
                 dllpath = ToLowerCaseW(*dllpath);
@@ -212,7 +210,7 @@ namespace Hunts {
                                       L" and may have been hijacked" };
                         CREATE_DETECTION_WITH_CONTEXT(
                             Certainty::Weak, RegistryDetectionData{ value.first, RegistryDetectionType::FileReference },
-                            DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003), std::nullopt, message });
+                            DetectionContext{ name, std::nullopt, message });
                     }
                 }
             }
@@ -236,18 +234,14 @@ namespace Hunts {
                             auto path{ FileSystem::SearchPathExecutable(*check.GetValue<std::wstring>(val)) };
                             if(path) {
                                 if(!FileSystem::File(*path).IsMicrosoftSigned()) {
-                                    CREATE_DETECTION_WITH_CONTEXT(
-                                        Certainty::Strong,
-                                        RegistryDetectionData{ *RegistryValue::Create(check, val),
-                                                               RegistryDetectionType::FileReference },
-                                        DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003) });
+                                    CREATE_DETECTION(Certainty::Strong,
+                                                     RegistryDetectionData{ *RegistryValue::Create(check, val),
+                                                                            RegistryDetectionType::FileReference });
                                 }
                             } else if(ToLowerCaseW(val).find(L"dll") != std::wstring::npos) {
-                                CREATE_DETECTION_WITH_CONTEXT(
-                                    Certainty::Strong,
-                                    RegistryDetectionData{ *RegistryValue::Create(check, val),
-                                                           RegistryDetectionType::FileReference },
-                                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1553_003) });
+                                CREATE_DETECTION(Certainty::Strong,
+                                                 RegistryDetectionData{ *RegistryValue::Create(check, val),
+                                                                        RegistryDetectionType::FileReference });
                             }
                         }
                     }
@@ -258,16 +252,24 @@ namespace Hunts {
             }
         }
 
+        SUBTECHNIQUE_END();
+    }
+
+    std::vector<std::shared_ptr<Detection>> HuntT1553::RunHunt(const Scope& scope) {
+        HUNT_INIT();
+
+        Subtechnique003(scope, detections);
+
         HUNT_END();
     }
 
-    std::vector<std::unique_ptr<Event>> HuntT1553::GetMonitoringEvents() {
-        std::vector<std::unique_ptr<Event>> events;
+    std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1553::GetMonitoringEvents() {
+        std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
-        Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE,
+        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_LOCAL_MACHINE,
                                     L"SOFTWARE\\Microsoft\\Cryptography\\OID\\EncodingType 0", true, false, true);
-        Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust",
-                                    true, false, true);
+        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(1), HKEY_LOCAL_MACHINE,
+                                    L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust", true, false, true);
 
         return events;
     }

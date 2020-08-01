@@ -11,6 +11,6 @@ namespace Hunts {
 		HuntT1068();
 
 		virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
-		virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
+		virtual std::vector<std::pair<std::unique_ptr<Event>, Scope>> GetMonitoringEvents() override;
 	};
 }

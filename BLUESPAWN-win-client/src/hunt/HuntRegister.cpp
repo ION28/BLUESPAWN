@@ -96,8 +96,8 @@ void HuntRegister::SetupMonitoring(IN CONST std::vector<std::wstring> vIncludedH
         if(HuntShouldRun(hunt.get(), vIncludedHunts, vExcludedHunts)) {
             Bluespawn::io.InformUser(L"Setting up monitoring for " + hunt->GetName());
             for(auto& event : hunt->GetMonitoringEvents()) {
-                std::function<void()> callback{ std::bind(&Hunt::RunHunt, hunt.get(), Scope{}) };
-                DWORD status{ EvtManager.SubscribeToEvent(std::move(event), callback) };
+                auto callback{ std::bind(&Hunt::RunHunt, hunt.get(), std::placeholders::_1) };
+                DWORD status{ EvtManager.SubscribeToEvent(std::move(event.first), callback, event.second) };
                 if(status != ERROR_SUCCESS) {
                     LOG_ERROR(L"Monitoring for " << hunt->GetName() << L" failed with error code " << status);
                 }

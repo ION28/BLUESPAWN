@@ -15,10 +15,10 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::Execution | (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
     }
 
-    std::vector<std::shared_ptr<Detection>> HuntT1053::RunHunt(const Scope& scope) {
-        HUNT_INIT();
+    void HuntT1053::Subtechnique005(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections){
+        SUBTECHNIQUE_INIT(005, Scheduled Task);
 
-        // Looks for T1053.005: Scheduled Task
+        SUBSECTION_INIT(0, Cursory);
         std::vector<EventLogs::XpathQuery> queries;
         auto param1 = EventLogs::ParamList();
         auto param2 = EventLogs::ParamList();
@@ -36,14 +36,16 @@ namespace Hunts {
         auto queryResults = EventLogs::QueryEvents(L"Security", 4698, queries);
 
         // clang-format off
-        for(auto result : queryResults) {
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate, OtherDetectionData{ L"Scheduled Task", {
+        for(auto result : queryResults){
+            CREATE_DETECTION(Certainty::Moderate, OtherDetectionData{ L"Scheduled Task", {
                 { L"Name", result.GetProperty(L"Event/EventData/Data[@Name='TaskName']") },
                 { L"User", result.GetProperty(L"Event/EventData/Data[@Name='SubjectUserName']") },
                 { L"Content", result.GetProperty(L"Event/EventData/Data[@Name='TaskContent']") }
-            }}, DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1053_005)});
-		}
+            }});
+        }
+        SUBSECTION_END();
 
+        SUBSECTION_INIT(1, Cursory);
         std::vector<EventLogs::XpathQuery> queries2;
         auto param5 = EventLogs::ParamList();
         auto param6 = EventLogs::ParamList();
@@ -52,24 +54,36 @@ namespace Hunts {
         queries2.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param5));
         queries2.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param6));
 
-        auto queryResults2 = EventLogs::QueryEvents(L"Microsoft-Windows-TaskScheduler/Operational", 106, queries);
+        auto queryResults2 = EventLogs::QueryEvents(L"Microsoft-Windows-TaskScheduler/Operational", 106, queries2);
 
-		for (auto result : queryResults2) {
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate, OtherDetectionData{ L"Scheduled Task", {
+        for(auto result : queryResults2){
+            CREATE_DETECTION(Certainty::Moderate, OtherDetectionData{ L"Scheduled Task", {
                 { L"Name", result.GetProperty(L"Event/EventData/Data[@Name='TaskName']") },
                 { L"User", result.GetProperty(L"Event/EventData/Data[@Name='SubjectUserName']") }
-            }}, DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1053_005)});
-		}
+            }});
+        }
         // clang-format on
+        SUBSECTION_END();
+
+        SUBTECHNIQUE_END();
+    }
+
+    std::vector<std::shared_ptr<Detection>> HuntT1053::RunHunt(const Scope& scope) {
+        HUNT_INIT();
+
+        // Looks for T1053.005: Scheduled Task
+
 
         HUNT_END();
     }
 
-    std::vector<std::unique_ptr<Event>> HuntT1053::GetMonitoringEvents() {
-        std::vector<std::unique_ptr<Event>> events;
+    std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1053::GetMonitoringEvents() {
+        std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
-        events.push_back(std::make_unique<EventLogEvent>(L"Security", 4698));
-        events.push_back(std::make_unique<EventLogEvent>(L"Microsoft-Windows-TaskScheduler/Operational", 106));
+        events.push_back(std::make_pair(std::make_unique<EventLogEvent>(L"Security", 4698), 
+                                        Scope::CreateSubhuntScope(0)));
+        events.push_back(std::make_pair(std::make_unique<EventLogEvent>(L"Microsoft-Windows-TaskScheduler/Operational", 
+                                                                        106), Scope::CreateSubhuntScope(1)));
 
         return events;
     }

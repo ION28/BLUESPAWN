@@ -16,9 +16,10 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::DefenseEvasion;
     }
 
-    std::vector<std::shared_ptr<Detection>> HuntT1070::RunHunt(const Scope& scope) {
-        HUNT_INIT();
+    void HuntT1070::Subtechnique006(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections){
+        SUBTECHNIQUE_INIT(006, Timestomp);
 
+        SUBSECTION_INIT(0, Normal);
         // Looks for T1070.006 Timestomp
         // Create existance queries so interesting data is output
         std::vector<EventLogs::XpathQuery> queries;
@@ -39,32 +40,38 @@ namespace Hunts {
         queries.push_back(EventLogs::XpathQuery(L"Event/EventData/Data", param5));
 
         auto queryResults = EventLogs::QueryEvents(L"Microsoft-Windows-Sysmon/Operational", 2, queries);
-
-        // Find detections with YARA rules
-        for(auto query : queryResults) {
-            FileSystem::File file = FileSystem::File(query.GetProperty(L"Event/EventData/"
-                                                                       L"Data[@Name='TargetFilename']"));
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong, FileDetectionData{ file },
-                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1070_006) });
+        for(auto query : queryResults){
+            FileSystem::File file{ query.GetProperty(L"Event/EventData/Data[@Name='TargetFilename']") };
+            CREATE_DETECTION(Certainty::Strong, FileDetectionData{ file });
 
             // Scan process
-            HandleWrapper hProcess{ OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false,
-                                                std::stoi(query.GetProperty(L"Event/EventData/"
-                                                                            L"Data[@Name='ProcessId']"))) };
-            if(hProcess) {
+            HandleWrapper hProcess{ 
+                OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false,
+                            std::stoi(query.GetProperty(L"Event/EventData/Data[@Name='ProcessId']"))) };
+            if(hProcess){
                 auto image{ GetProcessImage(hProcess) };
                 CREATE_DETECTION(Certainty::Moderate,
                                  ProcessDetectionData::CreateProcessDetectionData(GetProcessId(hProcess), image));
             }
         }
+        SUBSECTION_END();
+
+        SUBTECHNIQUE_END();
+    }
+
+    std::vector<std::shared_ptr<Detection>> HuntT1070::RunHunt(const Scope& scope) {
+        HUNT_INIT();
+
+        Subtechnique006(scope, detections);
 
         HUNT_END();
     }
 
-    std::vector<std::unique_ptr<Event>> HuntT1070::GetMonitoringEvents() {
-        std::vector<std::unique_ptr<Event>> events{};
+    std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1070::GetMonitoringEvents() {
+        std::vector<std::pair<std::unique_ptr<Event>, Scope>> events{};
 
-        events.push_back(std::make_unique<EventLogEvent>(L"Microsoft-Windows-Sysmon/Operational", 2));
+        events.push_back(std::make_pair(std::make_unique<EventLogEvent>(L"Microsoft-Windows-Sysmon/Operational", 2), 
+                                        Scope::CreateSubhuntScope(0)));
 
         return events;
     }

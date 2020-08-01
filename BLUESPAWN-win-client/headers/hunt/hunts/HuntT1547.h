@@ -17,19 +17,19 @@ namespace Hunts {
 	 * @scans Intensive Scan not supported.
 	 */
     class HuntT1547 : public Hunt {
-        private:
-        std::wstring t1547_001 = L"001: Registry Run Keys / Startup Folder";
-        std::wstring t1547_002 = L"002: Authentication Package";
-        std::wstring t1547_004 = L"004: Winlogon Helper DLL";
-        std::wstring t1547_005 = L"005: Security Support Provider";
-        std::wstring t1547_010 = L"010: Port Monitors";
 
         std::vector<std::wstring> RunKeys;
 
         public:
         HuntT1547();
 
+        void Subtechnique001(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+        void Subtechnique002(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+        void Subtechnique004(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+        void Subtechnique005(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+        void Subtechnique010(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+
         virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
-        virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
+        virtual std::vector<std::pair<std::unique_ptr<Event>, Scope>> GetMonitoringEvents() override;
     };
 }   // namespace Hunts
