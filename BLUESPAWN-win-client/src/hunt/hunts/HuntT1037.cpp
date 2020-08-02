@@ -15,21 +15,16 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
     }
 
-    void HuntT1037::Subtechnique001(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections){
-        SUBTECHNIQUE_INIT(001, Logon Script);
+    void HuntT1037::Subtechnique001(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(001, [Logon Script(Windows)]);
 
         SUBSECTION_INIT(0, Cursory);
-        for(auto detection : CheckValues(HKEY_CURRENT_USER, L"Environment", {
-            { L"UserInitMprLogonScript", L"", false, CheckSzEmpty }
-                                         }, true, true)){
-
+        for(auto detection : CheckValues(HKEY_CURRENT_USER, L"Environment",
+                                         { { L"UserInitMprLogonScript", L"", false, CheckSzEmpty } }, true, true)) {
             // Moderate contextual certainty due to the infequency of use for this registry value in legitimate cases
-            CREATE_DETECTION(Certainty::Moderate, RegistryDetectionData{
-                detection.key,
-                detection,
-                RegistryDetectionType::FileReference,
-                detection.key.GetRawValue(detection.wValueName)
-            });
+            CREATE_DETECTION(Certainty::Moderate,
+                             RegistryDetectionData{ detection.key, detection, RegistryDetectionType::FileReference,
+                                                    detection.key.GetRawValue(detection.wValueName) });
         }
         SUBSECTION_END();
 
@@ -48,7 +43,8 @@ namespace Hunts {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
         // Looks for T1037.001: Logon Script (Windows)
-        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_CURRENT_USER, L"Environment", true, true, false);
+        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_CURRENT_USER, L"Environment", true, true,
+                                    false);
 
         return events;
     }

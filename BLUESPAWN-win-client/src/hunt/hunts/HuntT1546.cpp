@@ -164,7 +164,7 @@ namespace Hunts {
                 if(detection.wValueName == L"GlobalFlag") {
                     CREATE_DETECTION_WITH_CONTEXT(
                         Certainty::Strong, RegistryDetectionData{ detection, RegistryDetectionType::FileReference },
-                        DetectionContext{ name }, [detection]() {
+                        DetectionContext{ __name }, [detection]() {
                             detection.key.SetValue<DWORD>(L"GlobalFlag", std::get<DWORD>(detection.data) & ~0x200);
                         });
                 } else {
@@ -325,15 +325,15 @@ namespace Hunts {
         events.push_back(
             std::make_pair(std::make_unique<FileEvent>(FileSystem::Folder{ L"C:\\Windows\\AppPatch\\Custom" }),
                            Scope::CreateSubhuntScope(APPLICATION_SHIM)));
-        events.push_back(
-            std::make_pair(
-                std::make_unique<FileEvent>(FileSystem::Folder{ L"C:\\Windows\\AppPatch\\Custom\\Custom64" }),
+        events.push_back(std::make_pair(std::make_unique<FileEvent>(FileSystem::Folder{ L"C:"
+                                                                                        L"\\Windows\\AppPatch\\Custom\\"
+                                                                                        L"Custom64" }),
                                         Scope::CreateSubhuntScope(APPLICATION_SHIM)));
 
         // Looks for T1546.012: Image File Execution Options Injection
-        Registry::GetRegistryEvents(
-            events, Scope::CreateSubhuntScope(IFEO_HIJACK), HKEY_LOCAL_MACHINE,
-            L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options", true, false, true);
+        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(IFEO_HIJACK), HKEY_LOCAL_MACHINE,
+                                    L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options",
+                                    true, false, true);
 
         // Looks for T1546.015: Component Object Model Hijacking
         if(Bluespawn::aggressiveness >= Aggressiveness::Intensive) {

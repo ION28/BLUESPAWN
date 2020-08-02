@@ -113,14 +113,14 @@ namespace Hunts {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
-                                    DetectionContext{ name, std::nullopt, message });
+                                    DetectionContext{ __name, std::nullopt, message });
                             }
 
                             if(dll) {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *dll, RegistryDetectionType::FileReference },
-                                    DetectionContext{ name, std::nullopt, message });
+                                    DetectionContext{ __name, std::nullopt, message });
                             }
                         }
                     }
@@ -168,14 +168,14 @@ namespace Hunts {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
-                                    DetectionContext{ name, std::nullopt, message });
+                                    DetectionContext{ __name, std::nullopt, message });
                             }
 
                             if(dll) {
                                 CREATE_DETECTION_WITH_CONTEXT(
                                     Certainty::Strong,
                                     RegistryDetectionData{ *dll, RegistryDetectionType::FileReference },
-                                    DetectionContext{ name, std::nullopt, message });
+                                    DetectionContext{ __name, std::nullopt, message });
                             }
                         }
                     }
@@ -194,7 +194,7 @@ namespace Hunts {
                 for(auto& value : pair.second) {
                     CREATE_DETECTION_WITH_CONTEXT(
                         Certainty::Weak, RegistryDetectionData{ value.first, RegistryDetectionType::FileReference },
-                        DetectionContext{ name, std::nullopt, message });
+                        DetectionContext{ __name, std::nullopt, message });
                 }
             } else {
                 dllpath = ToLowerCaseW(*dllpath);
@@ -210,12 +210,13 @@ namespace Hunts {
                                       L" and may have been hijacked" };
                         CREATE_DETECTION_WITH_CONTEXT(
                             Certainty::Weak, RegistryDetectionData{ value.first, RegistryDetectionType::FileReference },
-                            DetectionContext{ name, std::nullopt, message });
+                            DetectionContext{ __name, std::nullopt, message });
                     }
                 }
             }
         }
 
+        SUBSECTION_INIT(2, Intensive);
         // Ensure only Microsoft signed DLLs are used here
         std::vector<std::wstring> keypaths{ L"SOFTWARE\\Microsoft\\Cryptography\\OID\\EncodingType 0",
                                             L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust" };
@@ -251,6 +252,7 @@ namespace Hunts {
                 }
             }
         }
+        SUBSECTION_END();
 
         SUBTECHNIQUE_END();
     }
@@ -269,6 +271,8 @@ namespace Hunts {
         Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_LOCAL_MACHINE,
                                     L"SOFTWARE\\Microsoft\\Cryptography\\OID\\EncodingType 0", true, false, true);
         Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(1), HKEY_LOCAL_MACHINE,
+                                    L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust", true, false, true);
+        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(2), HKEY_LOCAL_MACHINE,
                                     L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust", true, false, true);
 
         return events;

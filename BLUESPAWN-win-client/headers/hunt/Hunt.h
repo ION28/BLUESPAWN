@@ -22,32 +22,33 @@ class HuntRegister;
 
 #define HUNT_INIT()                                       \
     std::vector<std::shared_ptr<Detection>> detections{}; \
-    LOG_INFO(1, "Beginning hunt for " << name);
+    auto __name{ this->name };                            \
+    LOG_INFO(1, "Beginning hunt for " << __name);
 
-#define SUBTECHNIQUE_INIT(id, desc)                                                                               \
-    if(!scope.Subtechniques || *scope.Subtechniques & (1 << id)) {                                                \
-        auto name{ (std::wstringstream{} << this->name << L" Subtechnique " << std::setfill(L'0') << std::setw(3) \
-                                         << id << L": " #desc)                                                    \
-                       .str() };
+#define SUBTECHNIQUE_INIT(id, desc)                                                                                 \
+    if(!scope.Subtechniques || *scope.Subtechniques & (1 << id)) {                                                  \
+        auto __name{ (std::wstringstream{} << this->name << L" Subtechnique " << std::setfill(L'0') << std::setw(3) \
+                                           << id << L": " #desc)                                                    \
+                         .str() };
 #define SUBTECHNIQUE_END() }
 
-#define SUBSECTION_INIT(id, intensity)                                                                                \
-    if(!scope.Subsections || *scope.Subsections & (1 << id)) {                                                        \
-        if(Bluespawn::aggressiveness < Aggressiveness::##intensity) {                                                 \
-            LOG_INFO(1,                                                                                               \
-                     L"Skipping " << name << L" subsection " #id "; rerun bluespawn at " #intensity " to run this."); \
+#define SUBSECTION_INIT(id, intensity)                                                                           \
+    if(!scope.Subsections || *scope.Subsections & (1 << id)) {                                                   \
+        if(Bluespawn::aggressiveness < Aggressiveness::##intensity) {                                            \
+            LOG_INFO(1, L"Skipping " << __name                                                                   \
+                                     << L" subsection " #id "; rerun BLUESPAWN at " #intensity " to run this."); \
         } else {
 #define SUBSECTION_END() \
     }                    \
     }
 
-#define HUNT_END()                             \
-    LOG_INFO(2, "Finished hunt for " << name); \
+#define HUNT_END()                               \
+    LOG_INFO(2, "Finished hunt for " << __name); \
     return detections;
 
 #define CREATE_DETECTION(certainty, ...) \
     detections.emplace_back(             \
-        Bluespawn::detections.AddDetection(Detection{ __VA_ARGS__, DetectionContext{ name } }, certainty));
+        Bluespawn::detections.AddDetection(Detection{ __VA_ARGS__, DetectionContext{ __name } }, certainty));
 
 #define CREATE_DETECTION_WITH_CONTEXT(certainty, ...)           \
     detections.emplace_back(Bluespawn::detections.AddDetection( \

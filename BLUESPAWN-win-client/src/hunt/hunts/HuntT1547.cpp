@@ -123,14 +123,14 @@ namespace Hunts {
                         auto value{ Bluespawn::detections.AddDetection(
                             Detection{ RegistryDetectionData{ RegistryValue{ lsa, PackageGroup, std::move(package) },
                                                               RegistryDetectionType::FileReference },
-                                       DetectionContext{ name } },
+                                       DetectionContext{ __name } },
                             Certainty::Moderate) };
                         detections.emplace_back(value);
 
                         // Since the security package is missing the dll extension, the scanner may not find the
                         // associated file
                         auto file{ Bluespawn::detections.AddDetection(
-                            Detection{ FileDetectionData{ *filepath }, DetectionContext{ name } }, Certainty::Weak) };
+                            Detection{ FileDetectionData{ *filepath }, DetectionContext{ __name } }, Certainty::Weak) };
                         detections.emplace_back(file);
 
                         // Define the association here since the scanner may not pick up on it
@@ -229,14 +229,14 @@ namespace Hunts {
                                 Detection{ RegistryDetectionData{
                                                RegistryValue{ key, L"Security Packages", std::move(package) },
                                                RegistryDetectionType::FileReference },
-                                           DetectionContext{ name } },
+                                           DetectionContext{ __name } },
                                 Certainty::Moderate) };
                             detections.emplace_back(value);
 
                             // Since the security package is missing the dll extension, the scanner may not find the
                             // associated file
                             auto file{ Bluespawn::detections.AddDetection(Detection{ FileDetectionData{ *filepath },
-                                                                                     DetectionContext{ name } },
+                                                                                     DetectionContext{ __name } },
                                                                           Certainty::Weak) };
                             detections.emplace_back(file);
 

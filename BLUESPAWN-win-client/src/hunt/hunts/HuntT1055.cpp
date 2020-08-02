@@ -33,12 +33,13 @@ namespace Hunts {
 
     void HuntT1055::HandleReport(OUT std::vector<std::shared_ptr<Detection>>& detections,
                                  IN CONST Promise<GenericWrapper<pesieve::ReportEx*>>& promise) {
+        auto __name{ this->name };
         auto value{ promise.GetValue() };
         if(value) {
             auto report{ *value };
             auto summary{ report->scan_report->generateSummary() };
             if(summary.skipped) {
-                LOG_WARNING("Skipped scanning " << summary.skipped << " modules in process "
+                LOG_INFO(2, "Skipped scanning " << summary.skipped << " modules in process "
                                                 << report->scan_report->getPid()
                                                 << ". This is likely due to use of .NET");
             }
@@ -71,7 +72,7 @@ namespace Hunts {
                 do {
                     auto pid{ info.th32ProcessID };
                     if(info.szExeFile == std::wstring{ L"vmmem" }) {
-                        LOG_WARNING(L"Skipping scans for process with PID " << pid << ".");
+                        LOG_INFO(2, L"Skipping scans for process with PID " << pid << ".");
                         continue;
                     }
 
@@ -99,7 +100,7 @@ namespace Hunts {
 
                             WRAP(pesieve::ReportEx*, report, scan_and_dump(params), delete data);
                             if(!report) {
-                                LOG_WARNING("Unable to scan process " << pid << " due to an error in PE-Sieve.dll");
+                                LOG_INFO(2, "Unable to scan process " << pid << " due to an error in PE-Sieve.dll");
                                 throw std::exception{ "Failed to scan process" };
                             }
 

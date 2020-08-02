@@ -35,7 +35,7 @@ namespace Hunts {
         dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
     }
 
-    void HuntT1543::Subtechnique003(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections){
+    void HuntT1543::Subtechnique003(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
         SUBTECHNIQUE_INIT(003, Windows Service);
 
         // DNS Service Audit
@@ -44,7 +44,7 @@ namespace Hunts {
                                           {
                                               { L"ServerLevelPluginDll", L"", false, CheckSzEmpty },
                                           },
-                                          false, false)){
+                                          false, false)) {
             CREATE_DETECTION(Certainty::Strong,
                              RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
         }
@@ -57,7 +57,7 @@ namespace Hunts {
                                               { L"LsaDbExtPt", L"", false, CheckSzEmpty },
                                               { L"DirectoryServiceExtPt", L"", false, CheckSzEmpty },
                                           },
-                                          false, false)){
+                                          false, false)) {
             CREATE_DETECTION(Certainty::Moderate,
                              RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
         }
@@ -66,9 +66,9 @@ namespace Hunts {
         // Winsock2 Service Audit
         auto winsock2 = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\WinSock2\\Parameters" };
         SUBSECTION_INIT(WINSOCK_PARAMS, Cursory);
-        for(auto paramdll : { L"AutodialDLL", L"NameSpace_Callout" }){
+        for(auto paramdll : { L"AutodialDLL", L"NameSpace_Callout" }) {
             auto detection{ Registry::RegistryValue::Create(winsock2, paramdll) };
-            if(detection && FileScanner::PerformQuickScan(detection->ToString())){
+            if(detection && FileScanner::PerformQuickScan(detection->ToString())) {
                 CREATE_DETECTION(Certainty::Moderate,
                                  RegistryDetectionData{ *detection, RegistryDetectionType::FileReference });
             }
@@ -77,9 +77,9 @@ namespace Hunts {
 
         SUBSECTION_INIT(WINSOCK_CATALOG, Cursory);
         auto appids = RegistryKey{ winsock2, L"AppId_Catalog" };
-        for(auto subkey : appids.EnumerateSubkeys()){
+        for(auto subkey : appids.EnumerateSubkeys()) {
             auto detection{ Registry::RegistryValue::Create(winsock2, L"AppFullPath") };
-            if(detection && FileScanner::PerformQuickScan(detection->ToString())){
+            if(detection && FileScanner::PerformQuickScan(detection->ToString())) {
                 CREATE_DETECTION(Certainty::Moderate,
                                  RegistryDetectionData{ *detection, RegistryDetectionType::FileReference });
             }
@@ -88,13 +88,13 @@ namespace Hunts {
 
         SUBSECTION_INIT(WINSOCK_CUR_CATALOG, Cursory);
         auto currentCallout = winsock2.GetValue<std::wstring>(L"Current_NameSpace_Catalog");
-        if(currentCallout){
+        if(currentCallout) {
             auto namespaceCatalog = RegistryKey{ winsock2, currentCallout.value() + L"\\Catalog_Entries" };
             auto namespaceCatalog64 = RegistryKey{ winsock2, currentCallout.value() + L"\\Catalog_Entries64" };
-            for(auto subkey : { namespaceCatalog, namespaceCatalog64 }){
-                for(auto entry : subkey.EnumerateSubkeys()){
+            for(auto subkey : { namespaceCatalog, namespaceCatalog64 }) {
+                for(auto entry : subkey.EnumerateSubkeys()) {
                     auto detection{ Registry::RegistryValue::Create(winsock2, L"LibraryPath") };
-                    if(detection && FileScanner::PerformQuickScan(detection->ToString())){
+                    if(detection && FileScanner::PerformQuickScan(detection->ToString())) {
                         CREATE_DETECTION(Certainty::Moderate,
                                          RegistryDetectionData{ *detection, RegistryDetectionType::FileReference });
                     }
@@ -106,9 +106,9 @@ namespace Hunts {
         // Service Failure Audit
         SUBSECTION_INIT(FAILURE_SECTION, Normal);
         auto services = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services" };
-        for(auto service : services.EnumerateSubkeys()){
+        for(auto service : services.EnumerateSubkeys()) {
             auto detection{ Registry::RegistryValue::Create(service, L"FailureCommand") };
-            if(detection && ProcessScanner::PerformQuickScan(detection->ToString())){
+            if(detection && ProcessScanner::PerformQuickScan(detection->ToString())) {
                 CREATE_DETECTION(Certainty::Moderate,
                                  RegistryDetectionData{ *detection, RegistryDetectionType::CommandReference });
             }
@@ -133,7 +133,7 @@ namespace Hunts {
 
         auto queryResults = EventLogs::QueryEvents(L"System", 7045, queries);
 
-        for(auto result : queryResults){
+        for(auto result : queryResults) {
             auto imageName{ result.GetProperty(L"Event/EventData/Data[@Name='ServiceName']") };
             auto imagePath{ GetImagePathFromCommand(result.GetProperty(L"Event/EventData/Data[@Name='ImagePath']")) };
 
@@ -142,25 +142,25 @@ namespace Hunts {
             ULONGLONG time = (ULONGLONG) stoull(result.GetTimeCreated());
             ULONGLONG nano = 0;
 
-            ft.dwHighDateTime = (DWORD) ((time >> 32) & 0xFFFFFFFF);
-            ft.dwLowDateTime = (DWORD) (time & 0xFFFFFFFF);
+            ft.dwHighDateTime = (DWORD)((time >> 32) & 0xFFFFFFFF);
+            ft.dwLowDateTime = (DWORD)(time & 0xFFFFFFFF);
 
             auto malicious{ Certainty::None };
 
             bool svchost{ false };
-            if(imagePath.find(L"svchost.exe") != std::wstring::npos){
+            if(imagePath.find(L"svchost.exe") != std::wstring::npos) {
                 // svchost services are rarely if ever should have 7045 events
                 malicious = malicious + Certainty::Strong;
                 svchost = true;
-            } else if(ServiceScanner::PerformQuickScan(std::nullopt, imageName, imagePath)){
+            } else if(ServiceScanner::PerformQuickScan(std::nullopt, imageName, imagePath)) {
                 malicious = malicious + Certainty::Moderate;
             }
 
-            if(malicious > Certainty::None){
+            if(malicious > Certainty::None) {
                 // clang-format off
                 CREATE_DETECTION_WITH_CONTEXT(
                     malicious, ServiceDetectionData{ std::nullopt, imageName, imagePath },
-                    DetectionContext{ name, ft, svchost ? std::optional<std::wstring>{
+                    DetectionContext{ __name, ft, svchost ? std::optional<std::wstring>{
                     L"Most if not all svchost services should come preinstalled and therefore should not show up in "
                     "the event logs. However, this can sometimes happen legitimately" } : std::nullopt });
                 // clang-format on
