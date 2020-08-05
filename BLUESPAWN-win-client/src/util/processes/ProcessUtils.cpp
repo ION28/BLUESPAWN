@@ -155,14 +155,14 @@ std::vector<std::wstring> EnumModules(const HandleWrapper& hProcess){
     std::vector<HMODULE> modules(1024);
     DWORD dwBytesNeeded{};
     auto status{ EnumProcessModules(hProcess, modules.data(), 1024 * sizeof(HMODULE), &dwBytesNeeded) };
-    if(dwBytesNeeded > 1024 * sizeof(HMODULE)){
+    while(dwBytesNeeded > modules.size() * sizeof(HMODULE)) {
         modules.resize(dwBytesNeeded / sizeof(HMODULE));
         status = EnumProcessModules(hProcess, modules.data(), dwBytesNeeded, &dwBytesNeeded);
     }
 
     std::vector<std::wstring> vModules{};
 
-    if(status){
+    if(status && status != ERROR_PARTIAL_COPY) {
         for(auto mod : modules){
             WCHAR path[MAX_PATH];
             if(GetModuleFileNameExW(hProcess, mod, path, MAX_PATH)){
@@ -193,12 +193,12 @@ LPVOID GetModuleAddress(const HandleWrapper& hProcess, const std::wstring& wsMod
     std::vector<HMODULE> modules(1024);
     DWORD dwBytesNeeded{};
     auto status{ EnumProcessModules(hProcess, modules.data(), 1024 * sizeof(HMODULE), &dwBytesNeeded) };
-    if(dwBytesNeeded > 1024 * sizeof(HMODULE)){
+    while(dwBytesNeeded > modules.size() * sizeof(HMODULE)) {
         modules.resize(dwBytesNeeded / sizeof(HMODULE));
         status = EnumProcessModules(hProcess, modules.data(), dwBytesNeeded, &dwBytesNeeded);
     }
 
-    if(status){
+    if(status && status != ERROR_PARTIAL_COPY) {
         for(auto mod : modules){
             WCHAR path[MAX_PATH];
             if(GetModuleFileNameExW(hProcess, mod, path, MAX_PATH)){
