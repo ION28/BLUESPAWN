@@ -25,11 +25,10 @@ class HuntRegister;
     auto __name{ this->name };                            \
     LOG_INFO(1, "Beginning hunt for " << __name);
 
-#define SUBTECHNIQUE_INIT(id, desc)                                                                                 \
-    if(!scope.Subtechniques || *scope.Subtechniques & (1 << id)) {                                                  \
-        auto __name{ (std::wstringstream{} << this->name << L" Subtechnique " << std::setfill(L'0') << std::setw(3) \
-                                           << id << L": " #desc)                                                    \
-                         .str() };
+#define SUBTECHNIQUE_INIT(id, desc)                                                                 \
+    if(!scope.Subtechniques || *scope.Subtechniques & (1 << id)) {                                  \
+        auto __name{ (std::wstringstream{} << this->name << L" Subtechnique " << std::setfill(L'0') \
+                                         << std::setw(3) << id << L": " #desc).str() };
 #define SUBTECHNIQUE_END() }
 
 #define SUBSECTION_INIT(id, intensity)                                                                           \
@@ -41,6 +40,9 @@ class HuntRegister;
 #define SUBSECTION_END() \
     }                    \
     }
+
+#define SCOPE(scope) \
+    Scope::CreateSubhuntScope(1 << scope)
 
 #define HUNT_END()                               \
     LOG_INFO(2, "Finished hunt for " << __name); \

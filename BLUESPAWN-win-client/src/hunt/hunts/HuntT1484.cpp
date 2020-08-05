@@ -5,6 +5,8 @@
 
 #include "user/bluespawn.h"
 
+#define NTUSER_MAN 0
+
 namespace Hunts {
 
     HuntT1484::HuntT1484() : Hunt(L"T1484 - Group Policy Modification") {
@@ -16,7 +18,7 @@ namespace Hunts {
     std::vector<std::shared_ptr<Detection>> HuntT1484::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
-        SUBSECTION_INIT(0, Normal)
+        SUBSECTION_INIT(NTUSER_MAN, Normal)
         auto userFolders = FileSystem::Folder(L"C:\\Users").GetSubdirectories(1);
         for(auto userFolder : userFolders) {
             FileSystem::File ntuserman{ userFolder.GetFolderPath() + L"\\ntuser.man" };
@@ -32,7 +34,7 @@ namespace Hunts {
     std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1484::GetMonitoringEvents() {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
-        auto scope{ Scope::CreateSubhuntScope(0) };
+        auto scope{ SCOPE(NTUSER_MAN) };
         events.push_back(std::make_pair(std::make_unique<FileEvent>(FileSystem::Folder(L"C:\\Users")), scope));
         auto userFolders = FileSystem::Folder(L"C:\\Users").GetSubdirectories(1);
         for(auto userFolder : userFolders) {

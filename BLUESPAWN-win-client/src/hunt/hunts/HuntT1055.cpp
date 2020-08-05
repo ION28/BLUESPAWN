@@ -49,10 +49,12 @@ namespace Hunts {
 
                 for(auto module : report->scan_report->moduleReports) {
                     if(module->status == pesieve::SCAN_SUSPICIOUS) {
-                        CREATE_DETECTION(Certainty::Strong, ProcessDetectionData::CreateMemoryDetectionData(
-                                                                report->scan_report->getPid(), path, module->module,
-                                                                static_cast<DWORD>(module->moduleSize),
-                                                                StringToWidestring(module->moduleFile), path));
+                        CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong,
+                                                      ProcessDetectionData::CreateMemoryDetectionData(
+                                                          report->scan_report->getPid(), path, module->module,
+                                                          static_cast<DWORD>(module->moduleSize),
+                                                          StringToWidestring(module->moduleFile), path),
+                                                      DetectionContext{ name });
                     }
                 }
             }

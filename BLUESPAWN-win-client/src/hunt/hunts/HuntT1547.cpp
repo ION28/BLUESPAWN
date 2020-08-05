@@ -178,16 +178,18 @@ namespace Hunts {
 
         SUBSECTION_INIT(WINLOGON, Cursory);
         // clang-format off
+        auto userinitRegex{ 
+            L"(C:\\\\[Ww](INDOWS|indows)\\\\[Ss](YSTEM32|ystem32)\\\\)?[Uu](SERINIT|serinit)\\.(exe|EXE),?" };
         std::vector<RegistryValue> winlogons{ CheckValues(HKEY_LOCAL_MACHINE,
             L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", {
                 { L"Shell", L"explorer\\.exe,?", false, CheckSzRegexMatch },
-                { L"UserInit", L"(C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\)?[Uu](SERINIT|"
-                    "serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch }
+                { L"UserInit", userinitRegex, false, CheckSzRegexMatch }
             }, true, true) };
         // clang-format on
 
         for(auto& detection : winlogons) {
-            CREATE_DETECTION(Certainty::Moderate, RegistryDetectionData{ detection });
+            // Moderate contextual certainty due to how rarely these values are used legitimately
+            CREATE_DETECTION(Certainty::Moderate, RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
         }
         SUBSECTION_END();
 
@@ -202,7 +204,8 @@ namespace Hunts {
         }
 
         for(auto& detection : notifies) {
-            CREATE_DETECTION(Certainty::Moderate, RegistryDetectionData{ detection });
+            // Weak contextual certainty due to how rarely these values are used legitimately
+            CREATE_DETECTION(Certainty::Weak, RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
         }
         SUBSECTION_END();
 
@@ -292,13 +295,13 @@ namespace Hunts {
 
         // Looks for T1547.001: Registry Run Keys / Startup Folder
         for(auto key : RunKeys) {
-            GetRegistryEvents(events, Scope::CreateSubhuntScope(RUN_KEY), HKEY_LOCAL_MACHINE, key);
+            GetRegistryEvents(events, SCOPE(RUN_KEY), HKEY_LOCAL_MACHINE, key);
         }
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(COMMAND_PROCESSOR), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(COMMAND_PROCESSOR), HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Command Processor");
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(STARTUP_FOLDER), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(STARTUP_FOLDER), HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders");
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(STARTUP_FOLDER), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(STARTUP_FOLDER), HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders");
         auto userFolders = FileSystem::Folder(L"C:\\Users").GetSubdirectories(1);
         for(auto userFolder : userFolders) {
@@ -306,26 +309,26 @@ namespace Hunts {
                                                                     L"Menu\\Programs\\StartUp" };
             if(folder.GetFolderExists()) {
                 events.push_back(
-                    std::make_pair(std::make_unique<FileEvent>(folder), Scope::CreateSubhuntScope(STARTUP_ITEMS)));
+                    std::make_pair(std::make_unique<FileEvent>(folder), SCOPE(STARTUP_ITEMS)));
             }
         }
 
         // Looks for T1547.002 (Authentication Package) and T1547.005 (Security Support Provider)
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(SSP | AUTH_PACKAGE), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, Scope::CreateSubhuntScope((1 << SSP) | (1 << AUTH_PACKAGE)), HKEY_LOCAL_MACHINE,
                           L"SYSTEM\\CurrentControlSet\\Control\\Lsa", false, false);
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(SSP | AUTH_PACKAGE), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, Scope::CreateSubhuntScope((1 << SSP) | (1 << AUTH_PACKAGE)), HKEY_LOCAL_MACHINE,
                           L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", false, false);
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(LSA_EXTENSION), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(LSA_EXTENSION), HKEY_LOCAL_MACHINE,
                           L"SYSTEM\\CurrentControlSet\\Control\\LsaExtensionConfig", false, false);
 
         // Looks for T1547.004: Winlogon Helper DLL
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(WINLOGON), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(WINLOGON), HKEY_LOCAL_MACHINE,
                           L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon");
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(WINLOGON_NOTIFY), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(WINLOGON_NOTIFY), HKEY_LOCAL_MACHINE,
                           L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify", true, true, true);
 
         // Looks for T1547.010: Port Monitors
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(PORT_MON), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(PORT_MON), HKEY_LOCAL_MACHINE,
                           L"SYSTEM\\CurrentControlSet\\Control\\Print\\Monitors", false, false, true);
 
         return events;

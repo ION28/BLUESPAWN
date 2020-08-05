@@ -10,6 +10,9 @@
 
 using namespace Registry;
 
+#define PRINTERS 0
+#define PORTS 1
+
 namespace Hunts {
 
     HuntT1068::HuntT1068() : Hunt(L"T1068 - Exploitation for Privilege Escalation") {
@@ -21,7 +24,7 @@ namespace Hunts {
     std::vector<std::shared_ptr<Detection>> HuntT1068::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
-        SUBSECTION_INIT(0, Cursory)
+        SUBSECTION_INIT(PRINTERS, Cursory)
         RegistryKey printers{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Print\\Printers",
                               true };
         for(auto printer : printers.EnumerateSubkeys()) {
@@ -39,7 +42,7 @@ namespace Hunts {
         }
         SUBSECTION_END();
 
-        SUBSECTION_INIT(1, Cursory);
+        SUBSECTION_INIT(PORTS, Cursory);
         RegistryKey ports{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Ports", true };
         for(auto value : ports.EnumerateValues()) {
             FileSystem::File filepath{ value };
@@ -61,10 +64,10 @@ namespace Hunts {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
         // CVE-2020-1048
-        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_LOCAL_MACHINE,
+        Registry::GetRegistryEvents(events, SCOPE(PRINTERS), HKEY_LOCAL_MACHINE,
                                     L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Print\\Printers", true, false, 
                                     true);
-        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(1), HKEY_LOCAL_MACHINE, 
+        Registry::GetRegistryEvents(events, SCOPE(PORTS), HKEY_LOCAL_MACHINE, 
                                     L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Ports", true, false, false);
 
         return events;

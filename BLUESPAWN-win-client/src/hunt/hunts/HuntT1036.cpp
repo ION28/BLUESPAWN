@@ -6,6 +6,8 @@
 #include "scan/FileScanner.h"
 #include "user/bluespawn.h"
 
+#define SEARCH_WRITABLE 0
+
 namespace Hunts {
 
     HuntT1036::HuntT1036() : Hunt(L"T1036 - Masquerading") {
@@ -17,7 +19,7 @@ namespace Hunts {
     void HuntT1036::Subtechnique005(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections){
         SUBTECHNIQUE_INIT(005, Match Legitimate Name or Location);
 
-        SUBSECTION_INIT(0, Intensive);
+        SUBSECTION_INIT(SEARCH_WRITABLE, Intensive);
         for(auto folder : writableFolders){
             auto f = FileSystem::Folder(folder);
             if(f.GetFolderExists()){
@@ -45,7 +47,7 @@ namespace Hunts {
     std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1036::GetMonitoringEvents() {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
-        Scope scope{ Scope::CreateSubhuntScope(0) };
+        Scope scope{ Scope::CreateSubhuntScope(1 << SEARCH_WRITABLE) };
         for(auto folder : writableFolders) {
             auto f = FileSystem::Folder(folder);
             if(f.GetFolderExists()) {

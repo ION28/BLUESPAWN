@@ -8,6 +8,8 @@
 
 #include "user/bluespawn.h"
 
+#define TIMESTOMP 0
+
 namespace Hunts {
 
     HuntT1070::HuntT1070() : Hunt(L"T1070 - Indicator Removal on Host") {
@@ -19,7 +21,7 @@ namespace Hunts {
     void HuntT1070::Subtechnique006(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections){
         SUBTECHNIQUE_INIT(006, Timestomp);
 
-        SUBSECTION_INIT(0, Normal);
+        SUBSECTION_INIT(TIMESTOMP, Normal);
         // Looks for T1070.006 Timestomp
         // Create existance queries so interesting data is output
         std::vector<EventLogs::XpathQuery> queries;
@@ -71,7 +73,7 @@ namespace Hunts {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events{};
 
         events.push_back(std::make_pair(std::make_unique<EventLogEvent>(L"Microsoft-Windows-Sysmon/Operational", 2), 
-                                        Scope::CreateSubhuntScope(0)));
+                                        SCOPE(TIMESTOMP)));
 
         return events;
     }

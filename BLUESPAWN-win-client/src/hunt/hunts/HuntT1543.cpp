@@ -183,18 +183,18 @@ namespace Hunts {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
         // Looks for T1543.003: Windows Service
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(FAILURE_SECTION), HKEY_LOCAL_MACHINE,
-                          L"SYSTEM\\CurrentControlSet\\Services", false, false);
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(NTDS_SECTION), HKEY_LOCAL_MACHINE,
-                          L"SYSTEM\\CurrentControlSet\\Services\\NTDS", false, false);
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(DNS_SECTION), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(FAILURE_SECTION), HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services",
+                          false, false);
+        GetRegistryEvents(events, SCOPE(NTDS_SECTION), HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\NTDS",
+                          false, false);
+        GetRegistryEvents(events, SCOPE(DNS_SECTION), HKEY_LOCAL_MACHINE,
                           L"SYSTEM\\CurrentControlSet\\Services\\DNS\\Parameters", false, false);
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(WINSOCK_PARAMS | WINSOCK_CUR_CATALOG), HKEY_LOCAL_MACHINE,
-                          L"SYSTEM\\CurrentControlSet\\Services\\WinSock2\\Parameters", false, false, true);
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(WINSOCK_CATALOG), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, Scope::CreateSubhuntScope((1 << WINSOCK_PARAMS) | (1 << WINSOCK_CUR_CATALOG)),
+                          HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\WinSock2\\Parameters", false,
+                          false, true);
+        GetRegistryEvents(events, SCOPE(WINSOCK_CATALOG), HKEY_LOCAL_MACHINE,
                           L"SYSTEM\\CurrentControlSet\\Services\\WinSock2\\Parameters\\AppId_Catalog", false, false);
-        events.push_back(
-            std::make_pair(std::make_unique<EventLogEvent>(L"System", 7045), Scope::CreateSubhuntScope(LOGS_SECTION)));
+        events.push_back(std::make_pair(std::make_unique<EventLogEvent>(L"System", 7045), SCOPE(LOGS_SECTION)));
 
         return events;
     }

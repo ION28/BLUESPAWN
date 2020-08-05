@@ -7,6 +7,8 @@
 #include "scan/YaraScanner.h"
 #include "user/bluespawn.h"
 
+#define WEB_SHELL 0
+
 namespace Hunts {
     HuntT1505::HuntT1505() : Hunt(L"T1505 - Server Software Component") {
         dwCategoriesAffected = (DWORD) Category::Files;
@@ -17,7 +19,7 @@ namespace Hunts {
     void HuntT1505::Subtechnique003(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections){
         SUBTECHNIQUE_INIT(003, Web Shell);
 
-        SUBSECTION_INIT(0, Normal);
+        SUBSECTION_INIT(WEB_SHELL, Normal);
         // Looks for T1505.003: Web Shell
         //PHP regex credit to: https://github.com/emposha/PHP-Shell-Detector
         php_vuln_functions.assign(
@@ -103,7 +105,7 @@ namespace Hunts {
     std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1505::GetMonitoringEvents() {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
-        auto scope{ Scope::CreateSubhuntScope(0) };
+        auto scope{ SCOPE(WEB_SHELL) };
         // Looks for T1505.003: Web Shell
         for(auto dir : web_directories) {
             auto folder = FileSystem::Folder{ dir };

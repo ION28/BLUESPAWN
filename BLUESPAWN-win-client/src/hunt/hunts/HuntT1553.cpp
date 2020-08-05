@@ -17,6 +17,10 @@
 
 using namespace Registry;
 
+#define SIPS 0
+#define PROVIDERS 1
+#define SIGNED 2
+
 namespace Hunts {
 
     HuntT1553::HuntT1553() : Hunt(L"T1553 - Subvert Trust Controls") {
@@ -72,7 +76,7 @@ namespace Hunts {
         std::unordered_map<std::wstring, std::vector<std::pair<RegistryValue, std::wstring>>> files{};
 
         // Verify SIPs
-        SUBSECTION_INIT(0, Intensive);
+        SUBSECTION_INIT(SIPS, Intensive);
         auto goodSIP{ ParseResource(GoodSIP) };
         for(auto keypath : { L"SOFTWARE\\Microsoft\\Cryptography\\OID\\EncodingType 0",
                              L"SOFTWARE\\WoW6432Node\\Microsoft\\Cryptography\\OID\\EncodingType 0" }) {
@@ -130,7 +134,7 @@ namespace Hunts {
         SUBSECTION_END();
 
         // Verify trust providers
-        SUBSECTION_INIT(1, Intensive);
+        SUBSECTION_INIT(PROVIDERS, Intensive);
         auto goodTrustProviders{ ParseResource(GoodTrustProviders) };
         for(auto keypath : { L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust",
                              L"SOFTWARE\\WoW6432Node\\Microsoft\\Cryptography\\Providers\\Trust" }) {
@@ -216,8 +220,8 @@ namespace Hunts {
             }
         }
 
-        SUBSECTION_INIT(2, Intensive);
         // Ensure only Microsoft signed DLLs are used here
+        SUBSECTION_INIT(SIGNED, Intensive);
         std::vector<std::wstring> keypaths{ L"SOFTWARE\\Microsoft\\Cryptography\\OID\\EncodingType 0",
                                             L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust" };
         for(auto keypath : keypaths) {
@@ -268,12 +272,11 @@ namespace Hunts {
     std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1553::GetMonitoringEvents() {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
-        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_LOCAL_MACHINE,
+        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope((1 << SIPS) | (1 << SIGNED)), HKEY_LOCAL_MACHINE,
                                     L"SOFTWARE\\Microsoft\\Cryptography\\OID\\EncodingType 0", true, false, true);
-        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(1), HKEY_LOCAL_MACHINE,
-                                    L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust", true, false, true);
-        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(2), HKEY_LOCAL_MACHINE,
-                                    L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust", true, false, true);
+        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope((1 << PROVIDERS) | (1 << SIGNED)),
+                                    HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Cryptography\\Providers\\Trust", true,
+                                    false, true);
 
         return events;
     }

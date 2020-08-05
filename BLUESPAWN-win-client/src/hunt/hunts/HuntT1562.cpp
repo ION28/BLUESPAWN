@@ -9,6 +9,8 @@
 
 using namespace Registry;
 
+#define REGISTRY_FIREWALL 0
+
 namespace Hunts {
 
     HuntT1562::HuntT1562() : Hunt(L"T1562 - Impair Defenses") {
@@ -20,7 +22,7 @@ namespace Hunts {
     void HuntT1562::Subtechnique004(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
         SUBTECHNIQUE_INIT(004, Disable or Modify System Firewall);
 
-        SUBSECTION_INIT(0, Normal);
+        SUBSECTION_INIT(REGISTRY_FIREWALL, Normal);
         RegistryKey DomainProfile{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters"
                                                        L"\\FirewallPolicy\\DomainProfile" };
         RegistryKey StandardProfile{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameter"
@@ -66,15 +68,15 @@ namespace Hunts {
     std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1562::GetMonitoringEvents() {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
-        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_LOCAL_MACHINE,
+        Registry::GetRegistryEvents(events, SCOPE(REGISTRY_FIREWALL), HKEY_LOCAL_MACHINE,
                                     L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\Do"
                                     L"mainProfile",
                                     false, false, true);
-        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_LOCAL_MACHINE,
+        Registry::GetRegistryEvents(events, SCOPE(REGISTRY_FIREWALL), HKEY_LOCAL_MACHINE,
                                     L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\St"
                                     L"andardProfile",
                                     false, false, true);
-        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(0), HKEY_LOCAL_MACHINE,
+        Registry::GetRegistryEvents(events, SCOPE(REGISTRY_FIREWALL), HKEY_LOCAL_MACHINE,
                                     L"SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\Pu"
                                     L"blicProfile",
                                     false, false, true);

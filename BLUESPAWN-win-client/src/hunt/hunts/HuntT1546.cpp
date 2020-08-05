@@ -300,45 +300,45 @@ namespace Hunts {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
         // Looks for T1546.007: Netsh Helper DLL
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(NETSH_HELPER), HKEY_LOCAL_MACHINE,
-                          L"SOFTWARE\\Microsoft\\Netsh", true, false, false);
+        GetRegistryEvents(events, SCOPE(NETSH_HELPER), HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Netsh", true, false,
+                          false);
 
         // Looks for T1546.008: Accessibility Features
         for(auto key : vAccessibilityBinaries) {
-            Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(ACCESSIBILITY_HIJACK), HKEY_LOCAL_MACHINE,
-                                        wsIFEO + key, true, false, false);
+            Registry::GetRegistryEvents(events, SCOPE(ACCESSIBILITY_HIJACK), HKEY_LOCAL_MACHINE, wsIFEO + key, true,
+                                        false, false);
         }
 
         // Looks for T1546.009: AppCert DLLs
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(APPCERT_DLL), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(APPCERT_DLL), HKEY_LOCAL_MACHINE,
                           L"System\\CurrentControlSet\\Control\\Session Manager", true, false, false);
 
         // Looks for T1546.010: AppInit DLLs
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(APPINIT_DLL), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(APPINIT_DLL), HKEY_LOCAL_MACHINE,
                           L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", true, false, false);
 
         // Looks for T1546.011: Application Shimming
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(APPLICATION_SHIM), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(APPLICATION_SHIM), HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB");
-        GetRegistryEvents(events, Scope::CreateSubhuntScope(APPLICATION_SHIM), HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(APPLICATION_SHIM), HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom");
         events.push_back(
             std::make_pair(std::make_unique<FileEvent>(FileSystem::Folder{ L"C:\\Windows\\AppPatch\\Custom" }),
-                           Scope::CreateSubhuntScope(APPLICATION_SHIM)));
+                           SCOPE(APPLICATION_SHIM)));
         events.push_back(std::make_pair(std::make_unique<FileEvent>(FileSystem::Folder{ L"C:"
                                                                                         L"\\Windows\\AppPatch\\Custom\\"
                                                                                         L"Custom64" }),
-                                        Scope::CreateSubhuntScope(APPLICATION_SHIM)));
+                                        SCOPE(APPLICATION_SHIM)));
 
         // Looks for T1546.012: Image File Execution Options Injection
-        Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(IFEO_HIJACK), HKEY_LOCAL_MACHINE,
+        Registry::GetRegistryEvents(events, SCOPE(IFEO_HIJACK), HKEY_LOCAL_MACHINE,
                                     L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options",
                                     true, false, true);
 
         // Looks for T1546.015: Component Object Model Hijacking
         if(Bluespawn::aggressiveness >= Aggressiveness::Intensive) {
-            Registry::GetRegistryEvents(events, Scope::CreateSubhuntScope(COM_HIJACK), HKEY_LOCAL_MACHINE,
-                                        L"SOFTWARE\\Classes\\CLSID", true, true, true);
+            Registry::GetRegistryEvents(events, SCOPE(COM_HIJACK), HKEY_LOCAL_MACHINE, L"SOFTWARE\\Classes\\CLSID",
+                                        true, true, true);
         }
 
         return events;

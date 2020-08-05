@@ -7,6 +7,9 @@
 #include "scan/YaraScanner.h"
 #include "user/bluespawn.h"
 
+#define EVT_4698 0
+#define EVT_106 1
+
 namespace Hunts {
 
     HuntT1053::HuntT1053() : Hunt(L"T1053 - Scheduled Task/Job") {
@@ -18,7 +21,7 @@ namespace Hunts {
     void HuntT1053::Subtechnique005(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections){
         SUBTECHNIQUE_INIT(005, Scheduled Task);
 
-        SUBSECTION_INIT(0, Cursory);
+        SUBSECTION_INIT(EVT_4698, Cursory);
         std::vector<EventLogs::XpathQuery> queries;
         auto param1 = EventLogs::ParamList();
         auto param2 = EventLogs::ParamList();
@@ -45,7 +48,7 @@ namespace Hunts {
         }
         SUBSECTION_END();
 
-        SUBSECTION_INIT(1, Cursory);
+        SUBSECTION_INIT(EVT_106, Cursory);
         std::vector<EventLogs::XpathQuery> queries2;
         auto param5 = EventLogs::ParamList();
         auto param6 = EventLogs::ParamList();
@@ -72,7 +75,7 @@ namespace Hunts {
         HUNT_INIT();
 
         // Looks for T1053.005: Scheduled Task
-
+        Subtechnique005(scope, detections);
 
         HUNT_END();
     }
@@ -80,10 +83,9 @@ namespace Hunts {
     std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1053::GetMonitoringEvents() {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
-        events.push_back(std::make_pair(std::make_unique<EventLogEvent>(L"Security", 4698), 
-                                        Scope::CreateSubhuntScope(0)));
+        events.push_back(std::make_pair(std::make_unique<EventLogEvent>(L"Security", 4698), SCOPE(EVT_4698)));
         events.push_back(std::make_pair(std::make_unique<EventLogEvent>(L"Microsoft-Windows-TaskScheduler/Operational", 
-                                                                        106), Scope::CreateSubhuntScope(1)));
+                                                                        106), SCOPE(EVT_106)));
 
         return events;
     }
