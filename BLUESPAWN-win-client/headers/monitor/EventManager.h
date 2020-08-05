@@ -9,7 +9,8 @@
 class EventManager {
 
 	public:
-		DWORD SubscribeToEvent(std::unique_ptr<Event>&& e, const std::function<void()>& callback);
+		DWORD SubscribeToEvent(std::unique_ptr<Event>&& e, const std::function<void(IN CONST Scope&)>& callback,
+							   IN CONST Scope& scope);
 		
 		// EventManager is a singleton class; call GetInstance() to get an instance of it.
 		static EventManager& GetInstance();

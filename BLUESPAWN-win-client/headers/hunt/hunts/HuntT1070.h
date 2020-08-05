@@ -10,13 +10,13 @@ namespace Hunts {
 	 * @monitor Triggers a hunt whenever Sysmon log event ID 2 is generated
 	 */
     class HuntT1070 : public Hunt {
-        private:
-        std::wstring t1070_006 = L"006: Timestomp";
 
         public:
         HuntT1070();
 
+        void Subtechnique006(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+
         virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
-        virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
+        virtual std::vector<std::pair<std::unique_ptr<Event>, Scope>> GetMonitoringEvents() override;
     };
 }   // namespace Hunts
