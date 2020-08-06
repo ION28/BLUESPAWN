@@ -162,7 +162,7 @@ std::vector<std::wstring> EnumModules(const HandleWrapper& hProcess){
 
     std::vector<std::wstring> vModules{};
 
-    if(status || GetLastError() == ERROR_PARTIAL_COPY) {
+    if(status) {
         for(auto mod : modules){
             WCHAR path[MAX_PATH];
             if(GetModuleFileNameExW(hProcess, mod, path, MAX_PATH)){
@@ -198,7 +198,7 @@ LPVOID GetModuleAddress(const HandleWrapper& hProcess, const std::wstring& wsMod
         status = EnumProcessModules(hProcess, modules.data(), dwBytesNeeded, &dwBytesNeeded);
     }
 
-    if(status || GetLastError() == ERROR_PARTIAL_COPY) {
+    if(status) {
         for(auto mod : modules){
             WCHAR path[MAX_PATH];
             if(GetModuleFileNameExW(hProcess, mod, path, MAX_PATH)){
