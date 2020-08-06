@@ -130,6 +130,31 @@ void FileScanner::UpdateModules() {
     }
 }
 
+bool IsPEFile(IN CONST FileSystem::File& file){
+    if(file.GetFileExists()){
+        if(!file.HasReadAccess()){
+            LOG_WARNING(L"Unable to properly scan " << file << L" due to lack of read access.");
+            return false;
+        }
+
+        auto headers{ file.Read(0x400) };
+        MemoryWrapper<> memory{ static_cast<LPVOID>(headers), headers.GetSize() };
+        if(*memory.Convert<WORD>() != 0x5A4D){
+            return false;
+        }
+
+        DWORD offset{ *memory.GetOffset(0x3C).Convert<DWORD>() };
+        if(offset + 4 >= 0x400){
+            LOG_INFO(2, "File " << file << " may conform to the PE32+ standard, but it is not normal PE.");
+            return false;
+        }
+
+        return *memory.GetOffset(offset).Convert<DWORD>() == 0x4550UL;
+    } else{
+        return false;
+    }
+}
+
 bool FileScanner::PerformQuickScan(IN CONST std::wstring& string) {
     if(FileSystem::CheckFileExists(string)) {
         return !FileSystem::File{ string }.GetFileSigned();
@@ -150,7 +175,7 @@ FileScanner::GetAssociatedDetections(IN CONST Detection& detection) {
 
     auto data{ std::get<FileDetectionData>(detection.data) };
 
-    if(data.Executor && ProcessScanner::PerformQuickScan(*data.Executor)) {
+    if(data.Executor && !IsPEFile(*data.FileHandle) && ProcessScanner::PerformQuickScan(*data.Executor)) {
         detections.emplace(Bluespawn::detections.AddDetection(
             Detection{ ProcessDetectionData::CreateCommandDetectionData(*data.Executor) }), Association::Strong);
     }
@@ -194,31 +219,6 @@ FileScanner::GetAssociatedDetections(IN CONST Detection& detection) {
     }
 
     return detections;
-}
-
-bool IsPEFile(IN CONST FileSystem::File& file){
-    if(file.GetFileExists()){
-        if(!file.HasReadAccess()){
-            LOG_WARNING(L"Unable to properly scan " << file << L" due to lack of read access.");
-            return false;
-        }
-
-        auto headers{ file.Read(0x400) };
-        MemoryWrapper<> memory{ static_cast<LPVOID>(headers), headers.GetSize() };
-        if(*memory.Convert<WORD>() != 0x5A4D){
-            return false;
-        }
-
-        DWORD offset{ *memory.GetOffset(0x3C).Convert<DWORD>() };
-        if(offset + 4 >= 0x400){
-            LOG_INFO(2, "File " << file << " may conform to the PE32+ standard, but it is not normal PE.");
-            return false;
-        }
-
-        return *memory.GetOffset(offset).Convert<DWORD>() == 0x4550UL;
-    } else{
-        return false;
-    }
 }
 
 Certainty FileScanner::ScanDetection(IN CONST Detection& detection) {
