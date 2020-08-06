@@ -133,8 +133,11 @@ void FileScanner::UpdateModules() {
 bool FileScanner::PerformQuickScan(IN CONST std::wstring& string) {
     if(FileSystem::CheckFileExists(string)) {
         return !FileSystem::File{ string }.GetFileSigned();
-    } else
+    } else if(auto path{ FileSystem::SearchPathExecutable(string) }){
+        return !FileSystem::File{ *path }.GetFileSigned();
+    } else{
         return false;
+    }
 }
 
 std::unordered_map<std::shared_ptr<Detection>, Association>
