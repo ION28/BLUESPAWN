@@ -14,9 +14,6 @@ namespace Hunts {
 	 */
     class HuntT1036 : public Hunt {
         private:
-        std::wstring t1036_005 = L"005: Match Legitimate Name or Location";
-
-        private:
         // Credit: https://twitter.com/mattifestation/status/1172520995472756737/photo/1
         std::vector<std::wstring> writableFolders = { L"%WINDIR%\\System32\\Microsoft\\crypto\\rsa\\machinekeys",
                                                       L"%WINDIR%\\System32\\tasks_"
@@ -40,7 +37,9 @@ namespace Hunts {
         public:
         HuntT1036();
 
+        void Subtechnique005(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+
         virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
-        virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
+        virtual std::vector<std::pair<std::unique_ptr<Event>, Scope>> GetMonitoringEvents() override;
     };
 }   // namespace Hunts

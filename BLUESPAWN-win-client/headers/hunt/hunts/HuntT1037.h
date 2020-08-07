@@ -10,13 +10,13 @@ namespace Hunts {
 	 * HuntT1037 examines the registry and filesystem for logon scripts
 	 */
     class HuntT1037 : public Hunt {
-        private:
-        std::wstring t1037_001 = L"001: Logon Script (Windows)";
 
         public:
         HuntT1037();
 
+        void Subtechnique001(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+
         virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
-        virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents() override;
+        virtual std::vector<std::pair<std::unique_ptr<Event>, Scope>> GetMonitoringEvents() override;
     };
 }   // namespace Hunts

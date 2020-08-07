@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <vector>
+#include <optional>
 
 /**
  * Used to define the scope of a hunt. Currently, this operates by requiring the programmer to
@@ -10,24 +11,14 @@
  */
 class Scope {
 public:
-	virtual bool FileIsInScope(LPCSTR sFileName) const;
-	virtual bool FileIsInScope(HANDLE hFile) const;
-	virtual std::vector<HANDLE> GetScopedFileHandles() const;
-	virtual std::vector<LPCSTR> GetScopedFileNames() const;
 
-	virtual bool RegistryKeyIsInScope(LPCSTR sKeyPath) const;
-	virtual bool RegistryKeyIsInScope(HKEY key) const;
-	virtual std::vector<HKEY> GetScopedKHEYs() const;
-	virtual std::vector<LPCSTR> GetScopedRegKeyNames() const;
+	/// This field is specific to the hunt being run. It is computed as a bitwise OR of segments of the hunt. Note that
+	/// subsections should be unique per hunt and that different subtechniques should not use the same hunt segments.
+	std::optional<DWORD64> Subsections;
 
-	virtual bool ProcessIsInScope(DWORD pid) const;
-	virtual bool ProcessIsInScope(HANDLE hProcess) const;
-	virtual std::vector<HANDLE> GetScopedProcessHandles() const;
-	virtual std::vector<DWORD> GetScopedProcessPIDs() const;
+	/// This field is specific to the hunt being run. It is computed as a bitwise OR of subtechnique IDs to be run. 
+	std::optional<DWORD> Subtechniques;
 
-	virtual bool ServiceIsInScope(LPCSTR sServiceName) const;
-	virtual bool ServiceIsInScope(SC_HANDLE hService) const;
-	virtual std::vector<SC_HANDLE> GetScopedServiceHandles() const;
-	virtual std::vector<LPCSTR> GetScopedServiceNames() const;
+	static Scope CreateSubhuntScope(IN DWORD Subtechniques, IN DWORD64 Subsections = -1ULL OPTIONAL);
 };
 
