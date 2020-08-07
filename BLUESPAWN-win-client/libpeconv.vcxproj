@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C9D09618-1DE6-3323-AED8-9B885AC8D9F3}</ProjectGuid>
+    <ProjectName>libpeconv</ProjectName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <BuildLog>
+      <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\include;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <UndefinePreprocessorDefinitions>UNICODE</UndefinePreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Lib>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)config\buildsettings.props" />
+    <Import Project="$(SolutionDir)config\buildstructure.props" />
+  </ImportGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ItemGroup>
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_hdrs_helper.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_mode_detector.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_raw_to_virtual.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_virtual_to_raw.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\relocate.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\util.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\buffer_util.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\remote_pe_reader.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\imports_loader.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\delayed_imports_loader.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\fix_imports.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_loader.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\pe_dumper.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\exports_lookup.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\function_resolver.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\hooks.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\exported_func.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\exports_mapper.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\resource_parser.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\file_util.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\resource_util.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\imports_uneraser.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\load_config_util.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\load_config_defs.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include\peconv\caves.h" />
+    <ClInclude Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\fix_dot_net_ep.h" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\pe_hdrs_helper.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\pe_mode_detector.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\pe_raw_to_virtual.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\pe_virtual_to_raw.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\relocate.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\buffer_util.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\remote_pe_reader.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\imports_loader.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\delayed_imports_loader.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\fix_imports.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\pe_loader.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\pe_dumper.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\exports_lookup.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\function_resolver.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\hooks.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\exported_func.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\exports_mapper.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\resource_parser.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\file_util.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\resource_util.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\imports_uneraser.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\load_config_util.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\caves.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\util.cpp" />
+    <ClCompile Include="$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\src\fix_dot_net_ep.cpp" />
+  </ItemGroup>
+</Project>
