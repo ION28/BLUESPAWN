@@ -1,7 +1,7 @@
 #include "hunt/hunts/HuntT1055.h"
 
 #include <Psapi.h>
-#pragma pack(push,8)
+#pragma pack(push, 8)
 #include <TlHelp32.h>
 #pragma pack(pop)
 #include <Windows.h>
@@ -33,12 +33,13 @@ namespace Hunts {
 
     void HuntT1055::HandleReport(OUT std::vector<std::shared_ptr<Detection>>& detections,
                                  IN CONST Promise<GenericWrapper<pesieve::ReportEx*>>& promise) {
+        auto __name{ this->name };
         auto value{ promise.GetValue() };
         if(value) {
             auto report{ *value };
             auto summary{ report->scan_report->generateSummary() };
             if(summary.skipped) {
-                LOG_WARNING("Skipped scanning " << summary.skipped << " modules in process "
+                LOG_INFO(2, "Skipped scanning " << summary.skipped << " modules in process "
                                                 << report->scan_report->getPid()
                                                 << ". This is likely due to use of .NET");
             }
@@ -48,10 +49,12 @@ namespace Hunts {
 
                 for(auto module : report->scan_report->moduleReports) {
                     if(module->status == pesieve::SCAN_SUSPICIOUS) {
-                        CREATE_DETECTION(Certainty::Strong, ProcessDetectionData::CreateMemoryDetectionData(
-                                                                report->scan_report->getPid(), path, module->module,
-                                                                static_cast<DWORD>(module->moduleSize),
-                                                                StringToWidestring(module->moduleFile), path));
+                        CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong,
+                                                      ProcessDetectionData::CreateMemoryDetectionData(
+                                                          report->scan_report->getPid(), path, module->module,
+                                                          static_cast<DWORD>(module->moduleSize),
+                                                          StringToWidestring(module->moduleFile), path),
+                                                      DetectionContext{ name });
                     }
                 }
             }
@@ -59,8 +62,9 @@ namespace Hunts {
     }
 
     std::vector<std::shared_ptr<Detection>> HuntT1055::RunHunt(const Scope& scope) {
-        HUNT_INIT_LEVEL(Normal);
+        HUNT_INIT();
 
+        SUBSECTION_INIT(0, Normal);
         HandleWrapper snapshot{ CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) };
         if(snapshot) {
             PROCESSENTRY32W info{};
@@ -68,45 +72,42 @@ namespace Hunts {
             if(Process32FirstW(snapshot, &info)) {
                 std::vector<Promise<GenericWrapper<pesieve::ReportEx*>>> results{};
                 do {
-                    if(scope.ProcessIsInScope(info.th32ProcessID)) {
-                        auto pid{ info.th32ProcessID };
-                        if(info.szExeFile == std::wstring{ L"vmmem" }) {
-                            LOG_WARNING(L"Skipping scans for process with PID " << pid << ".");
-                            continue;
-                        }
-
-                        results.emplace_back(
-                            ThreadPool::GetInstance().RequestPromise<GenericWrapper<pesieve::ReportEx*>>([pid]() {
-                                pesieve::t_params params{ pid,
-                                                          3,
-                                                          Bluespawn::aggressiveness == Aggressiveness::Intensive ?
-                                                              pesieve::PE_DNET_NONE :
-                                                              pesieve::PE_DNET_SKIP_HOOKS,
-                                                          pesieve::PE_IMPREC_NONE,
-                                                          true,
-                                                          pesieve::OUT_NO_DIR,
-                                                          Bluespawn::aggressiveness != Aggressiveness::Intensive,
-                                                          Bluespawn::aggressiveness == Aggressiveness::Intensive,
-                                                          Bluespawn::aggressiveness == Aggressiveness::Intensive ?
-                                                              pesieve::PE_IATS_FILTERED :
-                                                              pesieve::PE_IATS_NONE,
-                                                          Bluespawn::aggressiveness == Aggressiveness::Intensive ?
-                                                              pesieve::PE_DATA_SCAN_NO_DEP :
-                                                              pesieve::PE_DATA_NO_SCAN,
-                                                          false,
-                                                          pesieve::PE_DUMP_AUTO,
-                                                          false,
-                                                          0 };
-
-                                WRAP(pesieve::ReportEx*, report, scan_and_dump(params), delete data);
-                                if(!report) {
-                                    LOG_WARNING("Unable to scan process " << pid << " due to an error in PE-Sieve.dll");
-                                    throw std::exception{ "Failed to scan process" };
-                                }
-
-                                return report;
-                            }));
+                    auto pid{ info.th32ProcessID };
+                    if(info.szExeFile == std::wstring{ L"vmmem" }) {
+                        LOG_INFO(2, L"Skipping scans for process with PID " << pid << ".");
+                        continue;
                     }
+
+                    results.emplace_back(
+                        ThreadPool::GetInstance().RequestPromise<GenericWrapper<pesieve::ReportEx*>>([pid]() {
+                            pesieve::t_params params{
+                                pid,
+                                3,
+                                Bluespawn::aggressiveness == Aggressiveness::Intensive ? pesieve::PE_DNET_NONE :
+                                                                                         pesieve::PE_DNET_SKIP_HOOKS,
+                                pesieve::PE_IMPREC_NONE,
+                                true,
+                                pesieve::OUT_NO_DIR,
+                                Bluespawn::aggressiveness != Aggressiveness::Intensive,
+                                Bluespawn::aggressiveness == Aggressiveness::Intensive,
+                                Bluespawn::aggressiveness == Aggressiveness::Intensive ? pesieve::PE_IATS_FILTERED :
+                                                                                         pesieve::PE_IATS_NONE,
+                                Bluespawn::aggressiveness == Aggressiveness::Intensive ? pesieve::PE_DATA_SCAN_NO_DEP :
+                                                                                         pesieve::PE_DATA_NO_SCAN,
+                                false,
+                                pesieve::PE_DUMP_AUTO,
+                                false,
+                                0
+                            };
+
+                            WRAP(pesieve::ReportEx*, report, scan_and_dump(params), delete data);
+                            if(!report) {
+                                LOG_INFO(2, "Unable to scan process " << pid << " due to an error in PE-Sieve.dll");
+                                throw std::exception{ "Failed to scan process" };
+                            }
+
+                            return report;
+                        }));
                 } while(Process32NextW(snapshot, &info));
 
                 for(auto& promise : results) {
@@ -119,6 +120,7 @@ namespace Hunts {
         } else {
             LOG_ERROR("Unable to enumerate processes - Process related hunts will not run.");
         }
+        SUBSECTION_END();
 
         HUNT_END();
     }

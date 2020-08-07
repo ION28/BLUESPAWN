@@ -23,8 +23,8 @@ std::vector<std::shared_ptr<Detection>> Hunt::RunHunt(IN CONST Scope& scope){
 	return {};
 }
 
-std::vector<std::unique_ptr<Event>> Hunt::GetMonitoringEvents() {
-	return std::vector<std::unique_ptr<Event>>();
+std::vector<std::pair<std::unique_ptr<Event>, Scope>> Hunt::GetMonitoringEvents() {
+	return std::vector<std::pair<std::unique_ptr<Event>, Scope>>();
 }
 
 bool Hunt::AffectsCategory(IN DWORD dwStuff){

@@ -6,13 +6,13 @@
 
 Event::Event(EventType type) : type(type) {}
 
-void Event::AddCallback(const std::function<void()>& callback) {
-	callbacks.push_back(callback);
+void Event::AddCallback(const std::function<void(IN CONST Scope&)>& callback, IN CONST Scope& scope) {
+	callbacks.push_back(std::make_pair(callback, scope));
 }
 
 void Event::RunCallbacks() const {
-	for(auto callback : callbacks){
-		callback();
+	for(auto pair : callbacks){
+		pair.first(pair.second);
 	}
 }
 
@@ -163,8 +163,9 @@ const FileSystem::Folder& FileEvent::GetFolder() const {
 }
 
 namespace Registry {
-	void GetRegistryEvents(OUT std::vector<std::unique_ptr<Event>>& dest, IN HKEY hkHive, IN CONST std::wstring& path, 
-						   IN bool WatchWow64 OPTIONAL, IN bool WatchUsers OPTIONAL, IN bool WatchSubkeys OPTIONAL){
+	void GetRegistryEvents(OUT std::vector<std::pair<std::unique_ptr<Event>, Scope>>& dest, IN CONST Scope& scope,
+						   IN HKEY hkHive, IN CONST std::wstring& path, IN bool WatchWow64 OPTIONAL, 
+						   IN bool WatchUsers OPTIONAL, IN bool WatchSubkeys OPTIONAL){
 		std::unordered_set<RegistryKey> vKeys{ RegistryKey{ hkHive, path } };
 		if(WatchWow64){
 			RegistryKey Wow64Key{ HKEY(hkHive), path, true };
@@ -189,7 +190,7 @@ namespace Registry {
 		}
 		
 		for(auto& key : vKeys){
-			dest.emplace_back(std::make_unique<RegistryEvent>(key));
+			dest.emplace_back(std::make_pair(std::make_unique<RegistryEvent>(key), scope));
 		}
 	}
 }

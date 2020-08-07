@@ -96,8 +96,8 @@ namespace Log {
                                     IN CONST Association& a) {
         AcquireMutex mutex{ hMutex };
 
-        SetConsoleColor(CLISink::PrependColors[4]);
-        std::wcout << CLISink::MessagePrepends[4];
+        SetConsoleColor(CLISink::PrependColors[2]);
+        std::wcout << CLISink::MessagePrepends[2];
         SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
         std::wcout << L" Detections with IDs " << first->dwID << L" and " << second->dwID << L" now are associated"
                    << L" with strength " << static_cast<double>(a) << std::endl;
@@ -107,8 +107,8 @@ namespace Log {
         BeginCriticalSection _{ *detection };
         AcquireMutex mutex{ hMutex };
 
-        SetConsoleColor(CLISink::PrependColors[4]);
-        std::wcout << CLISink::MessagePrepends[4];
+        SetConsoleColor(CLISink::PrependColors[2]);
+        std::wcout << CLISink::MessagePrepends[2];
         SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
         std::wcout << L" Detection with ID " << detection->dwID << L" now has certainty "
                    << static_cast<double>(detection->info.GetCertainty()) << std::endl;

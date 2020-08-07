@@ -17,6 +17,15 @@
 
 using namespace Registry;
 
+#define NETSH_HELPER 0
+#define ACCESSIBILITY_HIJACK 1
+#define ACCESSIBILITY_REPLACE 2
+#define APPCERT_DLL 3
+#define APPINIT_DLL 4
+#define APPLICATION_SHIM 5
+#define IFEO_HIJACK 6
+#define COM_HIJACK 7
+
 namespace Hunts {
 
     HuntT1546::HuntT1546() : Hunt(L"T1546 - Event Triggered Execution") {
@@ -32,19 +41,24 @@ namespace Hunts {
         files.emplace(file, std::vector<RegistryValue>{ __VA_ARGS__ }); \
     }
 
-    std::vector<std::shared_ptr<Detection>> HuntT1546::RunHunt(IN CONST Scope& scope) {
-        HUNT_INIT();
+    void HuntT1546::Subtechnique007(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(7, Netsh Helper DLL);
 
-        // Looks for T1546.007: Netsh Helper DLL
+        SUBSECTION_INIT(NETSH_HELPER, Cursory);
         for(auto& helperDllValue : CheckKeyValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Netsh", true, false)) {
             if(FileScanner::PerformQuickScan(helperDllValue.ToString())) {
-                CREATE_DETECTION_WITH_CONTEXT(
-                    Certainty::Moderate, RegistryDetectionData{ helperDllValue, RegistryDetectionType::FileReference },
-                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1546_007) });
+                CREATE_DETECTION(Certainty::Moderate,
+                                 RegistryDetectionData{ helperDllValue, RegistryDetectionType::FileReference });
             }
         }
+        SUBSECTION_END();
 
-        // Looks for T1546.008: Accessibility Features
+        SUBTECHNIQUE_END();
+    }
+    void HuntT1546::Subtechnique008(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(8, Accessibility Features);
+
+        SUBSECTION_INIT(ACCESSIBILITY_HIJACK, Cursory);
         for(auto& key : vAccessibilityBinaries) {
             std::vector<RegistryValue> debugger{ CheckValues(HKEY_LOCAL_MACHINE, wsIFEO + key,
                                                              {
@@ -52,36 +66,47 @@ namespace Hunts {
                                                              },
                                                              true, false) };
             for(auto& detection : debugger) {
-                CREATE_DETECTION_WITH_CONTEXT(Certainty::Certain,
-                                              RegistryDetectionData{ detection.key, detection,
-                                                                     RegistryDetectionType::CommandReference,
-                                                                     detection.key.GetRawValue(detection.wValueName) },
-                                              DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1546_008) });
+                CREATE_DETECTION(Certainty::Certain,
+                                 RegistryDetectionData{ detection.key, detection,
+                                                        RegistryDetectionType::CommandReference,
+                                                        detection.key.GetRawValue(detection.wValueName) });
             }
         }
+        SUBSECTION_END();
 
+        SUBSECTION_INIT(ACCESSIBILITY_REPLACE, Normal);
         for(auto name : vAccessibilityBinaries) {
             FileSystem::File file{ FileSystem::File(L"C:\\Windows\\System32\\" + name) };
 
             if(!file.IsMicrosoftSigned()) {
-                CREATE_DETECTION_WITH_CONTEXT(Certainty::Certain, FileDetectionData{ file },
-                                              DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1546_008) });
+                CREATE_DETECTION(Certainty::Certain, FileDetectionData{ file });
             }
         }
+        SUBSECTION_END();
 
-        // Looks for T1546.009: AppCert DLLs
+        SUBTECHNIQUE_END();
+    }
+    void HuntT1546::Subtechnique009(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(9, AppCert DLLs);
+
+        SUBSECTION_INIT(APPCERT_DLL, Cursory);
         Registry::RegistryKey appcert_key{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager" };
         if(appcert_key.ValueExists(L"AppCertDLLs")) {
             for(auto dll : *appcert_key.GetValue<std::vector<std::wstring>>(L"AppCertDLLs")) {
-                CREATE_DETECTION_WITH_CONTEXT(
-                    Certainty::Strong,
-                    RegistryDetectionData{ appcert_key, RegistryValue{ appcert_key, L"AppCertDLLs", std::move(dll) },
-                                           RegistryDetectionType::FileReference },
-                    DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1546_009) });
+                CREATE_DETECTION(Certainty::Strong,
+                                 RegistryDetectionData{ appcert_key,
+                                                        RegistryValue{ appcert_key, L"AppCertDLLs", std::move(dll) },
+                                                        RegistryDetectionType::FileReference });
             }
         }
+        SUBSECTION_END();
 
-        // Looks for T1546.010: AppInit DLLs
+        SUBTECHNIQUE_END();
+    }
+    void HuntT1546::Subtechnique010(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(10, AppInit DLLs);
+
+        SUBSECTION_INIT(APPINIT_DLL, Cursory);
         for(auto& detection :
             CheckValues(HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows",
                         {
@@ -90,15 +115,19 @@ namespace Hunts {
                             { L"RequireSignedAppInit_DLLs", 1, false, CheckDwordEqual },
                         },
                         true, false)) {
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong,
-                                          RegistryDetectionData{ detection,
-                                                                 detection.type == RegistryType::REG_DWORD_T ?
-                                                                     RegistryDetectionType::Configuration :
-                                                                     RegistryDetectionType::FileReference },
-                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1546_010) });
+            CREATE_DETECTION(Certainty::Strong,
+                             RegistryDetectionData{ detection, detection.type == RegistryType::REG_DWORD_T ?
+                                                                   RegistryDetectionType::Configuration :
+                                                                   RegistryDetectionType::FileReference });
         }
+        SUBSECTION_END();
 
-        // Looks for T1546.011: Application Shimming
+        SUBTECHNIQUE_END();
+    }
+    void HuntT1546::Subtechnique011(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(11, Application Shimming);
+
+        SUBSECTION_INIT(APPLICATION_SHIM, Normal);
         auto& shims{ CheckKeyValues(HKEY_LOCAL_MACHINE,
                                     L"SOFTWARE\\Microsoft\\Windows "
                                     L"NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB",
@@ -109,12 +138,16 @@ namespace Hunts {
                                              true, true));
 
         for(const auto& detection : shims) {
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong,
-                                          RegistryDetectionData{ detection, RegistryDetectionType::Unknown },
-                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1546_011) });
+            CREATE_DETECTION(Certainty::Strong, RegistryDetectionData{ detection, RegistryDetectionType::Unknown });
         }
+        SUBSECTION_END();
 
-        // Looks for T1546.012: Image File Execution Options Injection
+        SUBTECHNIQUE_END();
+    }
+    void HuntT1546::Subtechnique012(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(12, Image File Execution Options Injection);
+
+        SUBSECTION_INIT(IFEO_HIJACK, Normal);
         auto IFEO = RegistryKey{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File "
                                                      L"Execution Options" };
         for(auto name : IFEO.EnumerateSubkeyNames()) {
@@ -131,13 +164,12 @@ namespace Hunts {
                 if(detection.wValueName == L"GlobalFlag") {
                     CREATE_DETECTION_WITH_CONTEXT(
                         Certainty::Strong, RegistryDetectionData{ detection, RegistryDetectionType::FileReference },
-                        DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1546_012) }, [detection]() {
+                        DetectionContext{ __name }, [detection]() {
                             detection.key.SetValue<DWORD>(L"GlobalFlag", std::get<DWORD>(detection.data) & ~0x200);
                         });
                 } else {
-                    CREATE_DETECTION_WITH_CONTEXT(
-                        Certainty::Strong, RegistryDetectionData{ detection, RegistryDetectionType::FileReference },
-                        DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1546_012) });
+                    CREATE_DETECTION(Certainty::Strong,
+                                     RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
                 }
             }
 
@@ -157,20 +189,23 @@ namespace Hunts {
 
                 for(const auto& detection : values2) {
                     if(detection.type == RegistryType::REG_DWORD_T) {
-                        CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate,
-                                                      RegistryDetectionData{ detection,
-                                                                             RegistryDetectionType::Configuration },
-                                                      DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1546_012) });
+                        CREATE_DETECTION(Certainty::Moderate,
+                                         RegistryDetectionData{ detection, RegistryDetectionType::Configuration });
                     } else {
-                        CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate,
-                                                      RegistryDetectionData{ detection,
-                                                                             RegistryDetectionType::FileReference },
-                                                      DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1546_012) });
+                        CREATE_DETECTION(Certainty::Moderate,
+                                         RegistryDetectionData{ detection, RegistryDetectionType::CommandReference });
                     }
                 }
             }
         }
+        SUBSECTION_END();
 
+        SUBTECHNIQUE_END();
+    }
+    void HuntT1546::Subtechnique015(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(15, Component Object Model Hijacking);
+
+        SUBSECTION_INIT(COM_HIJACK, Intensive);
         // Looks for T1546.015: Component Object Model Hijacking
         if(Bluespawn::aggressiveness >= Aggressiveness::Intensive) {
             std::map<std::wstring, std::vector<RegistryValue>> files{};
@@ -235,55 +270,75 @@ namespace Hunts {
                 if((dll && FileScanner::PerformQuickScan(path)) ||
                    (!dll && ProcessScanner::PerformQuickScan(pair.first))) {
                     for(auto& value : pair.second) {
-                        CREATE_DETECTION_WITH_CONTEXT(
-                            Certainty::Moderate,
-                            RegistryDetectionData{ value, dll ? RegistryDetectionType::FileReference :
-                                                                RegistryDetectionType::CommandReference },
-                            DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1546_015) });
+                        CREATE_DETECTION(Certainty::Moderate,
+                                         RegistryDetectionData{ value, dll ? RegistryDetectionType::FileReference :
+                                                                             RegistryDetectionType::CommandReference });
                     }
                 }
             }
         }
+        SUBSECTION_END();
+
+        SUBTECHNIQUE_END();
+    }
+
+    std::vector<std::shared_ptr<Detection>> HuntT1546::RunHunt(IN CONST Scope& scope) {
+        HUNT_INIT();
+
+        Subtechnique007(scope, detections);
+        Subtechnique008(scope, detections);
+        Subtechnique009(scope, detections);
+        Subtechnique010(scope, detections);
+        Subtechnique011(scope, detections);
+        Subtechnique012(scope, detections);
+        Subtechnique015(scope, detections);
 
         HUNT_END();
     }
 
-    std::vector<std::unique_ptr<Event>> HuntT1546::GetMonitoringEvents() {
-        std::vector<std::unique_ptr<Event>> events;
+    std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1546::GetMonitoringEvents() {
+        std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
         // Looks for T1546.007: Netsh Helper DLL
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Netsh", true, false, false);
+        GetRegistryEvents(events, SCOPE(NETSH_HELPER), HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Netsh", true, false,
+                          false);
 
         // Looks for T1546.008: Accessibility Features
         for(auto key : vAccessibilityBinaries) {
-            Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, wsIFEO + key, true, false, false);
+            Registry::GetRegistryEvents(events, SCOPE(ACCESSIBILITY_HIJACK), HKEY_LOCAL_MACHINE, wsIFEO + key, true,
+                                        false, false);
         }
 
         // Looks for T1546.009: AppCert DLLs
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager", true,
-                          false, false);
+        GetRegistryEvents(events, SCOPE(APPCERT_DLL), HKEY_LOCAL_MACHINE,
+                          L"System\\CurrentControlSet\\Control\\Session Manager", true, false, false);
 
         // Looks for T1546.010: AppInit DLLs
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", true,
-                          false, false);
+        GetRegistryEvents(events, SCOPE(APPINIT_DLL), HKEY_LOCAL_MACHINE,
+                          L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows", true, false, false);
 
         // Looks for T1546.011: Application Shimming
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(APPLICATION_SHIM), HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\InstalledSDB");
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(APPLICATION_SHIM), HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Custom");
-        events.push_back(std::make_unique<FileEvent>(FileSystem::Folder{ L"C:\\Windows\\AppPatch\\Custom" }));
-        events.push_back(std::make_unique<FileEvent>(FileSystem::Folder{ L"C:\\Windows\\AppPatch\\Custom\\Custom64" }));
+        events.push_back(
+            std::make_pair(std::make_unique<FileEvent>(FileSystem::Folder{ L"C:\\Windows\\AppPatch\\Custom" }),
+                           SCOPE(APPLICATION_SHIM)));
+        events.push_back(std::make_pair(std::make_unique<FileEvent>(FileSystem::Folder{ L"C:"
+                                                                                        L"\\Windows\\AppPatch\\Custom\\"
+                                                                                        L"Custom64" }),
+                                        SCOPE(APPLICATION_SHIM)));
 
         // Looks for T1546.012: Image File Execution Options Injection
-        Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE,
-                                    L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution "
-                                    L"Options",
+        Registry::GetRegistryEvents(events, SCOPE(IFEO_HIJACK), HKEY_LOCAL_MACHINE,
+                                    L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options",
                                     true, false, true);
 
         // Looks for T1546.015: Component Object Model Hijacking
         if(Bluespawn::aggressiveness >= Aggressiveness::Intensive) {
-            Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SOFTWARE\\Classes\\CLSID", true, true, true);
+            Registry::GetRegistryEvents(events, SCOPE(COM_HIJACK), HKEY_LOCAL_MACHINE, L"SOFTWARE\\Classes\\CLSID",
+                                        true, true, true);
         }
 
         return events;

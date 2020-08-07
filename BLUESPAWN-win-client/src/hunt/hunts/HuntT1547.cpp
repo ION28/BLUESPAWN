@@ -11,6 +11,17 @@
 
 using namespace Registry;
 
+#define RUN_KEY 0
+#define COMMAND_PROCESSOR 1
+#define STARTUP_FOLDER 2
+#define STARTUP_ITEMS 3
+#define AUTH_PACKAGE 4
+#define LSA_EXTENSION 5
+#define WINLOGON 6
+#define WINLOGON_NOTIFY 7
+#define SSP 8
+#define PORT_MON 9
+
 namespace Hunts {
 
     HuntT1547::HuntT1547() : Hunt(L"T1547 - Boot or Logon Autostart Execution") {
@@ -32,46 +43,47 @@ namespace Hunts {
         };
     }
 
-    std::vector<std::shared_ptr<Detection>> HuntT1547::RunHunt(const Scope& scope) {
-        HUNT_INIT();
+    void HuntT1547::Subtechnique001(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(001, Registry Run Keys / Startup Folder);
 
-        // Looks for T1547.001: Registry Run Keys / Startup Folder
+        SUBSECTION_INIT(RUN_KEY, Cursory);
         for(auto& key : RunKeys) {
             for(auto& detection : CheckKeyValues(HKEY_LOCAL_MACHINE, key)) {
                 if(ProcessScanner::PerformQuickScan(std::get<std::wstring>(detection.data))) {
-                    CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate,
-                                                  RegistryDetectionData{ detection,
-                                                                         RegistryDetectionType::CommandReference },
-                                                  DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_001) });
+                    CREATE_DETECTION(Certainty::Moderate,
+                                     RegistryDetectionData{ detection, RegistryDetectionType::CommandReference });
                 }
             }
         }
+        SUBSECTION_END();
 
+        SUBSECTION_INIT(COMMAND_PROCESSOR, Cursory);
         for(auto& detection : CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Command Processor",
                                           { { L"AutoRun", L"", false, CheckSzEmpty } })) {
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Strong,
-                                          RegistryDetectionData{ detection, RegistryDetectionType::CommandReference },
-                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_001) });
+            CREATE_DETECTION(Certainty::Strong,
+                             RegistryDetectionData{ detection, RegistryDetectionType::CommandReference });
         }
+        SUBSECTION_END();
 
+        SUBSECTION_INIT(STARTUP_FOLDER, Cursory);
         for(auto& detection : CheckValues(
                 HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
                 { { L"Startup", L"%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup",
                     false, CheckSzEqual } })) {
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate,
-                                          RegistryDetectionData{ detection, RegistryDetectionType::FolderReference },
-                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_001) });
+            CREATE_DETECTION(Certainty::Moderate,
+                             RegistryDetectionData{ detection, RegistryDetectionType::FolderReference });
         }
 
         for(auto& detection :
             CheckValues(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",
                         { { L"Common Startup", L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup",
                             false, CheckSzEqual } })) {
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate,
-                                          RegistryDetectionData{ detection, RegistryDetectionType::FolderReference },
-                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_001) });
+            CREATE_DETECTION(Certainty::Moderate,
+                             RegistryDetectionData{ detection, RegistryDetectionType::FolderReference });
         }
+        SUBSECTION_END();
 
+        SUBSECTION_INIT(STARTUP_ITEMS, Cursory);
         std::vector<FileSystem::Folder> startup_directories = { FileSystem::Folder(
             L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp") };
         auto userFolders = FileSystem::Folder{ L"C:\\Users" }.GetSubdirectories(1);
@@ -84,17 +96,21 @@ namespace Hunts {
         }
         for(auto folder : startup_directories) {
             LOG_VERBOSE(1, L"Scanning " << folder.GetFolderPath());
-            FileSystem::FileSearchAttribs searchFilters;
-            searchFilters.extensions = { L".bat", L".cmd", L".exe", L".dll", L".js",  L".jse",      L".lnk",
-                                         L".ps1", L".sct", L".vb",  L".vbe", L".vbs", L".vbscript", L".hta" };
-            for(auto value : folder.GetFiles(searchFilters, -1)) {
-                CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate, FileDetectionData{ value },
-                                              DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_001) });
+            for(auto value : folder.GetFiles(std::nullopt, -1)) {
+                if(FileScanner::PerformQuickScan(value.GetFilePath())) {
+                    CREATE_DETECTION(Certainty::Weak, FileDetectionData{ value });
+                }
             }
         }
+        SUBSECTION_END();
 
-        // Looks for T1547.002: Authentication Package
-        // LSA Configuration
+        SUBTECHNIQUE_END();
+    }
+
+    void HuntT1547::Subtechnique002(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(002, Authentication Package);
+
+        SUBSECTION_INIT(AUTH_PACKAGE, Cursory);
         auto lsa = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
         for(auto PackageGroup : { L"Authentication Packages", L"Notification Packages" }) {
             auto packages = lsa.GetValue<std::vector<std::wstring>>(PackageGroup);
@@ -107,16 +123,14 @@ namespace Hunts {
                         auto value{ Bluespawn::detections.AddDetection(
                             Detection{ RegistryDetectionData{ RegistryValue{ lsa, PackageGroup, std::move(package) },
                                                               RegistryDetectionType::FileReference },
-                                       DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_002) } },
+                                       DetectionContext{ __name } },
                             Certainty::Moderate) };
                         detections.emplace_back(value);
 
                         // Since the security package is missing the dll extension, the scanner may not find the
                         // associated file
                         auto file{ Bluespawn::detections.AddDetection(
-                            Detection{ FileDetectionData{ *filepath },
-                                       DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_002) } },
-                            Certainty::Weak) };
+                            Detection{ FileDetectionData{ *filepath }, DetectionContext{ __name } }, Certainty::Weak) };
                         detections.emplace_back(file);
 
                         // Define the association here since the scanner may not pick up on it
@@ -126,17 +140,17 @@ namespace Hunts {
                 }
             }
         }
+        SUBSECTION_END();
 
-        // LSA Extensions Configuration
+        SUBSECTION_INIT(LSA_EXTENSION, Cursory);
         auto lsaext = RegistryKey{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\LsaExtensionConfig" };
         for(auto subkeyName : lsaext.EnumerateSubkeyNames()) {
             if(subkeyName == L"Interfaces") {
                 for(auto subkey : RegistryKey{ lsaext, L"Interfaces" }.EnumerateSubkeys()) {
                     auto ext{ RegistryValue::Create(subkey, L"Extension") };
                     if(ext && FileScanner::PerformQuickScan(ext->ToString())) {
-                        CREATE_DETECTION_WITH_CONTEXT(
-                            Certainty::Moderate, RegistryDetectionData{ *ext, RegistryDetectionType::FileReference },
-                            DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_002) });
+                        CREATE_DETECTION(Certainty::Moderate,
+                                         RegistryDetectionData{ *ext, RegistryDetectionType::FileReference });
                     }
                 }
             } else {
@@ -145,35 +159,41 @@ namespace Hunts {
                 if(exts) {
                     for(auto ext : *exts) {
                         if(FileScanner::PerformQuickScan(ext)) {
-                            CREATE_DETECTION_WITH_CONTEXT(
+                            CREATE_DETECTION(
                                 Certainty::Moderate,
                                 RegistryDetectionData{ RegistryValue{ subkey, L"Extensions", std::move(ext) },
-                                                       RegistryDetectionType::FileReference },
-                                DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_002) });
+                                                       RegistryDetectionType::FileReference });
                         }
                     }
                 }
             }
         }
+        SUBSECTION_END();
 
-        // Looks for T1547.004: Winlogon Helper DLL
+        SUBTECHNIQUE_END();
+    }
+
+    void HuntT1547::Subtechnique004(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(004, Winlogon Helper DLL);
+
+        SUBSECTION_INIT(WINLOGON, Cursory);
         // clang-format off
+        auto userinitRegex{ 
+            L"(C:\\\\[Ww](INDOWS|indows)\\\\[Ss](YSTEM32|ystem32)\\\\)?[Uu](SERINIT|serinit)\\.(exe|EXE),?" };
         std::vector<RegistryValue> winlogons{ CheckValues(HKEY_LOCAL_MACHINE,
-            L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", { 
+            L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", {
                 { L"Shell", L"explorer\\.exe,?", false, CheckSzRegexMatch },
-                { L"UserInit", L"(C:\\\\(Windows|WINDOWS|windows)\\\\(System32|SYSTEM32|system32)\\\\)?(U|u)(SERINIT|"
-                    "serinit)\\.(exe|EXE),?", false, CheckSzRegexMatch } 
+                { L"UserInit", userinitRegex, false, CheckSzRegexMatch }
             }, true, true) };
         // clang-format on
 
         for(auto& detection : winlogons) {
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate,
-                                          RegistryDetectionData{ detection.key, detection,
-                                                                 RegistryDetectionType::FileReference,
-                                                                 detection.key.GetRawValue(detection.wValueName) },
-                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_004) });
+            // Moderate contextual certainty due to how rarely these values are used legitimately
+            CREATE_DETECTION(Certainty::Moderate, RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
         }
+        SUBSECTION_END();
 
+        SUBSECTION_INIT(WINLOGON_NOTIFY, Cursory);
         std::vector<RegistryValue> notifies{ CheckKeyValues(
             HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify", true, true) };
         for(auto& notify : CheckSubkeys(
@@ -184,14 +204,18 @@ namespace Hunts {
         }
 
         for(auto& detection : notifies) {
-            CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate,
-                                          RegistryDetectionData{ detection.key, detection,
-                                                                 RegistryDetectionType::FileReference,
-                                                                 detection.key.GetRawValue(detection.wValueName) },
-                                          DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_004) });
+            // Weak contextual certainty due to how rarely these values are used legitimately
+            CREATE_DETECTION(Certainty::Weak, RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
         }
+        SUBSECTION_END();
 
-        // Looks for T1547.005: Security Support Provider
+        SUBTECHNIQUE_END();
+    }
+
+    void HuntT1547::Subtechnique005(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(005, Security Support Provider);
+
+        SUBSECTION_INIT(SSP, Cursory);
         RegistryKey lsa3{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa" };
         RegistryKey lsa4{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig" };
 
@@ -208,16 +232,15 @@ namespace Hunts {
                                 Detection{ RegistryDetectionData{
                                                RegistryValue{ key, L"Security Packages", std::move(package) },
                                                RegistryDetectionType::FileReference },
-                                           DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_005) } },
+                                           DetectionContext{ __name } },
                                 Certainty::Moderate) };
                             detections.emplace_back(value);
 
                             // Since the security package is missing the dll extension, the scanner may not find the
                             // associated file
-                            auto file{ Bluespawn::detections.AddDetection(
-                                Detection{ FileDetectionData{ *filepath },
-                                           DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_005) } },
-                                Certainty::Weak) };
+                            auto file{ Bluespawn::detections.AddDetection(Detection{ FileDetectionData{ *filepath },
+                                                                                     DetectionContext{ __name } },
+                                                                          Certainty::Weak) };
                             detections.emplace_back(file);
 
                             // Define the association ourself
@@ -228,8 +251,15 @@ namespace Hunts {
                 }
             }
         }
+        SUBSECTION_END();
 
-        // Looks for T1547.010: Port Monitors
+        SUBTECHNIQUE_END();
+    }
+
+    void HuntT1547::Subtechnique010(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(010, Port Monitors);
+
+        SUBSECTION_INIT(PORT_MON, Cursory);
         RegistryKey monitors{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Print\\Monitors" };
 
         for(auto monitor : monitors.EnumerateSubkeys()) {
@@ -237,51 +267,69 @@ namespace Hunts {
                 auto filepath{ FileSystem::SearchPathExecutable(monitor.GetValue<std::wstring>(L"Driver").value()) };
 
                 if(filepath && FileScanner::PerformQuickScan(*filepath)) {
-                    CREATE_DETECTION_WITH_CONTEXT(Certainty::Moderate,
-                                                  RegistryDetectionData{ *RegistryValue::Create(monitor, L"Driver"),
-                                                                         RegistryDetectionType::FileReference },
-                                                  DetectionContext{ ADD_SUBTECHNIQUE_CONTEXT(t1547_010) });
+                    CREATE_DETECTION(Certainty::Moderate,
+                                     RegistryDetectionData{ *RegistryValue::Create(monitor, L"Driver"),
+                                                            RegistryDetectionType::FileReference });
                 }
             }
         }
+        SUBSECTION_END();
+
+        SUBTECHNIQUE_END();
+    }
+
+    std::vector<std::shared_ptr<Detection>> HuntT1547::RunHunt(const Scope& scope) {
+        HUNT_INIT();
+
+        Subtechnique001(scope, detections);
+        Subtechnique002(scope, detections);
+        Subtechnique004(scope, detections);
+        Subtechnique005(scope, detections);
+        Subtechnique010(scope, detections);
 
         HUNT_END();
     }
 
-    std::vector<std::unique_ptr<Event>> HuntT1547::GetMonitoringEvents() {
-        std::vector<std::unique_ptr<Event>> events;
+    std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1547::GetMonitoringEvents() {
+        std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
         // Looks for T1547.001: Registry Run Keys / Startup Folder
         for(auto key : RunKeys) {
-            GetRegistryEvents(events, HKEY_LOCAL_MACHINE, key);
+            GetRegistryEvents(events, SCOPE(RUN_KEY), HKEY_LOCAL_MACHINE, key);
         }
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Command Processor");
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(COMMAND_PROCESSOR), HKEY_LOCAL_MACHINE,
+                          L"SOFTWARE\\Microsoft\\Command Processor");
+        GetRegistryEvents(events, SCOPE(STARTUP_FOLDER), HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders");
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE,
+        GetRegistryEvents(events, SCOPE(STARTUP_FOLDER), HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders");
         auto userFolders = FileSystem::Folder(L"C:\\Users").GetSubdirectories(1);
         for(auto userFolder : userFolders) {
             FileSystem::Folder folder{ userFolder.GetFolderPath() + L"\\AppData\\Roaming\\Microsoft\\Windows\\Start "
                                                                     L"Menu\\Programs\\StartUp" };
             if(folder.GetFolderExists()) {
-                events.push_back(std::make_unique<FileEvent>(folder));
+                events.push_back(
+                    std::make_pair(std::make_unique<FileEvent>(folder), SCOPE(STARTUP_ITEMS)));
             }
         }
 
         // Looks for T1547.002 (Authentication Package) and T1547.005 (Security Support Provider)
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa", true, false, false);
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", true, false,
-                          false);
+        GetRegistryEvents(events, Scope::CreateSubhuntScope((1 << SSP) | (1 << AUTH_PACKAGE)), HKEY_LOCAL_MACHINE,
+                          L"SYSTEM\\CurrentControlSet\\Control\\Lsa", false, false);
+        GetRegistryEvents(events, Scope::CreateSubhuntScope((1 << SSP) | (1 << AUTH_PACKAGE)), HKEY_LOCAL_MACHINE,
+                          L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", false, false);
+        GetRegistryEvents(events, SCOPE(LSA_EXTENSION), HKEY_LOCAL_MACHINE,
+                          L"SYSTEM\\CurrentControlSet\\Control\\LsaExtensionConfig", false, false);
 
         // Looks for T1547.004: Winlogon Helper DLL
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon");
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Notify", true,
-                          true, true);
+        GetRegistryEvents(events, SCOPE(WINLOGON), HKEY_LOCAL_MACHINE,
+                          L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon");
+        GetRegistryEvents(events, SCOPE(WINLOGON_NOTIFY), HKEY_LOCAL_MACHINE,
+                          L"Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify", true, true, true);
 
         // Looks for T1547.010: Port Monitors
-        GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Print\\Monitors", false,
-                          false, true);
+        GetRegistryEvents(events, SCOPE(PORT_MON), HKEY_LOCAL_MACHINE,
+                          L"SYSTEM\\CurrentControlSet\\Control\\Print\\Monitors", false, false, true);
 
         return events;
     }

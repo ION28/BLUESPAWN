@@ -10,6 +10,9 @@
 
 using namespace Registry;
 
+#define PRINTERS 0
+#define PORTS 1
+
 namespace Hunts {
 
     HuntT1068::HuntT1068() : Hunt(L"T1068 - Exploitation for Privilege Escalation") {
@@ -21,10 +24,9 @@ namespace Hunts {
     std::vector<std::shared_ptr<Detection>> HuntT1068::RunHunt(const Scope& scope) {
         HUNT_INIT();
 
-        RegistryKey ports{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Ports", true };
+        SUBSECTION_INIT(PRINTERS, Cursory)
         RegistryKey printers{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Print\\Printers",
                               true };
-
         for(auto printer : printers.EnumerateSubkeys()) {
             if(printer.ValueExists(L"Port")) {
                 auto value{ RegistryValue::Create(printer, L"Port") };
@@ -38,7 +40,10 @@ namespace Hunts {
                 }
             }
         }
+        SUBSECTION_END();
 
+        SUBSECTION_INIT(PORTS, Cursory);
+        RegistryKey ports{ HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Ports", true };
         for(auto value : ports.EnumerateValues()) {
             FileSystem::File filepath{ value };
 
@@ -50,17 +55,20 @@ namespace Hunts {
                 CREATE_DETECTION(Certainty::Strong, FileDetectionData{ filepath });
             }
         }
+        SUBSECTION_END();
 
         HUNT_END();
     }
 
-    std::vector<std::unique_ptr<Event>> HuntT1068::GetMonitoringEvents() {
-        std::vector<std::unique_ptr<Event>> events;
+    std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1068::GetMonitoringEvents() {
+        std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
         // CVE-2020-1048
-        Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Print\\Printers",
-                                                           true, false, true);
-        Registry::GetRegistryEvents(events, HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Ports", true, false, false);
+        Registry::GetRegistryEvents(events, SCOPE(PRINTERS), HKEY_LOCAL_MACHINE,
+                                    L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Print\\Printers", true, false, 
+                                    true);
+        Registry::GetRegistryEvents(events, SCOPE(PORTS), HKEY_LOCAL_MACHINE, 
+                                    L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Ports", true, false, false);
 
         return events;
     }

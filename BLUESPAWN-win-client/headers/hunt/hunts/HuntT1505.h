@@ -13,8 +13,6 @@ namespace Hunts {
 	 * webshells.
 	 */
     class HuntT1505 : public Hunt {
-        private:
-        std::wstring t1505_003 = L"003: Web Shell";
 
         std::vector<std::wstring> web_directories = { L"C:\\inetpub\\wwwroot", L"C:\\xampp\\htdocs" };
         std::vector<std::wstring> web_exts = { L".php",  L".jsp",  L".jspx", L".asp",
@@ -27,7 +25,9 @@ namespace Hunts {
         public:
         HuntT1505();
 
+        void Subtechnique003(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+
         virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope);
-        virtual std::vector<std::unique_ptr<Event>> GetMonitoringEvents();
+        virtual std::vector<std::pair<std::unique_ptr<Event>, Scope>> GetMonitoringEvents();
     };
 }   // namespace Hunts
