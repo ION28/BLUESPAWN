@@ -152,7 +152,7 @@ namespace EventLogs {
 
         pItem.SetEventID(std::stoul(*eventIDStr));
         pItem.SetEventRecordID(std::stoul(*eventRecordIDStr));
-        pItem.SetTimeCreated(FormatWindowsTime(*timeCreated));
+        pItem.SetTimeCreated(*timeCreated);
         pItem.SetChannel(*channel);
         pItem.SetXML(*rawXML);
 

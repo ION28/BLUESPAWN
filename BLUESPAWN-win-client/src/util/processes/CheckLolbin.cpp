@@ -140,7 +140,7 @@ bool IsLolbinMalicious(const std::wstring& command) {
 
     LOG_VERBOSE(3, "Checking if " << executable << " is rundll32");
     if(hashmap.count(L"Rundll32.exe") && hashmap.at(L"Rundll32.exe") == hash) {
-        if(args.size()) {
+        if(args.size() && args[0] != L"/sta") {
             auto arg{ args[0] };
             auto br{ arg.find_first_of(L" \t,") };
             auto dll{ arg.substr(0, br) };
@@ -193,6 +193,11 @@ bool IsLolbinMalicious(const std::wstring& command) {
         return args.size();
     }
 
+    LOG_VERBOSE(3, "Checking if " << executable << " is Msiexec.exe");
+    if(hashmap.count(L"Msiexec.exe") && hashmap.at(L"Msiexec.exe") == hash){
+        return args.size() && args[0] != L"/V";
+    }
+
     LOG_VERBOSE(3, "Checking if " << executable << " is explorer.exe");
     if(hashmap.count(L"explorer.exe") && hashmap.at(L"explorer.exe") == hash) {
         for(auto& arg : args) {
@@ -202,6 +207,7 @@ bool IsLolbinMalicious(const std::wstring& command) {
             }
         }
         return false;
-    } else
+    } else{
         return true;
+    }
 }
