@@ -50,20 +50,22 @@ Visit [this map](https://bluespawn.cloud/coverage/) to see current coverage capa
 ```cmd
 .\BLUESPAWN-client-x64.exe --mitigate --action=audit
 ```
-![BLUESPAWN in Action-Mitigate](https://user-images.githubusercontent.com/3931697/77474842-2f370380-6dee-11ea-9d31-9392daa0a5da.png)
+![BLUESPAWN in Action-Mitigate](https://user-images.githubusercontent.com/3931697/89669848-25e69900-d8ae-11ea-836d-1618d7377211.png)
 
 ### Hunt Mode
 5. Run BLUESPAWN from the Administrative Command Prompt to hunt for malicious activity on the system
 ```cmd
 .\BLUESPAWN-client-x64.exe --hunt -a Cursory --log=console,xml
 ```
-![BLUESPAWN in Action-Hunt](https://user-images.githubusercontent.com/3931697/77475483-4a564300-6def-11ea-8faf-151508af73cb.png)
+![BLUESPAWN in Action-Hunt](https://user-images.githubusercontent.com/3931697/89669912-4878b200-d8ae-11ea-967b-03318468d711.png)
 
 ### Monitor Mode
 6. Run BLUESPAWN from the Administrative Command Prompt to monitor for malicious activity on the system
 ```cmd
 .\BLUESPAWN-client-x64.exe --monitor -a Cursory --log=console,xml
 ```
+![BLUESPAWN in Action-Monitor](https://user-images.githubusercontent.com/3931697/89670008-752cc980-d8ae-11ea-8490-1e0473d5f3c6.png)
+
 
 ## Lines of Effort
 BLUESPAWN consists of 3 major modes as listed below. Several of these modules have submodules (which may not be created in the codebase yet) as listed below and all are in varying stages of planning, research, and development. Additionally, they are supported by a number of other modules.
@@ -90,9 +92,9 @@ BLUESPAWN consists of 3 major modes as listed below. Several of these modules ha
 
 Here are some of the places you may have heard about the project :)
 
-DEFCON 28 Blue Team Village - [Overview](https://cfc.blueteamvillage.org/call-for-content-2020/talk/NCWJFG/), [Talk](to_be_updated), [Slides](to_be_updated)
+[![DEFCON 28 Blue Team Village](https://user-images.githubusercontent.com/3931697/89669226-11ee6780-d8ad-11ea-9361-fba4cb92c97c.png)](https://github.com/ION28/BLUESPAWN/blob/master/docs/media/Defcon28-BlueTeamVillage-BLUESPAWN-Presentation.pdf)
 
-NoVA Hackers Meeting, June 2020 - [Slides](to_be_updated)
+DEFCON 28 Blue Team Village - [Overview](https://cfc.blueteamvillage.org/call-for-content-2020/talk/NCWJFG/), [Slides](https://github.com/ION28/BLUESPAWN/blob/master/docs/media/Defcon28-BlueTeamVillage-BLUESPAWN-Presentation.pdf)
 
 National Collegiate Cyber Defense Competition, 2020 Red Team Debrief - [Youtube](https://youtu.be/UsZhMRMGLMA?t=3582)
 
