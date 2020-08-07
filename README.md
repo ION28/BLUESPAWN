@@ -1,3 +1,5 @@
+![BLUESPAWN-logo2-temp](https://user-images.githubusercontent.com/3931697/89133344-0e439500-d4e9-11ea-992f-6ae8ebe66177.png)
+
 # BLUESPAWN
 
 ![Version](https://img.shields.io/github/v/release/ION28/BLUESPAWN?include_prereleases) ![License](https://img.shields.io/github/license/ION28/BLUESPAWN?color=yellow) ![Platform](https://img.shields.io/badge/platform-x86%20%7C%20x64-lightgrey) ![Operating System](https://img.shields.io/badge/os-Windows%207%2F08%2B-blue) [![Discord](https://img.shields.io/discord/713926524167913544?color=blueviolet&label=Discord&logo=Discord&logoColor=white)](https://discord.gg/JMxPPfZ)
@@ -46,16 +48,24 @@ Visit [this map](https://bluespawn.cloud/coverage/) to see current coverage capa
 ### Mitigate Mode
 4. Run the following from your Administrative Command Prompt to audit your system for the presence of many security settings
 ```cmd
-.\BLUESPAWN-client-x64.exe --mitigate=audit --log=console
+.\BLUESPAWN-client-x64.exe --mitigate --action=audit
 ```
-![BLUESPAWN in Action-Mitigate](https://user-images.githubusercontent.com/3931697/77474842-2f370380-6dee-11ea-9d31-9392daa0a5da.png)
+![BLUESPAWN in Action-Mitigate](https://user-images.githubusercontent.com/3931697/89669848-25e69900-d8ae-11ea-836d-1618d7377211.png)
 
 ### Hunt Mode
 5. Run BLUESPAWN from the Administrative Command Prompt to hunt for malicious activity on the system
 ```cmd
-.\BLUESPAWN-client-x64.exe --hunt -l Cursory --log=console,xml --reaction=log
+.\BLUESPAWN-client-x64.exe --hunt -a Cursory --log=console,xml
 ```
-![BLUESPAWN in Action-Hunt](https://user-images.githubusercontent.com/3931697/77475483-4a564300-6def-11ea-8faf-151508af73cb.png)
+![BLUESPAWN in Action-Hunt](https://user-images.githubusercontent.com/3931697/89669912-4878b200-d8ae-11ea-967b-03318468d711.png)
+
+### Monitor Mode
+6. Run BLUESPAWN from the Administrative Command Prompt to monitor for malicious activity on the system
+```cmd
+.\BLUESPAWN-client-x64.exe --monitor -a Cursory --log=console,xml
+```
+![BLUESPAWN in Action-Monitor](https://user-images.githubusercontent.com/3931697/89670008-752cc980-d8ae-11ea-8490-1e0473d5f3c6.png)
+
 
 ## Lines of Effort
 BLUESPAWN consists of 3 major modes as listed below. Several of these modules have submodules (which may not be created in the codebase yet) as listed below and all are in varying stages of planning, research, and development. Additionally, they are supported by a number of other modules.
@@ -78,13 +88,25 @@ BLUESPAWN consists of 3 major modes as listed below. Several of these modules ha
     * PEs
     * Processes
 
+## Talks, Publications, and Other Mentions
+
+Here are some of the places you may have heard about the project :)
+
+[![DEFCON 28 Blue Team Village](https://user-images.githubusercontent.com/3931697/89669226-11ee6780-d8ad-11ea-9361-fba4cb92c97c.png)](https://github.com/ION28/BLUESPAWN/blob/master/docs/media/Defcon28-BlueTeamVillage-BLUESPAWN-Presentation.pdf)
+
+DEFCON 28 Blue Team Village - [Overview](https://cfc.blueteamvillage.org/call-for-content-2020/talk/NCWJFG/), [Slides](https://github.com/ION28/BLUESPAWN/blob/master/docs/media/Defcon28-BlueTeamVillage-BLUESPAWN-Presentation.pdf)
+
+National Collegiate Cyber Defense Competition, 2020 Red Team Debrief - [Youtube](https://youtu.be/UsZhMRMGLMA?t=3582)
+
+BLUESPAWN Research Paper at UVA - [Paper](https://libraetd.lib.virginia.edu/downloads/1j92g810n?filename=Smith_Jacob_Technical_Report.pdf), DOI 10.18130/v3-b1n6-ef83
+
 ## Contact Us
 If you have any questions, comments, or suggestions, please feel free to send us an email at <bluespawn@virginia.edu> or message us in [the BLUESPAWN Discord Server](https://discord.gg/JMxPPfZ).
 
 ## Licensing & Compliance
 The core BLUESPAWN code is licensed under [GNU General Public License (GPL) v3.0](https://github.com/ION28/BLUESPAWN/blob/master/LICENSE).
 
-Note that the project integrates several other libraries to provide additional features/detections. One of these is Florian Roth's [signature-base](https://github.com/Neo23x0/signature-base) which is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/). YARA rules from this project are integrated into the standard build without any changes. In order to use BLUESPAWN for any commercial purposes, you must remove everything under the "Non-Commercial Only" line in [this file](https://github.com/ION28/BLUESPAWN/blob/master/BLUESPAWN-client/resources/severe2.yar) and recompile the project.
+Note that the project integrates several other libraries to provide additional features/detections. One of these is Florian Roth's [signature-base](https://github.com/Neo23x0/signature-base) which is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/). YARA rules from this project are integrated into the standard build without any changes. In order to use BLUESPAWN for any commercial purposes, you must remove everything under the "Non-Commercial Only" line in [this file](https://github.com/ION28/BLUESPAWN/blob/master/BLUESPAWN-win-client/resources/severe2.yar) and recompile the project.
 
 ## Project Authors
 Made with :heart: by the UVA Cyber Defense Team and the other awesome people in the core dev team listed below

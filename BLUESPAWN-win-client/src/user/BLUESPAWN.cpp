@@ -314,13 +314,19 @@ Aggressiveness GetAggressiveness(const cxxopts::OptionValue& value) {
 int main(int argc, char* argv[]) {
     Log::LogLevel::LogError.Enable();
     Log::LogLevel::LogWarn.Enable();
-    ThreadPool::GetInstance().AddExceptionHandler([](const auto& e){ LOG_ERROR(e.what()); });
+    ThreadPool::GetInstance().AddExceptionHandler([](const auto& e) { LOG_ERROR(e.what()); });
 
     Bluespawn bluespawn{};
 
     print_banner();
 
     bluespawn.check_correct_arch();
+
+    if(argc == 1) {
+        Bluespawn::io.AlertUser(L"Please launch BLUESPAWN from a CLI and specify what you want it to do. You can use "
+                                L"the --help flag to see what options are available.",
+                                INFINITE, ImportanceLevel::MEDIUM);
+    }
 
     cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: An Active Defense and EDR software to empower Blue Teams");
 
