@@ -9,6 +9,7 @@
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/CLISink.h"
 #include "util/log/DebugSink.h"
+#include "util/log/JSONSink.h"
 #include "util/log/XMLSink.h"
 
 #include "hunt/hunts/HuntT1036.h"
@@ -278,6 +279,10 @@ void ParseLogSinks(const std::string& sinks) {
             auto XML = std::make_shared<Log::XMLSink>();
             Log::AddSink(XML, levels);
             Bluespawn::detectionSinks.emplace_back(XML);
+        } else if(sink == "json") {
+            auto JSON = std::make_shared<Log::JSONSink>();
+            Log::AddSink(JSON, levels);
+            Bluespawn::detectionSinks.emplace_back(JSON);
         } else if(sink == "debug") {
             auto debug = std::make_shared<Log::DebugSink>();
             Log::AddSink(debug, levels);
@@ -337,7 +342,7 @@ int main(int argc, char* argv[]) {
             cxxopts::value<bool>())
         ("m,mitigate", "Mitigate vulnerabilities by applying security settings.", 
             cxxopts::value<bool>())
-        ("log", "Specify how BLUESPAWN should log events. Options are console, xml, and debug.",
+        ("log", "Specify how BLUESPAWN should log events. Options are console, xml, json, and debug.",
             cxxopts::value<std::string>()->default_value("console"))
         ("help", "Help Information. You can also specify a category for help on a specific module such as hunt.",
             cxxopts::value<std::string>()->implicit_value("general"))
