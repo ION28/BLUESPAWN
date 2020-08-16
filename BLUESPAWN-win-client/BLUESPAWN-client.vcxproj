@@ -150,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="external\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1548.cpp" />
     <ClCompile Include="src\hunt\Hunt.cpp" />
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1036.cpp" />
@@ -267,6 +268,7 @@
     <ClCompile Include="src\util\StringUtils.cpp" />
     <ClCompile Include="src\util\ThreadPool.cpp" />
     <ClCompile Include="src\util\Utils.cpp" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1548.h" />
     <ClInclude Include="resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
