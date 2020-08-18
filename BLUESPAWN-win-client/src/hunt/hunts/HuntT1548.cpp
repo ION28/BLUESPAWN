@@ -27,6 +27,10 @@ namespace Hunts {
 
 		SUBSECTION_INIT(FODHELPER, Normal);
 
+		// Reference: https://winscripting.blog/2017/05/12/first-entry-welcome-and-uac-bypass/
+		// Test Commands:
+		//		1. reg add "HKCU\SOFTWARE\Classes\ms-settings\shell\open\command" /v "DelegateExecute"
+		//		2. reg add "HKCU\SOFTWARE\Classes\ms-settings\shell\open\command" /ve /t REG_SZ /d "cmd.exe" 
 		RegistryKey msSettingsCommand{ HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\ms-settings\\shell\\open\\command" };
         if(msSettingsCommand.ValueExists(L"DelegateExecute")) {
             for(auto& detection :
