@@ -9,8 +9,9 @@
 
 #include "user/bluespawn.h"
 
-#define EVT_VIEWER_REGISTRY 0
-#define SDCLT_REGISTRY 1
+#define FODHELPER 0
+#define EVT_VIEWER_REGISTRY 1
+#define SDCLT_REGISTRY 2
 
 using namespace Registry;
 
@@ -24,27 +25,43 @@ namespace Hunts {
 	void HuntT1548::Subtechnique002(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
 		SUBTECHNIQUE_INIT(002, Abuse Elevation Control Mechanism);
 
-		// Reference: https://enigma0x3.net/2016/08/15/fileless-uac-bypass-using-eventvwr-exe-and-registry-hijacking/
-		SUBSECTION_INIT(EVT_VIEWER_REGISTRY, Normal);
+		SUBSECTION_INIT(FODHELPER, Normal);
 
-		RegistryKey mscfileCommand = RegistryKey(HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\mscfile\\shell\\open\\command");
-		std::optional<RegistryValue> cmd = RegistryValue::Create(mscfileCommand, DEFAULT);
-		if (cmd) {
-			CREATE_DETECTION(Certainty::Certain,
-				RegistryDetectionData{ *cmd, RegistryDetectionType::CommandReference });
-		}
+		RegistryKey msSettingsCommand{ HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\ms-settings\\shell\\open\\command" };
+        if(msSettingsCommand.ValueExists(L"DelegateExecute")) {
+            for(auto& detection :
+                CheckValues(HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\ms-settings\\shell\\open\\command",
+                            { { DEFAULT, L"REG_SZ", false, CheckSzEmpty } }, true, true)) {
+                CREATE_DETECTION(Certainty::Strong,
+                                 RegistryDetectionData{ detection, RegistryDetectionType::CommandReference });
+            }
+        }
+
+        SUBSECTION_END();
+
+		// Reference: https://enigma0x3.net/2016/08/15/fileless-uac-bypass-using-eventvwr-exe-and-registry-hijacking/
+		// Test Command: reg add "HKCU\SOFTWARE\Classes\mscfile\shell\open\command" /ve /t REG_SZ /d "cmd.exe" 
+		// Metasploit module: https://www.exploit-db.com/exploits/40268
+ 		SUBSECTION_INIT(EVT_VIEWER_REGISTRY, Normal);
+
+		for(RegistryValue& detection :
+            CheckValues(HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\mscfile\\shell\\open\\command",
+                        { { DEFAULT, L"REG_SZ", false, CheckSzEmpty } }, false, false)) {
+            CREATE_DETECTION(Certainty::Strong,
+                             RegistryDetectionData{ detection, RegistryDetectionType::CommandReference });
+        }
 
 		SUBSECTION_END();
 
 		// Reference: https://enigma0x3.net/2017/03/17/fileless-uac-bypass-using-sdclt-exe/
+		// Test Command: reg add "HKCU\SOFTWARE\Classes\exefile\shell\runas\command" /v "IsolatedCommand" /t REG_SZ /d "cmd.exe" 
 		SUBSECTION_INIT(SDCLT_REGISTRY, Normal);
 
-		RegistryKey exefileCommand = RegistryKey(HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\exefile\\shell\\runas\\command");
-		std::optional<RegistryValue> cmd = RegistryValue::Create(exefileCommand, L"IsolatedCommand");
-		if (cmd) {
-			CREATE_DETECTION(Certainty::Certain,
-				RegistryDetectionData{ *cmd, RegistryDetectionType::CommandReference });
-		}
+        for(auto& detection : CheckValues(HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\exefile\\shell\\runas\\command",
+                                          { { L"IsolatedCommand", L"REG_SZ", false, CheckSzEmpty } }, true, true)) {
+            CREATE_DETECTION(Certainty::Strong,
+                             RegistryDetectionData{ detection, RegistryDetectionType::CommandReference });
+        }
 		SUBSECTION_END();
 
 		SUBTECHNIQUE_END();
@@ -61,11 +78,14 @@ namespace Hunts {
 	{
 		std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
 
-		GetRegistryEvents(events, SCOPE(EVT_VIEWER_REGISTRY), HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\mscfile\\shell\\open\\command",
-			false, false);
+        GetRegistryEvents(events, SCOPE(FODHELPER), HKEY_CURRENT_USER,
+                          L"SOFTWARE\\Classes\\ms-settings\\shell\\open\\command", true, true, true);
 
-		GetRegistryEvents(events, SCOPE(SDCLT_REGISTRY), HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\exefile\\shell\\runas\\command",
-			false, false);
+        GetRegistryEvents(events, SCOPE(EVT_VIEWER_REGISTRY), HKEY_CURRENT_USER,
+                          L"SOFTWARE\\Classes\\mscfile\\shell\\open\\command", true, true);
+
+		GetRegistryEvents(events, SCOPE(SDCLT_REGISTRY), HKEY_CURRENT_USER,
+                          L"SOFTWARE\\Classes\\exefile\\shell\\runas\\command", true, true);
 
 		return events;
 	}
