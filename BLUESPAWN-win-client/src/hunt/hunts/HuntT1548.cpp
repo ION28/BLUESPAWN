@@ -23,9 +23,9 @@ namespace Hunts {
 	}
 
 	void HuntT1548::Subtechnique002(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
-		SUBTECHNIQUE_INIT(002, Abuse Elevation Control Mechanism);
+        SUBTECHNIQUE_INIT(002, Bypass User Access Control);
 
-		SUBSECTION_INIT(FODHELPER, Normal);
+		SUBSECTION_INIT(FODHELPER, Cursory);
 
 		// Reference: https://winscripting.blog/2017/05/12/first-entry-welcome-and-uac-bypass/
 		// Test Commands:
@@ -46,7 +46,7 @@ namespace Hunts {
 		// Reference: https://enigma0x3.net/2016/08/15/fileless-uac-bypass-using-eventvwr-exe-and-registry-hijacking/
 		// Test Command: reg add "HKCU\SOFTWARE\Classes\mscfile\shell\open\command" /ve /t REG_SZ /d "cmd.exe" 
 		// Metasploit module: https://www.exploit-db.com/exploits/40268
- 		SUBSECTION_INIT(EVT_VIEWER_REGISTRY, Normal);
+        SUBSECTION_INIT(EVT_VIEWER_REGISTRY, Cursory);
 
 		for(RegistryValue& detection :
             CheckValues(HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\mscfile\\shell\\open\\command",
@@ -59,7 +59,7 @@ namespace Hunts {
 
 		// Reference: https://enigma0x3.net/2017/03/17/fileless-uac-bypass-using-sdclt-exe/
 		// Test Command: reg add "HKCU\SOFTWARE\Classes\exefile\shell\runas\command" /v "IsolatedCommand" /t REG_SZ /d "cmd.exe" 
-		SUBSECTION_INIT(SDCLT_REGISTRY, Normal);
+		SUBSECTION_INIT(SDCLT_REGISTRY, Cursory);
 
         for(auto& detection : CheckValues(HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\exefile\\shell\\runas\\command",
                                           { { L"IsolatedCommand", L"REG_SZ", false, CheckSzEmpty } }, true, true)) {
