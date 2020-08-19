@@ -17,6 +17,8 @@ DEFINE_FUNCTION(DWORD, NtQueryKey, NTAPI, HANDLE KeyHandle, int KeyInformationCl
 DEFINE_FUNCTION(NTSTATUS, NtQueryValueKey, NTAPI, HANDLE KeyHandle, PUNICODE_STRING ValueName, int KeyInformationClass, PVOID KeyInformation, ULONG Length, PULONG ResultLength);
 DEFINE_FUNCTION(NTSTATUS, NtDeleteValueKey, NTAPI, HANDLE KeyHandle, PUNICODE_STRING ValueName);
 
+#define DEFAULT L""
+
 /**
  * This enum represents the datatypes stored in the registry.
  * While other types do exist, for now, support only exists for the below types.

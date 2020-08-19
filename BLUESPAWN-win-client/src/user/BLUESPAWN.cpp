@@ -23,6 +23,7 @@
 #include "hunt/hunts/HuntT1543.h"
 #include "hunt/hunts/HuntT1546.h"
 #include "hunt/hunts/HuntT1547.h"
+#include "hunt/hunts/HuntT1548.h"
 #include "hunt/hunts/HuntT1553.h"
 #include "hunt/hunts/HuntT1562.h"
 #include "hunt/hunts/HuntT1569.h"
@@ -100,6 +101,7 @@ Bluespawn::Bluespawn() {
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1543>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1546>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1547>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1548>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1553>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1562>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1569>());
