@@ -123,7 +123,7 @@ Made with :heart: by the UVA Cyber Defense Team and the other awesome people in 
 Thanks to all of the folks listed below for their contributions to BLUESPAWN!
 
 * Alexander Kluth ([Github](https://github.com/akluth))
-* Yehuda Hido Cohen ([Github] (https://github.com/mryode))
+* Yehuda Hido Cohen ([Github](https://github.com/mryode))
 
 Want to help? Take a look at the current issues, add ideas for new features, write some code, and create a pull request!
 
