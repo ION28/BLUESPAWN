@@ -1,0 +1,6 @@
+cxxopts:x64-windows-static
+cxxopts:x86-windows-static
+yara:x64-windows-static
+yara:x86-windows-static
+libzip:x64-windows-static
+libzip:x86-windows-static
