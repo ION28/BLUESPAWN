@@ -1,0 +1,19 @@
+version: '3'
+services:
+    bluespawn-server:
+      build:
+        context: ./management
+      ports:
+        - "3000:3000"
+      volumes:
+        - "./bluespawn-server:/bluespawn-server"
+      stdin_open: true
+      tty: true
+    elk:
+      build:
+        context: ./elk
+      image: myelk
+      ports:
+        - "5601:5601"
+        - "9200:9200"
+        - "5044:5044"

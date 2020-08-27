@@ -1,19 +1,53 @@
 version: '3'
 services:
-    bluespawn-server:
-      build:
-        context: ./management
-      ports:
-        - "3000:3000"
-      volumes:
-        - "./bluespawn-server:/bluespawn-server"
-      stdin_open: true
-      tty: true
-    elk:
-      build:
-        context: ./elk
-      image: myelk
-      ports:
-        - "5601:5601"
-        - "9200:9200"
-        - "5044:5044"
+  # MongoDB: https://hub.docker.com/_/mongo/
+  mongo:
+    image: mongo:3
+    networks:
+      - graylog
+  # Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/6.x/docker.html
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.9.0-amd64
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=localhost
+      - network.host=0.0.0.0
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    networks:
+      - graylog
+  # Graylog: https://hub.docker.com/r/graylog/graylog/
+  graylog:
+    image: graylog/graylog:3.3
+    environment:
+      # CHANGE ME (must be at least 16 characters)!
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
+      # Password: admin
+      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
+    networks:
+      - graylog
+    depends_on:
+      - mongo
+      - elasticsearch
+    ports:
+      # Graylog web interface and REST API
+      - 9000:9000
+      # Syslog TCP
+      - 1514:1514
+      # Syslog UDP
+      - 1514:1514/udp
+      # GELF TCP
+      - 12201:12201
+      # GELF UDP
+      - 12201:12201/udp
+networks:
+  graylog:
+    driver: bridge
