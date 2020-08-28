@@ -5,9 +5,11 @@ services:
     image: mongo:3
     networks:
       - graylog
+    volumes:
+      - mongo_data:/data/db
   # Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/6.x/docker.html
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.9.0-amd64
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.9
     environment:
       - http.host=0.0.0.0
       - transport.host=localhost
@@ -23,8 +25,12 @@ services:
           memory: 1g
     networks:
       - graylog
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
   # Graylog: https://hub.docker.com/r/graylog/graylog/
   graylog:
+    # Ensure graylog can own the config dir
+    user: $USER
     image: graylog/graylog:3.3
     environment:
       # CHANGE ME (must be at least 16 characters)!
@@ -48,6 +54,18 @@ services:
       - 12201:12201
       # GELF UDP
       - 12201:12201/udp
+    volumes:
+      # Mount local configuration directory into Docker container
+      - ./graylog/config:/usr/share/graylog/data/config
+      - graylog_data:/usr/share/graylog/data
 networks:
   graylog:
     driver: bridge
+volumes:
+  mongo_data:
+    driver: local
+  es_data:
+    driver: local
+  graylog_data:
+    driver: local
+    
