@@ -398,7 +398,7 @@ namespace Permissions {
 				if (hr != ERROR_SUCCESS) {
 					LOG_ERROR("Error getting group privileges. (Error: " << GetLastError() << ")");
 				}
-				else if (hr == ERROR_SUCCESS) {
+				else {
 					for (int i = 0; i < uPrivCount; i++) {
 						vPrivs.emplace_back(LsaUnicodeStringToWString(pReceivedPrivs[i]));
 					}
