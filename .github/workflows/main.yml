@@ -1,4 +1,4 @@
-name: BLUESPAWN client build
+name: BLUESPAWN-win-client build
 
 on:
   push:
@@ -20,26 +20,24 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Setup NuGet.exe
-      uses: warrenbuckley/Setup-Nuget@v1
+    - uses: actions/checkout@main
 
     - name: Update submodules
       run: git submodule update --init --recursive
 
-    - name: Install vcpkg
+    - name: Restore from cache, and install vcpkg and project dependencies
+      uses: lukka/run-vcpkg@v3
+      with:
+        vcpkgArguments: '@../vcpkg_response_file.txt'
+        vcpkgDirectory: 'vcpkg'
+        appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
+
+    - name: Integrate vcpkg packages
       shell: powershell
       run: |
         cd vcpkg
-        .\bootstrap-vcpkg.bat
-        .\vcpkg.exe install yara:${{ matrix.buildarch }}-windows-static
-        .\vcpkg.exe install libzip:${{ matrix.buildarch }}-windows-static
         .\vcpkg.exe integrate install
         cd ..
-
-    - name: Download NuGet packages
-      run: nuget restore BLUESPAWN.sln
 
     - name: Build BLUESPAWN-client
       run: |
@@ -59,7 +57,7 @@ jobs:
       shell: powershell
 
     - name: Run BLUESPAWN Hunt
-      run: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe --hunt -l Normal --log=xml --reaction=log
+      run: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe --hunt -a Normal --log=xml
       shell: cmd
 
     - name: Rename BLUESPAWN XML output file
@@ -70,17 +68,17 @@ jobs:
       run: testing\run-hunt-results-comparison.ps1
       shell: powershell
 
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@main
       with:
         name: BLUESPAWN-client-${{ matrix.buildarch }}-${{ matrix.buildtype }}
         path: artifacts\${{ matrix.buildarch }}\${{ matrix.buildtype }}\BLUESPAWN-client.exe
 
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@main
       with:
         name: AtomicTestsResults-${{ matrix.buildarch }}-${{ matrix.buildtype }}.csv
         path: AtomicTestsResults.csv
 
-    - uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@main
       with:
         name: BLUESPAWNHuntResults-${{ matrix.buildarch }}-${{ matrix.buildtype }}.xml
         path: BLUESPAWNHuntResults.xml
