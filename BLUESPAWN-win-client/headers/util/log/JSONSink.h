@@ -34,10 +34,12 @@ namespace Log {
         /// A handle to a thread that periodically flushes the log to the file
         HandleWrapper thread;
 
-        /// A mapping of IDs to JSON entries created for detections
+        /// A set of IDs created for detections already in the JSON
         std::set<DWORD> detections;
 
         std::wstring ToWstringPad(DWORD value, size_t length);
+
+        void AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength);
 
         public:
         /**

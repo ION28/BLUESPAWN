@@ -61,49 +61,50 @@ namespace Log {
     void JSONSink::UpdateCertainty(IN CONST std::shared_ptr<Detection>& detection) {
         BeginCriticalSection __{ *detection };
         BeginCriticalSection _{ hGuard };
-        /*
+
         if(detections.find(detection->dwID) != detections.end()) {
-            for(auto child{ detections.at(detection->dwID)->FirstChildElement() }; child;
-                child = child->NextSiblingElement()) {
-                if(child->Name() == std::string{ "certainty" }) {
-                    child->SetText(detection->info.GetCertainty());
-                }
-                if(child->Name() == std::string{ "raw-certainty" }) {
-                    child->SetText(detection->info.GetIntrinsicCertainty());
+            for(auto& item : JSONDoc["bluespawn"]["detections"]) {
+                if(item["id"] == detection->dwID) {
+                    const auto cert = item.find("certainty");
+                    const auto rawcert = item.find("raw-certainty");
+                    item.erase(cert);
+                    item.erase(rawcert);
+                    item["certainty"] = std::to_string(detection->info.GetCertainty());
+                    item["raw-certainty"] = std::to_string(detection->info.GetIntrinsicCertainty());
+                    return;
                 }
             }
         }
-        */
     }
 
-    void AddAssociation() {
-        /*
-        for(auto child{ to->FirstChildElement() }; child; child = child->NextSiblingElement()) {
-            if(child->Name() == std::string{ "associated-detections" }) {
-                for(auto elem{ child->FirstChildElement() }; elem; elem = elem->NextSiblingElement()) {
-                    if(elem->GetText() == std::to_string(id)) {
-                        double existing{ 0 };
-                        elem->FindAttribute("strength")->QueryDoubleValue(&existing);
-                        elem->SetAttribute("strength", 1.0 - (1 - existing) * (1 - strength));
-                        return;
+    void JSONSink::AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength) {
+        for(auto& item : JSONDoc["bluespawn"]["detections"]) {
+            if(item["id"] == detection_id) {
+                if(item.find("associated-detections") != item.end()) {
+                    /// update association strength for association already in associated-detections of detection_id
+                    for(auto& child : item["associated-detections"]) {
+                        if(child["id"] == associated) {
+                            const auto cur_strength = child.find("strength");
+                            child.erase(cur_strength);
+                            child["strength"] = std::to_string(
+                                (1.0 - (1 - std::stod((std::string) cur_strength.value())) * (1 - strength)));
+                            return;
+                        }
                     }
+
+                    /// add new association in associated-detections of detection_id
+                    item["associated-detections"].push_back(
+                        { { "strength", static_cast<double>(strength) }, { "id", associated } });
+                    return;
                 }
 
-                auto elem{ doc.NewElement("association") };
-                elem->SetAttribute("strength", strength);
-                elem->SetText(std::to_string(id).c_str());
-                child->InsertEndChild(elem);
+                /// create associated-detections within detection_id and add new association
+                item["associated-detections"] = json::array();
+                item["associated-detections"].push_back(
+                    { { "strength", static_cast<double>(strength) }, { "id", associated } });
                 return;
             }
         }
-
-        auto assocations{ doc.NewElement("associated-detections") };
-        auto elem{ doc.NewElement("association") };
-        elem->SetAttribute("strength", strength);
-        elem->SetText(std::to_string(id).c_str());
-        assocations->InsertEndChild(elem);
-        to->InsertEndChild(assocations);
-        */
     }
 
     void JSONSink::RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN RecordType type) {
@@ -119,7 +120,15 @@ namespace Log {
         }
 
         if(detections.find(detection->dwID) != detections.end()) {
-            //TODO: Delete current detection within json
+            /// Delete current detection within json
+            for(auto& it : JSONDoc["bluespawn"]["detections"].items()) {
+                if(it.value().at("id").get<std::string>() == std::to_string(detection->dwID)) {
+                    JSONDoc["bluespawn"]["detections"].erase(JSONDoc["bluespawn"]["detections"].begin() + (int&) it);
+                    break;
+                }
+            }
+        } else {
+            detections.insert(detection->dwID);
         }
 
         json detect = {};
@@ -130,11 +139,11 @@ namespace Log {
 
         detect["type"] = (detection->type == DetectionType::FileDetection ?
                               "File" :
-                              detection->type == DetectionType::ProcessDetection ?
+                          detection->type == DetectionType::ProcessDetection ?
                               "Process" :
-                              detection->type == DetectionType::RegistryDetection ?
+                          detection->type == DetectionType::RegistryDetection ?
                               "Registry" :
-                              detection->type == DetectionType::ServiceDetection ?
+                          detection->type == DetectionType::ServiceDetection ?
                               "Service" :
                               WidestringToString(std::get<OtherDetectionData>(detection->data).DetectionType));
 
@@ -179,20 +188,18 @@ namespace Log {
     void JSONSink::RecordAssociation(IN CONST std::shared_ptr<Detection>& first,
                                      IN CONST std::shared_ptr<Detection>& second,
                                      IN CONST Association& strength) {
-        /*
         UpdateCertainty(first);
         UpdateCertainty(second);
 
         BeginCriticalSection _{ hGuard };
 
         if(detections.find(first->dwID) != detections.end()) {
-            //AddAssociation();
+            AddAssociation(first->dwID, second->dwID, strength);
         }
 
         if(detections.find(second->dwID) != detections.end()) {
-            //AddAssociation();
+            AddAssociation(second->dwID, first->dwID, strength);
         }
-        */
     }
 
     void JSONSink::LogMessage(const LogLevel& level, const std::wstring& message) {
@@ -201,8 +208,9 @@ namespace Log {
         if(level.Enabled()) {
             std::map<std::string, std::string> msg = {};
             if(level.detail) {
-                msg["detail"] = *level.detail == Detail::High ? "high" :
-                                                                *level.detail == Detail::Moderate ? "moderate" : "low";
+                msg["detail"] = *level.detail == Detail::High     ? "high" :
+                                *level.detail == Detail::Moderate ? "moderate" :
+                                                                    "low";
             }
             SYSTEMTIME time{};
             GetLocalTime(&time);
