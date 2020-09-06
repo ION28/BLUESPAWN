@@ -40,8 +40,21 @@ namespace Log {
         ResumeThread(thread);
     }
 
-    XMLSink::XMLSink(const std::wstring& wFileName) :
-        Root{ XMLDoc.NewElement("bluespawn") }, wFileName{ wFileName }, LogRoot{ XMLDoc.NewElement("log-messages") },
+    XMLSink::XMLSink(const std::wstring& wOutputDir) :
+        Root{ XMLDoc.NewElement("bluespawn") }, LogRoot{ XMLDoc.NewElement("log-messages") }, thread{
+            CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr)
+        } {
+        SYSTEMTIME time{};
+        GetLocalTime(&time);
+        wFileName = wOutputDir + L"\\bluespawn-" + ToWstringPad(time.wMonth) + L"-" + ToWstringPad(time.wDay) + L"-" +
+                    ToWstringPad(time.wYear, 4) + L"-" + ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + L"-" +
+                    ToWstringPad(time.wSecond) + L".xml";
+        XMLDoc.InsertEndChild(Root);
+    }
+
+    XMLSink::XMLSink(const std::wstring& wOutputDir, const std::wstring& wFileName) :
+        Root{ XMLDoc.NewElement("bluespawn") }, wFileName{ wOutputDir + L"\\" + wFileName }, LogRoot{ XMLDoc.NewElement(
+                                                                                                 "log-messages") },
         thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr) } {
         XMLDoc.InsertEndChild(Root);
     }
@@ -129,11 +142,11 @@ namespace Log {
         detect->SetAttribute("type",
                              (detection->type == DetectionType::FileDetection ?
                                   "File" :
-                                  detection->type == DetectionType::ProcessDetection ?
+                              detection->type == DetectionType::ProcessDetection ?
                                   "Process" :
-                                  detection->type == DetectionType::RegistryDetection ?
+                              detection->type == DetectionType::RegistryDetection ?
                                   "Registry" :
-                                  detection->type == DetectionType::ServiceDetection ?
+                              detection->type == DetectionType::ServiceDetection ?
                                   "Service" :
                                   WidestringToString(std::get<OtherDetectionData>(detection->data).DetectionType))
                                  .c_str());
@@ -207,9 +220,9 @@ namespace Log {
         if(level.Enabled()) {
             auto msg = XMLDoc.NewElement(MessageTags[static_cast<DWORD>(level.severity)].c_str());
             if(level.detail) {
-                msg->SetAttribute("detail", *level.detail == Detail::High ?
-                                                "high" :
-                                                *level.detail == Detail::Moderate ? "moderate" : "low");
+                msg->SetAttribute("detail", *level.detail == Detail::High     ? "high" :
+                                            *level.detail == Detail::Moderate ? "moderate" :
+                                                                                "low");
             }
 
             SYSTEMTIME time{};

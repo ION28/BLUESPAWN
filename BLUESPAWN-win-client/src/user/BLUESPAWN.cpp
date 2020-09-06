@@ -253,7 +253,7 @@ void Bluespawn::check_correct_arch() {
     }
 }
 
-void ParseLogSinks(const std::string& sinks) {
+void ParseLogSinks(const std::string& sinks, const std::string& logdir) {
     std::set<std::string> sink_set;
     for(unsigned startIdx = 0; startIdx < sinks.size();) {
         auto endIdx{ sinks.find(',', startIdx) };
@@ -263,6 +263,18 @@ void ParseLogSinks(const std::string& sinks) {
         if(endIdx == std::string::npos) {
             break;
         }
+    }
+
+    std::wstring outputFolderPath = L".";
+    auto outputDir = FileSystem::Folder(StringToWidestring(logdir));
+    if(outputDir.GetFolderExists() && !outputDir.GetCurIsFile() && outputDir.GetFolderWrite()) {
+        outputFolderPath = outputDir.GetFolderPath();
+    } else {
+        LOG_ERROR(L"Unable to access " << StringToWidestring(logdir)
+                                       << L" to write logs. Defaulting to current directory.");
+        Bluespawn::io.AlertUser(L"Unable to access " + StringToWidestring(logdir) +
+                                    L" to write logs. Defaulting to current directory.",
+                                5000, ImportanceLevel::MEDIUM);
     }
 
     std::vector<std::reference_wrapper<Log::LogLevel>> levels{
@@ -276,7 +288,7 @@ void ParseLogSinks(const std::string& sinks) {
             Log::AddSink(console, levels);
             Bluespawn::detectionSinks.emplace_back(console);
         } else if(sink == "xml") {
-            auto XML = std::make_shared<Log::XMLSink>();
+            auto XML = std::make_shared<Log::XMLSink>(outputFolderPath);
             Log::AddSink(XML, levels);
             Bluespawn::detectionSinks.emplace_back(XML);
         } else if(sink == "json") {
@@ -361,6 +373,11 @@ int main(int argc, char* argv[]) {
             cxxopts::value<std::string>()->default_value(""))
 		;
 
+    options.add_options("log")
+		("o,output", "Specify the output folder for any logs written to a file", 
+            cxxopts::value<std::string>()->default_value("."))
+        ;
+
     options.add_options("mitigate")
 		("action", "Selects whether to audit or enforce each mitigations.",
             cxxopts::value<std::string>()->default_value("audit")->implicit_value("audit"))
@@ -399,7 +416,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        ParseLogSinks(result["log"].as<std::string>());
+        ParseLogSinks(result["log"].as<std::string>(), result["output"].as<std::string>());
 
         if(result.count("hunt") || result.count("monitor")) {
             if(result.count("hunt")) {

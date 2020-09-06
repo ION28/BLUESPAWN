@@ -20,7 +20,8 @@
 
 #include "aclapi.h"
 
-LINK_FUNCTION(NtCreateFile, ntdll.dll)
+LINK_FUNCTION(NtCreateFile, ntdll.dll);
+LINK_FUNCTION(NtCreateDirectoryObject, ntdll.dll);
 
 namespace FileSystem {
     bool CheckFileExists(const std::wstring& path) {
@@ -75,7 +76,7 @@ namespace FileSystem {
             LOG_ERROR("Error acquiring catalog admin context " << SYSTEM_ERROR);
             return {};
         }
-        GenericWrapper<HCATADMIN> hCatAdmin{ admin, [](auto val){ CryptCATAdminReleaseContext(&val, 0); },
+        GenericWrapper<HCATADMIN> hCatAdmin{ admin, [](auto val) { CryptCATAdminReleaseContext(&val, 0); },
                                              INVALID_HANDLE_VALUE };
 
         DWORD dwHashLength{ 0 };
@@ -93,10 +94,9 @@ namespace FileSystem {
         std::vector<std::wstring> catalogfiles{};
         GenericWrapper<HCATINFO> hCatInfo{
             CryptCATAdminEnumCatalogFromHash(hCatAdmin, pbHash.data(), dwHashLength, 0, nullptr),
-            [&hCatAdmin](auto val){ CryptCATAdminReleaseCatalogContext(&hCatAdmin, &val, 0); },
-            INVALID_HANDLE_VALUE
+            [&hCatAdmin](auto val) { CryptCATAdminReleaseCatalogContext(&hCatAdmin, &val, 0); }, INVALID_HANDLE_VALUE
         };
-        while(hCatInfo){
+        while(hCatInfo) {
             CATALOG_INFO ciCatalogInfo = {};
             ciCatalogInfo.cbStruct = sizeof(ciCatalogInfo);
 
@@ -487,7 +487,7 @@ namespace FileSystem {
                 LOG_ERROR("Failed to query signature for " << FilePath << ": " << SYSTEM_ERROR);
                 return std::nullopt;
             }
-            GenericWrapper<HCERTSTORE> hStore{ store, [](HCERTSTORE store){ CertCloseStore(store, 0); },
+            GenericWrapper<HCERTSTORE> hStore{ store, [](HCERTSTORE store) { CertCloseStore(store, 0); },
                                                INVALID_HANDLE_VALUE };
             GenericWrapper<HCRYPTMSG> hMsg{ msg, CryptMsgClose, INVALID_HANDLE_VALUE };
 
@@ -753,6 +753,7 @@ namespace FileSystem {
         std::wstring searchName = FolderPath;
         searchName += L"\\*";
         bFolderExists = true;
+        bFolderWrite = false;
         auto f = FindFirstFileW(searchName.c_str(), &ffd);
         hCurFile = { f };
         if(hCurFile == INVALID_HANDLE_VALUE) {
@@ -761,6 +762,7 @@ namespace FileSystem {
         }
         if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
             bIsFile = false;
+            // TODO: correctly populate bFolderWrite
         } else {
             bIsFile = true;
         }
@@ -799,6 +801,8 @@ namespace FileSystem {
     bool Folder::GetFolderExists() const { return bFolderExists; }
 
     bool Folder::GetCurIsFile() const { return bIsFile; }
+
+    bool Folder::GetFolderWrite() const { return bFolderWrite; }
 
     std::optional<File> Folder::Open() const {
         if(bIsFile) {
