@@ -6,6 +6,16 @@
 #include <memory>
 #include <optional>
 #include <functional>
+#include <lm.h>
+#define PSTRING __PSTRING
+#define STRING __STRING
+#define UNICODE_STRING __UNICODE_STRING
+#define PUNICODE_STRING __PUNICODE_STRING
+#include <NTSecAPI.h>
+#undef PSTRING
+#undef STRING
+#undef UNICODE_STRING
+#undef PUNICODE_STRING
 
 template<class T>
 class GenericWrapper {
@@ -106,7 +116,7 @@ class AllocationWrapper {
 
 public:
 	enum AllocationFunction {
-		VIRTUAL_ALLOC, HEAP_ALLOC, MALLOC, CPP_ALLOC, CPP_ARRAY_ALLOC, STACK_ALLOC, LOCAL_ALLOC, GLOBAL_ALLOC
+		VIRTUAL_ALLOC, HEAP_ALLOC, MALLOC, CPP_ALLOC, CPP_ARRAY_ALLOC, STACK_ALLOC, LOCAL_ALLOC, GLOBAL_ALLOC, LSA_ALLOC, NET_ALLOC
 	};
 
 	AllocationWrapper(LPVOID memory, SIZE_T size, AllocationFunction AllocationType = STACK_ALLOC) :
@@ -114,20 +124,24 @@ public:
 		Memory{ 
 			size && memory ? std::optional<std::shared_ptr<char[]>>{{
 				reinterpret_cast<PCHAR>(memory), [AllocationType](char* value){
-					if(AllocationType == CPP_ALLOC)
+					if (AllocationType == CPP_ALLOC)
 						delete value;
-					else if(AllocationType == CPP_ARRAY_ALLOC)
+					else if (AllocationType == CPP_ARRAY_ALLOC)
 						delete[] value;
-					else if(AllocationType == MALLOC)
+					else if (AllocationType == MALLOC)
 						free(value);
-					else if(AllocationType == HEAP_ALLOC)
+					else if (AllocationType == HEAP_ALLOC)
 						HeapFree(GetProcessHeap(), 0, value);
-					else if(AllocationType == VIRTUAL_ALLOC)
+					else if (AllocationType == VIRTUAL_ALLOC)
 						VirtualFree(value, 0, MEM_RELEASE);
-					else if(AllocationType == GLOBAL_ALLOC)
+					else if (AllocationType == GLOBAL_ALLOC)
 						GlobalFree(value);
-					else if(AllocationType == LOCAL_ALLOC)
+					else if (AllocationType == LOCAL_ALLOC)
 						LocalFree(value);
+					else if (AllocationType == LSA_ALLOC)
+						LsaFreeMemory(value);
+					else if (AllocationType == NET_ALLOC)
+						NetApiBufferFree(value);
 				}
 			}} : std::nullopt
 	    },
