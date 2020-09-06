@@ -30,13 +30,6 @@ DEFINE_FUNCTION(NTSTATUS,
                 PVOID EaBuffer,
                 ULONG EaLength);
 
-DEFINE_FUNCTION(NTSTATUS,
-                NtCreateDirectoryObject,
-                NTAPI,
-                PHANDLE DirectoryHandle,
-                ACCESS_MASK DesiredAccess,
-                POBJECT_ATTRIBUTES ObjectAttributes);
-
 #define SHA1LEN 20
 #define SHA256LEN 32
 
