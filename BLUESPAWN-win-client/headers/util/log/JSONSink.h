@@ -37,9 +37,12 @@ namespace Log {
         /// A set of IDs created for detections already in the JSON
         std::set<DWORD> detections;
 
-        std::wstring ToWstringPad(DWORD value, size_t length);
-
         void AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength);
+
+        void JSONSink::InsertElement(IN json JSONDoc,
+                                     IN json parent,
+                                     IN CONST std::string& name,
+                                     IN CONST std::wstring& value);
 
         public:
         /**
@@ -49,11 +52,19 @@ namespace Log {
         JSONSink();
 
         /**
-		 * Constructor for JSONSink. The log will be saved with the name passed as the argument
+		 * Constructor for JSONSink. The log will be saved to the folder passed as the argument
 		 *
+		 * @param wOutputDir The folder to save the log to.
+		 */
+        JSONSink(const std::wstring& wOutputDir);
+
+        /**
+		 * Constructor for JSONSink. The log will be saved to the folder\name passed as the arguments
+		 *
+		 * @param wOutputDir The folder to save the log to.
 		 * @param wFileName The name of the file to save the log as.
 		 */
-        JSONSink(const std::wstring& wFileName);
+        JSONSink(const std::wstring& wOutputDir, const std::wstring& wFileName);
 
         /// Delete copy and move constructors and assignment operators
         JSONSink operator=(const JSONSink&) = delete;

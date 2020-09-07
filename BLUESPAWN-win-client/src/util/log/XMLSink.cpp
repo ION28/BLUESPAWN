@@ -10,14 +10,6 @@
 
 namespace Log {
 
-    std::wstring ToWstringPad(DWORD value, size_t length = 2) {
-        wchar_t* buf = new wchar_t[length + 1];
-        swprintf(buf, (L"%0" + std::to_wstring(length) + L"d").c_str(), value);
-        std::wstring str = buf;
-        delete[] buf;
-        return str;
-    }
-
     void UpdateLog(XMLSink* sink) {
         HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, L"Local\\FlushLogs") };
         while(true) {

@@ -1,63 +1,96 @@
 #pragma once
 
-// Remove this once GRPC is fixed
-#define GRPC_BROKEN
+#include <nlohmann/json.hpp>
 
-#ifndef GRPC_BROKEN
-#include <map>
-
+#include "DetectionSink.h"
 #include "LogSink.h"
-#include "LogLevel.h"
-#include "ReactionData.pb.h"
-#include "reaction/Detections.h"
+
+using json = nlohmann::json;
 
 namespace Log {
 
-	/**
-	 * ServerSink provides a sink for the logger that directs output to the console.
-	 * 
-	 * Each log message is prepended with the severity of the log, as defined in
-	 * MessagePrepends. This prepended text is colored with the color indicated in
-	 * PrependColors. 
+    /**
+	 * ServerSink provides a sink for the logger that will send logs to a remote server, usually a BLUESPAWN-server installation
 	 */
-	class ServerSink : public LogSink {
-	private:
-		std::string MessagePrepends[4] = { "[ERROR]", "[WARNING]", "[INFO]", "[OTHER]" };
+    class ServerSink : public LogSink, public DetectionSink {
+        /// Guards access to the server
+        CriticalSection hGuard;
 
-		// Converting HuntInfo to gpb::HuntInfo
-		gpb::Aggressiveness HuntAggressivenessToGPB(const Aggressiveness& info);
-		std::vector<gpb::Tactic> HuntTacticsToGPB(DWORD info);
-		std::vector<gpb::Category> HuntCategoriesToGPB(DWORD info);
-		std::vector<gpb::DataSource> HuntDatasourcesToGPB(DWORD info);
-		gpb::HuntInfo HuntInfoToGPB(const HuntInfo& info);
+        /// The remote server (http(s)://)IP:PORT or (http(s)://)FQDN:PORT that will recieve the logs
+        std::wstring wServerAddress;
 
-		std::vector<gpb::FileReactionData> GetFileReactions(const std::vector<std::shared_ptr<Detection>>& detections);
-		std::vector<gpb::RegistryReactionData> GetRegistryReactions(const std::vector<std::shared_ptr<Detection>>& detections);
-		std::vector<gpb::ProcessReactionData> GetProcessReactions(const std::vector<std::shared_ptr<Detection>>& detections);
-		std::vector<gpb::ServiceReactionData> GetServiceReactions(const std::vector<std::shared_ptr<Detection>>& detections);
+        /// Tags for messages sent at different levels
+        std::string MessageTags[4] = { "error", "warning", "info", "other" };
 
-	public:
+        /// A handle to a thread that periodically flushes the log to the file
+        HandleWrapper thread;
 
-		/**
-		 * Outputs a message to the console if its logging level is enabled. The log message
-		 * is prepended with its severity level.
+        /// A set of IDs created for detections already sent to the server
+        std::set<DWORD> detections;
+
+        void AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength);
+
+        public:
+        /**
+		 * Default constructor for ServerSink. Must provide a server address to send the logs
+		 */
+        ServerSink(const std::wstring ServerAddress);
+
+        /// Delete copy and move constructors and assignment operators
+        ServerSink operator=(const ServerSink&) = delete;
+        ServerSink operator=(ServerSink&&) = delete;
+        ServerSink(const ServerSink&) = delete;
+        ServerSink(ServerSink&&) = delete;
+
+        /// Custom destructor
+        ~ServerSink();
+
+        /**
+		 * Outputs a message to the target server if its logging level is enabled. 
 		 *
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
 		 */
-		virtual void LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info = std::nullopt, 
-			                    const std::vector<std::shared_ptr<Detection>>& detections = {}) override;
+        virtual void LogMessage(const LogLevel& level, const std::wstring& message);
 
-		/**
-		 * Compares this ServerSink to another LogSink. Currently, as only one console is supported,
-		 * any other ServerSink is considered to be equal. This is subject to change in the event that
-		 * support for more consoles is added.
+        /**
+		 * Compares this ServerSink to another LogSink. All LogSink objects referring to the same file are considered 
+		 * equal
 		 *
 		 * @param sink The LogSink to compare
 		 *
 		 * @return Whether or not the argument and this sink are considered equal.
 		 */
-		virtual bool operator==(const LogSink& sink) const;
-	};
-}
-#endif
+        virtual bool operator==(const LogSink& sink) const;
+
+        /**
+		 * Flushes the log to the server.
+		*/
+        void Flush();
+
+        /**
+		 * Updates the raw and combined certainty values associated with a detection
+		 * 
+		 * @param detection The detection to update
+		 */
+        virtual void UpdateCertainty(IN CONST std::shared_ptr<Detection>& detection);
+
+        /**
+		 * Records a detection, sending the information to the server.
+		 *
+		 * @param detection The detection to record
+		 * @param type The type of record this is, either PreScan or PostScan
+		 */
+        virtual void RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN RecordType type);
+
+        /**
+		 * Records an association between two detections and informs the server
+		 *
+		 * @param first The first detection in the assocation. This detection's ID will be lower than the second's.
+		 * @param second The second detection in the association.
+		 */
+        virtual void RecordAssociation(IN CONST std::shared_ptr<Detection>& first,
+                                       IN CONST std::shared_ptr<Detection>& second,
+                                       IN CONST Association& strength);
+    };
+}   // namespace Log

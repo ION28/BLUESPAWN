@@ -11,14 +11,6 @@
 
 namespace Log {
 
-    std::wstring JSONSink::ToWstringPad(DWORD value, size_t length = 2) {
-        wchar_t* buf = new wchar_t[length + 1];
-        swprintf(buf, (L"%0" + std::to_wstring(length) + L"d").c_str(), value);
-        std::wstring str = buf;
-        delete[] buf;
-        return str;
-    }
-
     void UpdateLog(JSONSink* sink) {
         HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, L"Local\\FlushLogs") };
         while(true) {
@@ -39,10 +31,24 @@ namespace Log {
                     ToWstringPad(time.wYear, 4) + L"-" + ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + L"-" +
                     ToWstringPad(time.wSecond) + L".json";
         ResumeThread(thread);
-    }   // namespace Log
+    }
 
-    JSONSink::JSONSink(const std::wstring& wFileName) :
-        wFileName{ wFileName }, thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr) } {
+    JSONSink::JSONSink(const std::wstring& wOutputDir) :
+        thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr) } {
+        SYSTEMTIME time{};
+        GetLocalTime(&time);
+        wFileName = wOutputDir + L"\\bluespawn-" + ToWstringPad(time.wMonth) + L"-" + ToWstringPad(time.wDay) + L"-" +
+                    ToWstringPad(time.wYear, 4) + L"-" + ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + L"-" +
+                    ToWstringPad(time.wSecond) + L".xml";
+        JSONDoc = json::object();
+        JSONDoc["bluespawn"] = json::object();
+        JSONDoc["bluespawn"]["log-messages"] = json::array();
+    }
+
+    JSONSink::JSONSink(const std::wstring& wOutputDir, const std::wstring& wFileName) :
+        wFileName{ wOutputDir + L"\\" + wFileName }, thread{
+            CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr)
+        } {
         JSONDoc = json::object();
         JSONDoc["bluespawn"] = json::object();
         JSONDoc["bluespawn"]["log-messages"] = json::array();
@@ -54,7 +60,8 @@ namespace Log {
         TerminateThread(thread, 0);
     }
 
-    void InsertElement(IN json JSONDoc, IN json parent, IN CONST std::string& name, IN CONST std::wstring& value) {
+    void
+    JSONSink::InsertElement(IN json JSONDoc, IN json parent, IN CONST std::string& name, IN CONST std::wstring& value) {
         parent[name] = WidestringToString(value).c_str();
     }
 

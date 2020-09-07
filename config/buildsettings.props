@@ -20,8 +20,10 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <Optimization Condition="'$(Configuration)'=='Debug'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)'=='Release'">MaxSpeed</Optimization>
-      <PreprocessorDefinitions>DELAYLOAD_IMPORTS_DEFINED;_UNICODE;UNICODE;_ITERATOR_DEBUG_LEVEL=0;_WIN32_WINNT=0x601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions Condition="'$(Configuration)'=='Release'">DELAYLOAD_IMPORTS_DEFINED;_UNICODE;UNICODE;_ITERATOR_DEBUG_LEVEL=0;_WIN32_WINNT=0x601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)'=='Debug'">DELAYLOAD_IMPORTS_DEFINED;_UNICODE;UNICODE;_ITERATOR_DEBUG_LEVEL=2;_WIN32_WINNT=0x601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebug</RuntimeLibrary>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>

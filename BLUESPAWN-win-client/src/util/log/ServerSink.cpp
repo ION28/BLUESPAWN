@@ -1,95 +1,75 @@
-#include <Windows.h>
+#include "util/log/ServerSink.h"
 
+#include <cpr/cpr.h>
+
+#include <chrono>
+#include <ctime>
+#include <fstream>
 #include <iostream>
 
-#include "util/log/ServerSink.h"
 #include "util/StringUtils.h"
+#include "util/Utils.h"
+#include "util/configurations/CollectInfo.h"
 
-#ifndef GRPC_BROKEN
+#include "user/bluespawn.h"
 
 namespace Log {
 
-	gpb::Aggressiveness ServerSink::HuntAggressivenessToGPB(const Aggressiveness& info) {
-		return gpb::Aggressiveness();
-	}
+    void UpdateLog(ServerSink* sink) {
+        HandleWrapper hRecordEvent{ CreateEventW(nullptr, false, false, L"Local\\FlushLogs") };
+        while(true) {
+            WaitForSingleObject(hRecordEvent, INFINITE);
+            sink->Flush();
+        }
+    }
 
-	std::vector<gpb::Tactic> ServerSink::HuntTacticsToGPB(DWORD info) {
-		return std::vector<gpb::Tactic>();
-	}
+    ServerSink::ServerSink(const std::wstring ServerAddress) :
+        wServerAddress{ ServerAddress }, thread{
+            CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, CREATE_SUSPENDED, nullptr)
+        } {
+        ResumeThread(thread);
+    }
 
-	std::vector<gpb::Category> ServerSink::HuntCategoriesToGPB(DWORD info) {
-		return std::vector<gpb::Category>();
-	}
+    ServerSink::~ServerSink() { TerminateThread(thread, 0); }
 
-	std::vector<gpb::DataSource> ServerSink::HuntDatasourcesToGPB(DWORD info) {
-		return std::vector<gpb::DataSource>();
-	}
+    void ServerSink::UpdateCertainty(IN CONST std::shared_ptr<Detection>& detection) {}
 
-	gpb::HuntInfo ServerSink::HuntInfoToGPB(const HuntInfo& info) {
-		gpb::HuntInfo gpbInfo;
+    void ServerSink::AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength) {}
 
-		gpbInfo.set_huntname(WidestringToString(info.HuntName));
-		gpbInfo.set_huntaggressiveness(HuntAggressivenessToGPB(info.HuntAggressiveness));
+    void ServerSink::RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN RecordType type) {
+        if(type == RecordType::PreScan && !Bluespawn::EnablePreScanDetections) {
+            return;
+        }
 
-		auto huntTactics = HuntTacticsToGPB(info.HuntTactics);
-		for(int i = 0; i < huntTactics.size(); i++)
-			gpbInfo.set_hunttactics(i, huntTactics[i]);
+        BeginCriticalSection __{ *detection };
+        BeginCriticalSection _{ hGuard };
+    }
 
-		auto huntCategories = HuntCategoriesToGPB(info.HuntCategories);
-		for (int i = 0; i < huntCategories.size(); i++)
-			gpbInfo.set_huntcategories(i, huntCategories[i]);
+    void ServerSink::RecordAssociation(IN CONST std::shared_ptr<Detection>& first,
+                                       IN CONST std::shared_ptr<Detection>& second,
+                                       IN CONST Association& strength) {}
 
-		auto huntDatasources = HuntDatasourcesToGPB(info.HuntDatasources);
-		for (int i = 0; i < huntDatasources.size(); i++)
-			gpbInfo.set_huntdatasources(i, huntDatasources[i]);
+    void ServerSink::LogMessage(const LogLevel& level, const std::wstring& message) {
+        BeginCriticalSection _{ hGuard };
 
-		gpbInfo.set_huntstarttime(info.HuntStartTime);
-    
-		return gpbInfo;
-	}
+        if(level.Enabled()) {
+            json payload = json::object();
+            payload["version"] = "1.1";
+            payload["host"] = "WIN-2389DM8W";
+            payload["short_message"] = WidestringToString(message);
+            payload["timestamp"] = std::time(0);
+            payload["level"] = 6;
 
-	std::vector<gpb::FileReactionData> ServerSink::GetFileReactions(const std::vector<std::shared_ptr<Detection>>& detections) {
-		std::vector<gpb::FileReactionData> fileDetections;
+            cpr::Response r = cpr::Post(cpr::Url{ WidestringToString(wServerAddress) },
+                                        cpr::Header{ { "Content-Type", "application/json" } },
+                                        cpr::Body{ payload.dump(-1) });
+        }
+    }
 
-		for (auto& detection : detections) {
-			// Extract all FILE_DETECTION objects
-			if (detection->Type == DetectionType::File) {
-				auto fileDetection = std::static_pointer_cast<FILE_DETECTION>(detection);
+    bool ServerSink::operator==(const LogSink& sink) const {
+        return (bool) dynamic_cast<const ServerSink*>(&sink) &&
+               dynamic_cast<const ServerSink*>(&sink)->wServerAddress == wServerAddress;
+    }
 
-				gpb::FileReactionData gpbFileDetection;
-
-				fileDetections.emplace_back(gpbFileDetection);
-			}
-		}
-
-		return fileDetections;
-	}
-
-	std::vector<gpb::RegistryReactionData> ServerSink::GetRegistryReactions(const std::vector<std::shared_ptr<Detection>>& detections) {
-		return std::vector<gpb::RegistryReactionData>();
-	}
-
-	std::vector<gpb::ProcessReactionData> ServerSink::GetProcessReactions(const std::vector<std::shared_ptr<Detection>>& detections) {
-		return std::vector<gpb::ProcessReactionData>();
-	}
-
-	std::vector<gpb::ServiceReactionData> ServerSink::GetServiceReactions(const std::vector<std::shared_ptr<Detection>>& detections) {
-		return std::vector<gpb::ServiceReactionData>();
-	}
-
-	void ServerSink::LogMessage(const LogLevel& level, const std::string& message, const std::optional<HuntInfo> info, 
-		const std::vector<std::shared_ptr<Detection>>& detections){
-		if (!level.Enabled())
-			return;
-
-		gpb::HuntMessage huntMessage{};
-		huntMessage.set_allocated_info(&HuntInfoToGPB(*info));
-		huntMessage.set_extramessage(message);
-	}
-
-	bool ServerSink::operator==(const LogSink& sink) const {
-		return (bool) dynamic_cast<const ServerSink*>(&sink);
-	}
-}
-
-#endif
+    void ServerSink::Flush() {}
+};   // namespace Log
