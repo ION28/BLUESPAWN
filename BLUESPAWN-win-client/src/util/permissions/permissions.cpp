@@ -214,12 +214,7 @@ namespace Permissions {
 	}
 
 	std::wstring Owner::LsaUnicodeStringToWString(IN const LSA_UNICODE_STRING& str) {
-		std::wstring toRet;
-		DWORD len = 0;
-
-		len = str.Length;
-		toRet = { str.Buffer };
-		return toRet;
+		return { str.Buffer };
 	}
 
 	Owner::Owner(IN const std::wstring& name) : wName{ name }, bExists{ true } {
@@ -650,11 +645,11 @@ namespace Permissions {
 		std::vector<WCHAR> Name(dwNameLen);
 		if (owner == nullptr) {
 			LOG_ERROR("Unable to allocate space for owner token.");
-			goto fail;
+			return std::nullopt;
 		}
 		if (!GetTokenInformation(hToken, TokenOwner, owner, dwSize, &dwSize)) {
 			LOG_ERROR("Couldn't get owner from token. Error " << GetLastError());
-			goto fail;
+			return std::nullopt;
 		}
 		LookupAccountSidW(nullptr, owner.GetAsPointer<TOKEN_OWNER>()->Owner, nullptr, &dwNameLen, nullptr, &dwDomainLen, &SIDType);
 		Domain = std::vector<WCHAR>(dwDomainLen);
@@ -663,12 +658,7 @@ namespace Permissions {
 		if (!LookupAccountSid(nullptr, owner.GetAsPointer<TOKEN_OWNER>()->Owner, Name.data(), &dwNameLen, Domain.data(), &dwDomainLen, &SIDType)) {
 			LOG_ERROR("Error getting owner " << GetLastError());
 		}
-		if (owner != nullptr) GlobalFree(owner);
 		CloseHandle(hToken);
 		return Owner(Name.data());
-	fail:
-		if(owner != nullptr) GlobalFree(owner);
-		CloseHandle(hToken);
-		return std::nullopt;
 	}
 }
