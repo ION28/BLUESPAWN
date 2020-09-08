@@ -205,9 +205,9 @@ namespace Permissions {
 		DWORD len = 0;
 
 		len = str.length();
-		LPWSTR cstr = new WCHAR[len + 1];
+		AllocationWrapper cstr{ new WCHAR[len + 1], len + 1, AllocationWrapper::CPP_ARRAY_ALLOC };
 		memcpy(cstr, str.c_str(), (len + 1) * sizeof(WCHAR));
-		lsaWStr.Buffer = cstr;
+		lsaWStr.Buffer = reinterpret_cast<PWSTR>(cstr.GetAsPointer());
 		lsaWStr.Length = (USHORT)((len) * sizeof(WCHAR));
 		lsaWStr.MaximumLength = (USHORT)((len + 1) * sizeof(WCHAR));
 		return lsaWStr;
@@ -218,9 +218,7 @@ namespace Permissions {
 		DWORD len = 0;
 
 		len = str.Length;
-		LPWSTR cstr = new WCHAR[len + 1];
-		memcpy(cstr, str.Buffer, (len + 1) * sizeof(WCHAR));
-		toRet = { cstr };
+		toRet = { str.Buffer };
 		return toRet;
 	}
 
