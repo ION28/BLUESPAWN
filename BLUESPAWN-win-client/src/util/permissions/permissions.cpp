@@ -634,7 +634,7 @@ namespace Permissions {
 	}
 
 	std::optional<Owner> GetProcessOwner() {
-		HANDLE hToken;
+		HandleWrapper hToken{ nullptr };
 		if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
 			LOG_ERROR("Couldn't access process token. Error " << GetLastError());
 			return std::nullopt;
