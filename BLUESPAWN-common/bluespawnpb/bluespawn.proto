@@ -1,0 +1,35 @@
+syntax = "proto3";
+package bluespawn;
+
+option go_package = "BLUESPAWN/BLUESPAWN-common/bluespawnpb";
+
+service LogReceiver {
+	rpc SendLog(LogMessageRequest) returns (LogMessageResponse) {}
+}
+
+message LogMessageRequest {
+	string host = 1;
+	int64 timestamp = 2;
+	string message = 3;
+	
+	enum Severity {
+		LogError = 0;
+		LogWarn = 1;
+		LogInfo = 2;
+		LogVerbose = 3;
+	}
+
+	Severity severity = 4;
+	
+	enum Detail {
+		Low = 0;
+		Moderate = 1;
+		High = 2;
+	}
+
+	Detail detail = 5;
+}
+
+message LogMessageResponse {
+	bool received = 1;
+}

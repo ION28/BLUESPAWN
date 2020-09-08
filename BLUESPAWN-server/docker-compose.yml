@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  # MySQL: https://hub.docker.com/_/mysql
+  mysql:
+    build:
+      context: .
+      dockerfile: ./mysql/Dockerfile
+    environment:
+      - MYSQL_ROOT_PASSWORD=Chiapet1
+      - MYSQL_DATABASE=bluespawn_server
+      - MYSQL_USER=bluespawn
+      - MYSQL_PASSWORD=Chiapet1
+    restart: on-failure
+    ports:
+      - "3306:3306"
+    networks:
+      - server_core
+    volumes:
+      - /data/mysql
+      - type: bind 
+        source: ./mysql/init
+        target: /docker-entrypoint-initdb.d/
+        read_only: true
+  # RPC Server for Client<->Server Communication written in Go/GRPC
+  rpc_server:
+    build:
+      context: ../
+      dockerfile: ./BLUESPAWN-server/rpc_server/Dockerfile
+    ports:
+      - "50052:50052"
+    depends_on:
+      - mysql
+    networks:
+      - server_core
+networks:
+  server_core:
+    driver: bridge
