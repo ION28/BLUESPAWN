@@ -282,7 +282,7 @@ struct ProcessDetectionData {
 	 *
 	 * @return True if the data is equal to this; false otherwise
 	 */
-	bool operator==(const ProcessDetectionData& detection) const = default;
+	bool operator==(const ProcessDetectionData& detection) CONST;
 
 private:
 

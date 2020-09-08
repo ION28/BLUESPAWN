@@ -75,7 +75,7 @@ namespace FileSystem {
             LOG_ERROR("Error acquiring catalog admin context " << SYSTEM_ERROR);
             return {};
         }
-        GenericWrapper<HCATADMIN> hCatAdmin{ admin, [](auto val){ CryptCATAdminReleaseContext(&val, 0); },
+        GenericWrapper<HCATADMIN> hCatAdmin{ admin, [](auto val) { CryptCATAdminReleaseContext(&val, 0); },
                                              INVALID_HANDLE_VALUE };
 
         DWORD dwHashLength{ 0 };
@@ -93,10 +93,9 @@ namespace FileSystem {
         std::vector<std::wstring> catalogfiles{};
         GenericWrapper<HCATINFO> hCatInfo{
             CryptCATAdminEnumCatalogFromHash(hCatAdmin, pbHash.data(), dwHashLength, 0, nullptr),
-            [&hCatAdmin](auto val){ CryptCATAdminReleaseCatalogContext(&hCatAdmin, &val, 0); },
-            INVALID_HANDLE_VALUE
+            [&hCatAdmin](auto val) { CryptCATAdminReleaseCatalogContext(&hCatAdmin, &val, 0); }, INVALID_HANDLE_VALUE
         };
-        while(hCatInfo){
+        while(hCatInfo) {
             CATALOG_INFO ciCatalogInfo = {};
             ciCatalogInfo.cbStruct = sizeof(ciCatalogInfo);
 
@@ -188,9 +187,9 @@ namespace FileSystem {
             IO_STATUS_BLOCK IoStatus{};
             InitializeObjectAttributes(&attributes, &UnicodeName, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, nullptr,
                                        nullptr);
-            NTSTATUS Status{ Linker::NtCreateFile(&hFile, GENERIC_READ | GENERIC_WRITE, &attributes, &IoStatus, nullptr,
-                                                  FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ, FILE_OPEN,
-                                                  FILE_SEQUENTIAL_ONLY, nullptr, 0) };
+            NTSTATUS Status{ Linker::NtCreateFile(
+                &hFile, GENERIC_READ | GENERIC_WRITE, &attributes, &IoStatus, nullptr, FILE_ATTRIBUTE_NORMAL,
+                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, FILE_OPEN, FILE_SEQUENTIAL_ONLY, nullptr, 0) };
             if(NT_SUCCESS(Status)) {
                 this->hFile = hFile;
                 bFileExists = true;
@@ -198,8 +197,9 @@ namespace FileSystem {
                 bReadAccess = true;
             } else if(Status == 0xC0000022 || Status == 0xC0000043) {   //STATUS_ACCESS_DENIED, STATUS_SHARING_VIOLATION
                 Status = Linker::NtCreateFile(&hFile, GENERIC_READ, &attributes, &IoStatus, nullptr,
-                                              FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ, FILE_OPEN, FILE_SEQUENTIAL_ONLY,
-                                              nullptr, 0);
+                                              FILE_ATTRIBUTE_NORMAL,
+                                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, FILE_OPEN,
+                                              FILE_SEQUENTIAL_ONLY, nullptr, 0);
                 if(NT_SUCCESS(Status)) {
                     this->hFile = hFile;
                     bFileExists = true;
@@ -218,7 +218,8 @@ namespace FileSystem {
                 bReadAccess = false;
             }
         } else {
-            hFile = CreateFileW(FilePath.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+            hFile = CreateFileW(FilePath.c_str(), GENERIC_READ | GENERIC_WRITE,
+                                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
                                 FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
             if(!hFile && GetLastError() == ERROR_FILE_NOT_FOUND) {
                 LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << FilePath << ".");
@@ -227,7 +228,8 @@ namespace FileSystem {
                 bReadAccess = false;
             } else if(!hFile && (GetLastError() == ERROR_ACCESS_DENIED || GetLastError() == ERROR_SHARING_VIOLATION)) {
                 bWriteAccess = false;
-                hFile = CreateFileW(FilePath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+                hFile = CreateFileW(FilePath.c_str(), GENERIC_READ,
+                                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
                                     FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
                 if(!hFile && GetLastError() == ERROR_SHARING_VIOLATION) {
                     LOG_VERBOSE(2, "Couldn't open file, sharing violation " << FilePath << ".");
@@ -487,7 +489,7 @@ namespace FileSystem {
                 LOG_ERROR("Failed to query signature for " << FilePath << ": " << SYSTEM_ERROR);
                 return std::nullopt;
             }
-            GenericWrapper<HCERTSTORE> hStore{ store, [](HCERTSTORE store){ CertCloseStore(store, 0); },
+            GenericWrapper<HCERTSTORE> hStore{ store, [](HCERTSTORE store) { CertCloseStore(store, 0); },
                                                INVALID_HANDLE_VALUE };
             GenericWrapper<HCRYPTMSG> hMsg{ msg, CryptMsgClose, INVALID_HANDLE_VALUE };
 
