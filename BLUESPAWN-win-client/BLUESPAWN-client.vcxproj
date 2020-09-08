@@ -96,7 +96,6 @@
     <ClInclude Include="headers\util\DynamicLinker.h" />
     <ClInclude Include="headers\util\Internals.h" />
     <ClInclude Include="headers\util\log\JSONSink.h" />
-    <ClInclude Include="headers\util\log\ServerSink.h" />
     <ClInclude Include="headers\util\Promise.h" />
     <ClInclude Include="headers\util\StringUtils.h" />
     <ClInclude Include="headers\util\ThreadPool.h" />
@@ -238,7 +237,6 @@
     <ClCompile Include="src\util\log\JSONSink.cpp" />
     <ClCompile Include="src\util\log\Log.cpp" />
     <ClCompile Include="src\util\log\LogLevel.cpp" />
-    <ClCompile Include="src\util\log\ServerSink.cpp" />
     <ClCompile Include="src\util\log\XMLSink.cpp" />
     <ClCompile Include="src\util\permissions\Permissions.cpp" />
     <ClCompile Include="src\util\pe\Export_Section.cpp">
