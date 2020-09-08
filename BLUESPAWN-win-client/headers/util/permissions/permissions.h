@@ -147,9 +147,6 @@ namespace Permissions{
 		* param handle - the handle to de initialize
 		*/
 		static void DeinitializePolicy(LSA_HANDLE handle);
-
-		//Let LsaHandleWrapper handle initialization tracking
-		friend void LsaHandleWrapper::SafeCloseLsaHandle(LSA_HANDLE handle);
 	protected:
 		//Whether or not this owner is on the system
 		bool bExists;
