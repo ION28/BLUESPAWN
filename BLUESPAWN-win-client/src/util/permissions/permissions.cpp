@@ -200,17 +200,16 @@ namespace Permissions {
 		bPolicyInitialized = false;
 	}
 
-	LSA_UNICODE_STRING Owner::WStringToLsaUnicodeString(IN const std::wstring& str) {
+	std::shared_ptr<LSA_UNICODE_STRING> Owner::WStringToLsaUnicodeString(IN const std::wstring& str) {
 		LSA_UNICODE_STRING lsaWStr{};
 		DWORD len = 0;
-
 		len = str.length();
-		AllocationWrapper cstr{ new WCHAR[len + 1], len + 1, AllocationWrapper::CPP_ARRAY_ALLOC };
-		memcpy(cstr, str.c_str(), (len + 1) * sizeof(WCHAR));
-		lsaWStr.Buffer = cstr.GetAsPointer<wchar_t>();
+		PWCHAR cstr = new WCHAR[len + 1];
+		MoveMemory(cstr, str.c_str(), (len + 1) * sizeof(WCHAR));
+		lsaWStr.Buffer = cstr;
 		lsaWStr.Length = (USHORT)((len) * sizeof(WCHAR));
 		lsaWStr.MaximumLength = (USHORT)((len + 1) * sizeof(WCHAR));
-		return lsaWStr;
+		return std::shared_ptr<LSA_UNICODE_STRING>{ new LSA_UNICODE_STRING(lsaWStr), [](auto* object) {delete[] object->Buffer; delete object; }};
 	}
 
 	std::wstring Owner::LsaUnicodeStringToWString(IN const LSA_UNICODE_STRING& str) {
@@ -301,7 +300,7 @@ namespace Permissions {
 				LOG_VERBOSE(2, "Group " << wName << " exists.");
 				otType = OwnerType::GROUP;
 				auto temp = SecurityDescriptor::CreateGroupSID(GetLengthSid(sdSID.GetUserSID()));
-				memcpy(temp.GetGroupSID(), sdSID.GetUserSID(), GetLengthSid(sdSID.GetUserSID()));
+				MoveMemory(temp.GetGroupSID(), sdSID.GetUserSID(), GetLengthSid(sdSID.GetUserSID()));
 				sdSID = temp;
 			}
 			else if (SIDType == SidTypeUser) {
@@ -405,7 +404,7 @@ namespace Permissions {
 	bool Owner::HasPrivilege(IN const std::wstring& wPriv) {
 		auto vOwnerPrivs = GetPrivileges();
 		for (auto iter = vOwnerPrivs.begin(); iter != vOwnerPrivs.end(); iter++) {
-			if (wPriv.compare(WStringToLsaUnicodeString(*iter).Buffer) == 0) return true;
+			if (wPriv.compare(WStringToLsaUnicodeString(*iter)->Buffer) == 0) return true;
 		}
 		return false;
 	}
@@ -420,7 +419,7 @@ namespace Permissions {
 				return std::vector<Owner>{ };
 			}
 		}
-		LSA_UNICODE_STRING lPrivName = WStringToLsaUnicodeString(wPriv);
+		LSA_UNICODE_STRING lPrivName = *WStringToLsaUnicodeString(wPriv);
 		PLSA_ENUMERATION_INFORMATION pOwners{ nullptr };
 		ULONG uNumOwners{ 0 };
 		auto hr = LsaNtStatusToWinError(LsaEnumerateAccountsWithUserRight(lPolicyHandle, &lPrivName, reinterpret_cast<PVOID *>(&pOwners), &uNumOwners));
@@ -434,7 +433,7 @@ namespace Permissions {
 		for (int i = 0; i < uNumOwners; i++) {
 			DWORD dwSidLen = GetLengthSid(pOwners[i].Sid);
 			SecurityDescriptor sdSID = SecurityDescriptor::CreateUserSID(dwSidLen);
-			memcpy(sdSID.GetUserSID(), pOwners[i].Sid, dwSidLen);
+			MoveMemory(sdSID.GetUserSID(), pOwners[i].Sid, dwSidLen);
 			vOwners.emplace_back(Owner{ sdSID });
 		}
 		SetLastError(ERROR_SUCCESS);
@@ -450,7 +449,7 @@ namespace Permissions {
 				return false;
 			}
 		}
-		LSA_UNICODE_STRING lPrivName = WStringToLsaUnicodeString(wPriv);
+		LSA_UNICODE_STRING lPrivName = *WStringToLsaUnicodeString(wPriv);
 		auto hr = LsaNtStatusToWinError(LsaRemoveAccountRights(lPolicyHandle, GetSID(), false, &lPrivName, 1));
 		if (hr != ERROR_SUCCESS) {
 			LOG_ERROR("Error removing privilege from account. (Error: " << hr << ")");
@@ -464,7 +463,7 @@ namespace Permissions {
 		auto vOwnerPrivs = GetPrivileges();
 		for (auto priv : vSuperUserPrivs) {
 			for (auto iter = vOwnerPrivs.begin(); iter != vOwnerPrivs.end(); iter++) {
-				if (priv.compare(WStringToLsaUnicodeString(*iter).Buffer) == 0) return true;
+				if (priv.compare(WStringToLsaUnicodeString(*iter)->Buffer) == 0) return true;
 			}
 		}
 		return false;
@@ -481,7 +480,7 @@ namespace Permissions {
 		}
 		std::vector<LSA_UNICODE_STRING> lSuperUserPrivs{ };
 		for (auto priv : vSuperUserPrivs) {
-			lSuperUserPrivs.emplace_back(WStringToLsaUnicodeString(priv));
+			lSuperUserPrivs.emplace_back(*WStringToLsaUnicodeString(priv));
 		}
 		auto hr = LsaNtStatusToWinError(LsaRemoveAccountRights(lPolicyHandle, GetSID(), false, lSuperUserPrivs.data(), lSuperUserPrivs.size()));
 		if (hr != ERROR_SUCCESS) {

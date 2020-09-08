@@ -170,7 +170,7 @@ namespace Permissions{
 		*
 		* @return an LSA_UNICODE_STRING corresponding to the given wstring
 		*/
-		static LSA_UNICODE_STRING Owner::WStringToLsaUnicodeString(IN const std::wstring& str);
+		static std::shared_ptr<LSA_UNICODE_STRING> Owner::WStringToLsaUnicodeString(IN const std::wstring& str);
 
 		/**
 		* Constructor for an owner object based off sid
