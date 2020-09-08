@@ -760,24 +760,26 @@ namespace FileSystem {
             LOG_VERBOSE(2, "Couldn't find folder " << FolderPath);
             bFolderExists = false;
         }
-        if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-            bIsFile = false;
-            PSECURITY_DESCRIPTOR pDesc{ nullptr };
-            PACL paDACL{ NULL };
-            auto status = GetNamedSecurityInfoW(reinterpret_cast<LPCWSTR>(FolderPath.c_str()), SE_FILE_OBJECT,
-                                                DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, &pDesc);
-            if(NT_SUCCESS(status)) {
-                auto owner = Permissions::GetProcessOwner();
-                Permissions::SecurityDescriptor secDesc = Permissions::SecurityDescriptor::CreateDACL(paDACL->AclSize);
-                memcpy(secDesc.GetDACL(), paDACL, paDACL->AclSize);
-                LocalFree(pDesc);
-                ACCESS_MASK mask = Permissions::GetOwnerRightsFromACL(owner.value(), secDesc);
-                if(Permissions::AccessIncludesWrite(mask)) {
-                    bFolderWrite = true;
+        else{
+            if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
+                bIsFile = false;
+                PSECURITY_DESCRIPTOR pDesc{ nullptr };
+                PACL paDACL{ NULL };
+                auto status = GetNamedSecurityInfoW(reinterpret_cast<LPCWSTR>(FolderPath.c_str()), SE_FILE_OBJECT,
+                                                    DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, &pDesc);
+                if(status == ERROR_SUCCESS){
+                    auto owner = Permissions::GetProcessOwner();
+                    Permissions::SecurityDescriptor secDesc = Permissions::SecurityDescriptor::CreateDACL(paDACL->AclSize);
+                    memcpy(secDesc.GetDACL(), paDACL, paDACL->AclSize);
+                    LocalFree(pDesc);
+                    ACCESS_MASK mask = Permissions::GetOwnerRightsFromACL(owner.value(), secDesc);
+                    if(Permissions::AccessIncludesWrite(mask)){
+                        bFolderWrite = true;
+                    }
                 }
+            } else{
+                bIsFile = true;
             }
-        } else {
-            bIsFile = true;
         }
     }
 

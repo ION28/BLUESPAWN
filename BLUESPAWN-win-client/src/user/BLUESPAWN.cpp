@@ -282,7 +282,7 @@ void ParseLogSinks(const std::string& sinks, const std::string& logdir, const st
     }
 
     std::wstring outputFolderPath = L".";
-    /*
+    
     auto outputDir = FileSystem::Folder(StringToWidestring(logdir));
     if(outputDir.GetFolderExists() && !outputDir.GetCurIsFile() && outputDir.GetFolderWrite()) {
         outputFolderPath = outputDir.GetFolderPath();
@@ -293,7 +293,7 @@ void ParseLogSinks(const std::string& sinks, const std::string& logdir, const st
                                     L" to write logs. Defaulting to current directory.",
                                 5000, ImportanceLevel::MEDIUM);
     }
-    */
+    
 
     std::vector<std::reference_wrapper<Log::LogLevel>> levels{
         Log::LogLevel::LogError, Log::LogLevel::LogWarn,     Log::LogLevel::LogInfo1,    Log::LogLevel::LogInfo2,
@@ -441,7 +441,7 @@ int main(int argc, char* argv[]) {
         }
 
         ParseLogSinks(result["log"].as<std::string>(), result["output"].as<std::string>(),
-                      result["server"].as<std::string>());
+                      result.count("server") ? result["server"].as<std::string>() : "");
 
         if(result.count("hunt") || result.count("monitor")) {
             if(result.count("hunt")) {
