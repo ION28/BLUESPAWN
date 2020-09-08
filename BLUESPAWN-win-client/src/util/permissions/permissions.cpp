@@ -120,16 +120,16 @@ namespace Permissions {
 			[](LPVOID memory) { HeapFree(GetProcessHeap(), 0, memory); }, nullptr) {
 		switch (type) {
 		case SecurityDescriptor::SecurityDataType::USER_SID:
-			lpUserSID = reinterpret_cast<PSID>(ReferenceCounter.get());
+			lpUserSID = reinterpret_cast<PSID>(*ReferenceCounter);
 			break;
 		case SecurityDescriptor::SecurityDataType::GROUP_SID:
-			lpGroupSID = reinterpret_cast<PSID>(ReferenceCounter.get());
+			lpGroupSID = reinterpret_cast<PSID>(*ReferenceCounter);
 			break;
 		case SecurityDescriptor::SecurityDataType::DACL:
-			dacl = reinterpret_cast<PACL>(ReferenceCounter.get());
+			dacl = reinterpret_cast<PACL>(*ReferenceCounter);
 			break;
 		case SecurityDescriptor::SecurityDataType::SACL:
-			sacl = reinterpret_cast<PACL>(ReferenceCounter.get());
+			sacl = reinterpret_cast<PACL>(*ReferenceCounter);
 			break;
 		}
 	}
