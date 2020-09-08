@@ -200,28 +200,20 @@ namespace Permissions {
 		bPolicyInitialized = false;
 	}
 
-	LSA_UNICODE_STRING Owner::WStringToLsaUnicodeString(IN const std::wstring& str) {
+	std::shared_ptr<LSA_UNICODE_STRING> Owner::WStringToLsaUnicodeString(IN const std::wstring& str) {
 		LSA_UNICODE_STRING lsaWStr{};
 		DWORD len = 0;
-
 		len = str.length();
-		LPWSTR cstr = new WCHAR[len + 1];
-		memcpy(cstr, str.c_str(), (len + 1) * sizeof(WCHAR));
+		PWCHAR cstr = new WCHAR[len + 1];
+		MoveMemory(cstr, str.c_str(), (len + 1) * sizeof(WCHAR));
 		lsaWStr.Buffer = cstr;
 		lsaWStr.Length = (USHORT)((len) * sizeof(WCHAR));
 		lsaWStr.MaximumLength = (USHORT)((len + 1) * sizeof(WCHAR));
-		return lsaWStr;
+		return std::shared_ptr<LSA_UNICODE_STRING>{ new LSA_UNICODE_STRING(lsaWStr), [](auto* object) {delete[] object->Buffer; delete object; }};
 	}
 
 	std::wstring Owner::LsaUnicodeStringToWString(IN const LSA_UNICODE_STRING& str) {
-		std::wstring toRet;
-		DWORD len = 0;
-
-		len = str.Length;
-		LPWSTR cstr = new WCHAR[len + 1];
-		memcpy(cstr, str.Buffer, (len + 1) * sizeof(WCHAR));
-		toRet = { cstr };
-		return toRet;
+		return { str.Buffer };
 	}
 
 	Owner::Owner(IN const std::wstring& name) : wName{ name }, bExists{ true } {
@@ -308,7 +300,7 @@ namespace Permissions {
 				LOG_VERBOSE(2, "Group " << wName << " exists.");
 				otType = OwnerType::GROUP;
 				auto temp = SecurityDescriptor::CreateGroupSID(GetLengthSid(sdSID.GetUserSID()));
-				memcpy(temp.GetGroupSID(), sdSID.GetUserSID(), GetLengthSid(sdSID.GetUserSID()));
+				MoveMemory(temp.GetGroupSID(), sdSID.GetUserSID(), GetLengthSid(sdSID.GetUserSID()));
 				sdSID = temp;
 			}
 			else if (SIDType == SidTypeUser) {
@@ -412,7 +404,7 @@ namespace Permissions {
 	bool Owner::HasPrivilege(IN const std::wstring& wPriv) {
 		auto vOwnerPrivs = GetPrivileges();
 		for (auto iter = vOwnerPrivs.begin(); iter != vOwnerPrivs.end(); iter++) {
-			if (wPriv.compare(WStringToLsaUnicodeString(*iter).Buffer) == 0) return true;
+			if (wPriv.compare(WStringToLsaUnicodeString(*iter)->Buffer) == 0) return true;
 		}
 		return false;
 	}
@@ -427,7 +419,7 @@ namespace Permissions {
 				return std::vector<Owner>{ };
 			}
 		}
-		LSA_UNICODE_STRING lPrivName = WStringToLsaUnicodeString(wPriv);
+		LSA_UNICODE_STRING lPrivName = *WStringToLsaUnicodeString(wPriv);
 		PLSA_ENUMERATION_INFORMATION pOwners{ nullptr };
 		ULONG uNumOwners{ 0 };
 		auto hr = LsaNtStatusToWinError(LsaEnumerateAccountsWithUserRight(lPolicyHandle, &lPrivName, reinterpret_cast<PVOID *>(&pOwners), &uNumOwners));
@@ -441,7 +433,7 @@ namespace Permissions {
 		for (int i = 0; i < uNumOwners; i++) {
 			DWORD dwSidLen = GetLengthSid(pOwners[i].Sid);
 			SecurityDescriptor sdSID = SecurityDescriptor::CreateUserSID(dwSidLen);
-			memcpy(sdSID.GetUserSID(), pOwners[i].Sid, dwSidLen);
+			MoveMemory(sdSID.GetUserSID(), pOwners[i].Sid, dwSidLen);
 			vOwners.emplace_back(Owner{ sdSID });
 		}
 		SetLastError(ERROR_SUCCESS);
@@ -457,7 +449,7 @@ namespace Permissions {
 				return false;
 			}
 		}
-		LSA_UNICODE_STRING lPrivName = WStringToLsaUnicodeString(wPriv);
+		LSA_UNICODE_STRING lPrivName = *WStringToLsaUnicodeString(wPriv);
 		auto hr = LsaNtStatusToWinError(LsaRemoveAccountRights(lPolicyHandle, GetSID(), false, &lPrivName, 1));
 		if (hr != ERROR_SUCCESS) {
 			LOG_ERROR("Error removing privilege from account. (Error: " << hr << ")");
@@ -471,7 +463,7 @@ namespace Permissions {
 		auto vOwnerPrivs = GetPrivileges();
 		for (auto priv : vSuperUserPrivs) {
 			for (auto iter = vOwnerPrivs.begin(); iter != vOwnerPrivs.end(); iter++) {
-				if (priv.compare(WStringToLsaUnicodeString(*iter).Buffer) == 0) return true;
+				if (priv.compare(WStringToLsaUnicodeString(*iter)->Buffer) == 0) return true;
 			}
 		}
 		return false;
@@ -488,7 +480,7 @@ namespace Permissions {
 		}
 		std::vector<LSA_UNICODE_STRING> lSuperUserPrivs{ };
 		for (auto priv : vSuperUserPrivs) {
-			lSuperUserPrivs.emplace_back(WStringToLsaUnicodeString(priv));
+			lSuperUserPrivs.emplace_back(*WStringToLsaUnicodeString(priv));
 		}
 		auto hr = LsaNtStatusToWinError(LsaRemoveAccountRights(lPolicyHandle, GetSID(), false, lSuperUserPrivs.data(), lSuperUserPrivs.size()));
 		if (hr != ERROR_SUCCESS) {
@@ -636,14 +628,14 @@ namespace Permissions {
 	}
 
 	std::optional<Owner> GetProcessOwner() {
-		HANDLE hToken;
+		HandleWrapper hToken{ nullptr };
 		if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
 			LOG_ERROR("Couldn't access process token. Error " << GetLastError());
 			return std::nullopt;
 		}
 		DWORD dwSize{ 0 };
 		GetTokenInformation(hToken, TokenOwner, nullptr, dwSize, &dwSize);
-		PTOKEN_OWNER owner = (PTOKEN_OWNER)GlobalAlloc(GPTR, dwSize);
+		AllocationWrapper owner{ GlobalAlloc(GPTR, dwSize), dwSize, AllocationWrapper::GLOBAL_ALLOC };
 		DWORD dwDomainLen{};
 		DWORD dwNameLen{};
 		SID_NAME_USE SIDType{ SidTypeUnknown };
@@ -652,25 +644,20 @@ namespace Permissions {
 		std::vector<WCHAR> Name(dwNameLen);
 		if (owner == nullptr) {
 			LOG_ERROR("Unable to allocate space for owner token.");
-			goto fail;
+			return std::nullopt;
 		}
 		if (!GetTokenInformation(hToken, TokenOwner, owner, dwSize, &dwSize)) {
 			LOG_ERROR("Couldn't get owner from token. Error " << GetLastError());
-			goto fail;
+			return std::nullopt;
 		}
-		LookupAccountSidW(nullptr, owner->Owner, nullptr, &dwNameLen, nullptr, &dwDomainLen, &SIDType);
+		LookupAccountSidW(nullptr, owner.GetAsPointer<TOKEN_OWNER>()->Owner, nullptr, &dwNameLen, nullptr, &dwDomainLen, &SIDType);
 		Domain = std::vector<WCHAR>(dwDomainLen);
 		Name = std::vector<WCHAR>(dwNameLen);
 
-		if (!LookupAccountSid(nullptr, owner->Owner, Name.data(), &dwNameLen, Domain.data(), &dwDomainLen, &SIDType)) {
+		if (!LookupAccountSid(nullptr, owner.GetAsPointer<TOKEN_OWNER>()->Owner, Name.data(), &dwNameLen, Domain.data(), &dwDomainLen, &SIDType)) {
 			LOG_ERROR("Error getting owner " << GetLastError());
 		}
-		if (owner != nullptr) GlobalFree(owner);
 		CloseHandle(hToken);
 		return Owner(Name.data());
-	fail:
-		if(owner != nullptr) GlobalFree(owner);
-		CloseHandle(hToken);
-		return std::nullopt;
 	}
 }
