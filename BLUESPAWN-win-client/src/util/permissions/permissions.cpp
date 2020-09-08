@@ -207,7 +207,7 @@ namespace Permissions {
 		len = str.length();
 		AllocationWrapper cstr{ new WCHAR[len + 1], len + 1, AllocationWrapper::CPP_ARRAY_ALLOC };
 		memcpy(cstr, str.c_str(), (len + 1) * sizeof(WCHAR));
-		lsaWStr.Buffer = reinterpret_cast<PWSTR>(cstr.GetAsPointer());
+		lsaWStr.Buffer = cstr.GetAsPointer<wchar_t>();
 		lsaWStr.Length = (USHORT)((len) * sizeof(WCHAR));
 		lsaWStr.MaximumLength = (USHORT)((len + 1) * sizeof(WCHAR));
 		return lsaWStr;
@@ -641,7 +641,7 @@ namespace Permissions {
 		}
 		DWORD dwSize{ 0 };
 		GetTokenInformation(hToken, TokenOwner, nullptr, dwSize, &dwSize);
-		PTOKEN_OWNER owner = (PTOKEN_OWNER)GlobalAlloc(GPTR, dwSize);
+		AllocationWrapper owner{ GlobalAlloc(GPTR, dwSize), dwSize, AllocationWrapper::GLOBAL_ALLOC };
 		DWORD dwDomainLen{};
 		DWORD dwNameLen{};
 		SID_NAME_USE SIDType{ SidTypeUnknown };
@@ -656,11 +656,11 @@ namespace Permissions {
 			LOG_ERROR("Couldn't get owner from token. Error " << GetLastError());
 			goto fail;
 		}
-		LookupAccountSidW(nullptr, owner->Owner, nullptr, &dwNameLen, nullptr, &dwDomainLen, &SIDType);
+		LookupAccountSidW(nullptr, owner.GetAsPointer<TOKEN_OWNER>()->Owner, nullptr, &dwNameLen, nullptr, &dwDomainLen, &SIDType);
 		Domain = std::vector<WCHAR>(dwDomainLen);
 		Name = std::vector<WCHAR>(dwNameLen);
 
-		if (!LookupAccountSid(nullptr, owner->Owner, Name.data(), &dwNameLen, Domain.data(), &dwDomainLen, &SIDType)) {
+		if (!LookupAccountSid(nullptr, owner.GetAsPointer<TOKEN_OWNER>()->Owner, Name.data(), &dwNameLen, Domain.data(), &dwDomainLen, &SIDType)) {
 			LOG_ERROR("Error getting owner " << GetLastError());
 		}
 		if (owner != nullptr) GlobalFree(owner);
