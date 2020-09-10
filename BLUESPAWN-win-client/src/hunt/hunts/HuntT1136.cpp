@@ -6,6 +6,7 @@
 #include "user/bluespawn.h"
 
 #define USER_LOG 0
+#define HIDDEN_USER 1
 
 namespace Hunts {
 
@@ -39,6 +40,18 @@ namespace Hunts {
             }});
             // clang-format on
         }
+        SUBSECTION_END();
+
+        SUBSECTION_INIT(HIDDEN_USER, Normal);
+
+        Permissions::User uHiddenUser(L"$");
+
+        if (uHiddenUser.Exists()) {
+            CREATE_DETECTION(Certainty::Certain, OtherDetectionData{ L"User", {
+                { L"Username", L"$" },
+            }});
+        }
+
         SUBSECTION_END();
 
         SUBTECHNIQUE_END();
