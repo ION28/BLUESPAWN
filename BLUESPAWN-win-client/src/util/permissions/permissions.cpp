@@ -522,7 +522,12 @@ namespace Permissions {
 		sdSID = SecurityDescriptor::CreateUserSID(dwSIDLen);
 		std::vector<WCHAR> Domain(dwDomainLen);
 		if (!LookupAccountNameW(nullptr, wName.c_str(), sdSID.GetUserSID(), &dwSIDLen, Domain.data(), &dwDomainLen, &SIDType)) {
-			LOG_ERROR("Error getting user with name " << wName << " " << GetLastError());
+			if (GetLastError() == ERROR_NONE_MAPPED) {
+				LOG_VERBOSE(2, L"User with name " << wName << " doesn't exist.");
+			}
+			else {
+				LOG_ERROR("Error getting user with name " << wName << " " << GetLastError());
+			}
 			bExists = false;
 		}
 		else {
@@ -551,7 +556,12 @@ namespace Permissions {
 		std::vector<WCHAR> Name(dwNameLen);
 
 		if (!LookupAccountSid(nullptr, sdSID.GetUserSID(), Name.data(), &dwNameLen, Domain.data(), &dwDomainLen, &SIDType)) {
-			LOG_ERROR("Error getting user " << GetLastError());
+			if (GetLastError() == ERROR_NONE_MAPPED) {
+				LOG_VERBOSE(2, L"User doesn't exist.");
+			}
+			else {
+				LOG_ERROR("Error getting user " << GetLastError());
+			}
 			bExists = false;
 		}
 		else {
