@@ -479,6 +479,15 @@
 			"showSubtechniques": true
 		},
 		{
+			"techniqueID": "T1546.002",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by checking the screensaver executable and registry entries that control the screensaver",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
 			"techniqueID": "T1546.007",
 			"tactic": "persistence",
 			"color": "#5AADFF",
@@ -551,6 +560,15 @@
 			"showSubtechniques": true
 		},
 		{
+			"techniqueID": "T1546.002",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by checking the screensaver executable and registry entries that control the screensaver",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
 			"techniqueID": "T1546.007",
 			"tactic": "privilege-escalation",
 			"color": "#5AADFF",
@@ -641,6 +659,15 @@
 			"showSubtechniques": false
 		},
 		{
+			"techniqueID": "T1547.003",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by examining all registered time providers on the system",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
 			"techniqueID": "T1547.004",
 			"tactic": "persistence",
 			"color": "#5AADFF",
@@ -699,6 +726,15 @@
 			"tactic": "privilege-escalation",
 			"color": "#5AADFF",
 			"comment": "Covered by registry checking for any additional Auth/Notif Packages. Mitigation to disable Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.003",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by examining all registered time providers on the system",
 			"enabled": true,
 			"metadata": [],
 			"showSubtechniques": false

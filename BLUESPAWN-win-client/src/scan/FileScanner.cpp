@@ -107,8 +107,9 @@ void FileScanner::UpdateModules() {
                 auto name{ ToLowerCaseW(mod) };
                 if(FileScanner::modules.find(name) == FileScanner::modules.end()) {
                     FileScanner::modules.emplace(name, std::unordered_set<DWORD>{ processes[i] });
-                } else
+                } else {
                     FileScanner::modules.at(name).emplace(processes[i]);
+                }
             }
         }
 

@@ -313,6 +313,7 @@ Aggressiveness GetAggressiveness(const cxxopts::OptionValue& value) {
 
     return aHuntLevel;
 }
+
 int main(int argc, char* argv[]) {
     Log::LogLevel::LogError.Enable();
     Log::LogLevel::LogWarn.Enable();
