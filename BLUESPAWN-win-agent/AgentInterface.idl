@@ -1,0 +1,9 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(3ab6a028-7fea-4e0a-99be-462463446079),
+	version(0.1)
+]
+interface AGENT {
+};
