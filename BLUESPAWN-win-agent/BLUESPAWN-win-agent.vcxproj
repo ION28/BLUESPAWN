@@ -27,8 +27,13 @@
     <ClInclude Include="headers\hooking\Argument.h" />
     <ClInclude Include="headers\hooking\Call.h" />
     <ClInclude Include="headers\hooking\Address.h" />
+    <ClInclude Include="headers\hooking\HookRegister.h" />
+    <ClInclude Include="headers\hooking\hooks\ThreadCreation.h" />
     <ClInclude Include="headers\Setup.h" />
     <ClInclude Include="headers\utils\Debug.h" />
+    <ClInclude Include="headers\utils\MemoryMap.h" />
+    <ClInclude Include="headers\utils\ProcessUtils.h" />
+    <ClInclude Include="headers\utils\StackWalker.h" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="AgentInterface.idl" />

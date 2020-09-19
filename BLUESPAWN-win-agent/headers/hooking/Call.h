@@ -23,5 +23,15 @@ namespace BLUESPAWN::Agent{
 		/// A vector containing the arguments passed into the function call. Note that for each possible Call being
 		/// created, an enum should exist mapping the parameter names to indexes into this vector.
 		std::vector<Argument> arguments;
+
+	public:
+
+		/**
+		 * \brief Construct a call object using the provided call stack and arguments
+		 * 
+		 * \param[in] callStack The call stack leading up to the call being described by this
+		 * \param[in] arguments The arguments passed into the function call
+		 */
+		Call(_In_ const std::vector<Address>& callStack, _In_ const std::vector<Argument>& arguments);
 	};
 }
