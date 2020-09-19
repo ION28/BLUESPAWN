@@ -39,7 +39,7 @@ namespace Log {
         GetLocalTime(&time);
         wFileName = wOutputDir + L"\\bluespawn-" + ToWstringPad(time.wMonth) + L"-" + ToWstringPad(time.wDay) + L"-" +
                     ToWstringPad(time.wYear, 4) + L"-" + ToWstringPad(time.wHour) + ToWstringPad(time.wMinute) + L"-" +
-                    ToWstringPad(time.wSecond) + L".xml";
+                    ToWstringPad(time.wSecond) + L".json";
         JSONDoc = json::object();
         JSONDoc["bluespawn"] = json::object();
         JSONDoc["bluespawn"]["log-messages"] = json::array();
@@ -85,6 +85,8 @@ namespace Log {
     }
 
     void JSONSink::AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength) {
+        BeginCriticalSection _{ hGuard };
+
         for(auto& item : JSONDoc["bluespawn"]["detections"]) {
             if(item["id"] == detection_id) {
                 if(item.find("associated-detections") != item.end()) {
