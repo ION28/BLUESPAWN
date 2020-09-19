@@ -85,7 +85,8 @@ namespace Log {
     }
 
     void JSONSink::AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength) {
-        BeginCriticalSection _{ hGuard };
+        /// Note that the critical section for hGuard is already acquired as this function is only called
+        /// by RecordAssociation
 
         for(auto& item : JSONDoc["bluespawn"]["detections"]) {
             if(item["id"] == detection_id) {
