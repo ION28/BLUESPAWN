@@ -21,6 +21,7 @@ using namespace Registry;
 #define WINLOGON_NOTIFY 7
 #define SSP 8
 #define PORT_MON 9
+#define TIME_PROV 10
 
 namespace Hunts {
 
@@ -173,6 +174,24 @@ namespace Hunts {
         SUBTECHNIQUE_END();
     }
 
+    void HuntT1547::Subtechnique003(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections){
+        SUBTECHNIQUE_INIT(003, Time Providers);
+
+        SUBSECTION_INIT(TIME_PROV, Cursory);
+        RegistryKey time{ HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Services\\W32Time\\TimeProviders" };
+        for(auto subkey : time.EnumerateSubkeys()){
+            if(auto value{ RegistryValue::Create(subkey, L"DllName") }){
+                auto path{ FileSystem::SearchPathExecutable(std::get<std::wstring>(value->data)) };
+                if(path && FileScanner::PerformQuickScan(*path)){
+                    CREATE_DETECTION(Certainty::Moderate, RegistryDetectionData{ *value });
+                }
+            }
+        }
+        SUBSECTION_END();
+
+        SUBTECHNIQUE_END();
+    }
+    
     void HuntT1547::Subtechnique004(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
         SUBTECHNIQUE_INIT(004, Winlogon Helper DLL);
 
@@ -283,6 +302,7 @@ namespace Hunts {
 
         Subtechnique001(scope, detections);
         Subtechnique002(scope, detections);
+        Subtechnique003(scope, detections);
         Subtechnique004(scope, detections);
         Subtechnique005(scope, detections);
         Subtechnique010(scope, detections);
@@ -320,6 +340,10 @@ namespace Hunts {
                           L"SYSTEM\\CurrentControlSet\\Control\\Lsa\\OSConfig", false, false);
         GetRegistryEvents(events, SCOPE(LSA_EXTENSION), HKEY_LOCAL_MACHINE,
                           L"SYSTEM\\CurrentControlSet\\Control\\LsaExtensionConfig", false, false);
+
+        // Looks for T1547.003: Time Provider
+        GetRegistryEvents(events, SCOPE(TIME_PROV), HKEY_LOCAL_MACHINE,
+                          L"System\\CurrentControlSet\\Services\\W32Time\\TimeProviders", false, false, true);
 
         // Looks for T1547.004: Winlogon Helper DLL
         GetRegistryEvents(events, SCOPE(WINLOGON), HKEY_LOCAL_MACHINE,
