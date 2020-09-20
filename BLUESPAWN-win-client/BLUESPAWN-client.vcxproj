@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\BLUESPAWN-common\bluespawnpb\bluespawn.grpc.pb.h" />
+    <ClInclude Include="..\BLUESPAWN-common\bluespawnpb\bluespawn.pb.h" />
     <ClInclude Include="headers\hunt\Hunt.h" />
     <ClInclude Include="headers\hunt\HuntInfo.h" />
     <ClInclude Include="headers\hunt\HuntRegister.h" />
@@ -98,6 +100,7 @@
     <ClInclude Include="headers\util\log\JSONSink.h" />
     <ClInclude Include="headers\util\log\ServerSink.h" />
     <ClInclude Include="headers\util\Promise.h" />
+    <ClInclude Include="headers\util\rpc\RpcClient.h" />
     <ClInclude Include="headers\util\StringUtils.h" />
     <ClInclude Include="headers\util\ThreadPool.h" />
     <ClInclude Include="headers\util\Utils.h" />
@@ -150,6 +153,8 @@
     <ClInclude Include="headers\util\processes\ProcessUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\BLUESPAWN-common\bluespawnpb\bluespawn.grpc.pb.cc" />
+    <ClCompile Include="..\BLUESPAWN-common\bluespawnpb\bluespawn.pb.cc" />
     <ClCompile Include="external\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1548.cpp" />
     <ClCompile Include="src\hunt\Hunt.cpp" />
@@ -267,6 +272,7 @@
     <ClCompile Include="src\reaction\ReactionManager.cpp" />
     <ClCompile Include="src\util\processes\PERemover.cpp" />
     <ClCompile Include="src\util\processes\ProcessUtils.cpp" />
+    <ClCompile Include="src\util\rpc\RpcClient.cpp" />
     <ClCompile Include="src\util\StringUtils.cpp" />
     <ClCompile Include="src\util\ThreadPool.cpp" />
     <ClCompile Include="src\util\Utils.cpp" />
@@ -299,12 +305,15 @@
     </EmbedManifest>
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <BuildLog>
       <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreaded</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreadedDebug</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -318,6 +327,15 @@
     <PostBuildEvent>
       <Message>Adding manifest to BLUESPAWN-client.exe</Message>
     </PostBuildEvent>
+	<PreBuildEvent>
+      <Message>Generate corresponding .h/cc files based on the current gRPC protobuf configuration</Message>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Command Condition="'$(Platform)'=='Win32'">"$(SolutionDir)vcpkg\packages\protobuf_x86-windows-static\tools\protobuf\protoc.exe" --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --cpp_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" "bluespawn.proto" &amp;&amp; "$(SolutionDir)vcpkg\packages\protobuf_x86-windows-static\tools\protobuf\protoc.exe" --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --grpc_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --plugin=protoc-gen-grpc="$(SolutionDir)vcpkg\packages\grpc_x86-windows-static\tools\grpc\grpc_cpp_plugin.exe" "$(SolutionDir)BLUESPAWN-common\bluespawnpb\bluespawn.proto"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Command Condition="'$(Platform)'=='x64'">"$(SolutionDir)vcpkg\packages\protobuf_x64-windows-static\tools\protobuf\protoc.exe" --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --cpp_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" "bluespawn.proto" &amp;&amp; "$(SolutionDir)vcpkg\packages\protobuf_x64-windows-static\tools\protobuf\protoc.exe" --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --grpc_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --plugin=protoc-gen-grpc="$(SolutionDir)vcpkg\packages\grpc_x64-windows-static\tools\grpc\grpc_cpp_plugin.exe" "$(SolutionDir)BLUESPAWN-common\bluespawnpb\bluespawn.proto"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{159B2E72-9553-4E17-9BEC-CB92FCA8D0B0}</ProjectGuid>

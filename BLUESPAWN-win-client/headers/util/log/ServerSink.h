@@ -1,11 +1,9 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
+#include "util/rpc/RpcClient.h"
 
 #include "DetectionSink.h"
 #include "LogSink.h"
-
-using json = nlohmann::json;
 
 namespace Log {
 
@@ -13,17 +11,14 @@ namespace Log {
 	 * ServerSink provides a sink for the logger that will send logs to a remote server, usually a BLUESPAWN-server installation
 	 */
     class ServerSink : public LogSink, public DetectionSink {
-        /// Guards access to the server
-        CriticalSection hGuard;
+        /// Rpc Server Client
+        RpcClient::RpcClient client;
 
         /// The remote server (http(s)://)IP:PORT or (http(s)://)FQDN:PORT that will recieve the logs
         std::wstring wServerAddress;
 
         /// Tags for messages sent at different levels
         std::string MessageTags[4] = { "error", "warning", "info", "other" };
-
-        /// A handle to a thread that periodically flushes the log to the file
-        HandleWrapper thread;
 
         /// A set of IDs created for detections already sent to the server
         std::set<DWORD> detections;
@@ -35,15 +30,6 @@ namespace Log {
 		 * Default constructor for ServerSink. Must provide a server address to send the logs
 		 */
         ServerSink(const std::wstring ServerAddress);
-
-        /// Delete copy and move constructors and assignment operators
-        ServerSink operator=(const ServerSink&) = delete;
-        ServerSink operator=(ServerSink&&) = delete;
-        ServerSink(const ServerSink&) = delete;
-        ServerSink(ServerSink&&) = delete;
-
-        /// Custom destructor
-        ~ServerSink();
 
         /**
 		 * Outputs a message to the target server if its logging level is enabled. 
@@ -62,11 +48,6 @@ namespace Log {
 		 * @return Whether or not the argument and this sink are considered equal.
 		 */
         virtual bool operator==(const LogSink& sink) const;
-
-        /**
-		 * Flushes the log to the server.
-		*/
-        void Flush();
 
         /**
 		 * Updates the raw and combined certainty values associated with a detection

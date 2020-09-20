@@ -6,5 +6,5 @@ libzip:x64-windows-static
 libzip:x86-windows-static
 nlohmann-json:x64-windows-static
 nlohmann-json:x86-windows-static
-cpr:x64-windows-static
-cpr:x86-windows-static
+grpc:x64-windows-static
+grpc:x86-windows-static

@@ -399,7 +399,7 @@ int main(int argc, char* argv[]) {
 		("o,output", "Specify the output folder for any logs written to a file", 
             cxxopts::value<std::string>()->default_value("."))
 		("server", "Specify the remote address of the server in the form of IP, FQDN, IP:PORT, or FQDN:PORT. Must be provided if you specify server as a log sink", 
-            cxxopts::value<std::string>())
+            cxxopts::value<std::string>()->default_value(""))
         ;
 
     options.add_options("mitigate")

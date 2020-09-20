@@ -11,6 +11,10 @@ vcpkg/
 *.lib
 *.aps
 
+# BLUESPAWN-common
+BLUESPAWN-common/bluespawnpb/*.h
+BLUESPAWN-common/bluespawnpb/*.cc
+
 # BLUESPAWN-win-client
 BLUESPAWN-win-client/external/
 BLUESPAWN-win-client/resources/severe
