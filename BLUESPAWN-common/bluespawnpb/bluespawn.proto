@@ -3,33 +3,181 @@ package bluespawn;
 
 option go_package = "BLUESPAWN/BLUESPAWN-common/bluespawnpb";
 
-service LogReceiver {
-	rpc SendLog(LogMessageRequest) returns (LogMessageResponse) {}
+/* Core BLUESPAWN RPC Server */
+service BluespawnRPC {
+	// Clients logging to Server
+	rpc SendLogMessage(LogMessage) returns (ResponseMessage) {}
+	rpc RecordDetection(Detection) returns (ResponseMessage) {}
+	rpc RecordAssociation(DetectionAssociation) returns (ResponseMessage) {}
+	rpc UpdateCertainty(DetectionCertaintyUpdate) returns (ResponseMessage) {}
 }
 
-message LogMessageRequest {
-	string client_id = 1;
+/* Data Type Enums */
+// General and Log
+enum LogDetail {
+	Low = 0;
+	Moderate = 1;
+	High = 2;
+}
+
+enum LogSeverity {
+	LogError = 0;
+	LogWarn = 1;
+	LogInfo = 2;
+	LogVerbose = 3;
+}
+
+// Windows Objects
+enum RegistryType {
+	RegSz = 0;
+	RegExpandSz = 1;
+	RegMultiSz = 2;
+	RegDword = 3;
+	RegBinary = 4;
+}
+
+// Detections
+enum DetectionType {
+	ProcessDetection = 0;
+	RegistryDetection = 1;
+	FileDetection = 2;
+	ServiceDetection = 3;
+	OtherDetection = 4;
+}
+
+enum RegistryDetectionType {
+	CommandReference = 0;
+	FileReference = 1;
+	FolderReference = 2;
+	PipeReference = 3;
+	ShareReference = 4;
+	UserReference = 5;
+	Configuration = 6;
+	Unknown = 7;
+}
+
+enum ProcessDetectionType {
+	MaliciousProcess = 0;
+	MaliciousImage = 1;
+	MaliciousMemory = 2;
+	MaliciousCommand = 3;
+}
+
+/* Message Serializers Types */
+// General and Log
+message LogMessage {
+	string clientId = 1;
 	int64 timestamp = 2;
 	string message = 3;
-	
-	enum Severity {
-		LogError = 0;
-		LogWarn = 1;
-		LogInfo = 2;
-		LogVerbose = 3;
-	}
-
-	Severity severity = 4;
-	
-	enum Detail {
-		Low = 0;
-		Moderate = 1;
-		High = 2;
-	}
-
-	Detail detail = 5;
+	LogSeverity severity = 4;
+	LogDetail detail = 5;
 }
 
-message LogMessageResponse {
+message ResponseMessage {
 	bool received = 1;
+	bool success = 2;
+	string message = 3; // optional
 }
+
+// Windows Objects
+message RegistryKey {
+	string keyPath = 1;
+	bool exists = 2;
+}
+
+message RegistryValue {
+	RegistryKey key = 1;
+	string valueName = 2;
+	string valueData = 3;
+}
+
+// Detections
+message DetectionAssociation {
+}
+
+message DetectionCertaintyUpdate {
+	int64 id = 1; // NOTE: Request change to string
+	
+}
+
+message ProcessDetectionData {
+	ProcessDetectionType type = 1;
+	uint64 pid = 2; // optional
+	uint64 tid = 3; // optional
+	string processName = 4; // optional
+	string processPath = 5; // optional
+	string processCommand = 6; // optional
+	// TODO: add repeated ParentProcess which is a ProcessDetectionData
+	int64 baseAddress = 7; // optional
+	uint64 memorySize = 8; // optional
+	string imageName = 9; // optional
+}
+message FileDetectionData {
+	bool exists = 1;
+	string filePath = 2;
+	string fileName = 3;
+	string fileExtension = 4; // optional
+	string fileType = 5; // optional
+	string executor = 6; // optional
+	string md5 = 7; // optional
+	string sha1 = 8; // optional
+	string sha256 = 9; // optional
+	uint64 lastOpened = 10; // optional
+	uint64 fileCreated = 11; // optional
+	message YaraScanResult {
+		repeated string KnownBadRules = 1;
+		repeated string IndicatorRules = 2;
+	}
+	YaraScanResult yara = 12; // optional
+	bool fileSigned = 13; // optional
+	string signer = 14; // optional
+}
+message RegistryDetectionData {
+	string keyPath = 1;
+	RegistryKey key = 2;
+	RegistryValue value = 3; // optional
+	bytes data = 4; // optional 
+	RegistryDetectionType type = 5; // optional 
+}
+message ServiceDetectionData {
+	string serviceName = 1; // optional
+	string displayName = 2; // optional
+	string description = 3; // optional
+	string filePath = 4; // optional
+}
+message OtherDetectionData {
+	string type = 1;
+	map<string, string> properties = 2;
+}
+
+message Detection {
+	int64 id = 1; // NOTE: Request change to string
+	int64 timestamp = 2;
+	DetectionType type = 3;
+	message ScanInfo {
+		double rawCertainty = 1;
+		double certainty = 2;
+		map<int64, double> assocation = 3; // Detection Id (int64), certainity (double)
+	}
+	ScanInfo info = 4;
+
+	message DetectionData {
+		oneof data {
+			ProcessDetectionData processData = 1;
+			FileDetectionData fileData = 2;
+			RegistryDetectionData registryData = 3;
+			ServiceDetectionData serviceData = 4;
+			OtherDetectionData otherData = 5;
+		}
+	}
+	DetectionData data = 5;
+	
+	message DetectionContext {
+		repeated string hunts = 1;
+		int64 FirstEvidenceTime = 2; // optional
+		int64 DetectionCreatedTime = 3;
+		string note = 4; // optional
+	}
+	DetectionContext context = 6;
+}
+

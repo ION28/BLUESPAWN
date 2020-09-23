@@ -9,9 +9,9 @@
 
 #include "BLUESPAWN-common/bluespawnpb/bluespawn.grpc.pb.h"
 
-using bluespawn::LogMessageRequest;
-using bluespawn::LogMessageResponse;
-using bluespawn::LogReceiver;
+using bluespawn::BluespawnRPC;
+using bluespawn::LogMessage;
+using bluespawn::ResponseMessage;
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
@@ -19,14 +19,12 @@ using grpc::Status;
 namespace RpcClient {
     class RpcClient {
         private:
-        std::unique_ptr<LogReceiver::Stub> stub_;
+        std::unique_ptr<BluespawnRPC::Stub> stub_;
 
         public:
-        RpcClient(std::shared_ptr<Channel> channel) : stub_(LogReceiver::NewStub(channel)){};
+        RpcClient(std::shared_ptr<Channel> channel) : stub_(BluespawnRPC::NewStub(channel)){};
 
-        bool SendLogMessage(const std::wstring& msg,
-                            bluespawn::LogMessageRequest_Severity severity,
-                            bluespawn::LogMessageRequest_Detail);
+        bool SendLogMessage(const std::wstring& msg, bluespawn::LogSeverity severity, bluespawn::LogDetail detail);
     };
 
 };   // namespace RpcClient

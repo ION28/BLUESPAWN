@@ -35,8 +35,8 @@ namespace Log {
 
     void ServerSink::LogMessage(const LogLevel& level, const std::wstring& message) {
         if(level.Enabled()) {
-            auto severity = static_cast<bluespawn::LogMessageRequest_Severity>(level.severity);
-            auto detail = static_cast<bluespawn::LogMessageRequest_Detail>(*level.detail);
+            auto severity = static_cast<bluespawn::LogSeverity>(level.severity);
+            auto detail = static_cast<bluespawn::LogDetail>(*level.detail);
             bool response = client.SendLogMessage(message, severity, detail);
         }
     }

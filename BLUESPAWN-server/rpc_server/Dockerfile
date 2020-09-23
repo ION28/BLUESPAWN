@@ -1,7 +1,7 @@
 FROM golang:1.15
 
-ENV PROTOC_VER 3.11.4
-ENV PROTOC_GEN_GO_VER 1.3.5
+ENV PROTOC_VER 3.13.0
+ENV PROTOC_GEN_GO_VER 1.4.0
 
 # Install dependencies
 RUN apt-get update --fix-missing && apt-get install -y \
