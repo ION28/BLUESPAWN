@@ -27,6 +27,8 @@ namespace Log {
         }
 
         BeginCriticalSection __{ *detection };
+
+        bool response = client.RecordDetection(detection, type);
     }
 
     void ServerSink::RecordAssociation(IN CONST std::shared_ptr<Detection>& first,
@@ -35,9 +37,7 @@ namespace Log {
 
     void ServerSink::LogMessage(const LogLevel& level, const std::wstring& message) {
         if(level.Enabled()) {
-            auto severity = static_cast<bluespawn::LogSeverity>(level.severity);
-            auto detail = static_cast<bluespawn::LogDetail>(*level.detail);
-            bool response = client.SendLogMessage(message, severity, detail);
+            bool response = client.SendLogMessage(message, level.severity, *level.detail);
         }
     }
 
