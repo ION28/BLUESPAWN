@@ -19,7 +19,7 @@ namespace Log {
         /// The JSON document
         json JSONDoc;
 
-        /// The root element in the XML document
+        /// The root element in the JSON document
         json Root;
 
         /// The element to which logs will be added
@@ -37,6 +37,10 @@ namespace Log {
         /// A set of IDs created for detections already in the JSON
         std::set<DWORD> detections;
 
+        /* 
+        * This private function is called by RecordAssociation to update the JSON of 
+        * detections to reflect a link between two detections.
+        */
         void AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength);
 
         void JSONSink::InsertElement(IN json JSONDoc,

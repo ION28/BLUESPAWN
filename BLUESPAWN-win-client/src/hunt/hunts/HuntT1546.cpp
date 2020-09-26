@@ -25,6 +25,8 @@ using namespace Registry;
 #define APPLICATION_SHIM 5
 #define IFEO_HIJACK 6
 #define COM_HIJACK 7
+#define SCREENSAVER_KEY 8
+#define SCREENSAVER_FILE 9
 
 namespace Hunts {
 
@@ -39,6 +41,27 @@ namespace Hunts {
         files.at(file).emplace_back(__VA_ARGS__);                       \
     } else {                                                            \
         files.emplace(file, std::vector<RegistryValue>{ __VA_ARGS__ }); \
+    }
+
+    void HuntT1546::Subtechnique002(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections){
+        SUBTECHNIQUE_INIT(002, Screensaver);
+
+        SUBSECTION_INIT(SCREENSAVER_KEY, Cursory);
+        for(const auto& detection : CheckValues(HKEY_CURRENT_USER, L"Control Panel\\Desktop",
+                                                { { L"SCRNSAVE.exe", L"", false, CheckSzEmpty } })){
+            CREATE_DETECTION(Certainty::None,
+                             RegistryDetectionData{ detection, RegistryDetectionType::CommandReference });
+        }
+        SUBSECTION_END();
+
+        SUBSECTION_INIT(SCREENSAVER_FILE, Cursory);
+        auto path{ L"C:\\Windows\\System32\\scrnsave.scr" };
+        if(FileSystem::CheckFileExists(path) && !FileSystem::File{ path }.GetFileSigned()){
+            CREATE_DETECTION(Certainty::None, FileDetectionData{ path });
+        }
+        SUBSECTION_END();
+
+        SUBTECHNIQUE_END();
     }
 
     void HuntT1546::Subtechnique007(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
@@ -285,6 +308,7 @@ namespace Hunts {
     std::vector<std::shared_ptr<Detection>> HuntT1546::RunHunt(IN CONST Scope& scope) {
         HUNT_INIT();
 
+        Subtechnique002(scope, detections);
         Subtechnique007(scope, detections);
         Subtechnique008(scope, detections);
         Subtechnique009(scope, detections);
@@ -298,6 +322,10 @@ namespace Hunts {
 
     std::vector<std::pair<std::unique_ptr<Event>, Scope>> HuntT1546::GetMonitoringEvents() {
         std::vector<std::pair<std::unique_ptr<Event>, Scope>> events;
+
+        // Looks for T1546.002: Screensaver
+        GetRegistryEvents(events, SCOPE(SCREENSAVER_KEY), HKEY_CURRENT_USER, L"Control Panel\\Desktop", true, false,
+                          false);
 
         // Looks for T1546.007: Netsh Helper DLL
         GetRegistryEvents(events, SCOPE(NETSH_HELPER), HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Netsh", true, false,
