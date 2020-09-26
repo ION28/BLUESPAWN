@@ -15,7 +15,7 @@ namespace Log {
         RpcClient::RpcClient client;
 
         /// The remote server (http(s)://)IP:PORT or (http(s)://)FQDN:PORT that will recieve the logs
-        std::wstring wServerAddress;
+        std::string ServerAddress;
 
         /// Tags for messages sent at different levels
         std::string MessageTags[4] = { "error", "warning", "info", "other" };
@@ -29,7 +29,7 @@ namespace Log {
         /**
 		 * Default constructor for ServerSink. Must provide a server address to send the logs
 		 */
-        ServerSink(const std::wstring ServerAddress);
+        ServerSink(const std::string address);
 
         /**
 		 * Outputs a message to the target server if its logging level is enabled. 

@@ -13,9 +13,8 @@
 
 namespace Log {
 
-    ServerSink::ServerSink(const std::wstring ServerAddress) :
-        wServerAddress{ ServerAddress },
-        client(grpc::CreateChannel(WidestringToString(wServerAddress), grpc::InsecureChannelCredentials())) {}
+    ServerSink::ServerSink(const std::string address) :
+        ServerAddress{ address }, client{ grpc::CreateChannel(address, grpc::InsecureChannelCredentials()) } {}
 
     void ServerSink::UpdateCertainty(IN CONST std::shared_ptr<Detection>& detection) {
         BeginCriticalSection __{ *detection };
@@ -64,6 +63,6 @@ namespace Log {
 
     bool ServerSink::operator==(const LogSink& sink) const {
         return (bool) dynamic_cast<const ServerSink*>(&sink) &&
-               dynamic_cast<const ServerSink*>(&sink)->wServerAddress == wServerAddress;
+               dynamic_cast<const ServerSink*>(&sink)->ServerAddress == ServerAddress;
     }
 };   // namespace Log

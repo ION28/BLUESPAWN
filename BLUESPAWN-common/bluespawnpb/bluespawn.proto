@@ -91,9 +91,8 @@ message RegistryKey {
 }
 
 message RegistryValue {
-	RegistryKey key = 1;
-	string value_name = 2;
-	string value_data = 3;
+	string value_name = 1;
+	string value_data = 2;
 }
 
 // Detections

@@ -25,6 +25,9 @@ namespace RpcClient {
                                                         IN CONST RecordType type);
 
         public:
+        RpcClient() :
+            stub_(protobuffer::BluespawnRPC::NewStub(
+                grpc::CreateChannel("localhost:50052", grpc::InsecureChannelCredentials()))){};
         RpcClient(std::shared_ptr<Channel> channel) : stub_(protobuffer::BluespawnRPC::NewStub(channel)){};
 
         bool RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN CONST RecordType type);

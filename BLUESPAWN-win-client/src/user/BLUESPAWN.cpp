@@ -10,6 +10,7 @@
 #include "util/log/CLISink.h"
 #include "util/log/DebugSink.h"
 #include "util/log/JSONSink.h"
+#include "util/log/ServerSink.h"
 #include "util/log/XMLSink.h"
 
 #include "hunt/hunts/HuntT1036.h"
@@ -255,7 +256,22 @@ void Bluespawn::check_correct_arch() {
     }
 }
 
-void ParseLogSinks(const std::string& sinks, const std::string& logdir) {
+void ParseLogSinks(const std::string& sinks, const std::string& logdir, const std::string& serverAddress) {
+    bool serverEnabled = false;
+    if(serverAddress.length() > 0 && sinks.find("server") == std::string::npos) {
+        LOG_WARNING("Specified a remote server for logs, but did not enable server log sink. Enabling...");
+        Bluespawn::io.InformUser(L"Specified a remote server for logs, but did not enable server log sink. "
+                                 L"Enabling...");
+        serverEnabled = true;
+    } else if(serverAddress.length() == 0 && sinks.find("server") != std::string::npos) {
+        LOG_ERROR("Tried to enable the server log sink, but did not specify a remote server. No logs will be sent!");
+        Bluespawn::io.AlertUser(L"Tried to enable the server log sink, but did not specify a remote server. No logs "
+                                "will be sent!",
+                                5000, ImportanceLevel::MEDIUM);
+    } else if(serverAddress.length() > 0 && sinks.find("server") != std::string::npos) {
+        serverEnabled = true;
+    }
+
     std::set<std::string> sink_set;
     for(unsigned startIdx = 0; startIdx < sinks.size();) {
         auto endIdx{ sinks.find(',', startIdx) };
@@ -298,6 +314,10 @@ void ParseLogSinks(const std::string& sinks, const std::string& logdir) {
             auto JSON = std::make_shared<Log::JSONSink>(outputFolderPath);
             Log::AddSink(JSON, levels);
             Bluespawn::detectionSinks.emplace_back(JSON);
+        } else if(serverEnabled) {
+            auto server = std::make_shared<Log::ServerSink>(serverAddress);
+            Log::AddSink(server, levels);
+            Bluespawn::detectionSinks.emplace_back(server);
         } else if(sink == "debug") {
             auto debug = std::make_shared<Log::DebugSink>();
             Log::AddSink(debug, levels);
@@ -422,7 +442,8 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        ParseLogSinks(result["log"].as<std::string>(), result["output"].as<std::string>());
+        ParseLogSinks(result["log"].as<std::string>(), result["output"].as<std::string>(),
+                      result["server"].as<std::string>());
 
         if(result.count("hunt") || result.count("monitor")) {
             if(result.count("hunt")) {

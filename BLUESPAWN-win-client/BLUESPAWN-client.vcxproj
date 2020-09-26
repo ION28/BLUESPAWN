@@ -98,6 +98,7 @@
     <ClInclude Include="headers\util\DynamicLinker.h" />
     <ClInclude Include="headers\util\Internals.h" />
     <ClInclude Include="headers\util\log\JSONSink.h" />
+    <ClInclude Include="headers\util\log\ServerSink.h" />
     <ClInclude Include="headers\util\Promise.h" />
     <ClInclude Include="headers\util\rpc\RpcClient.h" />
     <ClInclude Include="headers\util\StringUtils.h" />
@@ -242,6 +243,7 @@
     <ClCompile Include="src\util\log\JSONSink.cpp" />
     <ClCompile Include="src\util\log\Log.cpp" />
     <ClCompile Include="src\util\log\LogLevel.cpp" />
+    <ClCompile Include="src\util\log\ServerSink.cpp" />
     <ClCompile Include="src\util\log\XMLSink.cpp" />
     <ClCompile Include="src\util\permissions\Permissions.cpp" />
     <ClCompile Include="src\util\pe\Export_Section.cpp">
@@ -325,14 +327,14 @@
     <PostBuildEvent>
       <Message>Adding manifest to BLUESPAWN-client.exe</Message>
     </PostBuildEvent>
-	<PreBuildEvent>
+    <PreBuildEvent>
       <Message>Generate corresponding .h/cc files based on the current gRPC protobuf configuration</Message>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Command Condition="'$(Platform)'=='Win32'">"$(SolutionDir)vcpkg\packages\protobuf_x86-windows-static\tools\protobuf\protoc.exe" --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --cpp_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" "bluespawn.proto" &amp;&amp; "$(SolutionDir)vcpkg\packages\protobuf_x86-windows-static\tools\protobuf\protoc.exe" --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --grpc_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --plugin=protoc-gen-grpc="$(SolutionDir)vcpkg\packages\grpc_x86-windows-static\tools\grpc\grpc_cpp_plugin.exe" "$(SolutionDir)BLUESPAWN-common\bluespawnpb\bluespawn.proto"</Command>
+      <Command Condition="'$(Platform)'=='Win32'">"$(SolutionDir)vcpkg\packages\protobuf_x86-windows-static\tools\protobuf\protoc.exe" --error_format=msvs --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --cpp_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" "bluespawn.proto" &amp;&amp; "$(SolutionDir)vcpkg\packages\protobuf_x86-windows-static\tools\protobuf\protoc.exe" --error_format=msvs --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --grpc_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --plugin=protoc-gen-grpc="$(SolutionDir)vcpkg\packages\grpc_x86-windows-static\tools\grpc\grpc_cpp_plugin.exe" "$(SolutionDir)BLUESPAWN-common\bluespawnpb\bluespawn.proto"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Command Condition="'$(Platform)'=='x64'">"$(SolutionDir)vcpkg\packages\protobuf_x64-windows-static\tools\protobuf\protoc.exe" --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --cpp_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" "bluespawn.proto" &amp;&amp; "$(SolutionDir)vcpkg\packages\protobuf_x64-windows-static\tools\protobuf\protoc.exe" --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --grpc_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --plugin=protoc-gen-grpc="$(SolutionDir)vcpkg\packages\grpc_x64-windows-static\tools\grpc\grpc_cpp_plugin.exe" "$(SolutionDir)BLUESPAWN-common\bluespawnpb\bluespawn.proto"</Command>
+      <Command Condition="'$(Platform)'=='x64'">"$(SolutionDir)vcpkg\packages\protobuf_x64-windows-static\tools\protobuf\protoc.exe" --error_format=msvs --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --cpp_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" "bluespawn.proto" &amp;&amp; "$(SolutionDir)vcpkg\packages\protobuf_x64-windows-static\tools\protobuf\protoc.exe" --error_format=msvs --proto_path="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --grpc_out="$(SolutionDir)BLUESPAWN-common\bluespawnpb" --plugin=protoc-gen-grpc="$(SolutionDir)vcpkg\packages\grpc_x64-windows-static\tools\grpc\grpc_cpp_plugin.exe" "$(SolutionDir)BLUESPAWN-common\bluespawnpb\bluespawn.proto"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">
