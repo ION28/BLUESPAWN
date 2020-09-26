@@ -49,6 +49,7 @@ namespace Hunts {
         if (uHiddenUser.Exists()) {
             CREATE_DETECTION(Certainty::Certain, OtherDetectionData{ L"User", {
                 { L"Username", L"$" },
+                { L"Context", L"Users with this name are hidden from net user command."}
             }});
         }
 
