@@ -17,9 +17,19 @@ namespace Log {
         wServerAddress{ ServerAddress },
         client(grpc::CreateChannel(WidestringToString(wServerAddress), grpc::InsecureChannelCredentials())) {}
 
-    void ServerSink::UpdateCertainty(IN CONST std::shared_ptr<Detection>& detection) {}
+    void ServerSink::UpdateCertainty(IN CONST std::shared_ptr<Detection>& detection) {
+        BeginCriticalSection __{ *detection };
 
-    void ServerSink::AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength) {}
+        if(detections.find(detection->dwID) != detections.end()) {
+            bool response = client.UpdateCertainty(detection);
+        }
+    }
+
+    void ServerSink::AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength) {
+        if(detections.find(detection_id) != detections.end()) {
+            bool response = client.AddAssociation(detection_id, associated, strength);
+        }
+    }
 
     void ServerSink::RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN RecordType type) {
         if(type == RecordType::PreScan && !Bluespawn::EnablePreScanDetections) {
@@ -33,7 +43,18 @@ namespace Log {
 
     void ServerSink::RecordAssociation(IN CONST std::shared_ptr<Detection>& first,
                                        IN CONST std::shared_ptr<Detection>& second,
-                                       IN CONST Association& strength) {}
+                                       IN CONST Association& strength) {
+        UpdateCertainty(first);
+        UpdateCertainty(second);
+
+        if(detections.find(first->dwID) != detections.end()) {
+            AddAssociation(first->dwID, second->dwID, strength);
+        }
+
+        if(detections.find(second->dwID) != detections.end()) {
+            AddAssociation(second->dwID, first->dwID, strength);
+        }
+    }
 
     void ServerSink::LogMessage(const LogLevel& level, const std::wstring& message) {
         if(level.Enabled()) {

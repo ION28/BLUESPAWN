@@ -6,13 +6,13 @@
 #include <sstream>
 
 namespace RpcClient {
-    protobuffer::Detection RpcClient::SerializeDetectionObject(IN const std::shared_ptr<Detection>& detection,
+    protobuffer::Detection RpcClient::SerializeDetectionObject(IN CONST std::shared_ptr<Detection>& detection,
                                                                IN CONST RecordType type = RecordType::PostScan) {
         protobuffer::Detection message;
-        message.set_record_type(static_cast<bluespawn::protobuffer::DetectionRecordType>(type));
-        message.set_type(static_cast<bluespawn::protobuffer::DetectionType>(detection->type));
         message.set_id(detection->dwID);
         message.set_timestamp(FileTimeToInteger(detection->context.DetectionCreatedTime));
+        message.set_type(static_cast<bluespawn::protobuffer::DetectionType>(detection->type));
+        message.set_record_type(static_cast<bluespawn::protobuffer::DetectionRecordType>(type));
 
         protobuffer::ScanInfo info;
         info.set_certainty(detection->info.GetCertainty());
@@ -67,37 +67,55 @@ namespace RpcClient {
             protobuffer::RegistryDetectionData pbRegistryData;
             pbRegistryData.set_key_path(WidestringToString(registryData.KeyPath));
             protobuffer::RegistryKey pbRegistryKey;
+            pbRegistryKey.set_key_path(WidestringToString(registryData.key.GetName()));
+            pbRegistryKey.set_exists(registryData.key.Exists());
+            pbRegistryData.set_allocated_key(&pbRegistryKey);
             protobuffer::RegistryValue pbRegistryValue;
-            // set data
-            // set key/value
+            pbRegistryValue.set_allocated_key(&pbRegistryKey);
+            if(registryData.value.has_value()) {
+                pbRegistryValue.set_value_name(WidestringToString((*registryData.value).wValueName));
+                pbRegistryValue.set_value_data(WidestringToString((*registryData.value).ToString()));
+            }
+            pbRegistryData.set_allocated_value(&pbRegistryValue);
             pbRegistryData.set_type(static_cast<bluespawn::protobuffer::RegistryDetectionType>(registryData.type));
-
             data.set_allocated_registry_data(&pbRegistryData);
         } else if(std::holds_alternative<ServiceDetectionData>(detection->data)) {
             ServiceDetectionData serviceData = std::get<ServiceDetectionData>(detection->data);
             protobuffer::ServiceDetectionData pbServiceData;
+            pbServiceData.set_service_name(WidestringToString(*serviceData.ServiceName));
+            pbServiceData.set_display_name(WidestringToString(*serviceData.DisplayName));
+            pbServiceData.set_description(WidestringToString(*serviceData.Description));
+            pbServiceData.set_file_path(WidestringToString(*serviceData.FilePath));
             data.set_allocated_service_data(&pbServiceData);
         } else {
             OtherDetectionData otherData = std::get<OtherDetectionData>(detection->data);
             protobuffer::OtherDetectionData pbOtherData;
-            data.set_allocated_other_data(&pbOtherData);
+            pbOtherData.set_type(WidestringToString(otherData.DetectionType));
+            auto mutable_properties = pbOtherData.mutable_properties();
+            for(const auto& [key, value] : otherData.DetectionProperties) {
+                mutable_properties->insert({ WidestringToString(key), WidestringToString(value) });
+            }
         }
         message.set_allocated_data(&data);
 
         protobuffer::DetectionContext context;
-        if(detection->context.FirstEvidenceTime) {
-            context.set_first_evidence_time(FileTimeToInteger(*detection->context.FirstEvidenceTime));
-        }
-
-        if(detection->context.note) {
-            context.set_note(WidestringToString(*detection->context.note));
-        }
 
         if(detection->context.hunts.size()) {
             for(const auto& hunt : detection->context.hunts) {
                 context.add_hunts(WidestringToString(hunt));
             }
         }
+
+        if(detection->context.FirstEvidenceTime) {
+            context.set_first_evidence_time(FileTimeToInteger(*detection->context.FirstEvidenceTime));
+        }
+
+        context.set_first_evidence_time(FileTimeToInteger(detection->context.DetectionCreatedTime));
+
+        if(detection->context.note) {
+            context.set_note(WidestringToString(*detection->context.note));
+        }
+
         message.set_allocated_context(&context);
 
         return message;
@@ -117,8 +135,42 @@ namespace RpcClient {
         } else {
             return false;
         }
+    }
 
-        return false;
+    bool RpcClient::AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength) {
+        protobuffer::DetectionAssociation request;
+        request.set_detection_id(detection_id);
+        request.set_associated_id(associated);
+        request.set_strength(strength);
+
+        protobuffer::ResponseMessage response;
+        ClientContext context;
+
+        Status status = stub_->AddAssociation(&context, request, &response);
+
+        if(status.ok() && response.received()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    bool RpcClient::UpdateCertainty(IN const std::shared_ptr<Detection>& detection) {
+        protobuffer::DetectionCertaintyUpdate request;
+        request.set_id(detection->dwID);
+        request.set_raw_certainty(detection->info.GetIntrinsicCertainty());
+        request.set_certainty(detection->info.GetCertainty());
+
+        protobuffer::ResponseMessage response;
+        ClientContext context;
+
+        Status status = stub_->UpdateCertainty(&context, request, &response);
+
+        if(status.ok() && response.received()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     bool RpcClient::SendLogMessage(const std::wstring& msg, Log::Severity sev, Log::Detail det) {
@@ -142,7 +194,5 @@ namespace RpcClient {
         } else {
             return false;
         }
-
-        return false;
     }
 }   // namespace RpcClient

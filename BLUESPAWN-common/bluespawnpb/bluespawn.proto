@@ -146,8 +146,7 @@ message RegistryDetectionData {
 	string key_path = 1;
 	RegistryKey key = 2;
 	RegistryValue value = 3; // optional
-	bytes data = 4; // optional 
-	RegistryDetectionType type = 5; // optional 
+	RegistryDetectionType type = 4; // optional 
 }
 message ServiceDetectionData {
 	string service_name = 1; // optional

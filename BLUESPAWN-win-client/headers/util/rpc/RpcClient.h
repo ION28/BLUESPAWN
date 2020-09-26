@@ -22,12 +22,14 @@ namespace RpcClient {
         std::unique_ptr<protobuffer::BluespawnRPC::Stub> stub_;
 
         protobuffer::Detection SerializeDetectionObject(IN CONST std::shared_ptr<Detection>& detection,
-                                                        IN CONST RecordType type = RecordType::PostScan);
+                                                        IN CONST RecordType type);
 
         public:
         RpcClient(std::shared_ptr<Channel> channel) : stub_(protobuffer::BluespawnRPC::NewStub(channel)){};
 
         bool RecordDetection(IN CONST std::shared_ptr<Detection>& detection, IN CONST RecordType type);
+        bool AddAssociation(IN DWORD detection_id, IN DWORD associated, IN double strength);
+        bool UpdateCertainty(IN const std::shared_ptr<Detection>& detection);
 
         bool SendLogMessage(const std::wstring& msg, Log::Severity severity, Log::Detail detail);
     };
