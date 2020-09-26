@@ -2,11 +2,17 @@
 
 #include "hooking/hooks/ThreadCreation.h"
 
-namespace BLUESPAWN::Agent::ThreadCreation{
+namespace BLUESPAWN::Agent::Hooks{
+	const CreateRemoteThread CreateRemoteThread::instance{};
 
-	CreateRemoteThread_t _CreateRemoteThread{ nullptr };
+	CreateRemoteThread::CreateRemoteThread() : 
+		Hook{ L"Kernel32.dll", "CreateRemoteThread", this }{}
 
-	HANDLE WINAPI CreateRemoteThreadHook(
+	const CreateRemoteThread& CreateRemoteThread::GetInstance(){
+		return instance;
+	}
+
+	HANDLE CreateRemoteThread::HookFunc(
 		HANDLE                 hProcess,
 		LPSECURITY_ATTRIBUTES  lpThreadAttributes,
 		SIZE_T                 dwStackSize,
@@ -14,7 +20,7 @@ namespace BLUESPAWN::Agent::ThreadCreation{
 		LPVOID                 lpParameter,
 		DWORD                  dwCreationFlags,
 		LPDWORD                lpThreadId
-	){
+	) const {
 		DWORD dwPID{ GetProcessId(hProcess) };
 		LOG_DEBUG_MESSAGE(LOG_INFO, L"Detected CreateRemoteThread into process " << dwPID
 						  << " (Address: " << lpStartAddress << L")");
@@ -42,22 +48,19 @@ namespace BLUESPAWN::Agent::ThreadCreation{
 			Argument{ Value::OutPointer(lpThreadId, false) },
 		};
 
-		Call call{ addresses, args };
+		Call call{ std::move(addresses), std::move(args) };
 		if(!parent){
-			RecordCall(call, CallAction::Allowed);
-			if(_CreateRemoteThread){
-				return _CreateRemoteThread(hProcess, lpThreadAttributes, dwStackSize, lpStartAddress, lpParameter, 
+			HookRegister::GetInstance().RecordCall(call, CallAction::Allowed);
+			if(lpOriginalFunction){
+				return lpOriginalFunction(hProcess, lpThreadAttributes, dwStackSize, lpStartAddress, lpParameter,
 										   dwCreationFlags, lpThreadId);
+			} else{
+				LOG_DEBUG_MESSAGE(LOG_ERROR, L"Original function pointer for CreateRemoteThread is missing!");
 			}
-		} else{
-			RecordCall(call, CallAction::Blocked);
-			SetLastError(ERROR_ACCESS_DENIED);
-			return INVALID_HANDLE_VALUE;
 		}
-	}
 
-	namespace{
-		HookRegistration __CreateRemoteThread{ L"kernel32.dll", "CreateRemoteThread", CreateRemoteThreadHook,
-											   reinterpret_cast<LPVOID*>(&_CreateRemoteThread) };
+		HookRegister::GetInstance().RecordCall(call, CallAction::Blocked);
+		SetLastError(ERROR_ACCESS_DENIED);
+		return INVALID_HANDLE_VALUE;
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <winternl.h>
 
 #include <variant>
 #include <string>
@@ -171,7 +172,7 @@ namespace BLUESPAWN::Agent{
 			template<class T>
 			inline Struct(_In_ const T* value, _In_opt_ DWORD dwSize = sizeof(T)) : 
 				info{ typeid(T) }, 
-				lpUnderlyingData{ std::shared_ptr<byte[]>(dwSize) }{
+				lpUnderlyingData{ std::make_shared<byte[]>(dwSize) }{
 				
 				CopyMemory(lpUnderlyingData.get(), value, dwSize);
 			}

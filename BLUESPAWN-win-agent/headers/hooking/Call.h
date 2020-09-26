@@ -28,10 +28,18 @@ namespace BLUESPAWN::Agent{
 
 		/**
 		 * \brief Construct a call object using the provided call stack and arguments
-		 * 
+		 *
 		 * \param[in] callStack The call stack leading up to the call being described by this
 		 * \param[in] arguments The arguments passed into the function call
 		 */
 		Call(_In_ const std::vector<Address>& callStack, _In_ const std::vector<Argument>& arguments);
+
+		/**
+		 * \brief Construct a call object using the provided call stack and arguments
+		 *
+		 * \param[in] callStack The call stack leading up to the call being described by this
+		 * \param[in] arguments The arguments passed into the function call
+		 */
+		Call(_In_ std::vector<Address>&& callStack, _In_ std::vector<Argument>&& arguments);
 	};
 }

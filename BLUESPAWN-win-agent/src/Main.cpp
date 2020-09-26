@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <winternl.h>
+#include "hooking/hooks/ThreadCreation.h"
 
 #include "Setup.h"
 #include "hooking/Call.h"
