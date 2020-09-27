@@ -42,7 +42,7 @@ namespace Hunts {
         }
         SUBSECTION_END();
 
-        SUBSECTION_INIT(HIDDEN_USER, Normal);
+        SUBSECTION_INIT(HIDDEN_USER, Cursory);
 
         Permissions::User uHiddenUser(L"$");
 
