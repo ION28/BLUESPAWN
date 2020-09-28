@@ -1,4 +1,4 @@
-#include "ThreadsafeQueue.h"
+#include "util/ThreadsafeQueue.h"
 
 template <typename T>
 ThreadsafeQueue<T>::ThreadsafeQueue(){
@@ -12,7 +12,7 @@ ThreadsafeQueue<T>::~ThreadsafeQueue(){
 
 template <typename T>
 T& ThreadsafeQueue<T>::pop(){
-    T& result = std::nullptr_t;
+    T& result = NULL;
     lock(); //might want to make this wait until theres an element
     if(!queue.empty()){
         result = queue.front();

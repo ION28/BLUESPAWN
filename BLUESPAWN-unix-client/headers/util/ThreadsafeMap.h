@@ -3,6 +3,9 @@
 #include <optional>
 
 template<typename K, typename V>
+using MapIterator = typename std::map<K, V>::iterator;
+
+template<typename K, typename V>
 class ThreadsafeMap{
 private:
     pthread_mutex_t mutex;

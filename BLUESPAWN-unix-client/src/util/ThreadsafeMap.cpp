@@ -1,4 +1,4 @@
-#include "ThreadsafeMap.h"
+#include "util/ThreadsafeMap.h"
 
 template<typename K, typename V>
 ThreadsafeMap<K, V>::ThreadsafeMap(){
@@ -7,7 +7,7 @@ ThreadsafeMap<K, V>::ThreadsafeMap(){
 
 template<typename K, typename V>
 ThreadsafeMap<K, V>::~ThreadsafeMap(){
-    pthread_mutex_destroy(&this->mutex, NULL);
+    pthread_mutex_destroy(&this->mutex);
 }
 
 template<typename K, typename V>
@@ -20,7 +20,7 @@ void ThreadsafeMap<K, V>::put(K& key, V& value){
 template<typename K, typename V>
 std::optional<V&> ThreadsafeMap<K, V>::get(K& key){
     pthread_mutex_lock(&this->mutex);
-    std::map<K, V>::iterator itr;
+    MapIterator<K, V> itr;
     for (itr = this->map.begin(); itr != this->map.end(); ++itr) { 
         if(itr->first == key){
             pthread_mutex_unlock(&this->mutex);
