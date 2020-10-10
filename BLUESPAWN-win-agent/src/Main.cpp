@@ -49,6 +49,8 @@ extern "C" BOOL APIENTRY DllMain(_In_ HMODULE hModule, _In_ DWORD dwReason, LPVO
 extern "C" __declspec(dllexport) void APIENTRY Wait(){
 	LOG_DEBUG_MESSAGE(LOG_INFO, L"Entering infinite wait!");
 
+	CreateRemoteThread(nullptr, nullptr, 0, nullptr, nullptr, 0, nullptr);
+
 	Sleep(INFINITE);
 }
 

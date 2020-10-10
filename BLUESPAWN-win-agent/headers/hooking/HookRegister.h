@@ -22,7 +22,7 @@ namespace BLUESPAWN::Agent{
 	 * \return The return value of the function
 	 */
 	template<class H, class... Args>
-	auto WINAPI HookDelegate(Args&&... args){
+	auto WINAPI HookDelegate(Args... args){
 		return H::GetInstance().HookFunc(args...);
 	}
 

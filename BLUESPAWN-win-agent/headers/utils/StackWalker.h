@@ -5,11 +5,12 @@
 #include <vector>
 
 #include "hooking/Address.h"
+#include "utils/Common.h"
 
-namespace BLUESPAWN::Agent{
+namespace BLUESPAWN::Agent::Util {
+
+	extern CriticalSection dbghelpGuard;
 
 	_Success_(return == true)
-	bool WalkStack(_In_ HANDLE hThread, _Out_ std::vector<Address> addresses);
-
-	bool WalkStack(_Out_ std::vector<Address> addresses);
+	bool WalkStack(_Out_ std::vector<Address>& addresses);
 }

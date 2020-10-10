@@ -2,4 +2,5 @@
 
 #include <Windows.h>
 
-DWORD RequestParentPID(DWORD dwPID);
+// TODO: Move to client interface
+inline DWORD RequestParentPID(DWORD dwPID){ return 0; }

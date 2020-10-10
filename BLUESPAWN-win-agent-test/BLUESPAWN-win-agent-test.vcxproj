@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,39 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\hooking\Address.cpp" />
-    <ClCompile Include="src\hooking\Call.cpp" />
-    <ClCompile Include="src\hooking\HookRegister.cpp" />
-    <ClCompile Include="src\hooking\Argument.cpp" />
-    <ClCompile Include="src\hooking\hooks\ThreadCreation.cpp" />
-    <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Setup.cpp" />
-    <ClCompile Include="src\utils\Common.cpp" />
-    <ClCompile Include="src\utils\HandleInfo.cpp" />
-    <ClCompile Include="src\utils\MemoryMap.cpp" />
-    <ClCompile Include="src\utils\StackWalker.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="headers\hooking\Argument.h" />
-    <ClInclude Include="headers\hooking\Call.h" />
-    <ClInclude Include="headers\hooking\Address.h" />
-    <ClInclude Include="headers\hooking\Hook.h" />
-    <ClInclude Include="headers\hooking\HookRegister.h" />
-    <ClInclude Include="headers\hooking\hooks\ThreadCreation.h" />
-    <ClInclude Include="headers\Setup.h" />
-    <ClInclude Include="headers\utils\Common.h" />
-    <ClInclude Include="headers\utils\Debug.h" />
-    <ClInclude Include="headers\utils\HandleInfo.h" />
-    <ClInclude Include="headers\utils\MemoryMap.h" />
-    <ClInclude Include="headers\utils\ProcessUtils.h" />
-    <ClInclude Include="headers\utils\StackWalker.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Midl Include="AgentInterface.idl" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{ae91f040-be0a-489e-a5ed-5ed3c1d5dbb7}</ProjectGuid>
-    <RootNamespace>BLUESPAWNwinagent</RootNamespace>
+    <ProjectGuid>{a36ea9b7-b171-49c9-a985-aedbc3c4fa18}</ProjectGuid>
+    <RootNamespace>BLUESPAWNwinclienttest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
     <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
@@ -74,7 +46,7 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v141_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />

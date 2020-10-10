@@ -5,6 +5,8 @@
 #include <string>
 #include <type_traits>
 
+#include "utils/Debug.h"
+
 namespace BLUESPAWN::Agent::Hooks{
 
 	template<class Func, class... Args>
@@ -30,7 +32,22 @@ namespace BLUESPAWN::Agent::Hooks{
 		 * \param[in] type           A pointer to the subclass calling the constructor
 		 */
 		template<class HookType>
-		Hook(_In_ const std::wstring& szLibraryName, _In_ const std::string& szFunctionName, HookType* type);
+		Hook(_In_ const std::wstring& szLibraryName, _In_ const std::string& szFunctionName, HookType* type) :
+			szLibraryName{ szLibraryName }, szFunctionName{ szFunctionName }{
+
+			LOG_DEBUG_MESSAGE(LOG_INFO, L"Preparing hook for " << szFunctionName.c_str() << L" in " << szLibraryName);
+
+			if(HMODULE hLibrary = LoadLibraryW(szLibraryName.c_str())){
+				lpOriginalFunction = 
+					reinterpret_cast<decltype(lpOriginalFunction)>(GetProcAddress(hLibrary, szFunctionName.c_str()));
+			}
+
+			if(lpOriginalFunction){
+				HookRegister::GetInstance().RegisterHook(
+					reinterpret_cast<LPVOID>(&HookDelegate<std::remove_pointer_t<decltype(type)>, Args...>),
+					reinterpret_cast<LPVOID*>(&lpOriginalFunction));
+			}
+		}
 
 	public:
 

@@ -10,6 +10,7 @@
 #include <typeindex>
 
 #include "utils/HandleInfo.h"
+#include "hooking/Address.h"
 
 namespace BLUESPAWN::Agent{
 
@@ -172,9 +173,11 @@ namespace BLUESPAWN::Agent{
 			template<class T>
 			inline Struct(_In_ const T* value, _In_opt_ DWORD dwSize = sizeof(T)) : 
 				info{ typeid(T) }, 
-				lpUnderlyingData{ std::make_shared<byte[]>(dwSize) }{
+				lpUnderlyingData{ std::make_shared<byte[]>(value ? dwSize : 0) }{
 				
-				CopyMemory(lpUnderlyingData.get(), value, dwSize);
+				if(value){
+					CopyMemory(lpUnderlyingData.get(), value, dwSize);
+				}
 			}
 
 			/**
@@ -213,10 +216,10 @@ namespace BLUESPAWN::Agent{
 
 			/// The value of the handle passed to the function. Note that the handle may be closed, so this should only
 			/// be used for record-keeping purposes.
-			std::shared_ptr<HANDLE> hHandle;
+			HANDLE hHandle;
 
 			/// The type of the handle
-			Type type;
+			HandleType type;
 
 			/// The name of the object to which the handle refers, if available
 			std::optional<std::wstring> name;
@@ -278,50 +281,49 @@ namespace BLUESPAWN::Agent{
 		 * 
 		 * \param[in] value A Number object containing the value of the argument
 		 */
-		constexpr inline Argument(_In_ const Value::Number& value) : type{ ArgumentType::Numerical }, value{ value }{}
+		Argument(_In_ const Value::Number& value);
 
 		/**
 		 * \brief Constructs an argument referencing a pointer to which the called function will write some result
 		 *
 		 * \param[in] value An OutPointer object containing the value of the argument
 		 */
-		constexpr inline Argument(_In_ const Value::OutPointer& value) : 
-			type{ ArgumentType::OutPointer }, value{ value }{}
+		Argument(_In_ const Value::OutPointer& value);
 
 		/**
 		 * \brief Constructs an argument referencing a string
 		 *
 		 * \param[in] value A String object containing the value of the argument
 		 */
-		constexpr inline Argument(_In_ const Value::String& value) : type{ ArgumentType::String }, value{ value }{}
+		Argument(_In_ const Value::String& value);
 
 		/**
 		 * \brief Constructs an argument referencing a struct
 		 *
 		 * \param[in] value A Struct object containing the value of the argument
 		 */
-		constexpr inline Argument(_In_ const Value::Struct& value) : type{ ArgumentType::Struct }, value{ value }{}
+		Argument(_In_ const Value::Struct& value);
 
 		/**
 		 * \brief Constructs an argument referencing a string
 		 *
 		 * \param[in] value A String object containing the value of the argument
 		 */
-		constexpr inline Argument(_In_ const Value::Enum& value) : type{ ArgumentType::Enum }, value{ value }{}
+		Argument(_In_ const Value::Enum& value);
 
 		/**
 		 * \brief Constructs an argument referencing a handle
 		 *
 		 * \param[in] value A Handle object containing the value of the argument
 		 */
-		constexpr inline Argument(_In_ const Value::Handle& value) : type{ ArgumentType::Handle }, value{ value }{}
+		Argument(_In_ const Value::Handle& value);
 
 		/**
 		 * \brief Constructs an argument referencing a pointer
 		 *
 		 * \param[in] value A Pointer object containing the value of the argument
 		 */
-		constexpr inline Argument(_In_ const Value::Pointer& value) : type{ ArgumentType::Pointer }, value{ value }{}
+		Argument(_In_ const Value::Pointer& value);
 
 		/**
 		 * Retrieves the type of value passed as this argument.

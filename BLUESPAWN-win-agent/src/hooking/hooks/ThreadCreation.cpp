@@ -26,7 +26,7 @@ namespace BLUESPAWN::Agent::Hooks{
 						  << " (Address: " << lpStartAddress << L")");
 
 		std::vector<Address> addresses{};
-		auto status{ WalkStack(addresses) };
+		auto status{ Util::WalkStack(addresses) };
 		if(!status){
 			LOG_DEBUG_MESSAGE(LOG_ERROR, L"Failed to walk the stack in detected CreateRemoteThread!");
 		}
@@ -40,7 +40,7 @@ namespace BLUESPAWN::Agent::Hooks{
 
 		std::vector<Argument> args{
 			Argument{ Value::Handle(hProcess) },
-			Argument{ Value::Struct(lpThreadAttributes, lpThreadAttributes->nLength) },
+			Argument{ Value::Struct(lpThreadAttributes, lpThreadAttributes ? lpThreadAttributes->nLength : 0) },
 			Argument{ Value::Number(dwStackSize) },
 			Argument{ Value::Pointer(lpStartAddress) },
 			Argument{ Value::Pointer(lpParameter) },
@@ -48,7 +48,7 @@ namespace BLUESPAWN::Agent::Hooks{
 			Argument{ Value::OutPointer(lpThreadId, false) },
 		};
 
-		Call call{ std::move(addresses), std::move(args) };
+		Call call{ Address{ szLibraryName, szFunctionName }, std::move(addresses), std::move(args) };
 		if(!parent){
 			HookRegister::GetInstance().RecordCall(call, CallAction::Allowed);
 			if(lpOriginalFunction){
