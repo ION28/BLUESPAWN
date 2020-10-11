@@ -1,6 +1,7 @@
 #include "utils/HandleInfo.h"
 #include "utils/Common.h"
 #include "utils/Debug.h"
+#include "utils/ProcessUtils.h"
 
 #include <winternl.h>
 
@@ -82,12 +83,13 @@ namespace BLUESPAWN::Agent{
 						DWORD dwLength{ 0 };
 						std::vector<WCHAR> buffer(MAX_PATH);
 						NTSTATUS status{};
-						while(0xC0000004L == (status = _NtQueryObject(hQuery, ObjectNameInformation, buffer.data(), 
+						while(0xC0000004L == (status = _NtQueryObject(hQuery, ObjectNameInformation, buffer.data(),
 																	  buffer.size(), &dwLength))){
 							buffer.resize(dwLength + 0x100);
 						}
 						if(NT_SUCCESS(status)){
-							result = std::wstring{ buffer.data() };
+							auto pstr{ reinterpret_cast<PUNICODE_STRING>(buffer.data()) };
+							result = std::wstring{ pstr->Buffer, pstr->Length / sizeof(WCHAR) };
 						}
 
 						if(!SetEvent(hLookupResultTrigger)){
@@ -111,13 +113,8 @@ namespace BLUESPAWN::Agent{
 			}
 		}
 
-		std::pair<HandleType, std::wstring> DeduceHandleInformation(_In_ HANDLE hHandle, 
-																	_In_ const std::optional<std::wstring>& info){
+		std::pair<HandleType, std::wstring> DeduceHandleInformation(_In_ HANDLE hHandle){
 			auto result{ std::make_pair(HandleType::Other, std::wstring{ L"" }) };
-
-			if(info){
-				result.second = *info;
-			}
 
 			if(hHandle){
 				if(!HandlesInternal::_NtQueryObject){
@@ -137,8 +134,21 @@ namespace BLUESPAWN::Agent{
 
 				if(NT_SUCCESS(status)){
 					auto typeinfo{ reinterpret_cast<PPUBLIC_OBJECT_TYPE_INFORMATION>(buffer.data()) };
-					std::wstring name{ typeinfo->TypeName.Buffer, typeinfo->TypeName.Length };
-					LOG_DEBUG_MESSAGE(LOG_INFO, (info ? *info + L" is a " : L"(Unknown handle)") + name);
+					std::wstring name{ typeinfo->TypeName.Buffer, typeinfo->TypeName.Length / sizeof(WCHAR) };
+					if(name == L"File"){
+						result.first = HandleType::File;
+						// correct file name
+					} else if(name == L"Section"){
+						result.first = HandleType::Section;
+						// correct section name, potentially
+					} else if(name == L"Process"){
+						result.first = HandleType::Process;
+						result.second = Util::GetProcessName(hHandle) + L" (PID " + 
+							std::to_wstring(GetProcessId(hHandle)) + L")";
+					} else if(name == L"Thread"){
+						result.first = HandleType::Thread;
+						result.second = L"(TID " + std::to_wstring(GetThreadId(hHandle)) + L")";
+					}
 				}
 			}
 
@@ -149,11 +159,15 @@ namespace BLUESPAWN::Agent{
 			return result;
 		}
 
-		std::pair<HandleType, std::wstring> LookupHandle(_In_ HANDLE hHandle){
+		std::optional<std::wstring> LookupHandle(_In_ HANDLE hHandle){
 			FlushHandleCache(hHandle);
 			BeginCriticalSection _(HandlesInternal::guard);
 			HandlesInternal::hQuery = hHandle;
 			HandlesInternal::result = std::nullopt;
+			if(!HandlesInternal::hThread){
+				HandlesInternal::ResetThread();
+				ResumeThread(*HandlesInternal::hThread);
+			}
 			if(!SetEvent(HandlesInternal::hLookupTrigger)){
 
 				// An error with the lookup trigger has occured; destroy the current (presumably broken) one 
@@ -169,14 +183,11 @@ namespace BLUESPAWN::Agent{
 			auto wait = WaitForSingleObject(HandlesInternal::hLookupResultTrigger, 100);
 			auto res{ HandlesInternal::result };
 			if(wait == WAIT_OBJECT_0){
-				_.Release();
-				return DeduceHandleInformation(hHandle, res);
+				return res;
 			} else if(wait == WAIT_TIMEOUT){
 				HandlesInternal::ResetThread();
 				ResumeThread(*HandlesInternal::hThread);
-				_.Release();
-
-				return DeduceHandleInformation(hHandle, res);
+				return res;
 			} else{
 
 				// An error with the lookup result trigger has occured; destroy the current (presumably broken) one 
@@ -201,7 +212,7 @@ namespace BLUESPAWN::Agent{
 			}
 			_.Release();
 
-			return LookupHandle(hHandle).first;
+			return DeduceHandleInformation(hHandle).first;
 		}
 
 		std::wstring GetHandleName(_In_ HANDLE hHandle){
@@ -211,7 +222,7 @@ namespace BLUESPAWN::Agent{
 			}
 			_.Release();
 
-			return LookupHandle(hHandle).second;
+			return DeduceHandleInformation(hHandle).second;
 		}
 	}
 }

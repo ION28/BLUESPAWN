@@ -33,7 +33,7 @@ namespace BLUESPAWN::Agent::Hooks{
 
 		bool parent = false;
 		for(DWORD dwParent = RequestParentPID(dwPID); dwParent; dwParent = RequestParentPID(dwParent)){
-			if(RequestParentPID(dwPID) == GetCurrentProcessId()){
+			if(dwParent == GetCurrentProcessId()){
 				parent = true;
 			}
 		}
@@ -49,7 +49,7 @@ namespace BLUESPAWN::Agent::Hooks{
 		};
 
 		Call call{ Address{ szLibraryName, szFunctionName }, std::move(addresses), std::move(args) };
-		if(!parent){
+		if(parent){
 			HookRegister::GetInstance().RecordCall(call, CallAction::Allowed);
 			if(lpOriginalFunction){
 				return lpOriginalFunction(hProcess, lpThreadAttributes, dwStackSize, lpStartAddress, lpParameter,

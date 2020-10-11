@@ -92,6 +92,7 @@ namespace BLUESPAWN::Agent{
 
 		info << L"Action Taken: " << (action == CallAction::Allowed ? L"Allowed" : (action == CallAction::Blocked ? 
 																					L"Blocked" : L"Modified"));
+
 		LOG_DEBUG_MESSAGE(LOG_INFO, info.str());
 	}
 

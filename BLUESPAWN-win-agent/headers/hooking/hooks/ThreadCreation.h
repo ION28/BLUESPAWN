@@ -35,7 +35,7 @@ namespace BLUESPAWN::Agent::Hooks {
 		CreateRemoteThread(const CreateRemoteThread& other) = delete;
 		CreateRemoteThread(CreateRemoteThread&& other) = delete;
 		CreateRemoteThread operator=(const CreateRemoteThread& other) = delete;
-		CreateRemoteThread operator==(CreateRemoteThread&& other) = delete;
+		CreateRemoteThread operator=(CreateRemoteThread&& other) = delete;
 
 	public:
 
