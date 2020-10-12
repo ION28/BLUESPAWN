@@ -23,12 +23,15 @@
     <ClCompile Include="src\hooking\Call.cpp" />
     <ClCompile Include="src\hooking\HookRegister.cpp" />
     <ClCompile Include="src\hooking\Argument.cpp" />
+    <ClCompile Include="src\hooking\hooks\CloseHandle.cpp" />
     <ClCompile Include="src\hooking\hooks\ThreadCreation.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Setup.cpp" />
+    <ClCompile Include="src\test\HandleInferenceTests.cpp" />
     <ClCompile Include="src\utils\Common.cpp" />
     <ClCompile Include="src\utils\HandleInfo.cpp" />
     <ClCompile Include="src\utils\MemoryMap.cpp" />
+    <ClCompile Include="src\utils\ProcessUtils.cpp" />
     <ClCompile Include="src\utils\StackWalker.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -37,8 +40,10 @@
     <ClInclude Include="headers\hooking\Address.h" />
     <ClInclude Include="headers\hooking\Hook.h" />
     <ClInclude Include="headers\hooking\HookRegister.h" />
+    <ClInclude Include="headers\hooking\hooks\CloseHandle.h" />
     <ClInclude Include="headers\hooking\hooks\ThreadCreation.h" />
     <ClInclude Include="headers\Setup.h" />
+    <ClInclude Include="headers\test\HandleInferenceTests.h" />
     <ClInclude Include="headers\utils\Common.h" />
     <ClInclude Include="headers\utils\Debug.h" />
     <ClInclude Include="headers\utils\HandleInfo.h" />

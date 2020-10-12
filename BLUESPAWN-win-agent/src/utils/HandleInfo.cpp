@@ -113,6 +113,52 @@ namespace BLUESPAWN::Agent{
 			}
 		}
 
+		std::optional<std::wstring> LookupHandle(_In_ HANDLE hHandle){
+			FlushHandleCache(hHandle);
+			BeginCriticalSection _(HandlesInternal::guard);
+			HandlesInternal::hQuery = hHandle;
+			HandlesInternal::result = std::nullopt;
+			if(!HandlesInternal::hThread){
+				HandlesInternal::ResetThread();
+				ResumeThread(*HandlesInternal::hThread);
+			}
+			if(!SetEvent(HandlesInternal::hLookupTrigger)){
+
+				// An error with the lookup trigger has occured; destroy the current (presumably broken) one 
+				// and replace it with a new one. Kill the internal thread to reset everything.
+				LOG_DEBUG_MESSAGE(LOG_ERROR, "Handle lookup failed to trigger the lookup event (error code "
+								  << GetLastError() << ")");
+				HandlesInternal::ResetThread();
+				SafeCloseHandle(HandlesInternal::hLookupTrigger);
+				HandlesInternal::hLookupTrigger = CreateEventW(nullptr, false, false, nullptr);
+				ResumeThread(*HandlesInternal::hThread);
+			}
+
+			auto wait = WaitForSingleObject(HandlesInternal::hLookupResultTrigger, 100);
+			auto res{ HandlesInternal::result };
+			if(wait == WAIT_OBJECT_0){
+				return res;
+			} else if(wait == WAIT_TIMEOUT){
+				HandlesInternal::ResetThread();
+				ResumeThread(*HandlesInternal::hThread);
+				return res ? res : L"Pipe";
+			} else{
+
+				// An error with the lookup result trigger has occured; destroy the current (presumably broken) one 
+				// and replace it with a new one. Kill the internal thread to reset everything.
+				LOG_DEBUG_MESSAGE(LOG_ERROR, "Handle lookup failed to listen for the lookup result event (error code "
+								  << GetLastError() << ")");
+				HandlesInternal::ResetThread();
+				SafeCloseHandle(HandlesInternal::hLookupResultTrigger);
+				HandlesInternal::hLookupResultTrigger = CreateEventW(nullptr, false, false, nullptr);
+				ResumeThread(*HandlesInternal::hThread);
+
+				// try again
+				_.Release();
+				return LookupHandle(hHandle);
+			}
+		}
+
 		std::pair<HandleType, std::wstring> DeduceHandleInformation(_In_ HANDLE hHandle){
 			auto result{ std::make_pair(HandleType::Other, std::wstring{ L"" }) };
 
@@ -120,6 +166,16 @@ namespace BLUESPAWN::Agent{
 				if(!HandlesInternal::_NtQueryObject){
 					HandlesInternal::_NtQueryObject = reinterpret_cast<HandlesInternal::NtQueryObject_t>(
 						GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "NtQueryObject"));
+				}
+
+				// lookup the name before it is queried.
+				auto objectName{ LookupHandle(hHandle) };
+				if(objectName){
+					result.second = *objectName;
+					if(*objectName == L"Pipe"){ // if the handle is a problematic pipe, the name will be set to "Pipe"
+						result.first = HandleType::Pipe;
+						return result;
+					}
 				}
 
 				DWORD dwLength{ 0 };
@@ -137,10 +193,8 @@ namespace BLUESPAWN::Agent{
 					std::wstring name{ typeinfo->TypeName.Buffer, typeinfo->TypeName.Length / sizeof(WCHAR) };
 					if(name == L"File"){
 						result.first = HandleType::File;
-						// correct file name
 					} else if(name == L"Section"){
 						result.first = HandleType::Section;
-						// correct section name, potentially
 					} else if(name == L"Process"){
 						result.first = HandleType::Process;
 						result.second = Util::GetProcessName(hHandle) + L" (PID " + 
@@ -148,6 +202,16 @@ namespace BLUESPAWN::Agent{
 					} else if(name == L"Thread"){
 						result.first = HandleType::Thread;
 						result.second = L"(TID " + std::to_wstring(GetThreadId(hHandle)) + L")";
+					} else if(name == L"Key"){
+						result.first = HandleType::RegistryKey;
+					} else if(name == L"Token"){
+						result.first = HandleType::Token;
+					} else if(name == L"Mutant" || name == L"Event" || name == L"Semaphore"){
+						result.first = HandleType::Synchronization;
+					} else if(name == L"ALPC Port"){
+						result.first = HandleType::ALPCPort;
+					} else if(name == L"SymbolicLink"){
+						result.first = HandleType::SymbolicLink;
 					}
 				}
 			}
@@ -157,52 +221,6 @@ namespace BLUESPAWN::Agent{
 			handleInfos.emplace(hHandle, result);
 
 			return result;
-		}
-
-		std::optional<std::wstring> LookupHandle(_In_ HANDLE hHandle){
-			FlushHandleCache(hHandle);
-			BeginCriticalSection _(HandlesInternal::guard);
-			HandlesInternal::hQuery = hHandle;
-			HandlesInternal::result = std::nullopt;
-			if(!HandlesInternal::hThread){
-				HandlesInternal::ResetThread();
-				ResumeThread(*HandlesInternal::hThread);
-			}
-			if(!SetEvent(HandlesInternal::hLookupTrigger)){
-
-				// An error with the lookup trigger has occured; destroy the current (presumably broken) one 
-				// and replace it with a new one. Kill the internal thread to reset everything.
-				LOG_DEBUG_MESSAGE(LOG_ERROR, "Handle lookup failed to trigger the lookup event (error code " 
-								  << GetLastError() << ")");
-				HandlesInternal::ResetThread();
-				SafeCloseHandle(HandlesInternal::hLookupTrigger);
-				HandlesInternal::hLookupTrigger = CreateEventW(nullptr, false, false, nullptr);
-				ResumeThread(*HandlesInternal::hThread);
-			}
-			
-			auto wait = WaitForSingleObject(HandlesInternal::hLookupResultTrigger, 100);
-			auto res{ HandlesInternal::result };
-			if(wait == WAIT_OBJECT_0){
-				return res;
-			} else if(wait == WAIT_TIMEOUT){
-				HandlesInternal::ResetThread();
-				ResumeThread(*HandlesInternal::hThread);
-				return res;
-			} else{
-
-				// An error with the lookup result trigger has occured; destroy the current (presumably broken) one 
-				// and replace it with a new one. Kill the internal thread to reset everything.
-				LOG_DEBUG_MESSAGE(LOG_ERROR, "Handle lookup failed to listen for the lookup result event (error code "
-								  << GetLastError() << ")");
-				HandlesInternal::ResetThread();
-				SafeCloseHandle(HandlesInternal::hLookupResultTrigger);
-				HandlesInternal::hLookupResultTrigger = CreateEventW(nullptr, false, false, nullptr);
-				ResumeThread(*HandlesInternal::hThread);
-
-				// try again
-				_.Release();
-				return LookupHandle(hHandle);
-			}
 		}
 
 		HandleType GetHandleType(_In_ HANDLE hHandle){

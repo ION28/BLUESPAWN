@@ -13,14 +13,15 @@ namespace BLUESPAWN::Agent{
 		Thread,
 		File,
 		Pipe,
-		Synchronization, // Refers to a synchronization object such as an event or mutex
+		Synchronization, // Refers to a synchronization object such as an event, mutex, or semaphore
 		RegistryKey,
 		ETW,
 		Directory,
 		Section,
 		ALPCPort,
-		Mutant,
+		SymbolicLink,
 		Token,
+		Job,
 		Invalid,
 		Other
 	};
