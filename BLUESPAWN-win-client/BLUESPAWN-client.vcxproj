@@ -37,6 +37,8 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1553.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1562.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1569.h" />
+    <ClInclude Include="headers\mitigation\CombinePolicy.h" />
+    <ClInclude Include="headers\mitigation\MitigationPolicy.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1028-WFW.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1054-WSC.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV71769.h" />
@@ -150,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="external\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="headers\mitigation\RegistryPolicy.h" />
     <ClCompile Include="src\hunt\Hunt.cpp" />
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1036.cpp" />

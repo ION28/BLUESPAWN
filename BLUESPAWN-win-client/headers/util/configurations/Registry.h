@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <optional>
+#include <variant>
 #include <type_traits>
 
 #include "util/DynamicLinker.h"
@@ -30,6 +31,9 @@ enum class RegistryType {
 };
 
 namespace Registry {
+
+	typedef std::variant<std::wstring, DWORD, AllocationWrapper, std::vector<std::wstring>> RegistryData;
+
 	extern std::map<std::wstring, HKEY> vHiveNames;
 	extern std::map<HKEY, std::wstring> vHives;
 
@@ -305,6 +309,15 @@ namespace Registry {
 		 * @return a boolean indicating whether the value was successfully removed
 		 */
 		bool RemoveValue(const std::wstring& wsValueName) const;
+
+		/**
+		 * \brief Deletes the specified subkey under the referenced registry key, all its subkeys, and all its values
+		 * 
+		 * \param name The name of the subkey to delete.
+		 * 
+		 * \return True if the subkey no longer exists.
+		 */
+		bool DeleteSubkey(const std::wstring& subkey) const;
 
 		operator HKEY() const;
 	};
