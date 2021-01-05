@@ -217,13 +217,13 @@ bool RegistryPolicy::SubkeyPolicy::Enforce() const{
 			if(policyType == SubkeyPolicyType::Whitelist){
 				for(auto& subkey : subkeys){
 					if(subkeyNames.find(subkey) == subkeyNames.end()){
-						// delete subkey
+						key.DeleteSubkey(subkey);
 					}
 				}
 			} else{
 				for(auto& subkey : subkeys){
 					if(subkeyNames.find(subkey) != subkeyNames.end()){
-						// delete subkey
+						key.DeleteSubkey(subkey);
 					}
 				}
 			}

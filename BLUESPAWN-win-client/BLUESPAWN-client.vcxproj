@@ -37,12 +37,14 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1553.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1562.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1569.h" />
-    <ClInclude Include="headers\mitigation\CombinePolicy.h" />
-    <ClInclude Include="headers\mitigation\MitigationPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\CombinePolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\MitigationPolicy.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1028-WFW.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateM1054-WSC.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV71769.h" />
     <ClInclude Include="headers\mitigation\mitigations\MitigateV73511.h" />
+    <ClInclude Include="headers\mitigation\policy\SubkeyPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\ValuePolicy.h" />
     <ClInclude Include="headers\monitor\EventListener.h" />
     <ClInclude Include="headers\reaction\CarveMemory.h" />
     <ClInclude Include="headers\reaction\DeleteFile.h" />
@@ -152,7 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="external\tinyxml2\tinyxml2.cpp" />
-    <ClCompile Include="headers\mitigation\RegistryPolicy.h" />
+    <ClCompile Include="headers\mitigation\policy\RegistryPolicy.h" />
     <ClCompile Include="src\hunt\Hunt.cpp" />
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1036.cpp" />
@@ -174,6 +176,9 @@
     <ClCompile Include="src\mitigation\mitigations\MitigateM1054-WSC.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV71769.cpp" />
     <ClCompile Include="src\mitigation\mitigations\MitigateV73511.cpp" />
+    <ClCompile Include="src\mitigation\policy\CombinePolicy.cpp" />
+    <ClCompile Include="src\mitigation\policy\MitigationPolicy.cpp" />
+    <ClCompile Include="src\mitigation\policy\RegistryPolicy.cpp" />
     <ClCompile Include="src\monitor\EventListener.cpp" />
     <ClCompile Include="src\reaction\CarveMemory.cpp" />
     <ClCompile Include="src\scan\Detection.cpp" />

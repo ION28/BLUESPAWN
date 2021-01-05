@@ -2,6 +2,9 @@
 
 #include <string>
 #include <optional>
+#include <vector>
+
+#include "mitigation/Software.h"
 
 enum class EnforcementLevel {
 	None = 0,
@@ -34,6 +37,9 @@ class MitigationPolicy {
 
 	/// The level at which this mitigaiton policy should begin to be enforced. This should be Low, Moderate, or High
 	EnforcementLevel level;
+
+	/// Idenfies the minimum and maximum versions of the software for which this mitigation policy applies.
+	std::optional<Version> minVersion, maxVersion;
 
 public:
 
@@ -102,4 +108,13 @@ public:
 	 * \return The minimum level at which the MitigationPolicy will be enforced by default.
 	 */
 	EnforcementLevel GetEnforcementLevel() const;
+
+	/**
+	 * \brief Check if the version given meets the required versions for this mitigation policies. 
+	 *
+	 * \note If nullopt is passed in, this returns true if and only if the min and max versions for this policy are
+	 *       both nullopt. If the min or max version is nullopt, it is treated as not having a minimum or maximum 
+	 *       version respectively. 
+	 */
+	bool GetVersionMatch(std::optional<Version> version) const;
 };
