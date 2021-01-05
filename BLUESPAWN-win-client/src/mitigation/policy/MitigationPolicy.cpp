@@ -11,8 +11,9 @@ void MitigationPolicy::SetEnforced(bool enforce){ isEnforced = enforce; }
 void MitigationPolicy::SetEnforced(EnforcementLevel level){ isEnforced = level >= this->level; }
 
 MitigationPolicy::MitigationPolicy(const std::wstring& name, EnforcementLevel level, 
-								   const std::optional<std::wstring>& description) : name{ name }, level{ level }, 
-	                                                                                 description{ description }{}
+								   const std::optional<std::wstring>& description,
+								   const std::optional<Version>& min, const std::optional<Version>& max) : 
+	name{ name }, level{ level }, description{ description }, minVersion{ min }, maxVersion{ max }{}
 
 bool MitigationPolicy::GetVersionMatch(std::optional<Version> version) const{
 	if(minVersion == std::nullopt && maxVersion == std::nullopt){

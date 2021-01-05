@@ -7,15 +7,17 @@
 #include "util/StringUtils.h"
 
 RegistryPolicy::RegistryPolicy(const RegistryKey& key, const std::wstring& name, EnforcementLevel level,
-							   const std::optional<std::wstring>& description) :
-	MitigationPolicy(name, level, description), key{ key }{}
+							   const std::optional<std::wstring>& description,
+							   const std::optional<Version>& min, const std::optional<Version>& max) :
+	MitigationPolicy(name, level, description, min, max), key{ key }{}
 
 RegistryPolicy::ValuePolicy::ValuePolicy(const RegistryKey& key, const std::wstring& valueName, 
 										 const RegistryData& data, ValuePolicyType policyType, 
 										 const std::wstring& name, EnforcementLevel level,
 										 const std::optional<std::wstring>& description,
-										 const std::optional<RegistryData>& replacement) :
-	RegistryPolicy(key, name, level, description), 
+										 const std::optional<RegistryData>& replacement,
+										 const std::optional<Version>& min, const std::optional<Version>& max) :
+	RegistryPolicy(key, name, level, description, min, max), 
 	valueName{ valueName }, data{ data }, policyType{ policyType }, replacement{ replacement }{}
 
 std::vector<std::wstring>& ReadMultiValue(RegistryValue& value, const std::wstring& name){
@@ -205,9 +207,10 @@ bool RegistryPolicy::ValuePolicy::MatchesSystem() const{
 }
 
 RegistryPolicy::SubkeyPolicy::SubkeyPolicy(const RegistryKey& key, const std::vector<std::wstring>& subkeyNames,
-										   SubkeyPolicyType policyType, const std::wstring& name, EnforcementLevel level,
-										   const std::optional<std::wstring>& description) :
-	RegistryPolicy(key, name, level, description),
+										   SubkeyPolicyType policyType, const std::wstring& name, 
+										   EnforcementLevel level, const std::optional<std::wstring>& description, 
+										   const std::optional<Version>& min, const std::optional<Version>& max) :
+	RegistryPolicy(key, name, level, description, min, max),
 	subkeyNames(subkeyNames.begin(), subkeyNames.end()), policyType{ policyType }{}
 
 bool RegistryPolicy::SubkeyPolicy::Enforce() const{

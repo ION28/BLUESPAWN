@@ -53,9 +53,12 @@ public:
 	 *        Moderate, or High
 	 * \param description An optional explanation for the policy (i.e. "Anonymously accessible named pipes can be used 
 	 *        in X, Y and Z attacks and should be disabled. See abc.com/xyz for more info [v-123]")
+	 * \param min The minimum version of the associated software where this policy applies
+	 * \param max The maximum version of the associated software where this policy applies
 	 */
 	MitigationPolicy(const std::wstring& name, EnforcementLevel level, 
-					 const std::optional<std::wstring>& description = std::nullopt);
+					 const std::optional<std::wstring>& description = std::nullopt,
+					 const std::optional<Version>& min = std::nullopt, const std::optional<Version>& max = std::nullopt);
 
 	/**
 	 * \brief Enforces the mitgiation policy, applying the change to the system.

@@ -56,11 +56,14 @@ public:
 	 *        in X, Y and Z attacks and should be disabled. See abc.com/xyz for more info [v-123]")
 	 * \param replacement An optional replacement for the data. This is only used if the policyType is ForbidExact and 
 	 *        the value holds the forbidden data. If this is nullopt, the value will be deleted.
+	 * \param min The minimum version of the associated software where this policy applies
+	 * \param max The maximum version of the associated software where this policy applies
 	 */
 	ValuePolicy(const RegistryKey& key, const std::wstring& valueName, const RegistryData& data, 
 				ValuePolicyType policyType, const std::wstring& name, EnforcementLevel level, 
 				const std::optional<std::wstring>& description = std::nullopt, 
-				const std::optional<RegistryData>& replacement = std::nullopt);
+				const std::optional<RegistryData>& replacement = std::nullopt,
+				const std::optional<Version> & min = std::nullopt, const std::optional<Version> & max = std::nullopt);
 
 	/**
 	 * \brief Enforces the mitgiation policy, applying the change to the system.
