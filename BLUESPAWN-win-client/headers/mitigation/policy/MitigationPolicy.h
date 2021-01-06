@@ -14,6 +14,8 @@ enum class EnforcementLevel {
 	All = 4,
 };
 
+class CombinePolicy;
+
 /**
  * \brief A policy to be enforced by a mitigation. Each mitigation policy represents a single setting,
  *        configuration, or change to be enforced. 
@@ -41,6 +43,8 @@ protected:
 
 	/// Idenfies the minimum and maximum versions of the software for which this mitigation policy applies.
 	std::optional<Version> minVersion, maxVersion;
+
+	friend class CombinePolicy;
 
 public:
 

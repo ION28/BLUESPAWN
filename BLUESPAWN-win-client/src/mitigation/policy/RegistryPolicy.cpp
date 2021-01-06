@@ -7,6 +7,8 @@
 #include "user/bluespawn.h"
 #include "util/StringUtils.h"
 
+#include <assert.h>
+
 RegistryPolicy::RegistryPolicy(const RegistryKey& key,
                                const std::wstring& name,
                                EnforcementLevel level,
@@ -31,22 +33,65 @@ RegistryPolicy::ValuePolicy::ValuePolicy(const RegistryKey& key,
 
 RegistryPolicy::ValuePolicy::ValuePolicy(json policy) : 
     RegistryPolicy(HKEY_LOCAL_MACHINE, L"", EnforcementLevel::None){
-    assert(policy.find("key-path") != policy.end());
     assert(policy.find("name") != policy.end());
-    // assert(policy.find("description") != policy.end());
     assert(policy.find("enforcement-level") != policy.end());
-    // assert(policy.find("min-software-version") != policy.end());
-    // assert(policy.find("max-software-version") != policy.end());
+    assert(policy.find("key-path") != policy.end());
     assert(policy.find("value-name") != policy.end());
     assert(policy.find("data-value") != policy.end());
     assert(policy.find("data-type") != policy.end());
     assert(policy.find("registry-value-policy-type") != policy.end());
 
-    key = RegistryKey(StringToWidestring(policy["key-path"]));
-    name = StringToWidestring(policy["name"]);
+    name = StringToWidestring(policy["name"].get<std::string>());
     description = policy.find("description") != policy.end() ? 
         std::optional<std::wstring>(StringToWidestring(policy["description"].get<std::string>())) : std::nullopt;
 
+    auto levelString{ ToLowerCaseA(policy["enforcement-level"].get<std::string>()) };
+    if(levelString == "low"){ level = EnforcementLevel::Low; }
+    else if(levelString == "moderate"){ level = EnforcementLevel::Moderate; }
+    else if(levelString == "high"){ level = EnforcementLevel::High; }
+    else throw std::exception(("Unknown enforcement level: " + levelString).c_str());
+
+    minVersion = policy.find("min-software-version") != policy.end() ?
+        std::optional<Version>(StringToWidestring(policy["min-software-version"].get<std::string>())) : std::nullopt;
+    maxVersion = policy.find("max-software-version") != policy.end() ?
+        std::optional<Version>(StringToWidestring(policy["max-software-version"].get<std::string>())) : std::nullopt;
+
+    key = RegistryKey(StringToWidestring(policy["key-path"].get<std::string>()));
+    valueName = StringToWidestring(policy["value-name"].get<std::string>());
+
+    auto typeString{ ToLowerCaseA(policy["registry-value-policy-type"].get<std::string>()) };
+    if(typeString == "forbid-exact"){ policyType = ValuePolicyType::ForbidExact; }
+    else if(typeString == "forbid-subset-of"){ policyType = ValuePolicyType::ForbidSubsetOf; }
+    else if(typeString == "require-subset-of"){ policyType = ValuePolicyType::RequireSubsetOf; }
+    else if(typeString == "require-exact"){ policyType = ValuePolicyType::RequireExact; }
+    else if(typeString == "require-as-subset"){ policyType = ValuePolicyType::RequireAsSubset; }
+    else throw std::exception(("Unknown registry policy type: " + typeString).c_str());
+
+    auto datatypeString{ ToLowerCaseA(policy["data-type"].get<std::string>()) };
+    if(datatypeString == "reg_dword"){ 
+        assert(typeString == "forbid-exact" || typeString == "require-exact");
+        data = policy["data-value"].get<DWORD>();
+    } else if(datatypeString == "reg_sz"){
+        assert(typeString == "forbid-exact" || typeString == "require-exact");
+        data = StringToWidestring(policy["data-value"].get<std::string>());
+    }
+    else if(datatypeString == "reg_multi_sz"){ 
+        std::vector<std::wstring> dataValue{};
+        for(auto& entry : policy["data-value"]){
+            dataValue.emplace_back(StringToWidestring(entry.get<std::string>()));
+        }
+        data = dataValue;
+    }
+    else if(datatypeString == "reg_binary"){
+        assert(typeString == "forbid-exact" || typeString == "require-exact");
+        auto stringRepresentation{ policy["data-value"].get<std::string>() };
+        auto len{ stringRepresentation.size() };
+        AllocationWrapper dataValue(HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, len), len, 
+                                    AllocationWrapper::HEAP_ALLOC);
+        CopyMemory(dataValue, stringRepresentation.data(), len);
+        data = dataValue;
+    }
+    else throw std::exception(("Unknown registry data type: " + datatypeString).c_str());
 }
 
 std::vector<std::wstring>& ReadMultiValue(RegistryValue& value, const std::wstring& name) {
@@ -243,6 +288,41 @@ RegistryPolicy::SubkeyPolicy::SubkeyPolicy(const RegistryKey& key,
                                            const std::optional<Version>& max) :
     RegistryPolicy(key, name, level, description, min, max),
     subkeyNames(subkeyNames.begin(), subkeyNames.end()), policyType{ policyType } {}
+
+RegistryPolicy::SubkeyPolicy::SubkeyPolicy(json policy) :
+    RegistryPolicy(HKEY_LOCAL_MACHINE, L"", EnforcementLevel::None){
+    assert(policy.find("name") != policy.end());
+    assert(policy.find("enforcement-level") != policy.end());
+    assert(policy.find("key-path") != policy.end());
+    assert(policy.find("subkey-names") != policy.end());
+    assert(policy.find("subkey-policy-type") != policy.end());
+
+    name = StringToWidestring(policy["name"].get<std::string>());
+    description = policy.find("description") != policy.end() ?
+        std::optional<std::wstring>(StringToWidestring(policy["description"].get<std::string>())) : std::nullopt;
+
+    auto levelString{ ToLowerCaseA(policy["enforcement-level"].get<std::string>()) };
+    if(levelString == "low"){ level = EnforcementLevel::Low; } 
+    else if(levelString == "moderate"){ level = EnforcementLevel::Moderate; } 
+    else if(levelString == "high"){ level = EnforcementLevel::High; } 
+    else throw std::exception(("Unknown enforcement level: " + levelString).c_str());
+
+    minVersion = policy.find("min-software-version") != policy.end() ?
+        std::optional<Version>(StringToWidestring(policy["min-software-version"].get<std::string>())) : std::nullopt;
+    maxVersion = policy.find("max-software-version") != policy.end() ?
+        std::optional<Version>(StringToWidestring(policy["max-software-version"].get<std::string>())) : std::nullopt;
+
+    key = RegistryKey(StringToWidestring(policy["key-path"].get<std::string>()));
+
+    auto typeString{ ToLowerCaseA(policy["subkey-policy-type"].get<std::string>()) };
+    if(typeString == "blacklist"){ policyType = SubkeyPolicyType::Blacklist; } 
+    else if(typeString == "whitelist"){ policyType = SubkeyPolicyType::Whitelist; } 
+    else throw std::exception(("Unknown registry policy type: " + typeString).c_str());
+
+    for(auto& entry : policy["data-value"]){
+        subkeyNames.emplace(StringToWidestring(entry.get<std::string>()));
+    }
+}
 
 bool RegistryPolicy::SubkeyPolicy::Enforce() const {
     if(IsEnforced()) {

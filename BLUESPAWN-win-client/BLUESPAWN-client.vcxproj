@@ -45,6 +45,7 @@
     <ClInclude Include="headers\mitigation\mitigations\MitigateV73511.h" />
     <ClInclude Include="headers\mitigation\policy\SubkeyPolicy.h" />
     <ClInclude Include="headers\mitigation\policy\ValuePolicy.h" />
+    <ClInclude Include="headers\mitigation\Software.h" />
     <ClInclude Include="headers\monitor\EventListener.h" />
     <ClInclude Include="headers\reaction\CarveMemory.h" />
     <ClInclude Include="headers\reaction\DeleteFile.h" />
@@ -179,6 +180,7 @@
     <ClCompile Include="src\mitigation\policy\CombinePolicy.cpp" />
     <ClCompile Include="src\mitigation\policy\MitigationPolicy.cpp" />
     <ClCompile Include="src\mitigation\policy\RegistryPolicy.cpp" />
+    <ClCompile Include="src\mitigation\Software.cpp" />
     <ClCompile Include="src\monitor\EventListener.cpp" />
     <ClCompile Include="src\reaction\CarveMemory.cpp" />
     <ClCompile Include="src\scan\Detection.cpp" />
@@ -288,6 +290,7 @@
   <ItemGroup>
     <None Include=".clang-format" />
     <None Include="resources\indicators" />
+    <None Include="resources\mitigations.json" />
     <None Include="resources\severe" />
     <None Include="resources\severe2" />
     <None Include="resources\SIP" />

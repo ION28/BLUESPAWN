@@ -50,9 +50,7 @@ class CombinePolicy : public MitigationPolicy {
                   const std::wstring& name,
                   EnforcementLevel level,
                   const std::optional<std::wstring>& description = std::nullopt,
-                  Mode mode = Mode::AND,
-                  const std::optional<Version>& min = std::nullopt,
-                  const std::optional<Version>& max = std::nullopt);
+                  Mode mode = Mode::AND);
 
     /**
 	 * \brief Instantiates a CombinePolicy object from a json configuration. This may throw exceptions.

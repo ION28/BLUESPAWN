@@ -30,9 +30,9 @@ Mitigation::Mitigation(json mitigation) : software(L"", L""){
         software = Software(mitigation["software"], mitigation["software-description"]);
     }
     for(auto& policy : mitigation["policies"]){
-        assert(policy.find("registry-value-policy") != policy.end());
+        assert(policy.find("policy-type") != policy.end());
 
-        auto type{ policy["registry-value-policy"].get<std::string>() };
+        auto type{ policy["policy-type"].get<std::string>() };
         if(type == "registry-value-policy"){
             policies.emplace_back(std::make_unique<RegistryPolicy::ValuePolicy>(policy));
         } else if(type == "registry-subkey-policy"){
