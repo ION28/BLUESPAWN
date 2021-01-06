@@ -9,14 +9,14 @@
 using namespace Registry;
 
 namespace Mitigations{
-	Mitigation M1025(
-		L"M1025 - Privileged Process Integrity",
-		L"Protect processes with high privileges that can be used to interact with critical system components through "
+	Mitigation M1025{
+		std::wstring(L"M1025 - Privileged Process Integrity"),
+		std::wstring(L"Protect processes with high privileges that can be used to interact with critical system components through "
 		"use of protected process light, anti-process injection defenses, or other process integrity enforcement "
-		"measures.",
+		"measures."),
 		WindowsOS(),
 		{
-			RegistryPolicy::ValuePolicy(
+			std::make_unique<RegistryPolicy::ValuePolicy>(
 				RegistryKey{ HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Lsa" },
 				L"RunAsPPL", 1, RegistryPolicy::ValuePolicy::ValuePolicyType::RequireExact,
 				L"Run LSA as PPL", EnforcementLevel::Moderate, L"Run the Local Security Authority as a Protected "
@@ -24,5 +24,5 @@ namespace Mitigations{
 				Version{ 6, 3 }
 			)
 		}
-	);
+	};
 }

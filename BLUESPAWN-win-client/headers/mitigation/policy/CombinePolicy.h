@@ -1,37 +1,36 @@
 #pragma once
 
-#include "mitigation/policy/MitigationPolicy.h"
-
-#include <vector>
 #include <memory>
+#include <vector>
+
+#include "mitigation/policy/MitigationPolicy.h"
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 /**
  * \brief Combines two or more mitigation policy objects into just one object. The policy may require all of or just 
  *        one of the policies being combined to be enforced.
  */
 class CombinePolicy : public MitigationPolicy {
+    /// Stores pointers to the MitigationPolicies being combined
+    std::vector<std::unique_ptr<MitigationPolicy>> subpolicies;
 
-	/// Stores pointers to the MitigationPolicies being combined
-	std::vector<std::unique_ptr<MitigationPolicy>> subpolicies;
-
-public:
-
-	/**
+    public:
+    /**
 	 * \brief Refers to an enforcement mode for the policy. It may require all subpolicies to be enforced, or just one.
 	 */
-	enum class Mode {
-		OR,    /// Requires just one subpolicy to be enforced
-		AND    /// Requires that all subpolicies be enforced
-	};
+    enum class Mode {
+        OR,   /// Requires just one subpolicy to be enforced
+        AND   /// Requires that all subpolicies be enforced
+    };
 
-protected:
+    protected:
+    /// Tracks the mode of this mitigation policy
+    Mode mode;
 
-	/// Tracks the mode of this mitigation policy
-	Mode mode;
-
-public:
-
-	/**
+    public:
+    /**
 	 * \brief Constructs a CombinePolicy object with the specified subpolicies and mode, defaulting to requiring all 
 	 *        subpolicies to be enforced.
 	 * 
@@ -47,24 +46,34 @@ public:
 	 * \param min The minimum version of the associated software where this policy applies
 	 * \param max The maximum version of the associated software where this policy applies
 	 */
-	CombinePolicy(std::vector<std::unique_ptr<MitigationPolicy>> subpolicies, const std::wstring& name, 
-				  EnforcementLevel level, const std::optional<std::wstring>& description = std::nullopt, 
-				  Mode mode = Mode::AND, const std::optional<Version>& min = std::nullopt, 
-				  const std::optional<Version>& max = std::nullopt);
+    CombinePolicy(std::vector<std::unique_ptr<MitigationPolicy>> subpolicies,
+                  const std::wstring& name,
+                  EnforcementLevel level,
+                  const std::optional<std::wstring>& description = std::nullopt,
+                  Mode mode = Mode::AND,
+                  const std::optional<Version>& min = std::nullopt,
+                  const std::optional<Version>& max = std::nullopt);
 
-	/**
+    /**
+	 * \brief Instantiates a CombinePolicy object from a json configuration. This may throw exceptions.
+	 *
+	 * \param config The json object storing information about how the policy should be created.
+	 */
+    CombinePolicy(json config);
+
+    /**
 	 * \brief Enforces the mitgiation policy, applying the change to the system. If the policy does not currently match
 	 *        the system if the enforcement mode is OR, only the first subpolicy specified when constructed will be 
 	 *        enforced.
 	 *
 	 * \return True if the system has the mitigation policy enforced; false otherwise.
 	 */
-	virtual bool Enforce() const;
+    virtual bool Enforce() const;
 
-	/**
+    /**
 	 * \brief Checks if the changes specified by the subpolicies and mode match the current state of the system.
 	 *
 	 * \return True if the system has the changes specified by the mitigation policy enforced; false otherwise.
 	 */
-	virtual bool MatchesSystem() const;
+    virtual bool MatchesSystem() const;
 };

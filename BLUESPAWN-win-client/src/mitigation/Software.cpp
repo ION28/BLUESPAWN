@@ -78,7 +78,11 @@ bool Version::operator>=(const Version& v) const{ return !(*this < v); }
 bool Version::operator!=(const Version& v) const{ return !(*this == v); }
 
 Software::Software(const std::wstring& name, const std::wstring& description) : 
-	name{ name }, description{ description }, version{ std::nullopt }{
+	name{ name }, description{ description }, present{ false }, version{ std::nullopt }{
+
+	if(!name.length()){
+		return;
+	}
 
 	WCHAR guid[39];
 	for(int i = 0; !MsiEnumProductsW(0, guid); i++){

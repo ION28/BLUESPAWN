@@ -1,6 +1,9 @@
 #pragma once
 
 #include "mitigation/policy/RegistryPolicy.h"
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 using namespace Registry;
 
@@ -64,6 +67,13 @@ public:
 				const std::optional<std::wstring>& description = std::nullopt, 
 				const std::optional<RegistryData>& replacement = std::nullopt,
 				const std::optional<Version> & min = std::nullopt, const std::optional<Version> & max = std::nullopt);
+
+	/**
+	 * \brief Instantiates a ValuePolicy object from a json configuration. This may throw exceptions.
+	 * 
+	 * \param config The json object storing information about how the policy should be created.
+	 */
+	ValuePolicy(json config);
 
 	/**
 	 * \brief Enforces the mitgiation policy, applying the change to the system.

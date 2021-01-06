@@ -23,6 +23,7 @@ enum class EnforcementLevel {
  *       be implemented by instantiating a RegistryPolicy and specifying the keys and values in question.
  */
 class MitigationPolicy {
+protected:
 
 	/// A boolean tracking whether the policy should be enforced
 	bool isEnforced;

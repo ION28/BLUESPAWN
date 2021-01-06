@@ -1,8 +1,11 @@
 #pragma once
 
-#include "mitigation/policy/RegistryPolicy.h"
-
 #include <set>
+
+#include "mitigation/policy/RegistryPolicy.h"
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 using namespace Registry;
 
@@ -10,28 +13,25 @@ using namespace Registry;
  * \brief Implements a RegistryPolicy for enforcement of policies over subkeys of a specified registry key
  */
 class RegistryPolicy::SubkeyPolicy : public RegistryPolicy {
-public:
-
-	/**
+    public:
+    /**
 	 * \brief Describes the manner in the value policy affects the registry
 	 */
-	enum class SubkeyPolicyType {
-		Whitelist, /// Allow only the subkey names specified by this policy
-		Blacklist  /// Do not allow the subkey names specified by this policy
-	};
+    enum class SubkeyPolicyType {
+        Whitelist,   /// Allow only the subkey names specified by this policy
+        Blacklist    /// Do not allow the subkey names specified by this policy
+    };
 
-protected:
+    protected:
+    /// The names of subkeys to check for.
+    std::set<std::wstring> subkeyNames;
 
-	/// The names of subkeys to check for.
-	std::set<std::wstring> subkeyNames;
+    /// The type of policy to be enforced.
+    SubkeyPolicyType policyType;
 
-	/// The type of policy to be enforced.
-	SubkeyPolicyType policyType;
-
-public:
-
-	/**
-	 * \brief Instantiates a ValuePolicy object.
+    public:
+    /**
+	 * \brief Instantiates a SubkeyPolicy object.
 	 *
 	 * \param key The registry key associated with this registry policy
 	 * \param subkeyNames The names of subkeys this policy looks for. This is interpretted according to the policyType.
@@ -45,22 +45,33 @@ public:
 	 * \param min The minimum version of the associated software where this policy applies
 	 * \param max The maximum version of the associated software where this policy applies
 	 */
-	SubkeyPolicy(const RegistryKey& key, const std::vector<std::wstring>& subkeyNames,
-				 SubkeyPolicyType policyType, const std::wstring& name, EnforcementLevel level,
-				 const std::optional<std::wstring>& description = std::nullopt,
-				 const std::optional<Version>& min = std::nullopt, const std::optional<Version>& max = std::nullopt);
+    SubkeyPolicy(const RegistryKey& key,
+                 const std::vector<std::wstring>& subkeyNames,
+                 SubkeyPolicyType policyType,
+                 const std::wstring& name,
+                 EnforcementLevel level,
+                 const std::optional<std::wstring>& description = std::nullopt,
+                 const std::optional<Version>& min = std::nullopt,
+                 const std::optional<Version>& max = std::nullopt);
 
-	/**
+    /**
+	 * \brief Instantiates a SubkeyPolicy object from a json configuration. This may throw exceptions.
+	 *
+	 * \param config The json object storing information about how the policy should be created.
+	 */
+    SubkeyPolicy(json config);
+
+    /**
 	 * \brief Enforces the mitgiation policy, applying the change to the system.
 	 *
 	 * \return True if the system has the mitigation policy enforced; false otherwise.
 	 */
-	virtual bool Enforce() const;
+    virtual bool Enforce() const;
 
-	/**
+    /**
 	 * \brief Checks if the changes specified by the mitigation policy match the current state of the system.
 	 *
 	 * \return True if the system has the changes specified by the mitigation policy enforced; false otherwise.
 	 */
-	virtual bool MatchesSystem() const;
+    virtual bool MatchesSystem() const;
 };

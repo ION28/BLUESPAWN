@@ -1,8 +1,9 @@
 #include "mitigation/policy/CombinePolicy.h"
 
 CombinePolicy::CombinePolicy(std::vector<std::unique_ptr<MitigationPolicy>> subpolicies, const std::wstring& name,
-							 EnforcementLevel level, const std::optional<std::wstring>& description, Mode mode) :
-	MitigationPolicy(name, level, description), subpolicies{ std::move(subpolicies) }, mode{ mode }{}
+							 EnforcementLevel level, const std::optional<std::wstring>& description, Mode mode,
+							 const std::optional<Version>& min, const std::optional<Version>& max) :
+	MitigationPolicy(name, level, description, min, max), subpolicies{ std::move(subpolicies) }, mode{ mode }{}
 
 bool CombinePolicy::Enforce() const{
 	if(IsEnforced()){

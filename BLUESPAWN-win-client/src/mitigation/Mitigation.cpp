@@ -1,6 +1,9 @@
 #include "mitigation/Mitigation.h"
 
 #include "mitigation/MitigationRegister.h"
+#include "mitigation/policy/ValuePolicy.h"
+#include "mitigation/policy/SubkeyPolicy.h"
+#include "mitigation/policy/CombinePolicy.h"
 
 Mitigation::Mitigation(const std::wstring& name,
                        const std::wstring& description,
@@ -8,8 +11,37 @@ Mitigation::Mitigation(const std::wstring& name,
                        std::initializer_list<std::unique_ptr<MitigationPolicy>> policies) :
     name{ name },
     description{ description }, software{ software } {
-    for(auto& policy : policies) {
+    for(auto& policy : policies){
         this->policies.emplace_back(std::move(policy));
+    }
+}
+
+Mitigation::Mitigation(json mitigation) : software(L"", L""){
+    assert(mitigation.find("name") != mitigation.end());
+    assert(mitigation.find("description") != mitigation.end());
+    assert(mitigation.find("software") != mitigation.end());
+    assert(mitigation.find("policies") != mitigation.end());
+
+    name = mitigation["name"];
+    description = mitigation["description"];
+    if(mitigation["software"] == "Windows"){
+        software = WindowsOS();
+    } else{
+        software = Software(mitigation["software"], mitigation["software-description"]);
+    }
+    for(auto& policy : mitigation["policies"]){
+        assert(policy.find("registry-value-policy") != policy.end());
+
+        auto type{ policy["registry-value-policy"].get<std::string>() };
+        if(type == "registry-value-policy"){
+            policies.emplace_back(std::make_unique<RegistryPolicy::ValuePolicy>(policy));
+        } else if(type == "registry-subkey-policy"){
+            policies.emplace_back(std::make_unique<RegistryPolicy::SubkeyPolicy>(policy));
+        } else if(type == "combined-policy"){
+            policies.emplace_back(std::make_unique<CombinePolicy>(policy));
+        } else{
+            throw std::exception(("Unknown mitigation policy type \"" + type + "\"").c_str());
+        }
     }
 }
 

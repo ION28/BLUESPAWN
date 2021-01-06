@@ -5,15 +5,14 @@
 #include <vector>
 
 class MitigationRegister {
-
+	
 public:
 	MitigationRegister(const IOBase& oIo);
-	void RegisterMitigation(std::shared_ptr<Mitigation> mitigation);
-	void AuditMitigations(SecurityLevel securityLevel);
-	void EnforceMitigations(SecurityLevel securityLevel, bool bForceEnforce);
+
+	bool ParseMitigationsJSON(const std::wstring& path);
+	bool ParseMitigationsJSON(const AllocationWrapper& data);
 
 private:
-	std::vector<std::shared_ptr<Mitigation>> vRegisteredMitigations{};
-	const IOBase& io;
+	std::vector<Mitigation> registeredMitigations{};
 };
 

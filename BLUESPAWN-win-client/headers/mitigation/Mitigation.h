@@ -5,6 +5,10 @@
 #include "mitigation/Software.h"
 #include "mitigation/policy/MitigationPolicy.h"
 
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
+
 /**
  * \brief Describes how a mitigation should be applied to the system by specifying a default enforcement level and 
  *        providing a list of mitigation policies for which the default application should be overriden.
@@ -88,6 +92,8 @@ class Mitigation {
                const std::wstring& description,
                const Software& software,
                std::initializer_list<std::unique_ptr<MitigationPolicy>> policies);
+
+    Mitigation(json mitigation);
 
     /**
 	 * \brief Compares the current state of the system against the requirements set forth by the mitigation policies.

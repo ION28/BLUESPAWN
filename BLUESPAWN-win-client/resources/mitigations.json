@@ -1,0 +1,24 @@
+{
+	"mitigations": [
+		{
+			"name": "M1025 - Privileged Process Integrity",
+			"description": "Protect processes with high privileges that can be used to interact with critical system components through use of protected process light, anti-process injection defenses, or other process integrity enforcement measures",
+			"software": "Windows",
+			"policies": [
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Run LSA As PPL",
+					"description": "Run the Local Security Authority as a Protected Process Lite, preventing process injection and other attacks on lsass.exe's memory",
+					"enforcement-level": "moderate",
+					"min-software-version": "6.3",
+					"max-software-version": null, // this may be omitted entirely
+					"key-path": "HKLM\\System\\CurrentControlSet\\Control\\Lsa",
+					"value-name": "RunAsPPL",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				}
+			]
+		}
+	]
+}
