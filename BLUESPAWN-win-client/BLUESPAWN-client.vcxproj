@@ -128,7 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="external\tinyxml2\tinyxml2.cpp" />
-    <ClCompile Include="headers\mitigation\policy\RegistryPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\RegistryPolicy.h" />
     <ClCompile Include="src\hunt\Hunt.cpp" />
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1036.cpp" />

@@ -14,7 +14,9 @@ MitigationsConfiguration::MitigationsConfiguration(EnforcementLevel level){
 	}
 }
 
-MitigationRegister::MitigationRegister(){
+MitigationRegister::MitigationRegister(){}
+
+void MitigationRegister::Initialize(){
 	auto hRsrcInfo = FindResourceW(nullptr, MAKEINTRESOURCE(DefaultMitigations), L"textfile");
 	if(!hRsrcInfo){
 		LOG_ERROR("Unable to load default mitigations");

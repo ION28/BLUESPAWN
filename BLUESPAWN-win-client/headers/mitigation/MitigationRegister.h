@@ -25,6 +25,8 @@ class MitigationRegister {
 public:
     MitigationRegister();
 
+    void Initialize();
+
     std::map<Mitigation*, MitigationReport> EnforceMitigations(const MitigationsConfiguration& config) const;
     std::map<Mitigation*, MitigationReport> AuditMitigations(const MitigationsConfiguration& config) const;
 

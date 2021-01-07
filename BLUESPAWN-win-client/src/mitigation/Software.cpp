@@ -82,7 +82,7 @@ bool Version::operator!=(const Version& v) const{ return !(*this == v); }
 Software::Software(const std::wstring& name, const std::wstring& description) : 
 	name{ name }, description{ description }, present{ false }, version{ std::nullopt }{
 
-	if(!name.length() || name == L"Windows"){
+	if(!name.length()){
 		return;
 	}
 
@@ -115,7 +115,9 @@ bool Software::IsPresent() const {
 std::optional<Version> Software::GetVersion() const{
 	return version;
 }
-WindowsOS::WindowsOS() : Software(L"Windows", L"Base Windows operating system"){
+WindowsOS::WindowsOS() : Software(L"", L"Base Windows operating system"){
+	name = L"Windows";
+
 	auto versionInfoKey{ 
 		Registry::RegistryKey(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\WIndows NT\\CurrentVersion") };
 	auto majorVer{ *versionInfoKey.GetValue<DWORD>(L"CurrentMajorVersionNumber") };

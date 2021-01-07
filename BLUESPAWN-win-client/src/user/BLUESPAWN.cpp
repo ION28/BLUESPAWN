@@ -77,6 +77,8 @@ Bluespawn::Bluespawn() {
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1562>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1569>());
 
+    mitigationRecord.Initialize();
+
     reactions.emplace("carve-memory", std::make_unique<Reactions::CarveMemoryReaction>());
     reactions.emplace("delete-file", std::make_unique<Reactions::DeleteFileReaction>());
     reactions.emplace("quarantine-file", std::make_unique<Reactions::QuarantineFileReaction>());
