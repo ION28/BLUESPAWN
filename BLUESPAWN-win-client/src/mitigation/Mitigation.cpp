@@ -5,10 +5,12 @@
 #include "mitigation/policy/SubkeyPolicy.h"
 #include "mitigation/policy/CombinePolicy.h"
 
+#include "util/StringUtils.h"
+
 Mitigation::Mitigation(const std::wstring& name,
                        const std::wstring& description,
                        const Software& software,
-                       std::initializer_list<std::unique_ptr<MitigationPolicy>> policies) :
+                       std::vector<std::unique_ptr<MitigationPolicy>> policies) :
     name{ name },
     description{ description }, software{ software } {
     for(auto& policy : policies){
@@ -22,21 +24,22 @@ Mitigation::Mitigation(json mitigation) : software(L"", L""){
     assert(mitigation.find("software") != mitigation.end());
     assert(mitigation.find("policies") != mitigation.end());
 
-    name = mitigation["name"];
-    description = mitigation["description"];
-    if(mitigation["software"] == "Windows"){
+    name = StringToWidestring(mitigation["name"].get<std::string>());
+    description = StringToWidestring(mitigation["description"].get<std::string>());
+    if(mitigation["software"].get<std::string>() == "Windows"){
         software = WindowsOS();
     } else{
-        software = Software(mitigation["software"], mitigation["software-description"]);
+        software = Software(StringToWidestring(mitigation["software"].get<std::string>()), 
+                            StringToWidestring(mitigation["software-description"].get<std::string>()));
     }
     for(auto& policy : mitigation["policies"]){
         assert(policy.find("policy-type") != policy.end());
 
         auto type{ policy["policy-type"].get<std::string>() };
         if(type == "registry-value-policy"){
-            policies.emplace_back(std::make_unique<RegistryPolicy::ValuePolicy>(policy));
+            policies.emplace_back(std::make_unique<ValuePolicy>(policy));
         } else if(type == "registry-subkey-policy"){
-            policies.emplace_back(std::make_unique<RegistryPolicy::SubkeyPolicy>(policy));
+            policies.emplace_back(std::make_unique<SubkeyPolicy>(policy));
         } else if(type == "combined-policy"){
             policies.emplace_back(std::make_unique<CombinePolicy>(policy));
         } else{
@@ -85,6 +88,7 @@ MitigationReport Mitigation::AuditMitigation(const MitigationConfiguration& conf
             } catch(std::exception& e) { report.results.emplace(policy.get(), MitigationReport::PolicyStatus::Failed); }
         }
     }
+    return report;
 }
 
 MitigationReport Mitigation::EnforceMitigation(const MitigationConfiguration& config) const {
@@ -101,6 +105,7 @@ MitigationReport Mitigation::EnforceMitigation(const MitigationConfiguration& co
             }
         }
     }
+    return report;
 }
 
 std::vector<MitigationPolicy*> Mitigation::GetPolicies() const {

@@ -207,6 +207,10 @@ public:
 		return CompareMemory(wrapper);
 	}
 
+	bool operator!=(const AllocationWrapper& wrapper) const{
+		return !CompareMemory(wrapper);
+	}
+
 	bool SetByte(SIZE_T offset, char value){
 		if(offset < AllocationSize){
 			pointer[offset] = value;

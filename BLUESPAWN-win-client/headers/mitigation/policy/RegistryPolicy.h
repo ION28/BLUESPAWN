@@ -7,6 +7,10 @@
 
 using namespace Registry;
 
+/// Forward declare subpolicies here for namespacing purposes
+class ValuePolicy;
+class SubkeyPolicy;
+
 /**
  * \brief Implements a mitigation policy pertaining to registry settings. This class is abstract;
  *        developers should instead instantiate one of its children describing more accurately what
@@ -17,11 +21,8 @@ class RegistryPolicy : public MitigationPolicy {
 	/// The key being referenced by this policy
 	RegistryKey key;
 
-public:
-
-	/// Forward declare subpolicies here for namespacing purposes
-	class ValuePolicy;
-	class SubkeyPolicy;
+	friend class ValuePolicy;
+	friend class SubkeyPolicy;
 
 protected:
 

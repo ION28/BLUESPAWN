@@ -19,6 +19,7 @@
 #include "reaction/ReactionManager.h"
 #include "scan/DetectionRegister.h"
 #include "user/banners.h"
+#include "user/CLI.h"
 
 enum class BluespawnMode { HUNT, SCAN, MONITOR, MITIGATE };
 
@@ -42,6 +43,7 @@ class Bluespawn {
 
     void check_correct_arch();
 
+    static const IOBase& io;
     static HuntRegister huntRecord;
     static MitigationRegister mitigationRecord;
     static Aggressiveness aggressiveness;
@@ -50,5 +52,4 @@ class Bluespawn {
     static bool EnablePreScanDetections;
 
     static ReactionManager reaction;
-    static const IOBase& io;
 };

@@ -5,6 +5,8 @@
 #include <Windows.h>
 #include <Msi.h>
 
+#pragma comment(lib, "Msi.lib")
+
 Version::Version(std::initializer_list<uint32_t> list) : version{ std::move(list) }{}
 Version::Version(const std::wstring& versionString){
 	auto parts{ SplitStringW(versionString.data(), L".") };
@@ -80,7 +82,7 @@ bool Version::operator!=(const Version& v) const{ return !(*this == v); }
 Software::Software(const std::wstring& name, const std::wstring& description) : 
 	name{ name }, description{ description }, present{ false }, version{ std::nullopt }{
 
-	if(!name.length()){
+	if(!name.length() || name == L"Windows"){
 		return;
 	}
 

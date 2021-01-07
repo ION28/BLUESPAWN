@@ -51,9 +51,9 @@ CombinePolicy::CombinePolicy(json policy) :
 	for(auto& subpolicy : policy["subpolicies"]){
 		auto type{ subpolicy["policy-type"].get<std::string>() };
 		if(type == "registry-value-policy"){
-			subpolicies.emplace_back(std::make_unique<RegistryPolicy::ValuePolicy>(subpolicy));
+			subpolicies.emplace_back(std::make_unique<ValuePolicy>(subpolicy));
 		} else if(type == "registry-subkey-policy"){
-			subpolicies.emplace_back(std::make_unique<RegistryPolicy::SubkeyPolicy>(subpolicy));
+			subpolicies.emplace_back(std::make_unique<SubkeyPolicy>(subpolicy));
 		} else if(type == "combined-policy"){
 			subpolicies.emplace_back(std::make_unique<CombinePolicy>(subpolicy));
 		} else{
@@ -69,6 +69,7 @@ bool CombinePolicy::Enforce() const{
 				if(subpolicies.size()){
 					return subpolicies[0]->Enforce();
 				}
+				return false;
 			} else{
 				bool enforced = true;
 				for(auto& subpolicy : subpolicies){

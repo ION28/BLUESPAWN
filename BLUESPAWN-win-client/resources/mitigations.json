@@ -11,7 +11,6 @@
 					"description": "Run the Local Security Authority as a Protected Process Lite, preventing process injection and other attacks on lsass.exe's memory",
 					"enforcement-level": "moderate",
 					"min-software-version": "6.3",
-					"max-software-version": null, // this may be omitted entirely
 					"key-path": "HKLM\\System\\CurrentControlSet\\Control\\Lsa",
 					"value-name": "RunAsPPL",
 					"data-value": 1,

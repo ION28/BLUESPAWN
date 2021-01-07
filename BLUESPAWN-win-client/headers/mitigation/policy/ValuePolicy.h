@@ -10,7 +10,7 @@ using namespace Registry;
 /**
  * \brief Implements a RegistryPolicy for enforcement of policies over registry values
  */
-class RegistryPolicy::ValuePolicy : public RegistryPolicy {
+class ValuePolicy : public RegistryPolicy {
 public:
 
 	/**

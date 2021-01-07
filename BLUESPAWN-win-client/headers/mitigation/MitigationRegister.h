@@ -1,18 +1,33 @@
 #pragma once
 
-#include "Mitigation.h"
-#include "user/CLI.h"
+#include <map>
 #include <vector>
+#include <string>
 
-class MitigationRegister {
-	
-public:
-	MitigationRegister(const IOBase& oIo);
+#include "Mitigation.h"
+#include "util/wrappers.hpp"
+#include "nlohmann/json.hpp"
 
-	bool ParseMitigationsJSON(const std::wstring& path);
-	bool ParseMitigationsJSON(const AllocationWrapper& data);
+using json = nlohmann::json;
 
-private:
-	std::vector<Mitigation> registeredMitigations{};
+struct MitigationsConfiguration {
+    // MitigationsConfiguration(json config);
+    MitigationsConfiguration(EnforcementLevel level);
+
+    std::map<Mitigation*, MitigationConfiguration> configurations;
 };
 
+class MitigationRegister {
+    std::vector<Mitigation> registeredMitigations{};
+
+    friend class MitigationsConfiguration;
+
+public:
+    MitigationRegister();
+
+    std::map<Mitigation*, MitigationReport> EnforceMitigations(const MitigationsConfiguration& config) const;
+    std::map<Mitigation*, MitigationReport> AuditMitigations(const MitigationsConfiguration& config) const;
+
+    bool ParseMitigationsJSON(const std::wstring& path);
+    bool ParseMitigationsJSON(const AllocationWrapper& data);
+};

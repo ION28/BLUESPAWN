@@ -429,54 +429,22 @@ namespace Registry {
 	template bool RegistryKey::SetValue<std::string>(const std::wstring& name, std::string value, DWORD size, 
 													 DWORD type) const;
 
-	template<>
-	bool RegistryKey::SetValue(const std::wstring& name, RegistryData value, DWORD size, DWORD type) const{
+	bool RegistryKey::SetDataValue(const std::wstring& name, RegistryData value) const{
 		auto idx = value.index();
 		if(idx == 0){
-			return SetValue<decltype(std::get<0>(value))>(name, std::get<0>(value));
+			return SetValue<std::wstring>(name, std::get<0>(value));
 		}
 		if(idx == 1){
-			return SetValue<decltype(std::get<1>(value))>(name, std::get<1>(value));
+			return SetValue<DWORD>(name, std::get<1>(value));
 		}
 		if(idx == 2){
-			return SetValue<decltype(std::get<2>(value))>(name, std::get<2>(value));
+			return SetRawValue(name, std::get<2>(value), REG_BINARY);
 		}
 		if(idx == 3){
-			return SetValue<decltype(std::get<3>(value))>(name, std::get<3>(value));
+			return SetValue<std::vector<std::wstring>>(name, std::get<3>(value));
 		} else{
 			throw std::exception("Unknown registry data type");
 		}
-	}
-	template bool RegistryKey::SetValue<RegistryData>(const std::wstring& name, RegistryData value, DWORD size, 
-													  DWORD type) const;
-
-	template<>
-	bool RegistryKey::SetValue(const std::wstring& name, std::vector<std::wstring> value, DWORD _size, DWORD type) const {
-		SIZE_T size = 1;
-		for(auto string : value){
-			size += (string.length() + 1);
-		}
-
-		auto data = new WCHAR[size];
-		auto allocation = AllocationWrapper{ data, static_cast<DWORD>(size * sizeof(WCHAR)), AllocationWrapper::CPP_ARRAY_ALLOC };
-		unsigned ptr = 0;
-
-		for(auto string : value){
-			LPCWSTR lpRawString = string.c_str();
-			for(unsigned i = 0; i < string.length() + 1; i++){
-				if(ptr < size){
-					data[ptr++] = lpRawString[i];
-				}
-			}
-		}
-
-		if(ptr < size){
-			data[ptr] = { static_cast<WCHAR>(0) };
-		}
-
-		bool succeeded = SetRawValue(name, allocation, REG_MULTI_SZ);
-
-		return succeeded;
 	}
 
 	template bool RegistryKey::SetValue<std::vector<std::wstring>>(const std::wstring& name, std::vector<std::wstring> value,

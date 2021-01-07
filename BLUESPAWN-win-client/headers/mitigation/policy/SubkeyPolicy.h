@@ -12,7 +12,7 @@ using namespace Registry;
 /**
  * \brief Implements a RegistryPolicy for enforcement of policies over subkeys of a specified registry key
  */
-class RegistryPolicy::SubkeyPolicy : public RegistryPolicy {
+class SubkeyPolicy : public RegistryPolicy {
     public:
     /**
 	 * \brief Describes the manner in the value policy affects the registry

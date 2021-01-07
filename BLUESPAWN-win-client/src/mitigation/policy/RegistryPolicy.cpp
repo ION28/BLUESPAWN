@@ -18,20 +18,20 @@ RegistryPolicy::RegistryPolicy(const RegistryKey& key,
     MitigationPolicy(name, level, description, min, max),
     key{ key } {}
 
-RegistryPolicy::ValuePolicy::ValuePolicy(const RegistryKey& key,
-                                         const std::wstring& valueName,
-                                         const RegistryData& data,
-                                         ValuePolicyType policyType,
-                                         const std::wstring& name,
-                                         EnforcementLevel level,
-                                         const std::optional<std::wstring>& description,
-                                         const std::optional<RegistryData>& replacement,
-                                         const std::optional<Version>& min,
-                                         const std::optional<Version>& max) :
+ValuePolicy::ValuePolicy(const RegistryKey& key,
+                         const std::wstring& valueName,
+                         const RegistryData& data,
+                         ValuePolicyType policyType,
+                         const std::wstring& name,
+                         EnforcementLevel level,
+                         const std::optional<std::wstring>& description,
+                         const std::optional<RegistryData>& replacement,
+                         const std::optional<Version>& min,
+                         const std::optional<Version>& max) :
     RegistryPolicy(key, name, level, description, min, max),
     valueName{ valueName }, data{ data }, policyType{ policyType }, replacement{ replacement } {}
 
-RegistryPolicy::ValuePolicy::ValuePolicy(json policy) : 
+ValuePolicy::ValuePolicy(json policy) : 
     RegistryPolicy(HKEY_LOCAL_MACHINE, L"", EnforcementLevel::None){
     assert(policy.find("name") != policy.end());
     assert(policy.find("enforcement-level") != policy.end());
@@ -113,21 +113,21 @@ std::vector<std::wstring>& ReadMultiValue(RegistryValue& value, const std::wstri
     return std::get<std::vector<std::wstring>>(value.data);
 }
 
-bool RegistryPolicy::ValuePolicy::Enforce() const {
+bool ValuePolicy::Enforce() const {
     if(IsEnforced()) {
         if(!MatchesSystem()) {
             if(policyType == ValuePolicyType::RequireExact) {
-                return key.SetValue(valueName, data);
+                return key.SetDataValue(valueName, data);
             } else if(policyType == ValuePolicyType::ForbidExact) {
                 if(replacement) {
-                    return key.SetValue(valueName, *replacement);
+                    return key.SetDataValue(valueName, *replacement);
                 } else {
                     return key.RemoveValue(valueName);
                 }
             } else if(policyType == ValuePolicyType::RequireAsSubset) {
                 auto curVal{ RegistryValue::Create(key, valueName) };
                 if(!curVal) {
-                    return key.SetValue(valueName, data);
+                    return key.SetDataValue(valueName, data);
                 }
 
                 try {
@@ -145,7 +145,7 @@ bool RegistryPolicy::ValuePolicy::Enforce() const {
                         }
                     }
                     return key.SetValue(valueName, regData);
-                } catch(std::exception& e) { return key.SetValue(valueName, data); }
+                } catch(std::exception& e) { return key.SetDataValue(valueName, data); }
             } else if(policyType == ValuePolicyType::RequireSubsetOf) {
                 auto curVal{ RegistryValue::Create(key, valueName) };
                 std::vector<std::wstring> fixedData{};
@@ -195,7 +195,7 @@ bool RegistryPolicy::ValuePolicy::Enforce() const {
     }
 }
 
-bool RegistryPolicy::ValuePolicy::MatchesSystem() const {
+bool ValuePolicy::MatchesSystem() const {
     if(policyType == ValuePolicyType::RequireExact) {
         return key.ValueExists(valueName) && RegistryValue::Create(key, valueName)->data == data;
     } else if(policyType == ValuePolicyType::ForbidExact) {
@@ -278,18 +278,18 @@ bool RegistryPolicy::ValuePolicy::MatchesSystem() const {
     }
 }
 
-RegistryPolicy::SubkeyPolicy::SubkeyPolicy(const RegistryKey& key,
-                                           const std::vector<std::wstring>& subkeyNames,
-                                           SubkeyPolicyType policyType,
-                                           const std::wstring& name,
-                                           EnforcementLevel level,
-                                           const std::optional<std::wstring>& description,
-                                           const std::optional<Version>& min,
-                                           const std::optional<Version>& max) :
+SubkeyPolicy::SubkeyPolicy(const RegistryKey& key,
+                           const std::vector<std::wstring>& subkeyNames,
+                           SubkeyPolicyType policyType,
+                           const std::wstring& name,
+                           EnforcementLevel level,
+                           const std::optional<std::wstring>& description,
+                           const std::optional<Version>& min,
+                           const std::optional<Version>& max) :
     RegistryPolicy(key, name, level, description, min, max),
     subkeyNames(subkeyNames.begin(), subkeyNames.end()), policyType{ policyType } {}
 
-RegistryPolicy::SubkeyPolicy::SubkeyPolicy(json policy) :
+SubkeyPolicy::SubkeyPolicy(json policy) :
     RegistryPolicy(HKEY_LOCAL_MACHINE, L"", EnforcementLevel::None){
     assert(policy.find("name") != policy.end());
     assert(policy.find("enforcement-level") != policy.end());
@@ -324,30 +324,35 @@ RegistryPolicy::SubkeyPolicy::SubkeyPolicy(json policy) :
     }
 }
 
-bool RegistryPolicy::SubkeyPolicy::Enforce() const {
+bool SubkeyPolicy::Enforce() const {
     if(IsEnforced()) {
-        if(!MatchesSystem()) {
+        if(!MatchesSystem()){
             auto subkeys{ key.EnumerateSubkeyNames() };
-            if(policyType == SubkeyPolicyType::Whitelist) {
-                for(auto& subkey : subkeys) {
-                    if(subkeyNames.find(subkey) == subkeyNames.end()) {
-                        key.DeleteSubkey(subkey);
+            if(policyType == SubkeyPolicyType::Whitelist){
+                for(auto& subkey : subkeys){
+                    if(subkeyNames.find(subkey) == subkeyNames.end()){
+                        if(!key.DeleteSubkey(subkey)){
+                            return false;
+                        }
                     }
                 }
-            } else {
-                for(auto& subkey : subkeys) {
-                    if(subkeyNames.find(subkey) != subkeyNames.end()) {
-                        key.DeleteSubkey(subkey);
+            } else{
+                for(auto& subkey : subkeys){
+                    if(subkeyNames.find(subkey) != subkeyNames.end()){
+                        if(!key.DeleteSubkey(subkey)){
+                            return false;
+                        }
                     }
                 }
             }
-        }
+            return true;
+        } else return true;
     } else {
         return MatchesSystem();
     }
 }
 
-bool RegistryPolicy::SubkeyPolicy::MatchesSystem() const {
+bool SubkeyPolicy::MatchesSystem() const {
     auto subkeys{ key.EnumerateSubkeyNames() };
     if(policyType == SubkeyPolicyType::Whitelist) {
         for(auto& subkey : subkeys) {
@@ -362,4 +367,5 @@ bool RegistryPolicy::SubkeyPolicy::MatchesSystem() const {
             }
         }
     }
+    return true;
 }

@@ -26,33 +26,6 @@
 #include "hunt/hunts/HuntT1553.h"
 #include "hunt/hunts/HuntT1562.h"
 #include "hunt/hunts/HuntT1569.h"
-#include "mitigation/mitigations/MitigateM1025.h"
-#include "mitigation/mitigations/MitigateM1028-WFW.h"
-#include "mitigation/mitigations/MitigateM1035-RDP.h"
-#include "mitigation/mitigations/MitigateM1042-LLMNR.h"
-#include "mitigation/mitigations/MitigateM1042-NBT.h"
-#include "mitigation/mitigations/MitigateM1042-WSH.h"
-#include "mitigation/mitigations/MitigateM1047.h"
-#include "mitigation/mitigations/MitigateM1054-RDP.h"
-#include "mitigation/mitigations/MitigateM1054-WSC.h"
-#include "mitigation/mitigations/MitigateV1093.h"
-#include "mitigation/mitigations/MitigateV1153.h"
-#include "mitigation/mitigations/MitigateV3338.h"
-#include "mitigation/mitigations/MitigateV3340.h"
-#include "mitigation/mitigations/MitigateV3344.h"
-#include "mitigation/mitigations/MitigateV3379.h"
-#include "mitigation/mitigations/MitigateV3479.h"
-#include "mitigation/mitigations/MitigateV63597.h"
-#include "mitigation/mitigations/MitigateV63687.h"
-#include "mitigation/mitigations/MitigateV63753.h"
-#include "mitigation/mitigations/MitigateV63817.h"
-#include "mitigation/mitigations/MitigateV63825.h"
-#include "mitigation/mitigations/MitigateV63829.h"
-#include "mitigation/mitigations/MitigateV71769.h"
-#include "mitigation/mitigations/MitigateV72753.h"
-#include "mitigation/mitigations/MitigateV73511.h"
-#include "mitigation/mitigations/MitigateV73519.h"
-#include "mitigation/mitigations/MitigateV73585.h"
 #include "reaction/CarveMemory.h"
 #include "reaction/DeleteFile.h"
 #include "reaction/QuarantineFile.h"
@@ -78,7 +51,7 @@ LINK_FUNCTION(IsWow64Process2, KERNEL32.DLL);
 
 const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{};
-MitigationRegister Bluespawn::mitigationRecord{ io };
+MitigationRegister Bluespawn::mitigationRecord{};
 Aggressiveness Bluespawn::aggressiveness{ Aggressiveness::Normal };
 DetectionRegister Bluespawn::detections{ Certainty::Moderate };
 ReactionManager Bluespawn::reaction{};
@@ -104,34 +77,6 @@ Bluespawn::Bluespawn() {
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1562>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1569>());
 
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1025>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1028WFW>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1035RDP>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042LLMNR>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042NBT>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042WSH>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1047>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1054RDP>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1054WSC>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1093>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1153>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3338>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3340>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3344>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3379>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3479>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63597>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63687>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63753>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63817>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63825>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV71769>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73511>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
-
     reactions.emplace("carve-memory", std::make_unique<Reactions::CarveMemoryReaction>());
     reactions.emplace("delete-file", std::make_unique<Reactions::DeleteFileReaction>());
     reactions.emplace("quarantine-file", std::make_unique<Reactions::QuarantineFileReaction>());
@@ -152,10 +97,10 @@ void Bluespawn::RunHunts() {
 void Bluespawn::RunMitigations(bool enforce, bool force) {
     if(enforce) {
         Bluespawn::io.InformUser(L"Enforcing Mitigations");
-        mitigationRecord.EnforceMitigations(SecurityLevel::High, force);
+        mitigationRecord.EnforceMitigations(EnforcementLevel::Moderate);
     } else {
         Bluespawn::io.InformUser(L"Auditing Mitigations");
-        mitigationRecord.AuditMitigations(SecurityLevel::High);
+        mitigationRecord.AuditMitigations(EnforcementLevel::Moderate);
     }
 }
 
@@ -437,12 +382,10 @@ int main(int argc, char* argv[]) {
             if(result.count("force"))
                 bForceEnforce = true;
 
-            MitigationMode mode = MitigationMode::Audit;
-            if(result["action"].as<std::string>() == "e" || result["action"].as<std::string>() == "enforce")
-                mode = MitigationMode::Enforce;
+            bool enforce = result["action"].as<std::string>() == "e" || result["action"].as<std::string>() == "enforce";
 
             bluespawn.EnableMode(BluespawnMode::MITIGATE,
-                                 (static_cast<DWORD>(bForceEnforce) << 1) | (static_cast<DWORD>(mode) << 0));
+                                 (static_cast<DWORD>(bForceEnforce) << 1) | (static_cast<DWORD>(enforce) << 0));
         }
 
         bluespawn.Run();

@@ -91,7 +91,7 @@ class Mitigation {
     Mitigation(const std::wstring& name,
                const std::wstring& description,
                const Software& software,
-               std::initializer_list<std::unique_ptr<MitigationPolicy>> policies);
+               std::vector<std::unique_ptr<MitigationPolicy>> policies);
 
     Mitigation(json mitigation);
 

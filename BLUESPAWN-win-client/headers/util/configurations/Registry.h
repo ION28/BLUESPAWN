@@ -226,7 +226,7 @@ namespace Registry {
 		/**
 		 * Sets data for a specified value under the referenced key and handles conversions from
 		 * common types. For common types, the size and type do not need to be specified.
-		 * Supported types: std::wstring, std::string, LPCSTR, LPCWSTR, DWORD, and 
+		 * Supported types: std::wstring, std::string, LPCSTR, LPCWSTR, DWORD, and
 		 * std::vector<std::wstring>.
 		 *
 		 * @param name The name of the value to set.
@@ -239,7 +239,47 @@ namespace Registry {
 		 * @return True if the value was successfully set; false otherwise.
 		 */
 		template<class T>
-		bool SetValue(const std::wstring&, T value, DWORD size = sizeof(T), DWORD type = REG_BINARY) const;
+		bool SetValue(const std::wstring& name, T value, DWORD size = sizeof(T), DWORD type = REG_BINARY) const;
+
+		template<>
+		bool RegistryKey::SetValue(const std::wstring& name, std::vector<std::wstring> value, DWORD _size, DWORD type) const{
+			SIZE_T size = 1;
+			for(auto string : value){
+				size += (string.length() + 1);
+			}
+
+			auto data = new WCHAR[size];
+			auto allocation = AllocationWrapper{ data, static_cast<DWORD>(size * sizeof(WCHAR)), AllocationWrapper::CPP_ARRAY_ALLOC };
+			unsigned ptr = 0;
+
+			for(auto string : value){
+				LPCWSTR lpRawString = string.c_str();
+				for(unsigned i = 0; i < string.length() + 1; i++){
+					if(ptr < size){
+						data[ptr++] = lpRawString[i];
+					}
+				}
+			}
+
+			if(ptr < size){
+				data[ptr] = { static_cast<WCHAR>(0) };
+			}
+
+			bool succeeded = SetRawValue(name, allocation, REG_MULTI_SZ);
+
+			return succeeded;
+		}
+
+		/**
+		 * Sets data for a specified value under the referenced key given a RegistryData object wrapping the underlying
+		 * data
+		 *
+		 * @param name The name of the value to set.
+		 * @param value The data to write to the value.
+		 *
+		 * @return True if the value was successfully set; false otherwise.
+		 */
+		bool SetDataValue(const std::wstring& name, RegistryData value) const;
 
 		/**
 		 * Returns a list of values present under the currently referenced registry key.
