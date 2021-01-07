@@ -59,7 +59,7 @@ MitigationsConfiguration::MitigationsConfiguration(json config){
 					if(mitigationConfig.find("overrides") != mitigationConfig.end()){
 						for(auto& override : mitigationConfig["overrides"]){
 							if(override.find("enabled") == override.end()){
-								Bluespawn::io.InformUser(L"Skipping malformed custom policy configuration; missing "
+								Bluespawn::io.InformUser(L"Skipping malformed override policy configuration; missing "
 														 "`enabled`", ImportanceLevel::HIGH);
 							}
 							if(override.find("policy-name") != override.end()){

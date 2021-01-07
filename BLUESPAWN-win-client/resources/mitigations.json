@@ -18,6 +18,201 @@
 					"registry-value-policy-type": "require-exact"
 				}
 			]
+		},
+		{
+			"name": "M1028 - Operating System Configuration",
+			"description": "Make configuration changes related to the operating system or a common feature of the operating system that result in system hardening against techniques.",
+			"software": "Windows",
+			"policies": [
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17417",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. This setting enables the firewall when connected to a public network",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\PublicProfile",
+					"value-name": "EnableFirewall",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17415",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. This setting enables the firewall when connected to the domain.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\DomainProfile",
+					"value-name": "EnableFirewall",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17416",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. This setting enables the firewall when connected to a private network.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile",
+					"value-name": "EnableFirewall",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17440",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. The display of notifications to the user when a program is blocked from receiving an inbound connection on a public network must be enabled to alert the user of potential issues.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\PublicProfile",
+					"value-name": "DisableNotifications",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "forbid-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17420",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. The display of notifications to the user when a program is blocked from receiving an inbound connection in the domain must be enabled to alert the user of potential issues.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\DomainProfile",
+					"value-name": "DisableNotifications",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "forbid-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17430",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. The display of notifications to the user when a program is blocked from receiving an inbound connection on a private network must be enabled to alert the user of potential issues.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile",
+					"value-name": "DisableNotifications",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "forbid-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17438",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. Unsolicited inbound connections may be malicious attempts to gain access to a system. Unsolicited inbound connections, for which there is no rule allowing the connection, will be blocked on a public network",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\PublicProfile",
+					"value-name": "DefaultInboundAction",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17418",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. Unsolicited inbound connections may be malicious attempts to gain access to a system. Unsolicited inbound connections, for which there is no rule allowing the connection, will be blocked in the domain.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\DomainProfile",
+					"value-name": "DefaultInboundAction",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17428",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. Unsolicited inbound connections may be malicious attempts to gain access to a system. Unsolicited inbound connections, for which there is no rule allowing the connection, will be blocked on a private network. ",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile",
+					"value-name": "DefaultInboundAction",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				}
+			]
+		},
+		{
+			"name": "M1035 - Limit Access to Resource over Network",
+			"description": "Prevent access to file shares, remote access to systems, unnecessary services. Mechanisms to limit access may include use of network concentrators, RDP gateways, etc",
+			"software": "Windows",
+			"policies": [
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Nessus Plugin ID 58453",
+					"description": "This is a High severity finding due to the Bluekeep vulnerability that allows for a worm to quickly move through a network when NLA is disabled. RDP is a service that allows remote access to Windows computers",
+					"enforcement-level": "low",
+					"min-software-version": "5.1.2600",
+					"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
+					"value-name": "UserAuthentication",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				}
+			]
+		},
+		{
+			"name": "M1042 - Disable or Remove Feature or Program ",
+			"description": "Remove or deny access to unnecessary and potentially vulnerable software to prevent abuse by adversaries.",
+			"software": "Windows",
+			"policies": [
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Disable LLMNR",
+					"description": "Link-Local Multicast Name Resolution (LLMNR) serve as alternate methods for host identification. Adversaries can spoof an authoritative source for name resolution on a victim network by responding to LLMNR (UDP 5355)/NBT-NS (UDP 137) traffic as if they know the identity of the requested host.",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient",
+					"value-name": "EnableMulticast",
+					"data-value": 0,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Disable NBT-NS",
+					"description": "NetBIOS Name Service (NBT-NS) serve as alternate methods for host identification. Adversaries can spoof an authoritative source for name resolution on a victim network by responding to LLMNR (UDP 5355)/NBT-NS (UDP 137) traffic as if they know the identity of the requested host.",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Services\\NetBT\\Parameters\\Interfaces\\*",
+					"value-name": "NetbiosOptions",
+					"data-value": 2,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Disable WSH",
+					"description": "Windows Script Host enables the execution of wscript and cscript which allow VB, JS, and other scripts to be run. This feature is not typically needed, and Sean Metcalf recommends disabling it https://adsecurity.org/?p=3299.",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\Software\\Microsoft\\Windows Script Host\\Settings",
+					"value-name": "Enabled",
+					"data-value": 0,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "combined-policy",
+					"name": "Disable WDigest",
+					"description": "WDigest stores credentials in plaintext and should therefore be disabled.",
+					"enforcement-level": "low",
+					"mode": "or",
+					"subpolicies": [
+						{
+							"policy-type": "registry-value-policy",
+							"name": "Set UseLogonCredential to 0",
+							"enforcement-level": "low",
+							"min-software-version": "6.3",
+							"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest",
+							"value-name": "UseLogonCredential",
+							"data-value": 0,
+							"data-type": "REG_DWORD",
+							"registry-value-policy-type": "require-exact"
+						},
+						{
+							"policy-type": "registry-value-policy",
+							"name": "Remove WDigest",
+							"enforcement-level": "low",
+							"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa",
+							"value-name": "Security Packages",
+							"data-value": [ "wdigest" ],
+							"data-type": "REG_MULTI_SZ",
+							"registry-value-policy-type": "forbid-subset-of"
+						}
+					]
+				}
+			]
 		}
 	]
 }
