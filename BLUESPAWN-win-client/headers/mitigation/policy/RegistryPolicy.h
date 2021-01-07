@@ -4,6 +4,9 @@
 #include "util/configurations/RegistryValue.h"
 
 #include "mitigation/policy/MitigationPolicy.h"
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 using namespace Registry;
 
@@ -17,16 +20,14 @@ class SubkeyPolicy;
  *        the policy requires (i.e RegistryPolicy::ValuePolicy)
  */
 class RegistryPolicy : public MitigationPolicy {
+    /// The key being referenced by this policy
+    RegistryKey key;
 
-	/// The key being referenced by this policy
-	RegistryKey key;
+    friend class ValuePolicy;
+    friend class SubkeyPolicy;
 
-	friend class ValuePolicy;
-	friend class SubkeyPolicy;
-
-protected:
-
-	/**
+    protected:
+    /**
 	 * \brief Instantiates a RegistryPolicy object. This should only be called from withing derived classes'
 	 *        constructors.
 	 *
@@ -40,7 +41,12 @@ protected:
 	 * \param min The minimum version of the associated software where this policy applies
 	 * \param max The maximum version of the associated software where this policy applies
 	 */
-	RegistryPolicy(const RegistryKey& key, const std::wstring& name, EnforcementLevel level, 
-				   const std::optional<std::wstring>& description = std::nullopt, 
-				   const std::optional<Version>& min = std::nullopt, const std::optional<Version>& max = std::nullopt);
+    RegistryPolicy(const RegistryKey& key,
+                   const std::wstring& name,
+                   EnforcementLevel level,
+                   const std::optional<std::wstring>& description = std::nullopt,
+                   const std::optional<Version>& min = std::nullopt,
+                   const std::optional<Version>& max = std::nullopt);
+
+    RegistryPolicy(json config);
 };

@@ -99,10 +99,10 @@ void Bluespawn::RunHunts() {
 void Bluespawn::RunMitigations(bool enforce, bool force) {
     if(enforce) {
         Bluespawn::io.InformUser(L"Enforcing Mitigations");
-        mitigationRecord.EnforceMitigations(EnforcementLevel::Moderate);
+        mitigationRecord.PrintMitigationReports(mitigationRecord.EnforceMitigations(EnforcementLevel::Moderate));
     } else {
         Bluespawn::io.InformUser(L"Auditing Mitigations");
-        mitigationRecord.AuditMitigations(EnforcementLevel::Moderate);
+        mitigationRecord.PrintMitigationReports(mitigationRecord.AuditMitigations(EnforcementLevel::Moderate));
     }
 }
 

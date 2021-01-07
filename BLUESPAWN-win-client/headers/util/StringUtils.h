@@ -46,7 +46,7 @@ std::wstring ExpandEnvStringsW(const std::wstring& in);
  *
  * @return The string with all environment strings expanded.
  */
-std::wstring ExpandEnvStringsA(const std::string& in);
+std::string ExpandEnvStringsA(const std::string& in);
 
 /**
  * Convert a string or wstring to uppercase. Note that the only

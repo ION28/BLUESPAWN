@@ -19,12 +19,13 @@ public:
 	enum class ValuePolicyType {
 		RequireExact,    /// Require the registry data to match the data provided exactly
 		ForbidExact,     /// Forbid the registry data from matching the data provided exactly
-		RequireAsSubset, /// Require the registry to hold at least the provided data
+		RequireAsSubset, /// Require the registry to hold at least the provided data values
 						 /// This only applies for REG_MULTI_SZ registry values.
-		RequireSubsetOf, /// Require the registry to hold nothing but the provided data
+		RequireSubsetOf, /// Require the registry to hold nothing but the provided data values
 						 /// This only applies for REG_MULTI_SZ registry values.
-		ForbidSubsetOf,  /// Require the registry to hold none of the provided data
+		ForbidSubsetOf,  /// Require the registry to hold none of the provided data values
 						 /// This only applies for REG_MULTI_SZ registry values.
+		ForbidValue,     /// Require the specified registry value to not appear under the associated key.
 	};
 
 protected:
