@@ -112,6 +112,29 @@ ValuePolicy::ValuePolicy(json policy) : RegistryPolicy(policy) {
         } else
             throw std::exception(("Unknown registry data type: " + datatypeString).c_str());
     }
+    if(policyType == ValuePolicyType::ForbidExact && policy.count("replacement-data-type") && 
+       policy.count("replacement-data-value")){
+        auto datatypeString{ ToLowerCaseA(policy["replacement-data-type"].get<std::string>()) };
+        if(datatypeString == "reg_dword"){
+            replacement = policy["replacement-data-value"].get<DWORD>();
+        } else if(datatypeString == "reg_sz"){
+            replacement = StringToWidestring(policy["replacement-data-value"].get<std::string>());
+        } else if(datatypeString == "reg_multi_sz"){
+            std::vector<std::wstring> dataValue{};
+            for(auto& entry : policy["replacement-data-value"]){
+                dataValue.emplace_back(StringToWidestring(entry.get<std::string>()));
+            }
+            replacement = dataValue;
+        } else if(datatypeString == "reg_binary"){
+            auto stringRepresentation{ policy["replacement-data-value"].get<std::string>() };
+            auto len{ stringRepresentation.size() };
+            AllocationWrapper dataValue(HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, len), len,
+                                        AllocationWrapper::HEAP_ALLOC);
+            CopyMemory(dataValue, stringRepresentation.data(), len);
+            replacement = dataValue;
+        } else
+            throw std::exception(("Unknown registry data type: " + datatypeString).c_str());
+    }
 }
 
 std::vector<std::wstring>& ReadMultiValue(RegistryValue& value, const std::wstring& name) {
