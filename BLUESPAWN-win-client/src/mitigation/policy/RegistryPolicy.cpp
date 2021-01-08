@@ -2,6 +2,8 @@
 
 #include <assert.h>
 
+#include <regex>
+
 #include "util/StringUtils.h"
 
 #include "mitigation/policy/SubkeyPolicy.h"
@@ -15,11 +17,37 @@ RegistryPolicy::RegistryPolicy(const RegistryKey& key,
                                const std::optional<Version>& min,
                                const std::optional<Version>& max) :
     MitigationPolicy(name, level, description, min, max),
-    key{ key } {}
+    keys{ key } {}
 
-RegistryPolicy::RegistryPolicy(json policy) : MitigationPolicy(policy), key{ HKEY_LOCAL_MACHINE }{
+bool NameIsMatch(const std::wstring& subkeyName, std::wstring request) {
+    for(auto find{ request.find(L"*") }; find != std::string::npos; find = request.find(L"*", find + 2)) {
+        request.replace(request.begin() + find, request.begin() + find + 1, L".*");
+    }
+    return std::regex_match(ToLowerCaseW(subkeyName), std::wregex{ ToLowerCaseW(request) });
+}
+
+RegistryPolicy::RegistryPolicy(json policy) : MitigationPolicy(policy) {
     assert(policy.find("key-path") != policy.end());
-    key = RegistryKey(StringToWidestring(policy["key-path"].get<std::string>()));
+    auto keyPath(StringToWidestring(policy["key-path"].get<std::string>()));
+    auto keyPathParts{ SplitStringW(keyPath, L"\\") };
+
+    std::vector<RegistryKey> keys{ RegistryKey(keyPathParts[0]) };
+    for(auto idx = 1; idx < keyPathParts.size(); idx++) {
+        std::vector<RegistryKey> children{};
+        for(auto& key : keys) {
+            if(keyPathParts[idx].find(L'*') != std::wstring::npos){
+                for(auto& subkeyName : key.EnumerateSubkeyNames()){
+                    if(NameIsMatch(subkeyName, keyPathParts[idx])){
+                        children.emplace_back(RegistryKey{ key, subkeyName });
+                    }
+                }
+            } else{
+                children.emplace_back(RegistryKey{ key, keyPathParts[idx] });
+            }
+        }
+        keys = children;
+    }
+    this->keys = keys;
 }
 
 ValuePolicy::ValuePolicy(const RegistryKey& key,
@@ -49,31 +77,31 @@ ValuePolicy::ValuePolicy(json policy) : RegistryPolicy(policy) {
         policyType = ValuePolicyType::RequireSubsetOf;
     } else if(typeString == "require-exact") {
         policyType = ValuePolicyType::RequireExact;
-    } else if(typeString == "require-as-subset"){
+    } else if(typeString == "require-as-subset") {
         policyType = ValuePolicyType::RequireAsSubset;
-    } else if(typeString == "forbid-value"){
+    } else if(typeString == "forbid-value") {
         policyType = ValuePolicyType::ForbidValue;
     } else
         throw std::exception(("Unknown registry policy type: " + typeString).c_str());
 
-    if(policyType != ValuePolicyType::ForbidValue){
+    if(policyType != ValuePolicyType::ForbidValue) {
         assert(policy.find("data-value") != policy.end());
         assert(policy.find("data-type") != policy.end());
 
         auto datatypeString{ ToLowerCaseA(policy["data-type"].get<std::string>()) };
-        if(datatypeString == "reg_dword"){
+        if(datatypeString == "reg_dword") {
             assert(typeString == "forbid-exact" || typeString == "require-exact");
             data = policy["data-value"].get<DWORD>();
-        } else if(datatypeString == "reg_sz"){
+        } else if(datatypeString == "reg_sz") {
             assert(typeString == "forbid-exact" || typeString == "require-exact");
             data = StringToWidestring(policy["data-value"].get<std::string>());
-        } else if(datatypeString == "reg_multi_sz"){
+        } else if(datatypeString == "reg_multi_sz") {
             std::vector<std::wstring> dataValue{};
-            for(auto& entry : policy["data-value"]){
+            for(auto& entry : policy["data-value"]) {
                 dataValue.emplace_back(StringToWidestring(entry.get<std::string>()));
             }
             data = dataValue;
-        } else if(datatypeString == "reg_binary"){
+        } else if(datatypeString == "reg_binary") {
             assert(typeString == "forbid-exact" || typeString == "require-exact");
             auto stringRepresentation{ policy["data-value"].get<std::string>() };
             auto len{ stringRepresentation.size() };
@@ -107,170 +135,229 @@ std::vector<std::wstring>& ReadMultiValue(RegistryValue& value, const std::wstri
 
 bool ValuePolicy::Enforce() const {
     if(IsEnforced()) {
-        if(!MatchesSystem()) {
-            if(policyType == ValuePolicyType::ForbidValue){
-                return key.RemoveValue(valueName);
-            } else if(policyType == ValuePolicyType::RequireExact){
-                return key.SetDataValue(valueName, data);
-            } else if(policyType == ValuePolicyType::ForbidExact) {
-                if(replacement) {
-                    return key.SetDataValue(valueName, *replacement);
-                } else {
-                    return key.RemoveValue(valueName);
+        if(policyType == ValuePolicyType::ForbidValue){
+            for(auto& key : keys){
+                if(key.ValueExists(valueName) && !key.RemoveValue(valueName)){
+                    return false;
                 }
-            } else if(policyType == ValuePolicyType::RequireAsSubset) {
+            }
+            return true;
+        } else if(policyType == ValuePolicyType::RequireExact){
+            for(auto& key : keys){
+                if(!key.ValueExists(valueName) || !(RegistryValue::Create(key, valueName)->data == data)){
+                    if(!key.SetDataValue(valueName, data)){
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } else if(policyType == ValuePolicyType::ForbidExact){
+            for(auto& key : keys){
+                if(key.ValueExists(valueName) && (RegistryValue::Create(key, valueName)->data == data)){
+                    if(replacement){
+                        if(!key.SetDataValue(valueName, *replacement)){
+                            return false;
+                        }
+                    } else{
+                        if(!key.RemoveValue(valueName)){
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        } else if(policyType == ValuePolicyType::RequireAsSubset){
+            for(auto& key : keys){
                 auto curVal{ RegistryValue::Create(key, valueName) };
-                if(!curVal) {
-                    return key.SetDataValue(valueName, data);
+                if(!curVal){
+                    if(!key.SetDataValue(valueName, data)){
+                        return false;
+                    }
                 }
 
-                try {
+                try{
                     auto& regData{ ReadMultiValue(*curVal, GetPolicyName()) };
                     auto& reqData{ std::get<std::vector<std::wstring>>(data) };
-                    for(auto& elem : reqData) {
+                    for(auto& elem : reqData){
                         bool found = false;
-                        for(auto& present : regData) {
-                            if(elem == present) {
+                        for(auto& present : regData){
+                            if(elem == present){
                                 found = true;
                             }
                         }
-                        if(!found) {
+                        if(!found){
                             regData.emplace_back(elem);
                         }
                     }
-                    return key.SetValue(valueName, regData);
-                } catch(std::exception& e) { return key.SetDataValue(valueName, data); }
-            } else if(policyType == ValuePolicyType::RequireSubsetOf) {
-                auto curVal{ RegistryValue::Create(key, valueName) };
-                std::vector<std::wstring> fixedData{};
-
-                try {
-                    auto& regData{ ReadMultiValue(*curVal, GetPolicyName()) };
-                    auto& reqData{ std::get<std::vector<std::wstring>>(data) };
-                    for(auto& elem : regData) {
-                        bool found = false;
-                        for(auto& present : reqData) {
-                            if(elem == present) {
-                                found = true;
-                            }
-                        }
-                        if(found) {
-                            fixedData.emplace_back(elem);
-                        }
+                    if(!key.SetValue(valueName, regData)){
+                        return false;
                     }
-                } catch(std::exception& e) {}   // exception came from ReadMultiValue; discard it
-                return key.SetValue(valueName, fixedData);
-            } else {
-                auto curVal{ RegistryValue::Create(key, valueName) };
-                std::vector<std::wstring> fixedData{};
-
-                try {
-                    auto& regData{ ReadMultiValue(*curVal, GetPolicyName()) };
-                    auto& reqData{ std::get<std::vector<std::wstring>>(data) };
-                    for(auto& elem : regData) {
-                        bool found = false;
-                        for(auto& present : reqData) {
-                            if(elem == present) {
-                                found = true;
-                            }
-                        }
-                        if(!found) {
-                            fixedData.emplace_back(elem);
-                        }
+                } catch(std::exception& e){
+                    if(!key.SetDataValue(valueName, data)){
+                        return false;
                     }
-                } catch(std::exception& e) {}   // exception came from ReadMultiValue; discard it
-                return key.SetValue(valueName, fixedData);
+                }
             }
-        } else {
+            return true;
+        } else if(policyType == ValuePolicyType::RequireSubsetOf){
+            for(auto& key : keys){
+                auto curVal{ RegistryValue::Create(key, valueName) };
+                std::vector<std::wstring> fixedData{};
+
+                try{
+                    auto& regData{ ReadMultiValue(*curVal, GetPolicyName()) };
+                    auto& reqData{ std::get<std::vector<std::wstring>>(data) };
+                    for(auto& elem : regData){
+                        bool found = false;
+                        for(auto& present : reqData){
+                            if(elem == present){
+                                found = true;
+                            }
+                        }
+                        if(found){
+                            fixedData.emplace_back(elem);
+                        }
+                    }
+                } catch(std::exception& e){}   // exception came from ReadMultiValue; discard it
+                if(!key.SetValue(valueName, fixedData)){
+                    return false;
+                }
+            }
+            return true;
+        } else{
+            for(auto& key : keys){
+                auto curVal{ RegistryValue::Create(key, valueName) };
+                std::vector<std::wstring> fixedData{};
+
+                try{
+                    auto& regData{ ReadMultiValue(*curVal, GetPolicyName()) };
+                    auto& reqData{ std::get<std::vector<std::wstring>>(data) };
+                    for(auto& elem : regData){
+                        bool found = false;
+                        for(auto& present : reqData){
+                            if(elem == present){
+                                found = true;
+                            }
+                        }
+                        if(!found){
+                            fixedData.emplace_back(elem);
+                        }
+                    }
+                } catch(std::exception& e){}   // exception came from ReadMultiValue; discard it
+                if(!key.SetValue(valueName, fixedData)){
+                    return false;
+                }
+            }
             return true;
         }
-    } else {
-        return MatchesSystem();
+    } else{
+         return MatchesSystem();
     }
 }
 
 bool ValuePolicy::MatchesSystem() const {
-    if(policyType == ValuePolicyType::ForbidValue){
-        return key.ValueExists(valueName);
+    if(policyType == ValuePolicyType::ForbidValue) {
+        for(auto& key : keys) {
+            if(key.ValueExists(valueName)) {
+                return false;
+            }
+        }
+        return true;
     } else if(policyType == ValuePolicyType::RequireExact) {
-        return key.ValueExists(valueName) && RegistryValue::Create(key, valueName)->data == data;
+        for(auto& key : keys){
+            if(!key.ValueExists(valueName) || RegistryValue::Create(key, valueName)->data != data){
+                return false;
+            }
+        }
+        return true;
     } else if(policyType == ValuePolicyType::ForbidExact) {
-        return !key.ValueExists(valueName) || RegistryValue::Create(key, valueName)->data != data;
+        for(auto& key : keys){
+            if(key.ValueExists(valueName) && RegistryValue::Create(key, valueName)->data == data){
+                return false;
+            }
+        }
+        return true;
     } else if(policyType == ValuePolicyType::RequireAsSubset) {
-        auto curVal{ RegistryValue::Create(key, valueName) };
-        if(!curVal) {
-            return false;
-        }
+        for(auto& key : keys){
+            auto curVal{ RegistryValue::Create(key, valueName) };
+            if(!curVal){
+                return false;
+            }
 
-        try {
-            auto& regData{ ReadMultiValue(*curVal, GetPolicyName()) };
-            auto& reqData{ std::get<std::vector<std::wstring>>(data) };
-            for(auto& elem : reqData) {
-                bool found = false;
-                for(auto& present : regData) {
-                    if(elem == present) {
-                        found = true;
+            try{
+                auto& regData{ ReadMultiValue(*curVal, GetPolicyName()) };
+                auto& reqData{ std::get<std::vector<std::wstring>>(data) };
+                for(auto& elem : reqData){
+                    bool found = false;
+                    for(auto& present : regData){
+                        if(elem == present){
+                            found = true;
+                        }
+                    }
+                    if(!found){
+                        return false;
                     }
                 }
-                if(!found) {
-                    return false;
-                }
+            } catch(std::exception& e){
+                Bluespawn::io.InformUser(StringToWidestring(e.what()));
+                return false;
             }
-            return true;
-        } catch(std::exception& e) {
-            Bluespawn::io.InformUser(StringToWidestring(e.what()));
-            return false;
         }
+        return true;
     } else if(policyType == ValuePolicyType::RequireSubsetOf) {
-        auto curVal{ RegistryValue::Create(key, valueName) };
-        if(!curVal) {
-            return true;
-        }
+        for(auto& key : keys){
+            auto curVal{ RegistryValue::Create(key, valueName) };
+            if(!curVal){
+                continue;
+            }
 
-        try {
-            auto& regData{ ReadMultiValue(*curVal, GetPolicyName()) };
-            auto& reqData{ std::get<std::vector<std::wstring>>(data) };
-            for(auto& elem : regData) {
-                bool found = false;
-                for(auto& present : reqData) {
-                    if(elem == present) {
-                        found = true;
+            try{
+                auto& regData{ ReadMultiValue(*curVal, GetPolicyName()) };
+                auto& reqData{ std::get<std::vector<std::wstring>>(data) };
+                for(auto& elem : regData){
+                    bool found = false;
+                    for(auto& present : reqData){
+                        if(elem == present){
+                            found = true;
+                        }
+                    }
+                    if(!found){
+                        return false;
                     }
                 }
-                if(!found) {
-                    return false;
-                }
+            } catch(std::exception& e){
+                Bluespawn::io.InformUser(StringToWidestring(e.what()));
+                return false;
             }
-            return true;
-        } catch(std::exception& e) {
-            Bluespawn::io.InformUser(StringToWidestring(e.what()));
-            return false;
         }
+        return true;
     } else {
-        auto curVal{ RegistryValue::Create(key, valueName) };
-        if(!curVal) {
-            return true;
-        }
+        for(auto& key : keys){
+            auto curVal{ RegistryValue::Create(key, valueName) };
+            if(!curVal){
+                continue;
+            }
 
-        try {
-            auto& regData{ ReadMultiValue(*curVal, GetPolicyName()) };
-            auto& reqData{ std::get<std::vector<std::wstring>>(data) };
-            for(auto& elem : regData) {
-                bool found = false;
-                for(auto& present : reqData) {
-                    if(elem == present) {
-                        found = true;
+            try{
+                auto& regData{ ReadMultiValue(*curVal, GetPolicyName()) };
+                auto& reqData{ std::get<std::vector<std::wstring>>(data) };
+                for(auto& elem : regData){
+                    bool found = false;
+                    for(auto& present : reqData){
+                        if(elem == present){
+                            found = true;
+                        }
+                    }
+                    if(found){
+                        return false;
                     }
                 }
-                if(found) {
-                    return false;
-                }
+            } catch(std::exception& e){
+                Bluespawn::io.InformUser(StringToWidestring(e.what()));
+                return false;
             }
-            return true;
-        } catch(std::exception& e) {
-            Bluespawn::io.InformUser(StringToWidestring(e.what()));
-            return false;
         }
+        return true;
     }
 }
 
@@ -305,20 +392,22 @@ SubkeyPolicy::SubkeyPolicy(json policy) : RegistryPolicy(policy) {
 bool SubkeyPolicy::Enforce() const {
     if(IsEnforced()) {
         if(!MatchesSystem()) {
-            auto subkeys{ key.EnumerateSubkeyNames() };
-            if(policyType == SubkeyPolicyType::Whitelist) {
-                for(auto& subkey : subkeys) {
-                    if(subkeyNames.find(subkey) == subkeyNames.end()) {
-                        if(!key.DeleteSubkey(subkey)) {
-                            return false;
+            for(auto& key : keys){
+                auto subkeys{ key.EnumerateSubkeyNames() };
+                if(policyType == SubkeyPolicyType::Whitelist){
+                    for(auto& subkey : subkeys){
+                        if(subkeyNames.find(subkey) == subkeyNames.end()){
+                            if(!key.DeleteSubkey(subkey)){
+                                return false;
+                            }
                         }
                     }
-                }
-            } else {
-                for(auto& subkey : subkeys) {
-                    if(subkeyNames.find(subkey) != subkeyNames.end()) {
-                        if(!key.DeleteSubkey(subkey)) {
-                            return false;
+                } else{
+                    for(auto& subkey : subkeys){
+                        if(subkeyNames.find(subkey) != subkeyNames.end()){
+                            if(!key.DeleteSubkey(subkey)){
+                                return false;
+                            }
                         }
                     }
                 }
@@ -332,17 +421,19 @@ bool SubkeyPolicy::Enforce() const {
 }
 
 bool SubkeyPolicy::MatchesSystem() const {
-    auto subkeys{ key.EnumerateSubkeyNames() };
-    if(policyType == SubkeyPolicyType::Whitelist) {
-        for(auto& subkey : subkeys) {
-            if(subkeyNames.find(subkey) == subkeyNames.end()) {
-                return false;
+    for(auto& key : keys){
+        auto subkeys{ key.EnumerateSubkeyNames() };
+        if(policyType == SubkeyPolicyType::Whitelist){
+            for(auto& subkey : subkeys){
+                if(subkeyNames.find(subkey) == subkeyNames.end()){
+                    return false;
+                }
             }
-        }
-    } else {
-        for(auto& subkey : subkeys) {
-            if(subkeyNames.find(subkey) != subkeyNames.end()) {
-                return false;
+        } else{
+            for(auto& subkey : subkeys){
+                if(subkeyNames.find(subkey) != subkeyNames.end()){
+                    return false;
+                }
             }
         }
     }

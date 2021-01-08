@@ -150,6 +150,10 @@ namespace Registry {
 			tracker->Increment(hkBackingKey);
 		}
 	}
+
+	RegistryKey::RegistryKey(const RegistryKey& hive, const std::wstring& path, bool wow64) :
+		RegistryKey{ hive.Exists() ? hive.hkBackingKey : hive.hkHive, hive.Exists() ? path : hive.path + L"\\" + path, 
+		             wow64 }{}
 	
 	RegistryKey::RegistryKey(std::wstring name, bool WoW64) :
 		tracker{ __tracker }{
@@ -168,7 +172,7 @@ namespace Registry {
 		else {
 			hkHive = vHiveNames[HiveName];
 
-			if(slash == name.length()){
+			if(slash == name.length() || slash == std::wstring::npos){
 				this->bKeyExists = true;
 				this->bWow64 = false;
 				this->hkBackingKey = hkHive;

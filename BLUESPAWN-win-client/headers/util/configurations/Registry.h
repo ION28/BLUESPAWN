@@ -92,6 +92,16 @@ namespace Registry {
 		 */
 		RegistryKey(std::wstring path, bool WoW64 = false);
 
+		/**
+		 * \brief Construct a RegistryKey object reference to a key present under another RegistryKey object.
+		 * 
+		 * \param baseKey The base key.
+		 * \param subkeyName The relative path to the base key.
+		 * \param WoW64 Indicate whether this instance should refer to the WoW64 version of a key. For keys without 
+		 *        WoW64 versions, this has no effect. If Wow6432node is part of the provided path, this value is ignored.
+		 */
+		RegistryKey(const RegistryKey& baseKey, const std::wstring& subkeyName, bool wow64 = false);
+
 		/** Copy operator overload */
 		RegistryKey& operator=(const RegistryKey& key) noexcept;
 

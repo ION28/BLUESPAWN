@@ -20,8 +20,8 @@ class SubkeyPolicy;
  *        the policy requires (i.e RegistryPolicy::ValuePolicy)
  */
 class RegistryPolicy : public MitigationPolicy {
-    /// The key being referenced by this policy
-    RegistryKey key;
+    /// The keys being referenced by this policy
+    std::vector<RegistryKey> keys;
 
     friend class ValuePolicy;
     friend class SubkeyPolicy;
