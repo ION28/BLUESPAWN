@@ -12,6 +12,8 @@ void MitigationPolicy::SetEnforced(bool enforce){ isEnforced = enforce; }
 
 void MitigationPolicy::SetEnforced(EnforcementLevel level){ isEnforced = level >= this->level; }
 
+std::optional<std::wstring> MitigationPolicy::GetDescription() const{ return this->description; }
+
 MitigationPolicy::MitigationPolicy(const std::wstring& name, EnforcementLevel level, 
 								   const std::optional<std::wstring>& description,
 								   const std::optional<Version>& min, const std::optional<Version>& max) : 

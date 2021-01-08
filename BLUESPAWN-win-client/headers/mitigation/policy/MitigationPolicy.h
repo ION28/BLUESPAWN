@@ -86,12 +86,19 @@ class MitigationPolicy {
 	 */
     virtual bool MatchesSystem() const = 0;
 
-    /**
+	/**
 	 * \brief Retrieves the name of the mitigation policy
-	 * 
+	 *
 	 * \return The name of the policy
 	 */
-    std::wstring GetPolicyName() const;
+	std::wstring GetPolicyName() const;
+
+	/**
+	 * \brief Retrieves the description of the mitigation policy
+	 *
+	 * \return The description of the policy
+	 */
+	std::optional<std::wstring> GetDescription() const;
 
     /**
 	 * \brief Returns whether or not the mitigation policy is set to be enforced

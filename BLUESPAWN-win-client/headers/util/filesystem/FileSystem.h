@@ -153,7 +153,7 @@ namespace FileSystem {
 		*
 		* @return true if write successful, false if write unsuccessful
 		*/
-		bool Write(IN const LPVOID value, IN const long offset, IN const unsigned long length, __in_opt const bool truncate = false,
+		bool Write(IN const LPCVOID value, IN const long offset, IN const unsigned long length, __in_opt const bool truncate = false,
 				   __in_opt const bool insert = false) const;
 
 		/**

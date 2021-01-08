@@ -96,13 +96,13 @@ void Bluespawn::RunHunts() {
     huntRecord.RunHunts(vIncludedHunts, vExcludedHunts, scope);
 }
 
-void Bluespawn::RunMitigations(bool enforce, bool force) {
+void Bluespawn::RunMitigations(bool enforce) {
     if(enforce) {
         Bluespawn::io.InformUser(L"Enforcing Mitigations");
-        mitigationRecord.PrintMitigationReports(mitigationRecord.EnforceMitigations(EnforcementLevel::Moderate));
+        mitigationRecord.PrintMitigationReports(mitigationRecord.EnforceMitigations(*mitigationConfig));
     } else {
         Bluespawn::io.InformUser(L"Auditing Mitigations");
-        mitigationRecord.PrintMitigationReports(mitigationRecord.AuditMitigations(EnforcementLevel::Moderate));
+        mitigationRecord.PrintMitigationReports(mitigationRecord.AuditMitigations(*mitigationConfig));
     }
 }
 
@@ -149,7 +149,7 @@ void Bluespawn::Run() {
         aggressiveness = Aggressiveness::Normal;
     }
     if(modes.find(BluespawnMode::MITIGATE) != modes.end()) {
-        RunMitigations(modes[BluespawnMode::MITIGATE] & 0x01, modes[BluespawnMode::MITIGATE] & 0x02);
+        RunMitigations(modes[BluespawnMode::MITIGATE]);
     }
     if(modes.find(BluespawnMode::HUNT) != modes.end()) {
         RunHunts();
@@ -176,6 +176,10 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
         output = std::regex_replace(options.help(), std::regex("hunt options"), "hunt/monitor options");
     }
     Bluespawn::io.InformUser(StringToWidestring(output));
+}
+
+void Bluespawn::SetMitigationConfig(const MitigationsConfiguration& config){
+    mitigationConfig = config;
 }
 
 void Bluespawn::check_correct_arch() {
@@ -299,10 +303,20 @@ int main(int argc, char* argv[]) {
 		;
 
     options.add_options("mitigate")
-		("action", "Selects whether to audit or enforce each mitigations.",
+		("mode", "Selects whether to audit or enforce each mitigations. Options are audit and enforce. Ignored if "
+                 "--gen-config is specified",
             cxxopts::value<std::string>()->default_value("audit")->implicit_value("audit"))
-        ("force", "Use this option to forcibly apply mitigations with no prompt", 
-            cxxopts::value<bool>())
+        ("config-json", "Specify a file containing a JSON configuration for which mitigations and policies should run", 
+            cxxopts::value<std::string>())
+        ("enforcement-level", "Specify the enforcement level for mitigations. This is used to select which policies "
+                               "should be run. Available levels are none, low, moderate, high, and all",
+            cxxopts::value<std::string>()->default_value("moderate")->implicit_value("moderate"))
+        ("add-mitigations", "Specify additional JSON files containing mitigations.",
+            cxxopts::value<std::vector<std::string>>())
+        ("gen-config", "Generate a default JSON configuration file (./bluespawn-mitigation-config.json) with the "
+                       "specified level of detail. Options are global, mitigations, and mitigation-policies. Will not "
+                       "run any mitigations if this is specified",
+            cxxopts::value<std::string>()->default_value("mitigations"))
         ;
     // clang-format on
 
@@ -380,14 +394,66 @@ int main(int argc, char* argv[]) {
         }
 
         if(result.count("mitigate")) {
-            bool bForceEnforce = false;
-            if(result.count("force"))
-                bForceEnforce = true;
-
-            bool enforce = result["action"].as<std::string>() == "e" || result["action"].as<std::string>() == "enforce";
-
-            bluespawn.EnableMode(BluespawnMode::MITIGATE,
-                                 (static_cast<DWORD>(bForceEnforce) << 1) | (static_cast<DWORD>(enforce) << 0));
+            if(result.count("add-mitigations")){
+                for(auto& path : result["add-mitigations"].as<std::vector<std::string>>()){
+                    Bluespawn::mitigationRecord.ParseMitigationsJSON({ StringToWidestring(path) });
+                }
+            }
+            if(result.count("gen-config")){
+                auto opt{ ToLowerCaseA(result["gen-config"].as<std::string>()) };
+                std::map<std::string, int> genConfigOptions{
+                    {"global", 0},
+                    {"mitigations", 1},
+                    {"mitigation-policies", 2}
+                };
+                if(genConfigOptions.count(opt)){
+                    if(Bluespawn::mitigationRecord.CreateConfig(
+                        FileSystem::File{ L".\\bluespawn-mitigation-config.json" }, genConfigOptions[opt])){
+                        Bluespawn::io.InformUser(L"Saved configuration to .\\bluespawn-mitigation-config.json");
+                    }
+                } else{
+                    Bluespawn::io.AlertUser(StringToWidestring("Unknown gen-config mode \"" + opt + "\". Options are "
+                                                               "global, mitigations, and mitigation-policies"));
+                }
+            } else{
+                auto mode{ result["mode"].as<std::string>() };
+                bool enforce{ mode == "e" || mode == "enforce" };
+                std::map<std::string, EnforcementLevel> enforcementLevelOptions{
+                    {"none", EnforcementLevel::None},
+                    {"low", EnforcementLevel::Low},
+                    {"moderate", EnforcementLevel::Moderate},
+                    {"high", EnforcementLevel::High},
+                    {"all", EnforcementLevel::All},
+                };
+                auto fileSpecified{ result.count("config-json") };
+                if(!fileSpecified){
+                    auto level{ EnforcementLevel::None };
+                    auto levelSpecified{ result["enforcement-level"].as<std::string>() };
+                    if(enforcementLevelOptions.count(levelSpecified)){
+                        level = enforcementLevelOptions[levelSpecified];
+                    } else{
+                        Bluespawn::io.AlertUser(
+                            StringToWidestring("Unknown enforcement level \"" + levelSpecified + "\". Options are none,"
+                                               "low, moderate, high, and all. Defaulting to none"));
+                    }
+                    bluespawn.SetMitigationConfig(level);
+                } else{
+                    auto file{ FileSystem::File(StringToWidestring(result["config-json"].as<std::string>())) };
+                    if(file.GetFileExists()){
+                        try{
+                            auto contents{ file.Read() };
+                            bluespawn.SetMitigationConfig(json::parse(nlohmann::detail::input_adapter(
+                                contents.GetAsPointer<char>(), contents.GetSize())));
+                        } catch(std::exception& e){
+                            Bluespawn::io.AlertUser(L"Error parsing JSON: " + StringToWidestring(e.what()));
+                        }
+                    } else{
+                        Bluespawn::io.AlertUser(L"JSON configuration file " + file.GetFilePath() + L" not found!");
+                        bluespawn.SetMitigationConfig(EnforcementLevel::None);
+                    }
+                }
+                bluespawn.EnableMode(BluespawnMode::MITIGATE, enforce);
+            }
         }
 
         bluespawn.Run();

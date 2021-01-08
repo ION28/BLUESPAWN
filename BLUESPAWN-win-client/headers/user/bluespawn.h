@@ -28,7 +28,9 @@ class Bluespawn {
     std::vector<std::wstring> vIncludedHunts;
     std::vector<std::wstring> vExcludedHunts;
 
-    void RunMitigations(bool enforce, bool force);
+    std::optional<MitigationsConfiguration> mitigationConfig;
+
+    void RunMitigations(bool enforce);
     void RunHunts();
     void RunMonitor();
 
@@ -39,6 +41,7 @@ class Bluespawn {
     void EnableMode(BluespawnMode mode, int argument = 0);
     void SetIncludedHunts(std::vector<std::string> includedHunts);
     void SetExcludedHunts(std::vector<std::string> excludedHunts);
+    void SetMitigationConfig(const MitigationsConfiguration& config);
     void Run();
 
     void check_correct_arch();

@@ -113,4 +113,18 @@ public:
      *         MitigationRegister
      */
     bool ParseMitigationsJSON(const AllocationWrapper& data);
+
+    /**
+     * \brief Creates a JSON configuration file that can be parsed as a MitigationsConfiguration to specify which
+     *        mitigation policies should and should not be run. Everything will be configured to not run by default.
+     * 
+     * \param outfile The file to which the information should be written. Overwrites existing files.
+     * \param mode Specifies what the JSON configuration should include. Options are listed below.
+     *        0 - Create a configuration file with only a global default enforcement level
+     *        1 - Create a configuration file with a global default enforcement level and an enforcement level for
+     *            each mitigation
+     *        2 - Creates a configuration file with a global default enforcement level, an enforcement level for each
+     *            mitigation, and an override for each mitigation policy
+     */
+    bool CreateConfig(FileSystem::File& outfile, uint32_t mode);
 };
