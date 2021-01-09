@@ -16,6 +16,7 @@
 #include "pe_sieve.h"
 #include "pe_sieve_types.h"
 #include "user/bluespawn.h"
+#include "utils/debug.h"
 
 extern "C" {
 void __stdcall PESieve_help(void);
@@ -26,6 +27,7 @@ pesieve::t_report __stdcall PESieve_scan(pesieve::t_params args);
 namespace Hunts {
 
     HuntT1055::HuntT1055() : Hunt(L"T1055 - Process Injection") {
+        debug_output = false;
         dwCategoriesAffected = (DWORD) Category::Processes;
         dwSourcesInvolved = (DWORD) DataSource::Processes;
         dwTacticsUsed = (DWORD) Tactic::PrivilegeEscalation | (DWORD) Tactic::DefenseEvasion;

@@ -10,7 +10,11 @@
 #define WEB_SHELL 0
 
 namespace Hunts {
-    HuntT1505::HuntT1505() : Hunt(L"T1505 - Server Software Component") {
+    HuntT1505::HuntT1505() : Hunt(L"T1505 - Server Software Component"),
+        //PHP regex credit to: https://github.com/emposha/PHP-Shell-Detector
+        php_vuln_functions{ R"(preg_replace.*\/e|`.*?\$.*?`|\bcreate_function\b|\bpassthru\b|\bshell_exec\b|\bexec\b|\bbase64_decode\b|\bedoced_46esab\b|\beval\b|\bsystem\b|\bproc_open\b|\bpopen\b|\bcurl_exec\b|\bcurl_multi_exec\b|\bparse_ini_file\b|\bshow_source\b)" },
+        asp_indicators{ R"(\bcmd.exe\b|\bpowershell.exe\b|\bwscript.shell\b|\bprocessstartinfo\b|\bcreatenowindow\b|\bcmd\b|\beval request\b|\bexecute request\b|\boscriptnet\b|createobject\("scripting.filesystemobject"\))" },
+        jsp_indicators{ R"(\bcmd.exe\b|\bpowershell.exe\b|\bgetruntime\(\)\.exec\b)" }{
         dwCategoriesAffected = (DWORD) Category::Files;
         dwSourcesInvolved = (DWORD) DataSource::FileSystem;
         dwTacticsUsed = (DWORD) Tactic::Persistence | (DWORD) Tactic::PrivilegeEscalation;
@@ -21,12 +25,6 @@ namespace Hunts {
 
         SUBSECTION_INIT(WEB_SHELL, Normal);
         // Looks for T1505.003: Web Shell
-        //PHP regex credit to: https://github.com/emposha/PHP-Shell-Detector
-        php_vuln_functions.assign(
-            R"(preg_replace.*\/e|`.*?\$.*?`|\bcreate_function\b|\bpassthru\b|\bshell_exec\b|\bexec\b|\bbase64_decode\b|\bedoced_46esab\b|\beval\b|\bsystem\b|\bproc_open\b|\bpopen\b|\bcurl_exec\b|\bcurl_multi_exec\b|\bparse_ini_file\b|\bshow_source\b)");
-        asp_indicators.assign(
-            R"(\bcmd.exe\b|\bpowershell.exe\b|\bwscript.shell\b|\bprocessstartinfo\b|\bcreatenowindow\b|\bcmd\b|\beval request\b|\bexecute request\b|\boscriptnet\b|createobject\("scripting.filesystemobject"\))");
-        jsp_indicators.assign(R"(\bcmd.exe\b|\bpowershell.exe\b|\bgetruntime\(\)\.exec\b)");
 
         for(std::wstring path : web_directories){
             auto hWebRoot = FileSystem::Folder(path);

@@ -193,8 +193,7 @@ bool MitigationRegister::ParseMitigationsJSON(const AllocationWrapper& contents)
             return true;
         } catch(std::exception& e) {
             Bluespawn::io.AlertUser(L"Unable to parse JSON for mitigations! Ensure there are no errors in your "
-                                    "configuration file. Error: " +
-                                        StringToWidestring(e.what()),
+                                    "configuration file. Error: " + StringToWidestring(e.what()),
                                     -1, ImportanceLevel::HIGH);
             LOG_ERROR("Unable to parse mitigations");
         }
