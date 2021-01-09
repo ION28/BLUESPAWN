@@ -60,6 +60,8 @@
 #include "reaction/QuarantineFile.h"
 #include "reaction/RemoveValue.h"
 #include "reaction/SuspendProcess.h"
+#include "scan/FileScanner.h"
+#include "scan/ProcessScanner.h"
 #include "user/CLI.h"
 
 #pragma warning(push)
@@ -198,20 +200,26 @@ void Bluespawn::SetExcludedHunts(std::vector<std::string> excludedHunts) {
     }
 }
 
-void Bluespawn::Run() {
-    if(modes.find(BluespawnMode::SCAN) != modes.end()) {
-        aggressiveness = static_cast<Aggressiveness>(modes.at(BluespawnMode::SCAN));
-    } else {
-        aggressiveness = Aggressiveness::Normal;
+void Bluespawn::RunScan(){
+    for(auto& file : scanFiles){
+        if(FileScanner::PerformQuickScan(file.GetFilePath())){
+            Bluespawn::detections.AddDetection(Detection(FileDetectionData{ file }));
+        }
     }
+}
+
+void Bluespawn::Run() {
     if(modes.find(BluespawnMode::MITIGATE) != modes.end()) {
         RunMitigations(modes[BluespawnMode::MITIGATE] & 0x01, modes[BluespawnMode::MITIGATE] & 0x02);
     }
     if(modes.find(BluespawnMode::HUNT) != modes.end()) {
         RunHunts();
     }
-    if(modes.find(BluespawnMode::MONITOR) != modes.end()) {
+    if(modes.find(BluespawnMode::MONITOR) != modes.end()){
         RunMonitor();
+    }
+    if(modes.find(BluespawnMode::SCAN) != modes.end()){
+        RunScan();
     }
 
     ThreadPool::GetInstance().Wait();
@@ -358,12 +366,21 @@ int main(int argc, char* argv[]) {
             cxxopts::value<bool>())
         ("m,mitigate", "Mitigate vulnerabilities by applying security settings.", 
             cxxopts::value<bool>())
+        ("s,scan", "Scan a particular process, file, or folder", cxxopts::value<bool>())
         ("log", "Specify how BLUESPAWN should log events. Options are console, xml, json, and debug.",
-            cxxopts::value<std::string>()->default_value("console"))
+            cxxopts::value<std::string>()->default_value("console")->implicit_value("console"))
         ("help", "Help Information. You can also specify a category for help on a specific module such as hunt.",
             cxxopts::value<std::string>()->implicit_value("general"))
         ("v,verbose", "Verbosity", cxxopts::value<int>()->default_value("1"))
         ("debug", "Enable Debug Output", cxxopts::value<int>()->default_value("0"))
+        ;
+
+    options.add_options("scan")
+        ("a,aggressiveness", "Sets the aggressiveness of BLUESPAWN. Options are cursory, normal, and intensive",
+         cxxopts::value<std::string>()->default_value("Normal"))
+        ("folder", "Specify a folder to scan", cxxopts::value<std::vector<std::string>>()->implicit_value({}))
+        ("file", "Specify a file to scan", cxxopts::value<std::vector<std::string>>()->implicit_value({}))
+        ("process", "Specify a process to scan by PID", cxxopts::value<std::vector<int>>()->implicit_value({}))
         ;
 
     options.add_options("hunt")
@@ -422,17 +439,16 @@ int main(int argc, char* argv[]) {
 
         ParseLogSinks(result["log"].as<std::string>(), result["output"].as<std::string>());
 
+        if(result.count("aggressiveness")){
+            bluespawn.aggressiveness = GetAggressiveness(result["aggressiveness"]);
+        }
+
         if(result.count("hunt") || result.count("monitor")) {
             if(result.count("hunt")) {
                 bluespawn.EnableMode(BluespawnMode::HUNT);
             }
             if(result.count("monitor")) {
                 bluespawn.EnableMode(BluespawnMode::MONITOR);
-            }
-
-            if(result.count("aggressiveness")) {
-                bluespawn.EnableMode(BluespawnMode::SCAN, static_cast<DWORD>(GetAggressiveness(result["aggressivenes"
-                                                                                                      "s"])));
             }
 
             if(result.count("hunts")) {
@@ -474,6 +490,31 @@ int main(int argc, char* argv[]) {
 
             bluespawn.EnableMode(BluespawnMode::MITIGATE,
                                  (static_cast<DWORD>(bForceEnforce) << 1) | (static_cast<DWORD>(mode) << 0));
+        }
+
+        if(result.count("scan")){
+            for(auto& filePath : result["file"].as<std::vector<std::string>>()){
+                FileSystem::File file{ StringToWidestring(filePath) };
+                if(!file.GetFileExists()){
+                    Bluespawn::io.AlertUser(L"File " + file.GetFilePath() + L" not found");
+                    continue;
+                }
+                bluespawn.scanFiles.emplace_back(file);
+            }
+            for(auto& folderPath : result["folder"].as<std::vector<std::string>>()){
+                FileSystem::Folder folder{ StringToWidestring(folderPath) };
+                if(!folder.GetFolderExists()){
+                    Bluespawn::io.AlertUser(L"Folder " + folder.GetFolderPath() + L" not found");
+                    continue;
+                }
+                auto folderContents{ folder.GetFiles() };
+                for(auto& file : folderContents){
+                    bluespawn.scanFiles.emplace_back(file);
+                }
+            }
+            for(auto& process : result["process"].as<std::vector<int>>()){
+                bluespawn.scanProcesses.emplace_back(process);
+            }
         }
 
         bluespawn.Run();
