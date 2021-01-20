@@ -201,10 +201,14 @@ void Bluespawn::SetExcludedHunts(std::vector<std::string> excludedHunts) {
 }
 
 void Bluespawn::RunScan(){
+    std::vector<std::shared_ptr<Detection>> detections;
     for(auto& file : scanFiles){
         if(FileScanner::PerformQuickScan(file.GetFilePath())){
-            Bluespawn::detections.AddDetection(Detection(FileDetectionData{ file }));
+            detections.emplace_back(Bluespawn::detections.AddDetection(Detection(FileDetectionData{ file })));
         }
+    }
+    for(auto pid : scanProcesses){
+        Hunts::HuntT1055::HandleReport(detections, Hunts::HuntT1055::QueueProcessScan(pid));
     }
 }
 
@@ -373,25 +377,23 @@ int main(int argc, char* argv[]) {
             cxxopts::value<std::string>()->implicit_value("general"))
         ("v,verbose", "Verbosity", cxxopts::value<int>()->default_value("1"))
         ("debug", "Enable Debug Output", cxxopts::value<int>()->default_value("0"))
+        ("a,aggressiveness", "Sets the aggressiveness of BLUESPAWN. Options are cursory, normal, and intensive",
+         cxxopts::value<std::string>()->default_value("Normal"))
+        ("r,react", "Specifies how BLUESPAWN should react to potential threats dicovered during hunts. Available reactions are remove-value, carve-memory, suspend, delete-file, and quarantine-file",
+         cxxopts::value<std::string>()->default_value(""))
         ;
 
     options.add_options("scan")
-        ("a,aggressiveness", "Sets the aggressiveness of BLUESPAWN. Options are cursory, normal, and intensive",
-         cxxopts::value<std::string>()->default_value("Normal"))
-        ("folder", "Specify a folder to scan", cxxopts::value<std::vector<std::string>>()->implicit_value({}))
-        ("file", "Specify a file to scan", cxxopts::value<std::vector<std::string>>()->implicit_value({}))
-        ("process", "Specify a process to scan by PID", cxxopts::value<std::vector<int>>()->implicit_value({}))
+        ("scan-folder", "Specify a folder to scan", cxxopts::value<std::vector<std::string>>()->implicit_value({}))
+        ("scan-file", "Specify a file to scan", cxxopts::value<std::vector<std::string>>()->implicit_value({}))
+        ("scan-process", "Specify a process to scan by PID", cxxopts::value<std::vector<int>>()->implicit_value({}))
         ;
 
     options.add_options("hunt")
-		("a,aggressiveness", "Sets the aggressiveness of BLUESPAWN. Options are cursory, normal, and intensive.",
-            cxxopts::value<std::string>()->default_value("Normal"))
 		("hunts", "Only run the hunts specified. Provide as a comma separated list of Mitre ATT&CK Technique IDs.", 
             cxxopts::value<std::vector<std::string>>())
 		("exclude-hunts", "Run all hunts except those specified. Provide as a comma separated list of Mitre ATT&CK Technique IDs.", 
             cxxopts::value<std::vector<std::string>>())
-        ("r,react", "Specifies how BLUESPAWN should react to potential threats dicovered during hunts. Available reactions are remove-value, carve-memory, suspend, delete-file, and quarantine-file",
-            cxxopts::value<std::string>()->default_value(""))
 		;
 
     options.add_options("log")
@@ -443,12 +445,44 @@ int main(int argc, char* argv[]) {
             bluespawn.aggressiveness = GetAggressiveness(result["aggressiveness"]);
         }
 
-        if(result.count("hunt") || result.count("monitor")) {
+        if(result.count("hunt") || result.count("monitor") || result.count("scan")) {
             if(result.count("hunt")) {
                 bluespawn.EnableMode(BluespawnMode::HUNT);
             }
             if(result.count("monitor")) {
                 bluespawn.EnableMode(BluespawnMode::MONITOR);
+            }
+
+            if(result.count("scan")){
+                if(result.count("scan-file")){
+                    for(auto& filePath : result["scan-file"].as<std::vector<std::string>>()){
+                        FileSystem::File file{ StringToWidestring(filePath) };
+                        if(!file.GetFileExists()){
+                            Bluespawn::io.AlertUser(L"File " + file.GetFilePath() + L" not found");
+                            continue;
+                        }
+                        bluespawn.scanFiles.emplace_back(file);
+                    }
+                }
+                if(result.count("scan-folder")){
+                    for(auto& folderPath : result["scan-folder"].as<std::vector<std::string>>()){
+                        FileSystem::Folder folder{ StringToWidestring(folderPath) };
+                        if(!folder.GetFolderExists()){
+                            Bluespawn::io.AlertUser(L"Folder " + folder.GetFolderPath() + L" not found");
+                            continue;
+                        }
+                        auto folderContents{ folder.GetFiles() };
+                        for(auto& file : folderContents){
+                            bluespawn.scanFiles.emplace_back(file);
+                        }
+                    }
+                }
+                if(result.count("scan-process")){
+                    for(auto& process : result["scan-process"].as<std::vector<int>>()){
+                        bluespawn.scanProcesses.emplace_back(process);
+                    }
+                }
+                bluespawn.EnableMode(BluespawnMode::SCAN);
             }
 
             if(result.count("hunts")) {
@@ -490,31 +524,6 @@ int main(int argc, char* argv[]) {
 
             bluespawn.EnableMode(BluespawnMode::MITIGATE,
                                  (static_cast<DWORD>(bForceEnforce) << 1) | (static_cast<DWORD>(mode) << 0));
-        }
-
-        if(result.count("scan")){
-            for(auto& filePath : result["file"].as<std::vector<std::string>>()){
-                FileSystem::File file{ StringToWidestring(filePath) };
-                if(!file.GetFileExists()){
-                    Bluespawn::io.AlertUser(L"File " + file.GetFilePath() + L" not found");
-                    continue;
-                }
-                bluespawn.scanFiles.emplace_back(file);
-            }
-            for(auto& folderPath : result["folder"].as<std::vector<std::string>>()){
-                FileSystem::Folder folder{ StringToWidestring(folderPath) };
-                if(!folder.GetFolderExists()){
-                    Bluespawn::io.AlertUser(L"Folder " + folder.GetFolderPath() + L" not found");
-                    continue;
-                }
-                auto folderContents{ folder.GetFiles() };
-                for(auto& file : folderContents){
-                    bluespawn.scanFiles.emplace_back(file);
-                }
-            }
-            for(auto& process : result["process"].as<std::vector<int>>()){
-                bluespawn.scanProcesses.emplace_back(process);
-            }
         }
 
         bluespawn.Run();

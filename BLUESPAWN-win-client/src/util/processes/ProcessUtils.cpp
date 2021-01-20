@@ -119,8 +119,8 @@ std::wstring GetProcessCommandline(DWORD dwPID) {
 
 std::wstring GetProcessImage(const HandleWrapper& process) {
     if(process) {
-        std::vector<WCHAR> name{};
-        DWORD dwSize{ 0 };
+        std::vector<WCHAR> name(MAX_PATH);
+        DWORD dwSize{ MAX_PATH };
         QueryFullProcessImageNameW(process, 0, name.data(), &dwSize);
         dwSize += 1;
         name.resize(dwSize);
