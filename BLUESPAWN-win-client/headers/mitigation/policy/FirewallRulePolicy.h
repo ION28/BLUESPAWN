@@ -10,7 +10,7 @@ using json = nlohmann::json;
 /**
  * \brief Represents an IP address, either in IPv4 or IPv6 
  */
-class IP {
+struct IP {
 
 	enum class Version {
 		IPv4, IPv6
@@ -19,10 +19,8 @@ class IP {
 	/// The version of IP address stored in this object
 	Version type;
 
-	/// Holds the value of the IP (in little endian)
+	/// Holds the value of the IP (in big endian)
 	std::variant<uint32_t, uint16_t[8]> ip;
-
-public:
 
 	/**
 	 * \brief Instantiates an IP from the string representation of the IP address
@@ -34,14 +32,14 @@ public:
 	/**
 	 * \brief Instantiates an IP from an IPv4 address encoded in little endian as a 32 bit unsigned integer
 	 * 
-	 * \param ip The IPv4 address encoded in little endian as a 32 bit unsigned integer
+	 * \param ip The IPv4 address encoded in big endian as a 32 bit unsigned integer
 	 */
 	IP(uint32_t ip);
 
 	/**
 	 * \brief Instantiates an IP from an IPv6 address encoded in 8 little 16 bit unsigned integers
 	 *
-	 * \param ip The IPv6 address encoded in 8 little 16 bit unsigned integers
+	 * \param ip The IPv6 address encoded in 8 big endian 16 bit unsigned integers
 	 */
 	IP(uint16_t ip[8]);
 
@@ -50,7 +48,7 @@ public:
 	 * 
 	 * \return The string representation of the IP address referenced by this object.
 	 */
-	std::wstring ToString();
+	std::wstring ToString() const;
 };
 
 /**
@@ -86,7 +84,18 @@ struct IPRange {
 	 * 
 	 * \return True if the given IP is contained within the range referenced by this; false otherwise.
 	 */
-	bool IPInRange(const IP& ip);
+	bool IPInRange(const IP& ip) const;
+
+	/**
+	 * \brief Converts the IP range to its string representation
+	 */
+	std::wstring ToString() const;
+};
+
+/// Specify whether the type of connection should be allowed
+enum class FirewallAction {
+	ALLOW, // Connections matching the conditions specified should be allowed
+	BLOCK  // Connections matching the conditions specified should be blocked
 };
 
 /**
@@ -96,6 +105,8 @@ struct IPRange {
  *       described be able to pass through the firewall. This may result in allow rules being added or block 
  *       rules being modified to meet this requirement. Inconsistent FirewallRulePolicies will result in an 
  *       error.
+ * 
+ * \note All firewall rule policies should only be listed as rules under a firewall base policy
  */
 class FirewallRulePolicy : public MitigationPolicy {
 public:
@@ -113,21 +124,18 @@ public:
 		ICMP,   // ICMP "ping" protocol
 	};
 
-	/// Specify whether the type of connection should be allowed
-	enum class Action {
-		ALLOW, // Connections matching the conditions specified should be allowed
-		BLOCK  // Connections matching the conditions specified should be blocked
-	};
-
 protected:
 
 	/// The direction from which the connection originates
 	Dir direction;
 
+	/// The action to be taken on the connections matching the conditions specified here
+	FirewallAction action;
+
 	/// The protocol in consideration
 	Protocol protocol = Protocol::TCPUDP;
 
-	/// The ports in consideration, if any. If none are specified, all ports apply
+	/// The destination ports in consideration, if any. If none are specified, all ports apply
 	std::vector<uint16_t> ports;
 
 	/// The programs for which this rule should apply, if any. If none are specified, all programs apply
@@ -152,6 +160,42 @@ public:
 	 * \param config The json object storing information about how the policy should be created.
 	 */
 	FirewallRulePolicy(json config);
+
+	/**
+	 * \brief Enforces the mitgiation policy, applying the change to the system.
+	 *
+	 * \return True if the system has the mitigation policy enforced; false otherwise.
+	 */
+	virtual bool Enforce() const override;
+
+	/**
+	 * \brief Checks if the changes specified by the mitigation policy match the current state of the
+	 *        system.
+	 *
+	 * \return True if the system has the changes specified by the mitigation policy enforced; false
+	 *         otherwise.
+	 */
+	virtual bool MatchesSystem() const override;
+};
+
+class FirewallBasePolicy : public MitigationPolicy {
+
+	/// Specifies the default action for packets not matching any FirewallRulePolicy
+	FirewallAction defaultAction;
+
+	/// Specifies whether preexisting allow or block rules without an associated FirewallRulePolicy should be allowed
+	/// to remain in effect, overriding the default action 
+	bool allowPreexisting;
+
+	/// A list of firewall rule policies to be enforced
+	std::vector<FirewallRulePolicy> rules;
+
+	/**
+	 * \brief Instantiates a FirewallRulePolicy object from a json configuration. This may throw exceptions.
+	 *
+	 * \param config The json object storing information about how the policy should be created.
+	 */
+	FirewallBasePolicy(json config);
 
 	/**
 	 * \brief Enforces the mitgiation policy, applying the change to the system.
