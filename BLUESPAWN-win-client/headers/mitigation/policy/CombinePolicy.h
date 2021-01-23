@@ -66,7 +66,7 @@ class CombinePolicy : public MitigationPolicy {
 	 *
 	 * \return True if the system has the mitigation policy enforced; false otherwise.
 	 */
-    virtual bool Enforce() const;
+    virtual bool Enforce();
 
     /**
 	 * \brief Checks if the changes specified by the subpolicies and mode match the current state of the system.

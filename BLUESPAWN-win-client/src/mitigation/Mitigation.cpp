@@ -4,6 +4,7 @@
 #include "mitigation/policy/ValuePolicy.h"
 #include "mitigation/policy/SubkeyPolicy.h"
 #include "mitigation/policy/CombinePolicy.h"
+#include "mitigation/policy/EventLogPolicy.h"
 
 #include "util/StringUtils.h"
 
@@ -42,6 +43,8 @@ Mitigation::Mitigation(json mitigation) : software(L"", L""){
             policies.emplace_back(std::make_unique<SubkeyPolicy>(policy));
         } else if(type == "combined-policy"){
             policies.emplace_back(std::make_unique<CombinePolicy>(policy));
+        } else if(type == "event-log"){
+            policies.emplace_back(std::make_unique<EventLogPolicy>(policy));
         } else{
             throw std::exception(("Unknown mitigation policy type \"" + type + "\"").c_str());
         }

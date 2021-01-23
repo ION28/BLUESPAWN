@@ -30,7 +30,7 @@ RegistryPolicy::RegistryPolicy(json policy) : MitigationPolicy(policy) {
     assert(policy.find("key-path") != policy.end());
     auto keyPath(StringToWidestring(policy["key-path"].get<std::string>()));
     auto keyPathParts{ SplitStringW(keyPath, L"\\") };
-
+    bool care{ !wcscmp(keyPath.c_str(), L"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer") };
     std::vector<RegistryKey> keys{ RegistryKey(keyPathParts[0]) };
     for(auto idx = 1; idx < keyPathParts.size(); idx++) {
         std::vector<RegistryKey> children{};
@@ -156,7 +156,7 @@ std::vector<std::wstring>& ReadMultiValue(RegistryValue& value, const std::wstri
     return std::get<std::vector<std::wstring>>(value.data);
 }
 
-bool ValuePolicy::Enforce() const {
+bool ValuePolicy::Enforce() {
     if(IsEnforced()) {
         if(policyType == ValuePolicyType::ForbidValue){
             for(auto& key : keys){
@@ -167,6 +167,9 @@ bool ValuePolicy::Enforce() const {
             return true;
         } else if(policyType == ValuePolicyType::RequireExact){
             for(auto& key : keys){
+                if(!key.Exists()){
+                    key.Create();
+                }
                 if(!key.ValueExists(valueName) || !(RegistryValue::Create(key, valueName)->data == data)){
                     if(!key.SetDataValue(valueName, data)){
                         return false;
@@ -191,6 +194,9 @@ bool ValuePolicy::Enforce() const {
             return true;
         } else if(policyType == ValuePolicyType::RequireAsSubset){
             for(auto& key : keys){
+                if(!key.Exists()){
+                    key.Create();
+                }
                 auto curVal{ RegistryValue::Create(key, valueName) };
                 if(!curVal){
                     if(!key.SetDataValue(valueName, data)){
@@ -412,7 +418,7 @@ SubkeyPolicy::SubkeyPolicy(json policy) : RegistryPolicy(policy) {
     }
 }
 
-bool SubkeyPolicy::Enforce() const {
+bool SubkeyPolicy::Enforce() {
     if(IsEnforced()) {
         if(!MatchesSystem()) {
             for(auto& key : keys){

@@ -26,22 +26,9 @@ CombinePolicy::CombinePolicy(std::vector<std::unique_ptr<MitigationPolicy>> subp
 	}
 }
 
-CombinePolicy::CombinePolicy(json policy) :
-	MitigationPolicy(L"", EnforcementLevel::None){
-	assert(policy.find("name") != policy.end());
-	assert(policy.find("enforcement-level") != policy.end());
+CombinePolicy::CombinePolicy(json policy) : MitigationPolicy(policy){
 	assert(policy.find("mode") != policy.end());
 	assert(policy.find("subpolicies") != policy.end());
-
-	name = StringToWidestring(policy["name"].get<std::string>());
-	description = policy.find("description") != policy.end() ?
-		std::optional<std::wstring>(StringToWidestring(policy["description"].get<std::string>())) : std::nullopt;
-
-	auto levelString{ ToLowerCaseA(policy["enforcement-level"].get<std::string>()) };
-	if(levelString == "low"){ level = EnforcementLevel::Low; } 
-	else if(levelString == "moderate"){ level = EnforcementLevel::Moderate; } 
-	else if(levelString == "high"){ level = EnforcementLevel::High; }
-	else throw std::exception(("Unknown enforcement level: " + levelString).c_str());
 
 	auto typeString{ ToLowerCaseA(policy["mode"].get<std::string>()) };
 	if(typeString == "and"){ mode = Mode::AND; } 
@@ -62,7 +49,7 @@ CombinePolicy::CombinePolicy(json policy) :
 	}
 }
 
-bool CombinePolicy::Enforce() const{
+bool CombinePolicy::Enforce(){
 	if(IsEnforced()){
 		if(!MatchesSystem()){
 			if(mode == Mode::OR){

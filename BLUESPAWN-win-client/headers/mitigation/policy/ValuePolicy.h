@@ -81,7 +81,7 @@ public:
 	 *
 	 * \return True if the system has the mitigation policy enforced; false otherwise.
 	 */
-	virtual bool Enforce() const override;
+	virtual bool Enforce() override;
 
 	/**
 	 * \brief Checks if the changes specified by the mitigation policy match the current state of the

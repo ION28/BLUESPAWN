@@ -77,6 +77,8 @@ namespace Registry {
 		bKeyExists{ key.bKeyExists },
 		bWow64{ key.bWow64 },
 		hkBackingKey{ key.hkBackingKey },
+		path{ key.path },
+		hkHive{ key.hkHive },
 		tracker{ __tracker }{
 
 		tracker->Increment(hkBackingKey);
@@ -86,6 +88,8 @@ namespace Registry {
 		this->bKeyExists = key.bKeyExists;
 		this->bWow64 = key.bWow64;
 		this->hkBackingKey = key.hkBackingKey;
+		this->path = key.path;
+		this->hkHive = key.hkHive;
 
 		tracker->Increment(hkBackingKey);
 
@@ -96,6 +100,8 @@ namespace Registry {
 		bKeyExists{ key.bKeyExists },
 		bWow64{ key.bWow64 },
 		hkBackingKey{ key.hkBackingKey },
+		path{ std::move(key.path) },
+		hkHive{ key.hkHive },
 		tracker{ __tracker }{
 
 		key.bKeyExists = false;
@@ -109,6 +115,8 @@ namespace Registry {
 		this->bKeyExists = key.bKeyExists;
 		this->bWow64 = key.bWow64;
 		this->hkBackingKey = key.hkBackingKey;
+		this->path = std::move(key.path);
+		this->hkHive = key.hkHive;
 
 		key.bKeyExists = false;
 		key.bWow64 = false;
@@ -130,7 +138,7 @@ namespace Registry {
 	}
 
 	RegistryKey::RegistryKey(HKEY hive, std::wstring path, bool WoW64) :
-		tracker{ __tracker }{
+		tracker{ __tracker }, hkHive{ hive }, path{ path }{
 		auto wLowerPath = ToLowerCase(path);
 
 		bWow64 = WoW64 || wLowerPath.find(L"wow6432node") != std::wstring::npos;
@@ -141,9 +149,6 @@ namespace Registry {
 
 		if(status != ERROR_SUCCESS){
 			bKeyExists = false;
-
-			this->hkHive = hive;
-			this->path = path;
 		} else {
 			bKeyExists = true;
 
@@ -200,7 +205,9 @@ namespace Registry {
 	}
 
 	RegistryKey::~RegistryKey(){
-		tracker->Decrement(hkBackingKey);
+		if(Exists()){
+			tracker->Decrement(hkBackingKey);
+		}
 	}
 
 	bool RegistryKey::CheckKeyExists(HKEY hive, const std::wstring& name, bool WoW64){

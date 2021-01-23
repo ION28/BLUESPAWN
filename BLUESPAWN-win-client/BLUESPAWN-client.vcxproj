@@ -38,6 +38,7 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1562.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1569.h" />
     <ClInclude Include="headers\mitigation\policy\CombinePolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\EventLogPolicy.h" />
     <ClInclude Include="headers\mitigation\policy\MitigationPolicy.h" />
     <ClInclude Include="headers\mitigation\policy\SubkeyPolicy.h" />
     <ClInclude Include="headers\mitigation\policy\ValuePolicy.h" />
@@ -147,6 +148,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1562.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1569.cpp" />
     <ClCompile Include="src\mitigation\policy\CombinePolicy.cpp" />
+    <ClCompile Include="src\mitigation\policy\EventLogPolicy.cpp" />
     <ClCompile Include="src\mitigation\policy\MitigationPolicy.cpp" />
     <ClCompile Include="src\mitigation\policy\RegistryPolicy.cpp" />
     <ClCompile Include="src\mitigation\Software.cpp" />

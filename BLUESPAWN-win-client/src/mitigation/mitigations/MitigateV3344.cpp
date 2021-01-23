@@ -24,7 +24,7 @@ namespace Mitigations{
 		if(!lsa.ValueExists(L"LimitBlankPasswordUse") || lsa.GetValue<DWORD>(L"LimitBlankPasswordUse") != 1){
 			if(enforce){
 				LOG_VERBOSE(1, "Setting LimitBlankPasswordUse to 1");
-				return lsa.SetValue<DWORD>(L"RunAsPPL", 1);
+				return lsa.SetValue<DWORD>(L"LimitBlankPasswordUse", 1);
 			} else {
 				LOG_VERBOSE(1, "Detected LSA allowing non-console logons with blank passwords");
 				return false;
