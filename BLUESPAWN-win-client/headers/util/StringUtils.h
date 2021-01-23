@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Windows.h>
+
 #include <string>
 #include <vector>
 
@@ -47,6 +49,16 @@ std::wstring ExpandEnvStringsW(const std::wstring& in);
  * @return The string with all environment strings expanded.
  */
 std::string ExpandEnvStringsA(const std::string& in);
+
+/**
+* Zero pads a number to the specified width, useful for zeropadding dates
+*
+* @param value The number to be zeropadded
+* @param length The width to pad to. Defaults to 2
+*
+* @return A wstring with the number zeropadded to the requested width
+*/
+std::wstring ToWstringPad(DWORD value, size_t length = 2);
 
 /**
  * Convert a string or wstring to uppercase. Note that the only

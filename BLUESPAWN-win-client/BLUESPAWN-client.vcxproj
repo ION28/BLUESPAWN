@@ -40,6 +40,7 @@
     <ClInclude Include="headers\mitigation\policy\CombinePolicy.h" />
     <ClInclude Include="headers\mitigation\policy\EventLogPolicy.h" />
     <ClInclude Include="headers\mitigation\policy\MitigationPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\RegistryPolicy.h" />
     <ClInclude Include="headers\mitigation\policy\SubkeyPolicy.h" />
     <ClInclude Include="headers\mitigation\policy\ValuePolicy.h" />
     <ClInclude Include="headers\mitigation\Software.h" />
@@ -74,6 +75,7 @@
     <ClInclude Include="headers\user\iobase.h" />
     <ClInclude Include="headers\util\DynamicLinker.h" />
     <ClInclude Include="headers\util\Internals.h" />
+    <ClInclude Include="headers\util\log\JSONSink.h" />
     <ClInclude Include="headers\util\Promise.h" />
     <ClInclude Include="headers\util\StringUtils.h" />
     <ClInclude Include="headers\util\ThreadPool.h" />
@@ -96,7 +98,6 @@
     <ClInclude Include="headers\util\log\Loggable.h" />
     <ClInclude Include="headers\util\log\LogLevel.h" />
     <ClInclude Include="headers\util\log\LogSink.h" />
-    <ClInclude Include="headers\util\log\ServerSink.h" />
     <ClInclude Include="headers\util\log\XMLSink.h" />
     <ClInclude Include="headers\util\permissions\Permissions.h" />
     <ClInclude Include="headers\util\pe\Export_Section.h">
@@ -129,7 +130,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="external\tinyxml2\tinyxml2.cpp" />
-    <ClInclude Include="headers\mitigation\policy\RegistryPolicy.h" />
     <ClCompile Include="src\hunt\Hunt.cpp" />
     <ClCompile Include="src\hunt\HuntRegister.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1036.cpp" />
@@ -144,6 +144,7 @@
     <ClCompile Include="src\hunt\hunts\HuntT1543.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1546.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1547.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1548.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1553.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1562.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1569.cpp" />
@@ -191,9 +192,9 @@
     <ClCompile Include="src\scan\YaraScanner.cpp" />
     <ClCompile Include="src\util\log\CLISink.cpp" />
     <ClCompile Include="src\util\log\DebugSink.cpp" />
+    <ClCompile Include="src\util\log\JSONSink.cpp" />
     <ClCompile Include="src\util\log\Log.cpp" />
     <ClCompile Include="src\util\log\LogLevel.cpp" />
-    <ClCompile Include="src\util\log\ServerSink.cpp" />
     <ClCompile Include="src\util\log\XMLSink.cpp" />
     <ClCompile Include="src\util\permissions\Permissions.cpp" />
     <ClCompile Include="src\util\pe\Export_Section.cpp">
@@ -225,6 +226,7 @@
     <ClCompile Include="src\util\StringUtils.cpp" />
     <ClCompile Include="src\util\ThreadPool.cpp" />
     <ClCompile Include="src\util\Utils.cpp" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1548.h" />
     <ClInclude Include="resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -265,7 +267,7 @@
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>

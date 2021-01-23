@@ -9,6 +9,7 @@
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/CLISink.h"
 #include "util/log/DebugSink.h"
+#include "util/log/JSONSink.h"
 #include "util/log/XMLSink.h"
 
 #include "hunt/hunts/HuntT1036.h"
@@ -23,6 +24,7 @@
 #include "hunt/hunts/HuntT1543.h"
 #include "hunt/hunts/HuntT1546.h"
 #include "hunt/hunts/HuntT1547.h"
+#include "hunt/hunts/HuntT1548.h"
 #include "hunt/hunts/HuntT1553.h"
 #include "hunt/hunts/HuntT1562.h"
 #include "hunt/hunts/HuntT1569.h"
@@ -73,6 +75,7 @@ Bluespawn::Bluespawn() {
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1543>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1546>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1547>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1548>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1553>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1562>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1569>());
@@ -203,7 +206,7 @@ void Bluespawn::check_correct_arch() {
     }
 }
 
-void ParseLogSinks(const std::string& sinks) {
+void ParseLogSinks(const std::string& sinks, const std::string& logdir) {
     std::set<std::string> sink_set;
     for(unsigned startIdx = 0; startIdx < sinks.size();) {
         auto endIdx{ sinks.find(',', startIdx) };
@@ -213,6 +216,19 @@ void ParseLogSinks(const std::string& sinks) {
         if(endIdx == std::string::npos) {
             break;
         }
+    }
+
+    std::wstring outputFolderPath = L".";
+
+    auto outputDir = FileSystem::Folder(StringToWidestring(logdir));
+    if(outputDir.GetFolderExists() && !outputDir.GetCurIsFile() && outputDir.GetFolderWrite()) {
+        outputFolderPath = outputDir.GetFolderPath();
+    } else {
+        LOG_ERROR(L"Unable to access " << StringToWidestring(logdir)
+                                       << L" to write logs. Defaulting to current directory.");
+        Bluespawn::io.AlertUser(L"Unable to access " + StringToWidestring(logdir) +
+                                    L" to write logs. Defaulting to current directory.",
+                                5000, ImportanceLevel::MEDIUM);
     }
 
     std::vector<std::reference_wrapper<Log::LogLevel>> levels{
@@ -226,9 +242,13 @@ void ParseLogSinks(const std::string& sinks) {
             Log::AddSink(console, levels);
             Bluespawn::detectionSinks.emplace_back(console);
         } else if(sink == "xml") {
-            auto XML = std::make_shared<Log::XMLSink>();
+            auto XML = std::make_shared<Log::XMLSink>(outputFolderPath);
             Log::AddSink(XML, levels);
             Bluespawn::detectionSinks.emplace_back(XML);
+        } else if(sink == "json") {
+            auto JSON = std::make_shared<Log::JSONSink>(outputFolderPath);
+            Log::AddSink(JSON, levels);
+            Bluespawn::detectionSinks.emplace_back(JSON);
         } else if(sink == "debug") {
             auto debug = std::make_shared<Log::DebugSink>();
             Log::AddSink(debug, levels);
@@ -266,13 +286,19 @@ Aggressiveness GetAggressiveness(const cxxopts::OptionValue& value) {
 int main(int argc, char* argv[]) {
     Log::LogLevel::LogError.Enable();
     Log::LogLevel::LogWarn.Enable();
-    ThreadPool::GetInstance().AddExceptionHandler([](const auto& e){ LOG_ERROR(e.what()); });
+    ThreadPool::GetInstance().AddExceptionHandler([](const auto& e) { LOG_ERROR(e.what()); });
 
     Bluespawn bluespawn{};
 
     print_banner();
 
     bluespawn.check_correct_arch();
+
+    if(argc == 1) {
+        Bluespawn::io.AlertUser(L"Please launch BLUESPAWN from a CLI and specify what you want it to do. You can use "
+                                L"the --help flag to see what options are available.",
+                                INFINITE, ImportanceLevel::MEDIUM);
+    }
 
     cxxopts::Options options("BLUESPAWN.exe", "BLUESPAWN: An Active Defense and EDR software to empower Blue Teams");
 
@@ -283,7 +309,7 @@ int main(int argc, char* argv[]) {
             cxxopts::value<bool>())
         ("m,mitigate", "Mitigate vulnerabilities by applying security settings.", 
             cxxopts::value<bool>())
-        ("log", "Specify how BLUESPAWN should log events. Options are console, xml, and debug.",
+        ("log", "Specify how BLUESPAWN should log events. Options are console, xml, json, and debug.",
             cxxopts::value<std::string>()->default_value("console"))
         ("help", "Help Information. You can also specify a category for help on a specific module such as hunt.",
             cxxopts::value<std::string>()->implicit_value("general"))
@@ -301,6 +327,11 @@ int main(int argc, char* argv[]) {
         ("r,react", "Specifies how BLUESPAWN should react to potential threats dicovered during hunts. Available reactions are remove-value, carve-memory, suspend, delete-file, and quarantine-file",
             cxxopts::value<std::string>()->default_value(""))
 		;
+
+    options.add_options("log")
+		("o,output", "Specify the output folder for any logs written to a file", 
+            cxxopts::value<std::string>()->default_value("."))
+        ;
 
     options.add_options("mitigate")
 		("mode", "Selects whether to audit or enforce each mitigations. Options are audit and enforce. Ignored if "
@@ -350,7 +381,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        ParseLogSinks(result["log"].as<std::string>());
+        ParseLogSinks(result["log"].as<std::string>(), result["output"].as<std::string>());
 
         if(result.count("hunt") || result.count("monitor")) {
             if(result.count("hunt")) {
