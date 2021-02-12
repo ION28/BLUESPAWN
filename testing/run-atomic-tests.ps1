@@ -10,10 +10,8 @@ $T1505003Args = @{ "web_shell_path" = "C:\inetpub\wwwroot"; "web_shells" = "C:\A
 $T1546007Args = @{ "helper_file" = "C:\AtomicRedTeam\atomics\T1134.004\bin\calc.dll" }
 $T1546010Args = @{ "registry_file" = "C:\AtomicRedTeam\atomics\T1546.010\src\T1546.010.reg" }
 
-$ErrorActionPreference = "silentlycontinue" # Some tests may run into errors but we don't want those to fail the build
-
 Invoke-AtomicTest T1037.001 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
-Invoke-AtomicTest T1053.005 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
+#Invoke-AtomicTest T1053.005 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1055 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1136.001 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv' -InputArgs $T1136001Args
 Invoke-AtomicTest T1505.003 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv' -InputArgs $T1505003Args
