@@ -26,15 +26,19 @@ enum class BluespawnMode { HUNT, SCAN, MONITOR, MITIGATE };
 class Bluespawn {
     std::map<BluespawnMode, int> modes;
     std::vector<std::wstring> vIncludedHunts;
-    std::vector<std::wstring> vExcludedHunts;
+    std::vector<std::wstring> vExcludedHunts; 
 
     std::optional<MitigationsConfiguration> mitigationConfig;
 
     void RunMitigations(bool enforce);
     void RunHunts();
     void RunMonitor();
+    void RunScan();
 
     public:
+    std::vector<FileSystem::File> scanFiles;
+    std::vector<int> scanProcesses;
+
     Bluespawn();
 
     void AddReaction(std::unique_ptr<Reaction>&& reaction);
