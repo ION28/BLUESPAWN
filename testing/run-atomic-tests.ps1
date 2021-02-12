@@ -10,9 +10,10 @@ $T1505003Args = @{ "web_shell_path" = "C:\inetpub\wwwroot"; "web_shells" = "C:\A
 $T1546007Args = @{ "helper_file" = "C:\AtomicRedTeam\atomics\T1134.004\bin\calc.dll" }
 $T1546010Args = @{ "registry_file" = "C:\AtomicRedTeam\atomics\T1546.010\src\T1546.010.reg" }
 
+try {
 Invoke-AtomicTest T1037.001 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 #Invoke-AtomicTest T1053.005 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
-Invoke-AtomicTest T1055 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
+# Invoke-AtomicTest T1055 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1136.001 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv' -InputArgs $T1136001Args
 Invoke-AtomicTest T1505.003 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv' -InputArgs $T1505003Args
 Invoke-AtomicTest T1543.003 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
@@ -28,3 +29,4 @@ Invoke-AtomicTest T1547.004 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTe
 Invoke-AtomicTest T1547.005 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1562.004 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1569.002 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
+} catch {}
