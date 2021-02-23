@@ -238,8 +238,8 @@ namespace Registry {
 
 		UNICODE_STRING RegistryKeyName{ 
 			static_cast<USHORT>(wsValueName.length() * 2), 
-			static_cast<USHORT>(wsValueName.length() * 2), 
-			const_cast<PWSTR>(wsValueName.c_str()) 
+			static_cast<USHORT>(wsValueName.length() * 2 + 2),
+			const_cast<PWSTR>(wsValueName.c_str())
 		};
 
 		ULONG size{};
@@ -274,16 +274,16 @@ namespace Registry {
 		return false;
 	}
 
-	AllocationWrapper RegistryKey::GetRawValue(const std::wstring& ValueName) const {
+	AllocationWrapper RegistryKey::GetRawValue(const std::wstring& wsValueName) const {
 		if(!Exists()){
 			SetLastError(FILE_DOES_NOT_EXIST);
 			return { nullptr, 0 };
 		}
 
 		UNICODE_STRING RegistryKeyName{
-			static_cast<USHORT>(ValueName.length() * 2),
-			static_cast<USHORT>(ValueName.length() * 2),
-			const_cast<PWSTR>(ValueName.c_str())
+			static_cast<USHORT>(wsValueName.length() * 2),
+			static_cast<USHORT>(wsValueName.length() * 2 + 2),
+			const_cast<PWSTR>(wsValueName.c_str())
 		};
 
 		ULONG size{};
@@ -308,16 +308,16 @@ namespace Registry {
 		return { lpbValue, dwDataSize, AllocationWrapper::CPP_ARRAY_ALLOC };
 	}
 
-	std::optional<RegistryType> RegistryKey::GetValueType(const std::wstring& ValueName) const {
+	std::optional<RegistryType> RegistryKey::GetValueType(const std::wstring& wsValueName) const {
 		if(!Exists()){
 			SetLastError(FILE_DOES_NOT_EXIST);
 			return std::nullopt;
 		}
 
 		UNICODE_STRING RegistryKeyName{
-			static_cast<USHORT>(ValueName.length() * 2),
-			static_cast<USHORT>(ValueName.length() * 2),
-			const_cast<PWSTR>(ValueName.c_str())
+			static_cast<USHORT>(wsValueName.length() * 2),
+			static_cast<USHORT>(wsValueName.length() * 2 + 2),
+			const_cast<PWSTR>(wsValueName.c_str())
 		};
 
 		ULONG size{};
@@ -616,10 +616,11 @@ namespace Registry {
 	}
 
 	bool RegistryKey::RemoveValue(const std::wstring& wsValueName) const {
-		UNICODE_STRING RegistryKeyName{ 
-			static_cast<USHORT>(wsValueName.length() * 2), 
+
+		UNICODE_STRING RegistryKeyName{
 			static_cast<USHORT>(wsValueName.length() * 2),
-			const_cast<PWSTR>(wsValueName.c_str()) 
+			static_cast<USHORT>(wsValueName.length() * 2 + 2),
+			const_cast<PWSTR>(wsValueName.c_str())
 		};
 
 		NTSTATUS status{ Linker::NtDeleteValueKey(hkBackingKey, &RegistryKeyName)};
