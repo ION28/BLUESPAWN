@@ -1,0 +1,526 @@
+{
+	"mitigations": [
+		{
+			"name": "M1025 - Privileged Process Integrity",
+			"description": "Protect processes with high privileges that can be used to interact with critical system components through use of protected process light, anti-process injection defenses, or other process integrity enforcement measures",
+			"software": "Windows",
+			"policies": [
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Run LSA As PPL",
+					"description": "Run the Local Security Authority as a Protected Process Lite, preventing process injection and other attacks on lsass.exe's memory",
+					"enforcement-level": "moderate",
+					"min-software-version": "6.3",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Control\\Lsa",
+					"value-name": "RunAsPPL",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				}
+			]
+		},
+		{
+			"name": "M1028 - Operating System Configuration",
+			"description": "Make configuration changes related to the operating system or a common feature of the operating system that result in system hardening against techniques.",
+			"software": "Windows",
+			"policies": [
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17417",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. This setting enables the firewall when connected to a public network",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\PublicProfile",
+					"value-name": "EnableFirewall",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17415",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. This setting enables the firewall when connected to the domain.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\DomainProfile",
+					"value-name": "EnableFirewall",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17416",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. This setting enables the firewall when connected to a private network.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile",
+					"value-name": "EnableFirewall",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17440",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. The display of notifications to the user when a program is blocked from receiving an inbound connection on a public network must be enabled to alert the user of potential issues.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\PublicProfile",
+					"value-name": "DisableNotifications",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "forbid-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17420",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. The display of notifications to the user when a program is blocked from receiving an inbound connection in the domain must be enabled to alert the user of potential issues.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\DomainProfile",
+					"value-name": "DisableNotifications",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "forbid-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17430",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. The display of notifications to the user when a program is blocked from receiving an inbound connection on a private network must be enabled to alert the user of potential issues.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile",
+					"value-name": "DisableNotifications",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "forbid-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17438",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. Unsolicited inbound connections may be malicious attempts to gain access to a system. Unsolicited inbound connections, for which there is no rule allowing the connection, will be blocked on a public network",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\PublicProfile",
+					"value-name": "DefaultInboundAction",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17418",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. Unsolicited inbound connections may be malicious attempts to gain access to a system. Unsolicited inbound connections, for which there is no rule allowing the connection, will be blocked in the domain.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\DomainProfile",
+					"value-name": "DefaultInboundAction",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-17428",
+					"description": "A firewall provides a line of defense against attack. To be effective, it must be enabled and properly configured. Unsolicited inbound connections may be malicious attempts to gain access to a system. Unsolicited inbound connections, for which there is no rule allowing the connection, will be blocked on a private network. ",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile",
+					"value-name": "DefaultInboundAction",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-1093: Anonymous enumeration of shares must be restricted",
+					"description": "This is a High finding because allowing anonymous logon users (null session connections) to list all account names and enumerate all shared resources can provide a map of potential points to attack the system.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Control\\Lsa",
+					"value-name": "restrictanonymous",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-1153: The LanMan authentication level must be set to send NTLMv2 response only, and to refuse LM and NTLM",
+					"description": "The Kerberos v5 authentication protocol is the default for authentication of users who are logging on to domain accounts. NTLM which is less secure, is retained in later Windows versions for compatibility with clients and servers that are running earlier versions of Windows or applications that still use it. It is also used to authenticate logons to stand-alone computers that are running later versions.",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Control\\Lsa",
+					"value-name": "LmCompatibilityLevel",
+					"data-value": 5,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-3338: Unauthorized named pipes are accessible with anonymous credentials",
+					"description": "This is a High finding because of the potential for gaining unauthorized system access. Pipes are internal system communications processes. They are identified internally by ID numbers that vary between systems. To make access to these processes easier, these pipes are given names that do not vary between systems. This setting controls which of these pipes anonymous users may access.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters",
+					"value-name": "NullSessionPipes",
+					"data-value": [],
+					"data-type": "REG_MULTI_SZ",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-3340: Unauthorized shares can be accessed anonymously",
+					"description": "This is a High finding finding because of the potential for gaining unauthorized system access. Any shares listed can be accessed by any network user. This could lead to the exposure or corruption of sensitive data.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Services\\LanManServer\\Parameters",
+					"value-name": "NullSessionShares",
+					"data-value": [],
+					"data-type": "REG_MULTI_SZ",
+					"registry-value-policy-type": "require-subset-of"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-3344: Local accounts with blank passwords restricted to console logon only",
+					"description": "This is a Category 1 finding because no accounts with blank passwords should exist on a system. The password policy should prevent this from occurring. However, if a local account with a blank password does exist, enabling this setting will limit the account to local console logon only.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Control\\Lsa",
+					"value-name": "LimitBlankPasswordUse",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-3376: The system must be configured to prevent the storage of passwords and credentials.",
+					"description": " This setting controls the storage of passwords and credentials for network authentication on the local system. Such credentials must not be stored on the local machine, as that may lead to account compromise.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Control\\Lsa",
+					"value-name": "DisableDomainCreds",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-3379: The system is configured to store the LAN Manager hash of the password in the SAM",
+					"description": "This setting controls whether or not a LAN Manager hash of the password is stored in the SAM the next time the password is changed. The LAN Manager hash uses a weak encryption algorithm and there are several tools available that use this hash to retrieve account passwords.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\System\\CurrentControlSet\\Control\\Lsa",
+					"value-name": "NoLMHash",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-3479: The system will be configured to use Safe DLL Search Mode",
+					"description": "The default search behavior, when an application calls a function in a Dynamic Link Library (DLL), is to search the current directory followed by the directories contained in the systems path environment variable. An unauthorized DLL inserted into an applications working directory could allow malicious code to be run on the system. Creating the following registry key and setting the appropriate value forces the system to search the %Systemroot% for the DLL before searching the current directory or the rest of the path",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager",
+					"value-name": "SafeDllSearchMode",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-63597: Apply UAC privileged token filtering for network logons",
+					"description": "With User Account Control enabled, filtering the privileged token for built-in administrator accounts will prevent the elevated privileges of these accounts from being used over the network.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager",
+					"value-name": "SafeDllSearchMode",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-63687: Caching of logon credentials must be limited",
+					"description": "The default Windows configuration caches the last logon credentials for users who log on interactively to a system. This feature is provided for system availability reasons, such as the user's machine being disconnected from the network or domain controllers being unavailable. Even though the credential cache is well-protected, if a system is attacked, an unauthorized individual may isolate the password to a domain user account using a password-cracking program and gain access to the domain.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+					"value-name": "CachedLogonsCount",
+					"data-value": 0,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-63817: User Account Control approval mode for the built-in Administrator must be enabled",
+					"description": "User Account Control (UAC) is a security mechanism for limiting the elevation of privileges, including administrative accounts, unless authorized. This setting configures the built-in Administrator account so that it runs in Admin Approval Mode.",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+					"value-name": "FilterAdministratorToken",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-63825: User Account Control must be configured to detect application installations and prompt for elevation",
+					"description": "User Account Control (UAC) is a security mechanism for limiting the elevation of privileges, including administrative accounts, unless authorized. This setting requires Windows to respond to application installation requests by prompting for credentials.",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+					"value-name": "EnableInstallerDetection",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-63829: User Account Control must run all administrators in Admin Approval Mode, enabling UAC",
+					"description": "User Account Control (UAC) is a security mechanism for limiting the elevation of privileges, including administrative accounts, unless authorized. This setting enables UAC.",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+					"value-name": "EnableLUA",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-71769: Remote calls to the Security Account Manager (SAM) must be restricted to Administrators",
+					"description": "The Windows Security Account Manager (SAM) stores users' passwords. Restricting remote rpc connections to the SAM to Administrators helps protect those credentials.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa",
+					"value-name": "RestrictRemoteSAM",
+					"data-value": "O:BAG:BAD:(A;;RC;;;BA)",
+					"data-type": "REG_SZ",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-73585 - The Windows Installer Always install with elevated privileges option must be disabled",
+					"description": "Standard user accounts must not be granted elevated privileges. Enabling Windows Installer to elevate privileges when installing applications can allow malicious persons and applications to gain full control of a system.",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer",
+					"value-name": "InstallAlwaysElevated",
+					"data-value": 0,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				}
+			]
+		},
+		{
+			"name": "M1035 - Limit Access to Resource over Network",
+			"description": "Prevent access to file shares, remote access to systems, unnecessary services. Mechanisms to limit access may include use of network concentrators, RDP gateways, etc",
+			"software": "Windows",
+			"policies": [
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Nessus Plugin ID 58453",
+					"description": "This is a High severity finding due to the Bluekeep vulnerability that allows for a worm to quickly move through a network when NLA is disabled. RDP is a service that allows remote access to Windows computers",
+					"enforcement-level": "low",
+					"min-software-version": "5.1.2600",
+					"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
+					"value-name": "UserAuthentication",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				}
+			]
+		},
+		{
+			"name": "M1042 - Disable or Remove Feature or Program ",
+			"description": "Remove or deny access to unnecessary and potentially vulnerable software to prevent abuse by adversaries.",
+			"software": "Windows",
+			"policies": [
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Disable LLMNR",
+					"description": "Link-Local Multicast Name Resolution (LLMNR) serve as alternate methods for host identification. Adversaries can spoof an authoritative source for name resolution on a victim network by responding to LLMNR (UDP 5355)/NBT-NS (UDP 137) traffic as if they know the identity of the requested host.",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient",
+					"value-name": "EnableMulticast",
+					"data-value": 0,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Disable NBT-NS",
+					"description": "NetBIOS Name Service (NBT-NS) serve as alternate methods for host identification. Adversaries can spoof an authoritative source for name resolution on a victim network by responding to LLMNR (UDP 5355)/NBT-NS (UDP 137) traffic as if they know the identity of the requested host.",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Services\\NetBT\\Parameters\\Interfaces\\*",
+					"value-name": "NetbiosOptions",
+					"data-value": 2,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Disable WSH",
+					"description": "Windows Script Host enables the execution of wscript and cscript which allow VB, JS, and other scripts to be run. This feature is not typically needed, and Sean Metcalf recommends disabling it https://adsecurity.org/?p=3299.",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\Software\\Microsoft\\Windows Script Host\\Settings",
+					"value-name": "Enabled",
+					"data-value": 0,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-73519: The Server Message Block (SMB) v1 protocol must be disabled on the SMB server",
+					"description": "SMBv1 is a legacy protocol that uses the MD5 algorithm as part of SMB. MD5 is known to be vulnerable to a number of attacks such as collision and preimage attacks as well as not being FIPS compliant. Disabling SMBv1 support may prevent access to file or print sharing resources with systems or devices that only support SMBv1. File shares and print services hosted on Windows Server 2003 are an example, however Windows Server 2003 is no longer a supported operating system. Some older network attached devices may only support SMBv1",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters",
+					"value-name": "SMB1",
+					"data-value": 0,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "combined-policy",
+					"name": "V-72753: WDigest Authentication must be disabled",
+					"description": "When the WDigest Authentication protocol is enabled, plain text passwords are stored in the Local Security Authority Subsystem Service (LSASS) exposing them to theft. This setting will prevent WDigest from storing credentials in memory.",
+					"enforcement-level": "low",
+					"mode": "or",
+					"subpolicies": [
+						{
+							"policy-type": "registry-value-policy",
+							"name": "Set UseLogonCredential to 0",
+							"enforcement-level": "low",
+							"min-software-version": "6.3",
+							"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest",
+							"value-name": "UseLogonCredential",
+							"data-value": 0,
+							"data-type": "REG_DWORD",
+							"registry-value-policy-type": "require-exact"
+						},
+						{
+							"policy-type": "registry-value-policy",
+							"name": "Remove WDigest",
+							"enforcement-level": "low",
+							"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa",
+							"value-name": "Security Packages",
+							"data-value": [ "wdigest" ],
+							"data-type": "REG_MULTI_SZ",
+							"registry-value-policy-type": "forbid-subset-of"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "M1047 - Audit",
+			"description": "Configure the system to perform audits or scans of systems, permissions, insecure software, insecure configurations, etc. to identify potential weaknesses",
+			"software": "Windows",
+			"policies": [
+				{
+					"policy-type": "combined-policy",
+					"name": "Enable Sysmon Service",
+					"description": "If the sysmon service is installed, ensure it is enabled.",
+					"enforcement-level": "moderate",
+					"mode": "or",
+					"subpolicies": [
+						{
+							"policy-type": "registry-value-policy",
+							"name": "Sysmon Service Enabled",
+							"enforcement-level": "moderate",
+							"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Services\\Sysmon",
+							"value-name": "start",
+							"data-value": 2,
+							"data-type": "REG_DWORD",
+							"registry-value-policy-type": "require-exact"
+						},
+						{
+							"policy-type": "registry-value-policy",
+							"name": "Sysmon64 Service Enabled",
+							"enforcement-level": "moderate",
+							"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Services\\Sysmon64",
+							"value-name": "start",
+							"data-value": 2,
+							"data-type": "REG_DWORD",
+							"registry-value-policy-type": "require-exact"
+						},
+						{
+							"policy-type": "registry-subkey-policy",
+							"name": "Sysmon not installed",
+							"enforcement-level": "low",
+							"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Services",
+							"subkey-policy-type": "blacklist",
+							"subkey-names": [ "Sysmon", "Sysmon64" ]
+						}
+					]
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "EventLog Service Enabled",
+					"description": "Enables the Windows Event Log Service",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\SYSTEM\\CurrentControlSet\\Services\\EventLog",
+					"value-name": "start",
+					"data-value": 2,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "V-73511: Command line data must be included in process creation events",
+					"description": "Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot service disruptions, and analyze compromises that have occurred, as well as detect attacks. Collecting this data is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected behavior.",
+					"enforcement-level": "moderate",
+					"key-path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\Audit",
+					"value-name": "ProcessCreationIncludeCmdLine_Enabled",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "require-exact"
+				},
+				{
+					"policy-type": "event-log",
+					"name": "Enable Event Logs",
+					"description": "Enable important event log channels",
+					"enforcement-level": "low",
+					"channels": [
+						"Microsoft-Windows-CertificateServicesClient-Lifecycle-System/Operational",
+						"Microsoft-Windows-Bits-Client/Operational",
+						"Microsoft-Windows-AppLocker/EXE and DLL",
+						"Microsoft-Windows-AppLocker/MSI and Script",
+						"Security",
+						"System",
+						"Microsoft-Windows-Powershell/Operational",
+						"Microsoft-Windows-TaskScheduler/Operational",
+						"Microsoft-Windows-Windows Defender/Operational",
+						"Microsoft-Windows-Windows Defender/Operational",
+						"Microsoft-Windows-Windows Firewall With Advanced Security/Firewall"
+					]
+				}
+			]
+		},
+		{
+			"name": "M1054 - Software Configuration",
+			"description": "Implement configuration changes to software (other than the operating system) to mitigate security risks associated to how the software operates",
+			"software": "Windows",
+			"policies": [
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Antispyware Notifications",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\Software\\Microsoft\\Security Center",
+					"value-name": "AntiSpyWareDisableNotify",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "forbid-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Antivirus Notifications",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\Software\\Microsoft\\Security Center",
+					"value-name": "AntiVirusDisableNotify",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "forbid-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "UAC Notifications",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\Software\\Microsoft\\Security Center",
+					"value-name": "UacDisableNotify",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "forbid-exact"
+				},
+				{
+					"policy-type": "registry-value-policy",
+					"name": "Firewall Notifications",
+					"enforcement-level": "low",
+					"key-path": "HKLM\\Software\\Microsoft\\Security Center",
+					"value-name": "FirewallDisableNotify",
+					"data-value": 1,
+					"data-type": "REG_DWORD",
+					"registry-value-policy-type": "forbid-exact"
+				}
+			]
+		}
+	]
+}

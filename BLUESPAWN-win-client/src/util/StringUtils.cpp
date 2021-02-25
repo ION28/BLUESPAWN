@@ -48,14 +48,14 @@ std::wstring ExpandEnvStringsW(const std::wstring& in) {
     return str;
 }
 
-std::string ExpandEnvStringsW(const std::string& in) {
-    CHAR* expanded = new CHAR[MAX_PATH];
-    auto result = ExpandEnvironmentStringsA(in.c_str(), expanded, MAX_PATH);
-    if(result > MAX_PATH) {
-        delete[] expanded;
-        expanded = new CHAR[result];
-        result = ExpandEnvironmentStringsA(in.c_str(), expanded, result);
-    }
+std::string ExpandEnvStringsA(const std::string& in){
+	CHAR* expanded = new CHAR[MAX_PATH];
+	auto result = ExpandEnvironmentStringsA(in.c_str(), expanded, MAX_PATH);
+	if(result > MAX_PATH){
+		delete[] expanded;
+		expanded = new CHAR[result];
+		result = ExpandEnvironmentStringsA(in.c_str(), expanded, result);
+	}
 
     std::string str{ expanded };
 

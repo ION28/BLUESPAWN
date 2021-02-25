@@ -39,6 +39,9 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -72,6 +75,7 @@
     <ClCompile Include="external\pe-sieve\scanners\workingset_scanner.cpp" />
     <ClCompile Include="external\pe-sieve\utils\artefacts_util.cpp" />
     <ClCompile Include="external\pe-sieve\utils\console_color.cpp" />
+    <ClCompile Include="external\pe-sieve\utils\debug.cpp" />
     <ClCompile Include="external\pe-sieve\utils\format_util.cpp" />
     <ClCompile Include="external\pe-sieve\utils\modules_enum.cpp" />
     <ClCompile Include="external\pe-sieve\utils\path_converter.cpp" />

@@ -17,9 +17,9 @@ namespace Hunts {
         std::vector<std::wstring> web_directories = { L"C:\\inetpub\\wwwroot", L"C:\\xampp\\htdocs" };
         std::vector<std::wstring> web_exts = { L".php",  L".jsp",  L".jspx", L".asp",
                                                L".aspx", L".asmx", L".ashx", L".ascx" };
-        std::regex php_vuln_functions{};
-        std::regex asp_indicators{};
-        std::regex jsp_indicators{};
+        std::regex php_vuln_functions;
+        std::regex asp_indicators;
+        std::regex jsp_indicators;
         std::smatch match_index;
 
         public:

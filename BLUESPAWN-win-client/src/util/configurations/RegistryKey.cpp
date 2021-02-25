@@ -55,7 +55,7 @@ namespace Registry {
 		BeginCriticalSection _{ hGuard };
 		if(hKey){
 			if(counts.find(hKey) != counts.end()){
-				if(!--counts[hKey] && !(ULONG_PTR(hKey) & 0xFFFFFFFF80000000)){
+				if(!--counts[hKey] && !(reinterpret_cast<ULONG_PTR>(hKey) & 0xFFFFFFFF80000000)){
 					CloseHandle(hKey);
 				}
 			}
@@ -77,6 +77,8 @@ namespace Registry {
 		bKeyExists{ key.bKeyExists },
 		bWow64{ key.bWow64 },
 		hkBackingKey{ key.hkBackingKey },
+		path{ key.path },
+		hkHive{ key.hkHive },
 		tracker{ __tracker }{
 
 		tracker->Increment(hkBackingKey);
@@ -86,6 +88,8 @@ namespace Registry {
 		this->bKeyExists = key.bKeyExists;
 		this->bWow64 = key.bWow64;
 		this->hkBackingKey = key.hkBackingKey;
+		this->path = key.path;
+		this->hkHive = key.hkHive;
 
 		tracker->Increment(hkBackingKey);
 
@@ -96,6 +100,8 @@ namespace Registry {
 		bKeyExists{ key.bKeyExists },
 		bWow64{ key.bWow64 },
 		hkBackingKey{ key.hkBackingKey },
+		path{ std::move(key.path) },
+		hkHive{ key.hkHive },
 		tracker{ __tracker }{
 
 		key.bKeyExists = false;
@@ -109,6 +115,8 @@ namespace Registry {
 		this->bKeyExists = key.bKeyExists;
 		this->bWow64 = key.bWow64;
 		this->hkBackingKey = key.hkBackingKey;
+		this->path = std::move(key.path);
+		this->hkHive = key.hkHive;
 
 		key.bKeyExists = false;
 		key.bWow64 = false;
@@ -130,7 +138,7 @@ namespace Registry {
 	}
 
 	RegistryKey::RegistryKey(HKEY hive, std::wstring path, bool WoW64) :
-		tracker{ __tracker }{
+		tracker{ __tracker }, hkHive{ hive }, path{ path }{
 		auto wLowerPath = ToLowerCase(path);
 
 		bWow64 = WoW64 || wLowerPath.find(L"wow6432node") != std::wstring::npos;
@@ -141,15 +149,16 @@ namespace Registry {
 
 		if(status != ERROR_SUCCESS){
 			bKeyExists = false;
-
-			this->hkHive = hive;
-			this->path = path;
 		} else {
 			bKeyExists = true;
 
 			tracker->Increment(hkBackingKey);
 		}
 	}
+
+	RegistryKey::RegistryKey(const RegistryKey& hive, const std::wstring& path, bool wow64) :
+		RegistryKey{ hive.Exists() ? hive.hkBackingKey : hive.hkHive, hive.Exists() ? path : hive.path + L"\\" + path, 
+		             wow64 }{}
 	
 	RegistryKey::RegistryKey(std::wstring name, bool WoW64) :
 		tracker{ __tracker }{
@@ -168,7 +177,7 @@ namespace Registry {
 		else {
 			hkHive = vHiveNames[HiveName];
 
-			if(slash == name.length()){
+			if(slash == name.length() || slash == std::wstring::npos){
 				this->bKeyExists = true;
 				this->bWow64 = false;
 				this->hkBackingKey = hkHive;
@@ -196,7 +205,9 @@ namespace Registry {
 	}
 
 	RegistryKey::~RegistryKey(){
-		tracker->Decrement(hkBackingKey);
+		if(Exists()){
+			tracker->Decrement(hkBackingKey);
+		}
 	}
 
 	bool RegistryKey::CheckKeyExists(HKEY hive, const std::wstring& name, bool WoW64){
@@ -227,8 +238,8 @@ namespace Registry {
 
 		UNICODE_STRING RegistryKeyName{ 
 			static_cast<USHORT>(wsValueName.length() * 2), 
-			static_cast<USHORT>(wsValueName.length() * 2), 
-			const_cast<PWSTR>(wsValueName.c_str()) 
+			static_cast<USHORT>(wsValueName.length() * 2 + 2),
+			const_cast<PWSTR>(wsValueName.c_str())
 		};
 
 		ULONG size{};
@@ -247,7 +258,9 @@ namespace Registry {
 			return false;
 		}
 
-		LSTATUS status = RegCreateKeyEx(hkHive, path.c_str(), 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &hkBackingKey, nullptr);
+		LSTATUS status = RegCreateKeyExW(hkHive, path.c_str(), 0, nullptr, 0, 
+										KEY_ALL_ACCESS | (this->bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY), nullptr,
+										&hkBackingKey, nullptr);
 		if(status == ERROR_SUCCESS){
 			bKeyExists = true;
 
@@ -261,16 +274,16 @@ namespace Registry {
 		return false;
 	}
 
-	AllocationWrapper RegistryKey::GetRawValue(const std::wstring& ValueName) const {
+	AllocationWrapper RegistryKey::GetRawValue(const std::wstring& wsValueName) const {
 		if(!Exists()){
 			SetLastError(FILE_DOES_NOT_EXIST);
 			return { nullptr, 0 };
 		}
 
 		UNICODE_STRING RegistryKeyName{
-			static_cast<USHORT>(ValueName.length() * 2),
-			static_cast<USHORT>(ValueName.length() * 2),
-			const_cast<PWSTR>(ValueName.c_str())
+			static_cast<USHORT>(wsValueName.length() * 2),
+			static_cast<USHORT>(wsValueName.length() * 2 + 2),
+			const_cast<PWSTR>(wsValueName.c_str())
 		};
 
 		ULONG size{};
@@ -295,16 +308,16 @@ namespace Registry {
 		return { lpbValue, dwDataSize, AllocationWrapper::CPP_ARRAY_ALLOC };
 	}
 
-	std::optional<RegistryType> RegistryKey::GetValueType(const std::wstring& ValueName) const {
+	std::optional<RegistryType> RegistryKey::GetValueType(const std::wstring& wsValueName) const {
 		if(!Exists()){
 			SetLastError(FILE_DOES_NOT_EXIST);
 			return std::nullopt;
 		}
 
 		UNICODE_STRING RegistryKeyName{
-			static_cast<USHORT>(ValueName.length() * 2),
-			static_cast<USHORT>(ValueName.length() * 2),
-			const_cast<PWSTR>(ValueName.c_str())
+			static_cast<USHORT>(wsValueName.length() * 2),
+			static_cast<USHORT>(wsValueName.length() * 2 + 2),
+			const_cast<PWSTR>(wsValueName.c_str())
 		};
 
 		ULONG size{};
@@ -378,7 +391,8 @@ namespace Registry {
 			return false;
 		}
 
-		LSTATUS status = RegSetValueEx(hkBackingKey, name.c_str(), 0, dwType, reinterpret_cast<BYTE*>((LPVOID) bytes), bytes.GetSize());
+		LSTATUS status = RegSetValueEx(hkBackingKey, name.c_str(), 0, dwType, reinterpret_cast<BYTE*>((LPVOID) bytes),
+									   bytes.GetSize());
 		if(status != ERROR_SUCCESS){
 			SetLastError(status);
 			return false;
@@ -394,9 +408,11 @@ namespace Registry {
 
 	template<>
 	bool RegistryKey::SetValue(const std::wstring& name, LPCWSTR value, DWORD size, DWORD type) const {
-		return RegistryKey::SetRawValue(name, { PBYTE(value), wcslen(value) * 2 + 2, AllocationWrapper::STACK_ALLOC }, type);
+		return RegistryKey::SetRawValue(name, { PBYTE(value), wcslen(value) * 2 + 2, AllocationWrapper::STACK_ALLOC },
+										type);
 	}
-	template bool RegistryKey::SetValue<LPCWSTR>(const std::wstring& name, LPCWSTR value, DWORD size, DWORD type) const;
+	template bool RegistryKey::SetValue<LPCWSTR>(const std::wstring& name, LPCWSTR value, DWORD size, 
+												 DWORD type) const;
 
 	template<>
 	bool RegistryKey::SetValue(const std::wstring& name, LPCSTR value, DWORD size, DWORD type) const {
@@ -414,41 +430,32 @@ namespace Registry {
 	bool RegistryKey::SetValue(const std::wstring& name, std::wstring value, DWORD size, DWORD type) const {
 		return SetValue<LPCWSTR>(name, value.c_str(), static_cast<DWORD>((value.size() + 1) * 2), REG_SZ);
 	}
-	template bool RegistryKey::SetValue<std::wstring>(const std::wstring& name, std::wstring value, DWORD size, DWORD type) const;
+	template bool RegistryKey::SetValue<std::wstring>(const std::wstring& name, std::wstring value, DWORD size, 
+													  DWORD type) const;
 
 	template<>
-	bool RegistryKey::SetValue(const std::wstring& name, std::string value, DWORD size, DWORD type) const {
+	bool RegistryKey::SetValue(const std::wstring& name, std::string value, DWORD size, DWORD type) const{
 		return SetValue<std::wstring>(name, StringToWidestring(value));
 	}
-	template bool RegistryKey::SetValue<std::string>(const std::wstring& name, std::string value, DWORD size, DWORD type) const;
+	template bool RegistryKey::SetValue<std::string>(const std::wstring& name, std::string value, DWORD size, 
+													 DWORD type) const;
 
-	template<>
-	bool RegistryKey::SetValue(const std::wstring& name, std::vector<std::wstring> value, DWORD _size, DWORD type) const {
-		SIZE_T size = 1;
-		for(auto string : value){
-			size += (string.length() + 1);
+	bool RegistryKey::SetDataValue(const std::wstring& name, RegistryData value) const{
+		auto idx = value.index();
+		if(idx == 0){
+			return SetValue<std::wstring>(name, std::get<0>(value));
 		}
-
-		auto data = new WCHAR[size];
-		auto allocation = AllocationWrapper{ data, static_cast<DWORD>(size * sizeof(WCHAR)), AllocationWrapper::CPP_ARRAY_ALLOC };
-		unsigned ptr = 0;
-
-		for(auto string : value){
-			LPCWSTR lpRawString = string.c_str();
-			for(unsigned i = 0; i < string.length() + 1; i++){
-				if(ptr < size){
-					data[ptr++] = lpRawString[i];
-				}
-			}
+		if(idx == 1){
+			return SetValue<DWORD>(name, std::get<1>(value));
 		}
-
-		if(ptr < size){
-			data[ptr] = { static_cast<WCHAR>(0) };
+		if(idx == 2){
+			return SetRawValue(name, std::get<2>(value), REG_BINARY);
 		}
-
-		bool succeeded = SetRawValue(name, allocation, REG_MULTI_SZ);
-
-		return succeeded;
+		if(idx == 3){
+			return SetValue<std::vector<std::wstring>>(name, std::get<3>(value));
+		} else{
+			throw std::exception("Unknown registry data type");
+		}
 	}
 
 	template bool RegistryKey::SetValue<std::vector<std::wstring>>(const std::wstring& name, std::vector<std::wstring> value,
@@ -609,10 +616,11 @@ namespace Registry {
 	}
 
 	bool RegistryKey::RemoveValue(const std::wstring& wsValueName) const {
-		UNICODE_STRING RegistryKeyName{ 
-			static_cast<USHORT>(wsValueName.length() * 2), 
+
+		UNICODE_STRING RegistryKeyName{
 			static_cast<USHORT>(wsValueName.length() * 2),
-			const_cast<PWSTR>(wsValueName.c_str()) 
+			static_cast<USHORT>(wsValueName.length() * 2 + 2),
+			const_cast<PWSTR>(wsValueName.c_str())
 		};
 
 		NTSTATUS status{ Linker::NtDeleteValueKey(hkBackingKey, &RegistryKeyName)};
@@ -622,6 +630,25 @@ namespace Registry {
 
 	RegistryKey::operator HKEY() const {
 		return hkBackingKey;
+	}
+
+	bool RegistryKey::DeleteSubkey(const std::wstring& name) const {
+		if(!Exists()){
+			return true;
+		}
+
+		if(!RegistryKey::CheckKeyExists(hkBackingKey, name, bWow64)){
+			return true;
+		}
+
+		LSTATUS status = RegDeleteKeyExW(hkBackingKey, name.c_str(), bWow64 ? KEY_WOW64_32KEY : KEY_WOW64_64KEY, 0);
+		if(status == ERROR_SUCCESS){
+			return true;
+		}
+
+		SetLastError(status);
+
+		return false;
 	}
 }
 

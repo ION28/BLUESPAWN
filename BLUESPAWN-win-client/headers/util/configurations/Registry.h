@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <optional>
+#include <variant>
 #include <type_traits>
 
 #include "util/DynamicLinker.h"
@@ -32,6 +33,9 @@ enum class RegistryType {
 };
 
 namespace Registry {
+
+	typedef std::variant<std::wstring, DWORD, AllocationWrapper, std::vector<std::wstring>> RegistryData;
+
 	extern std::map<std::wstring, HKEY> vHiveNames;
 	extern std::map<HKEY, std::wstring> vHives;
 
@@ -89,6 +93,16 @@ namespace Registry {
 		 * @param path The path of the registry key to reference.
 		 */
 		RegistryKey(std::wstring path, bool WoW64 = false);
+
+		/**
+		 * \brief Construct a RegistryKey object reference to a key present under another RegistryKey object.
+		 * 
+		 * \param baseKey The base key.
+		 * \param subkeyName The relative path to the base key.
+		 * \param WoW64 Indicate whether this instance should refer to the WoW64 version of a key. For keys without 
+		 *        WoW64 versions, this has no effect. If Wow6432node is part of the provided path, this value is ignored.
+		 */
+		RegistryKey(const RegistryKey& baseKey, const std::wstring& subkeyName, bool wow64 = false);
 
 		/** Copy operator overload */
 		RegistryKey& operator=(const RegistryKey& key) noexcept;
@@ -224,7 +238,7 @@ namespace Registry {
 		/**
 		 * Sets data for a specified value under the referenced key and handles conversions from
 		 * common types. For common types, the size and type do not need to be specified.
-		 * Supported types: std::wstring, std::string, LPCSTR, LPCWSTR, DWORD, and 
+		 * Supported types: std::wstring, std::string, LPCSTR, LPCWSTR, DWORD, and
 		 * std::vector<std::wstring>.
 		 *
 		 * @param name The name of the value to set.
@@ -237,7 +251,47 @@ namespace Registry {
 		 * @return True if the value was successfully set; false otherwise.
 		 */
 		template<class T>
-		bool SetValue(const std::wstring&, T value, DWORD size = sizeof(T), DWORD type = REG_BINARY) const;
+		bool SetValue(const std::wstring& name, T value, DWORD size = sizeof(T), DWORD type = REG_BINARY) const;
+
+		template<>
+		bool RegistryKey::SetValue(const std::wstring& name, std::vector<std::wstring> value, DWORD _size, DWORD type) const{
+			SIZE_T size = 1;
+			for(auto string : value){
+				size += (string.length() + 1);
+			}
+
+			auto data = new WCHAR[size];
+			auto allocation = AllocationWrapper{ data, static_cast<DWORD>(size * sizeof(WCHAR)), AllocationWrapper::CPP_ARRAY_ALLOC };
+			unsigned ptr = 0;
+
+			for(auto string : value){
+				LPCWSTR lpRawString = string.c_str();
+				for(unsigned i = 0; i < string.length() + 1; i++){
+					if(ptr < size){
+						data[ptr++] = lpRawString[i];
+					}
+				}
+			}
+
+			if(ptr < size){
+				data[ptr] = { static_cast<WCHAR>(0) };
+			}
+
+			bool succeeded = SetRawValue(name, allocation, REG_MULTI_SZ);
+
+			return succeeded;
+		}
+
+		/**
+		 * Sets data for a specified value under the referenced key given a RegistryData object wrapping the underlying
+		 * data
+		 *
+		 * @param name The name of the value to set.
+		 * @param value The data to write to the value.
+		 *
+		 * @return True if the value was successfully set; false otherwise.
+		 */
+		bool SetDataValue(const std::wstring& name, RegistryData value) const;
 
 		/**
 		 * Returns a list of values present under the currently referenced registry key.
@@ -307,6 +361,15 @@ namespace Registry {
 		 * @return a boolean indicating whether the value was successfully removed
 		 */
 		bool RemoveValue(const std::wstring& wsValueName) const;
+
+		/**
+		 * \brief Deletes the specified subkey under the referenced registry key, all its subkeys, and all its values
+		 * 
+		 * \param name The name of the subkey to delete.
+		 * 
+		 * \return True if the subkey no longer exists.
+		 */
+		bool DeleteSubkey(const std::wstring& subkey) const;
 
 		operator HKEY() const;
 	};

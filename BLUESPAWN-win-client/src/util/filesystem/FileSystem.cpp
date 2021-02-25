@@ -274,7 +274,7 @@ namespace FileSystem {
 
     bool File::HasReadAccess() const { return bReadAccess; }
 
-    bool File::Write(IN const LPVOID value,
+    bool File::Write(IN const LPCVOID value,
                      IN const long offset,
                      IN const unsigned long length,
                      IN const bool truncate OPTIONAL,

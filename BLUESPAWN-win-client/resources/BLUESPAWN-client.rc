@@ -97,6 +97,8 @@ YaraIndicators          yararule                "resources\\indicators"
 GoodSIP                 textfile                "resources\\SIP"
 GoodTrustProviders      textfile                "resources\\TrustProviders"
 
+DefaultMitigations      textfile                "resources\\mitigations.json"
+
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 

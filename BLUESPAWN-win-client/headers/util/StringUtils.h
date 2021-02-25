@@ -48,7 +48,7 @@ std::wstring ExpandEnvStringsW(const std::wstring& in);
  *
  * @return The string with all environment strings expanded.
  */
-std::wstring ExpandEnvStringsA(const std::string& in);
+std::string ExpandEnvStringsA(const std::string& in);
 
 /**
 * Zero pads a number to the specified width, useful for zeropadding dates

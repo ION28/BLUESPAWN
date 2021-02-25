@@ -88,15 +88,18 @@ namespace Hunts {
 
                     for(auto GUID : SIPType.EnumerateSubkeyNames()) {
                         RegistryKey GUIDInfo{ SIPType, GUID };
-                        auto dll{ RegistryValue::Create(SIPType, L"Dll") };
-                        auto func{ RegistryValue::Create(SIPType, L"FuncName") };
+                        auto dll{ RegistryValue::Create(GUIDInfo, L"Dll") };
+                        auto func{ RegistryValue::Create(GUIDInfo, L"FuncName") };
                         GUID = GUID.substr(1, GUID.length() - 2);
 
                         if(entry.find(GUID) != entry.end()) {
                             auto& pair{ entry.at(GUID) };
                             if(func && func->ToString() != pair.second) {
-                                CREATE_DETECTION(Certainty::Strong,
-                                                 RegistryDetectionData{ *func, RegistryDetectionType::Configuration });
+                                CREATE_DETECTION_WITH_CONTEXT(
+                                    Certainty::Strong,
+                                    RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
+                                    DetectionContext{ __name },
+                                    [GUIDInfo, pair](){ GUIDInfo.SetValue(L"FuncName", pair.second); });
                             }
 
                             if(dll) {
@@ -111,7 +114,7 @@ namespace Hunts {
                             }
                         } else {
                             auto message{ L"Nonstandard subject interface provider GUID " + GUID + L" (DLL: " +
-                                          dll->ToString() + L", Function: " + dll->ToString() + L")" };
+                                          dll->ToString() + L", Function: " + func->ToString() + L")" };
 
                             if(func) {
                                 CREATE_DETECTION_WITH_CONTEXT(
@@ -153,8 +156,11 @@ namespace Hunts {
                         if(entry.find(GUID) != entry.end()) {
                             auto& pair{ entry.at(GUID) };
                             if(func && func->ToString() != pair.second) {
-                                CREATE_DETECTION(Certainty::Strong,
-                                                 RegistryDetectionData{ *func, RegistryDetectionType::Configuration });
+                                CREATE_DETECTION_WITH_CONTEXT(
+                                    Certainty::Strong,
+                                    RegistryDetectionData{ *func, RegistryDetectionType::Configuration },
+                                    DetectionContext{ __name },
+                                    [GUIDInfo, pair](){ GUIDInfo.SetValue(L"$Function", pair.second); });
                             }
 
                             if(files.find(dll->ToString()) == files.end()) {
