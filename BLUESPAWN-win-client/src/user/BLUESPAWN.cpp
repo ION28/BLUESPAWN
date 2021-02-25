@@ -523,8 +523,9 @@ int main(int argc, char* argv[]) {
                     if(file.GetFileExists()){
                         try{
                             auto contents{ file.Read() };
+                            char* buffer = contents.GetAsPointer<char>();
                             bluespawn.SetMitigationConfig(json::parse(nlohmann::detail::input_adapter(
-                                contents.GetAsPointer<char>(), contents.GetSize())));
+                                buffer, contents.GetSize())));
                         } catch(std::exception& e){
                             Bluespawn::io.AlertUser(L"Error parsing JSON: " + StringToWidestring(e.what()));
                         }
