@@ -182,7 +182,7 @@ bool MitigationRegister::ParseMitigationsJSON(const AllocationWrapper& contents)
     if(contents.GetSize()) {
         try {
             char* buffer = contents.GetAsPointer<char>();
-            auto data{ json::parse(nlohmann::detail::input_adapter(buffer, contents.GetSize())) };
+            auto data{ json::parse(nlohmann::detail::input_adapter(std::string(buffer, contents.GetSize()))) };
             if(data.find("mitigations") == data.end()) {
                 throw std::exception("unable to find mitigations");
             }
