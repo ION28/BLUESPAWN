@@ -9,6 +9,7 @@
 #include "util/eventlogs/EventLogs.h"
 #include "util/log/CLISink.h"
 #include "util/log/DebugSink.h"
+#include "util/log/JSONSink.h"
 #include "util/log/XMLSink.h"
 
 #include "hunt/hunts/HuntT1036.h"
@@ -23,41 +24,17 @@
 #include "hunt/hunts/HuntT1543.h"
 #include "hunt/hunts/HuntT1546.h"
 #include "hunt/hunts/HuntT1547.h"
+#include "hunt/hunts/HuntT1548.h"
 #include "hunt/hunts/HuntT1553.h"
 #include "hunt/hunts/HuntT1562.h"
 #include "hunt/hunts/HuntT1569.h"
-#include "mitigation/mitigations/MitigateM1025.h"
-#include "mitigation/mitigations/MitigateM1028-WFW.h"
-#include "mitigation/mitigations/MitigateM1035-RDP.h"
-#include "mitigation/mitigations/MitigateM1042-LLMNR.h"
-#include "mitigation/mitigations/MitigateM1042-NBT.h"
-#include "mitigation/mitigations/MitigateM1042-WSH.h"
-#include "mitigation/mitigations/MitigateM1047.h"
-#include "mitigation/mitigations/MitigateM1054-RDP.h"
-#include "mitigation/mitigations/MitigateM1054-WSC.h"
-#include "mitigation/mitigations/MitigateV1093.h"
-#include "mitigation/mitigations/MitigateV1153.h"
-#include "mitigation/mitigations/MitigateV3338.h"
-#include "mitigation/mitigations/MitigateV3340.h"
-#include "mitigation/mitigations/MitigateV3344.h"
-#include "mitigation/mitigations/MitigateV3379.h"
-#include "mitigation/mitigations/MitigateV3479.h"
-#include "mitigation/mitigations/MitigateV63597.h"
-#include "mitigation/mitigations/MitigateV63687.h"
-#include "mitigation/mitigations/MitigateV63753.h"
-#include "mitigation/mitigations/MitigateV63817.h"
-#include "mitigation/mitigations/MitigateV63825.h"
-#include "mitigation/mitigations/MitigateV63829.h"
-#include "mitigation/mitigations/MitigateV71769.h"
-#include "mitigation/mitigations/MitigateV72753.h"
-#include "mitigation/mitigations/MitigateV73511.h"
-#include "mitigation/mitigations/MitigateV73519.h"
-#include "mitigation/mitigations/MitigateV73585.h"
 #include "reaction/CarveMemory.h"
 #include "reaction/DeleteFile.h"
 #include "reaction/QuarantineFile.h"
 #include "reaction/RemoveValue.h"
 #include "reaction/SuspendProcess.h"
+#include "scan/FileScanner.h"
+#include "scan/ProcessScanner.h"
 #include "user/CLI.h"
 
 #pragma warning(push)
@@ -78,7 +55,7 @@ LINK_FUNCTION(IsWow64Process2, KERNEL32.DLL);
 
 const IOBase& Bluespawn::io = CLI::GetInstance();
 HuntRegister Bluespawn::huntRecord{};
-MitigationRegister Bluespawn::mitigationRecord{ io };
+MitigationRegister Bluespawn::mitigationRecord{};
 Aggressiveness Bluespawn::aggressiveness{ Aggressiveness::Normal };
 DetectionRegister Bluespawn::detections{ Certainty::Moderate };
 ReactionManager Bluespawn::reaction{};
@@ -100,37 +77,12 @@ Bluespawn::Bluespawn() {
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1543>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1546>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1547>());
+    huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1548>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1553>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1562>());
     huntRecord.RegisterHunt(std::make_unique<Hunts::HuntT1569>());
 
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1025>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1028WFW>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1035RDP>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042LLMNR>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042NBT>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1042WSH>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1047>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1054RDP>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateM1054WSC>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1093>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV1153>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3338>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3340>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3344>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3379>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV3479>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63597>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63687>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63753>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63817>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63825>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV63829>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV71769>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV72753>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73511>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73519>());
-    mitigationRecord.RegisterMitigation(std::make_shared<Mitigations::MitigateV73585>());
+    mitigationRecord.Initialize();
 
     reactions.emplace("carve-memory", std::make_unique<Reactions::CarveMemoryReaction>());
     reactions.emplace("delete-file", std::make_unique<Reactions::DeleteFileReaction>());
@@ -149,13 +101,13 @@ void Bluespawn::RunHunts() {
     huntRecord.RunHunts(vIncludedHunts, vExcludedHunts, scope);
 }
 
-void Bluespawn::RunMitigations(bool enforce, bool force) {
+void Bluespawn::RunMitigations(bool enforce) {
     if(enforce) {
         Bluespawn::io.InformUser(L"Enforcing Mitigations");
-        mitigationRecord.EnforceMitigations(SecurityLevel::High, force);
+        mitigationRecord.PrintMitigationReports(mitigationRecord.EnforceMitigations(*mitigationConfig));
     } else {
         Bluespawn::io.InformUser(L"Auditing Mitigations");
-        mitigationRecord.AuditMitigations(SecurityLevel::High);
+        mitigationRecord.PrintMitigationReports(mitigationRecord.AuditMitigations(*mitigationConfig));
     }
 }
 
@@ -195,20 +147,30 @@ void Bluespawn::SetExcludedHunts(std::vector<std::string> excludedHunts) {
     }
 }
 
-void Bluespawn::Run() {
-    if(modes.find(BluespawnMode::SCAN) != modes.end()) {
-        aggressiveness = static_cast<Aggressiveness>(modes.at(BluespawnMode::SCAN));
-    } else {
-        aggressiveness = Aggressiveness::Normal;
+void Bluespawn::RunScan(){
+    std::vector<std::shared_ptr<Detection>> detections;
+    for(auto& file : scanFiles){
+        if(FileScanner::PerformQuickScan(file.GetFilePath())){
+            detections.emplace_back(Bluespawn::detections.AddDetection(Detection(FileDetectionData{ file })));
+        }
     }
+    for(auto pid : scanProcesses){
+        Hunts::HuntT1055::HandleReport(detections, Hunts::HuntT1055::QueueProcessScan(pid));
+    }
+}
+
+void Bluespawn::Run() {
     if(modes.find(BluespawnMode::MITIGATE) != modes.end()) {
-        RunMitigations(modes[BluespawnMode::MITIGATE] & 0x01, modes[BluespawnMode::MITIGATE] & 0x02);
+        RunMitigations(modes[BluespawnMode::MITIGATE]);
     }
     if(modes.find(BluespawnMode::HUNT) != modes.end()) {
         RunHunts();
     }
-    if(modes.find(BluespawnMode::MONITOR) != modes.end()) {
+    if(modes.find(BluespawnMode::MONITOR) != modes.end()){
         RunMonitor();
+    }
+    if(modes.find(BluespawnMode::SCAN) != modes.end()){
+        RunScan();
     }
 
     ThreadPool::GetInstance().Wait();
@@ -229,6 +191,10 @@ void print_help(cxxopts::ParseResult result, cxxopts::Options options) {
         output = std::regex_replace(options.help(), std::regex("hunt options"), "hunt/monitor options");
     }
     Bluespawn::io.InformUser(StringToWidestring(output));
+}
+
+void Bluespawn::SetMitigationConfig(const MitigationsConfiguration& config){
+    mitigationConfig = config;
 }
 
 void Bluespawn::check_correct_arch() {
@@ -252,7 +218,7 @@ void Bluespawn::check_correct_arch() {
     }
 }
 
-void ParseLogSinks(const std::string& sinks) {
+void ParseLogSinks(const std::string& sinks, const std::string& logdir) {
     std::set<std::string> sink_set;
     for(unsigned startIdx = 0; startIdx < sinks.size();) {
         auto endIdx{ sinks.find(',', startIdx) };
@@ -262,6 +228,19 @@ void ParseLogSinks(const std::string& sinks) {
         if(endIdx == std::string::npos) {
             break;
         }
+    }
+
+    std::wstring outputFolderPath = L".";
+
+    auto outputDir = FileSystem::Folder(StringToWidestring(logdir));
+    if(outputDir.GetFolderExists() && !outputDir.GetCurIsFile() && outputDir.GetFolderWrite()) {
+        outputFolderPath = outputDir.GetFolderPath();
+    } else {
+        LOG_ERROR(L"Unable to access " << StringToWidestring(logdir)
+                                       << L" to write logs. Defaulting to current directory.");
+        Bluespawn::io.AlertUser(L"Unable to access " + StringToWidestring(logdir) +
+                                    L" to write logs. Defaulting to current directory.",
+                                5000, ImportanceLevel::MEDIUM);
     }
 
     std::vector<std::reference_wrapper<Log::LogLevel>> levels{
@@ -275,9 +254,13 @@ void ParseLogSinks(const std::string& sinks) {
             Log::AddSink(console, levels);
             Bluespawn::detectionSinks.emplace_back(console);
         } else if(sink == "xml") {
-            auto XML = std::make_shared<Log::XMLSink>();
+            auto XML = std::make_shared<Log::XMLSink>(outputFolderPath);
             Log::AddSink(XML, levels);
             Bluespawn::detectionSinks.emplace_back(XML);
+        } else if(sink == "json") {
+            auto JSON = std::make_shared<Log::JSONSink>(outputFolderPath);
+            Log::AddSink(JSON, levels);
+            Bluespawn::detectionSinks.emplace_back(JSON);
         } else if(sink == "debug") {
             auto debug = std::make_shared<Log::DebugSink>();
             Log::AddSink(debug, levels);
@@ -311,6 +294,7 @@ Aggressiveness GetAggressiveness(const cxxopts::OptionValue& value) {
 
     return aHuntLevel;
 }
+
 int main(int argc, char* argv[]) {
     Log::LogLevel::LogError.Enable();
     Log::LogLevel::LogWarn.Enable();
@@ -337,30 +321,52 @@ int main(int argc, char* argv[]) {
             cxxopts::value<bool>())
         ("m,mitigate", "Mitigate vulnerabilities by applying security settings.", 
             cxxopts::value<bool>())
-        ("log", "Specify how BLUESPAWN should log events. Options are console, xml, and debug.",
-            cxxopts::value<std::string>()->default_value("console"))
+        ("s,scan", "Scan a particular process, file, or folder", cxxopts::value<bool>())
+        ("log", "Specify how BLUESPAWN should log events. Options are console, xml, json, and debug.",
+            cxxopts::value<std::string>()->default_value("console")->implicit_value("console"))
         ("help", "Help Information. You can also specify a category for help on a specific module such as hunt.",
             cxxopts::value<std::string>()->implicit_value("general"))
         ("v,verbose", "Verbosity", cxxopts::value<int>()->default_value("1"))
         ("debug", "Enable Debug Output", cxxopts::value<int>()->default_value("0"))
+        ("a,aggressiveness", "Sets the aggressiveness of BLUESPAWN. Options are cursory, normal, and intensive",
+         cxxopts::value<std::string>()->default_value("Normal"))
+        ("r,react", "Specifies how BLUESPAWN should react to potential threats dicovered during hunts. Available reactions are remove-value, carve-memory, suspend, delete-file, and quarantine-file",
+         cxxopts::value<std::string>()->default_value(""))
+        ;
+
+    options.add_options("scan")
+        ("scan-folder", "Specify a folder to scan", cxxopts::value<std::vector<std::string>>()->implicit_value({}))
+        ("scan-file", "Specify a file to scan", cxxopts::value<std::vector<std::string>>()->implicit_value({}))
+        ("scan-process", "Specify a process to scan by PID", cxxopts::value<std::vector<int>>()->implicit_value({}))
         ;
 
     options.add_options("hunt")
-		("a,aggressiveness", "Sets the aggressiveness of BLUESPAWN. Options are cursory, normal, and intensive.",
-            cxxopts::value<std::string>()->default_value("Normal"))
 		("hunts", "Only run the hunts specified. Provide as a comma separated list of Mitre ATT&CK Technique IDs.", 
             cxxopts::value<std::vector<std::string>>())
 		("exclude-hunts", "Run all hunts except those specified. Provide as a comma separated list of Mitre ATT&CK Technique IDs.", 
             cxxopts::value<std::vector<std::string>>())
-        ("r,react", "Specifies how BLUESPAWN should react to potential threats dicovered during hunts. Available reactions are remove-value, carve-memory, suspend, delete-file, and quarantine-file",
-            cxxopts::value<std::string>()->default_value(""))
 		;
 
+    options.add_options("log")
+		("o,output", "Specify the output folder for any logs written to a file", 
+            cxxopts::value<std::string>()->default_value("."))
+        ;
+
     options.add_options("mitigate")
-		("action", "Selects whether to audit or enforce each mitigations.",
+		("mode", "Selects whether to audit or enforce each mitigations. Options are audit and enforce. Ignored if "
+                 "--gen-config is specified",
             cxxopts::value<std::string>()->default_value("audit")->implicit_value("audit"))
-        ("force", "Use this option to forcibly apply mitigations with no prompt", 
-            cxxopts::value<bool>())
+        ("config-json", "Specify a file containing a JSON configuration for which mitigations and policies should run", 
+            cxxopts::value<std::string>())
+        ("enforcement-level", "Specify the enforcement level for mitigations. This is used to select which policies "
+                               "should be run. Available levels are none, low, moderate, high, and all",
+            cxxopts::value<std::string>()->default_value("moderate")->implicit_value("moderate"))
+        ("add-mitigations", "Specify additional JSON files containing mitigations.",
+            cxxopts::value<std::vector<std::string>>())
+        ("gen-config", "Generate a default JSON configuration file (./bluespawn-mitigation-config.json) with the "
+                       "specified level of detail. Options are global, mitigations, and mitigation-policies. Will not "
+                       "run any mitigations if this is specified",
+            cxxopts::value<std::string>()->default_value("mitigations"))
         ;
     // clang-format on
 
@@ -394,9 +400,13 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        ParseLogSinks(result["log"].as<std::string>());
+        ParseLogSinks(result["log"].as<std::string>(), result["output"].as<std::string>());
 
-        if(result.count("hunt") || result.count("monitor")) {
+        if(result.count("aggressiveness")){
+            bluespawn.aggressiveness = GetAggressiveness(result["aggressiveness"]);
+        }
+
+        if(result.count("hunt") || result.count("monitor") || result.count("scan")) {
             if(result.count("hunt")) {
                 bluespawn.EnableMode(BluespawnMode::HUNT);
             }
@@ -404,9 +414,36 @@ int main(int argc, char* argv[]) {
                 bluespawn.EnableMode(BluespawnMode::MONITOR);
             }
 
-            if(result.count("aggressiveness")) {
-                bluespawn.EnableMode(BluespawnMode::SCAN, static_cast<DWORD>(GetAggressiveness(result["aggressivenes"
-                                                                                                      "s"])));
+            if(result.count("scan")){
+                if(result.count("scan-file")){
+                    for(auto& filePath : result["scan-file"].as<std::vector<std::string>>()){
+                        FileSystem::File file{ StringToWidestring(filePath) };
+                        if(!file.GetFileExists()){
+                            Bluespawn::io.AlertUser(L"File " + file.GetFilePath() + L" not found");
+                            continue;
+                        }
+                        bluespawn.scanFiles.emplace_back(file);
+                    }
+                }
+                if(result.count("scan-folder")){
+                    for(auto& folderPath : result["scan-folder"].as<std::vector<std::string>>()){
+                        FileSystem::Folder folder{ StringToWidestring(folderPath) };
+                        if(!folder.GetFolderExists()){
+                            Bluespawn::io.AlertUser(L"Folder " + folder.GetFolderPath() + L" not found");
+                            continue;
+                        }
+                        auto folderContents{ folder.GetFiles() };
+                        for(auto& file : folderContents){
+                            bluespawn.scanFiles.emplace_back(file);
+                        }
+                    }
+                }
+                if(result.count("scan-process")){
+                    for(auto& process : result["scan-process"].as<std::vector<int>>()){
+                        bluespawn.scanProcesses.emplace_back(process);
+                    }
+                }
+                bluespawn.EnableMode(BluespawnMode::SCAN);
             }
 
             if(result.count("hunts")) {
@@ -438,16 +475,66 @@ int main(int argc, char* argv[]) {
         }
 
         if(result.count("mitigate")) {
-            bool bForceEnforce = false;
-            if(result.count("force"))
-                bForceEnforce = true;
-
-            MitigationMode mode = MitigationMode::Audit;
-            if(result["action"].as<std::string>() == "e" || result["action"].as<std::string>() == "enforce")
-                mode = MitigationMode::Enforce;
-
-            bluespawn.EnableMode(BluespawnMode::MITIGATE,
-                                 (static_cast<DWORD>(bForceEnforce) << 1) | (static_cast<DWORD>(mode) << 0));
+            if(result.count("add-mitigations")){
+                for(auto& path : result["add-mitigations"].as<std::vector<std::string>>()){
+                    Bluespawn::mitigationRecord.ParseMitigationsJSON({ StringToWidestring(path) });
+                }
+            }
+            if(result.count("gen-config")){
+                auto opt{ ToLowerCaseA(result["gen-config"].as<std::string>()) };
+                std::map<std::string, int> genConfigOptions{
+                    {"global", 0},
+                    {"mitigations", 1},
+                    {"mitigation-policies", 2}
+                };
+                if(genConfigOptions.count(opt)){
+                    if(Bluespawn::mitigationRecord.CreateConfig(
+                        FileSystem::File{ L".\\bluespawn-mitigation-config.json" }, genConfigOptions[opt])){
+                        Bluespawn::io.InformUser(L"Saved configuration to .\\bluespawn-mitigation-config.json");
+                    }
+                } else{
+                    Bluespawn::io.AlertUser(StringToWidestring("Unknown gen-config mode \"" + opt + "\". Options are "
+                                                               "global, mitigations, and mitigation-policies"));
+                }
+            } else{
+                auto mode{ result["mode"].as<std::string>() };
+                bool enforce{ mode == "e" || mode == "enforce" };
+                std::map<std::string, EnforcementLevel> enforcementLevelOptions{
+                    {"none", EnforcementLevel::None},
+                    {"low", EnforcementLevel::Low},
+                    {"moderate", EnforcementLevel::Moderate},
+                    {"high", EnforcementLevel::High},
+                    {"all", EnforcementLevel::All},
+                };
+                auto fileSpecified{ result.count("config-json") };
+                if(!fileSpecified){
+                    auto level{ EnforcementLevel::None };
+                    auto levelSpecified{ result["enforcement-level"].as<std::string>() };
+                    if(enforcementLevelOptions.count(levelSpecified)){
+                        level = enforcementLevelOptions[levelSpecified];
+                    } else{
+                        Bluespawn::io.AlertUser(
+                            StringToWidestring("Unknown enforcement level \"" + levelSpecified + "\". Options are none,"
+                                               "low, moderate, high, and all. Defaulting to none"));
+                    }
+                    bluespawn.SetMitigationConfig(level);
+                } else{
+                    auto file{ FileSystem::File(StringToWidestring(result["config-json"].as<std::string>())) };
+                    if(file.GetFileExists()){
+                        try{
+                            auto contents{ file.Read() };
+                            bluespawn.SetMitigationConfig(json::parse(nlohmann::detail::span_input_adapter(
+                                contents.GetAsPointer<char>(), contents.GetSize())));
+                        } catch(std::exception& e){
+                            Bluespawn::io.AlertUser(L"Error parsing JSON: " + StringToWidestring(e.what()));
+                        }
+                    } else{
+                        Bluespawn::io.AlertUser(L"JSON configuration file " + file.GetFilePath() + L" not found!");
+                        bluespawn.SetMitigationConfig(EnforcementLevel::None);
+                    }
+                }
+                bluespawn.EnableMode(BluespawnMode::MITIGATE, enforce);
+            }
         }
 
         bluespawn.Run();

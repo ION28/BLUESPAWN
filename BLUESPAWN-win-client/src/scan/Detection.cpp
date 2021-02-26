@@ -278,6 +278,21 @@ size_t ProcessDetectionData::Hash() CONST {
     return hash;
 }
 
+bool ProcessDetectionData::operator==(IN CONST ProcessDetectionData& data) CONST {
+    if(type != data.type){
+        return false;
+    }
+    if(type == ProcessDetectionType::MaliciousCommand){
+        return *ProcessCommand == *data.ProcessCommand;
+    } else if(type == ProcessDetectionType::MaliciousImage){
+        return *PID == *data.PID && *ImageName == *data.ImageName;
+    } else if(type == ProcessDetectionType::MaliciousMemory){
+        return *PID == *data.PID && *BaseAddress == *data.BaseAddress;
+    } else{
+        return *PID == *data.PID;
+    }
+}
+
 FileDetectionData::FileDetectionData(IN CONST FileSystem::File& file,
                                      IN CONST std::optional<YaraScanResult>& scan OPTIONAL) :
     FileFound{ file.GetFileExists() },

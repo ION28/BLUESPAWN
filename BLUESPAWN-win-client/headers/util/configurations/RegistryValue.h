@@ -12,8 +12,6 @@
 
 namespace Registry {
 
-	typedef std::variant<std::wstring, DWORD, AllocationWrapper, std::vector<std::wstring>> RegistryData;
-
 	/**
 	 * A container class for registry values and associated data.
 	 */

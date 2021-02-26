@@ -16,11 +16,12 @@
 
 #include "util/StringUtils.h"
 #include "util/log/Log.h"
+#include "util/permissions/permissions.h"
 #include "util/wrappers.hpp"
 
 #include "aclapi.h"
 
-LINK_FUNCTION(NtCreateFile, ntdll.dll)
+LINK_FUNCTION(NtCreateFile, ntdll.dll);
 
 namespace FileSystem {
     bool CheckFileExists(const std::wstring& path) {
@@ -75,7 +76,7 @@ namespace FileSystem {
             LOG_ERROR("Error acquiring catalog admin context " << SYSTEM_ERROR);
             return {};
         }
-        GenericWrapper<HCATADMIN> hCatAdmin{ admin, [](auto val){ CryptCATAdminReleaseContext(&val, 0); },
+        GenericWrapper<HCATADMIN> hCatAdmin{ admin, [](auto val) { CryptCATAdminReleaseContext(&val, 0); },
                                              INVALID_HANDLE_VALUE };
 
         DWORD dwHashLength{ 0 };
@@ -93,10 +94,9 @@ namespace FileSystem {
         std::vector<std::wstring> catalogfiles{};
         GenericWrapper<HCATINFO> hCatInfo{
             CryptCATAdminEnumCatalogFromHash(hCatAdmin, pbHash.data(), dwHashLength, 0, nullptr),
-            [&hCatAdmin](auto val){ CryptCATAdminReleaseCatalogContext(&hCatAdmin, &val, 0); },
-            INVALID_HANDLE_VALUE
+            [&hCatAdmin](auto val) { CryptCATAdminReleaseCatalogContext(&hCatAdmin, &val, 0); }, INVALID_HANDLE_VALUE
         };
-        while(hCatInfo){
+        while(hCatInfo) {
             CATALOG_INFO ciCatalogInfo = {};
             ciCatalogInfo.cbStruct = sizeof(ciCatalogInfo);
 
@@ -188,9 +188,9 @@ namespace FileSystem {
             IO_STATUS_BLOCK IoStatus{};
             InitializeObjectAttributes(&attributes, &UnicodeName, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, nullptr,
                                        nullptr);
-            NTSTATUS Status{ Linker::NtCreateFile(&hFile, GENERIC_READ | GENERIC_WRITE, &attributes, &IoStatus, nullptr,
-                                                  FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ, FILE_OPEN,
-                                                  FILE_SEQUENTIAL_ONLY, nullptr, 0) };
+            NTSTATUS Status{ Linker::NtCreateFile(
+                &hFile, GENERIC_READ | GENERIC_WRITE, &attributes, &IoStatus, nullptr, FILE_ATTRIBUTE_NORMAL,
+                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, FILE_OPEN, FILE_SEQUENTIAL_ONLY, nullptr, 0) };
             if(NT_SUCCESS(Status)) {
                 this->hFile = hFile;
                 bFileExists = true;
@@ -198,8 +198,9 @@ namespace FileSystem {
                 bReadAccess = true;
             } else if(Status == 0xC0000022 || Status == 0xC0000043) {   //STATUS_ACCESS_DENIED, STATUS_SHARING_VIOLATION
                 Status = Linker::NtCreateFile(&hFile, GENERIC_READ, &attributes, &IoStatus, nullptr,
-                                              FILE_ATTRIBUTE_NORMAL, FILE_SHARE_READ, FILE_OPEN, FILE_SEQUENTIAL_ONLY,
-                                              nullptr, 0);
+                                              FILE_ATTRIBUTE_NORMAL,
+                                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, FILE_OPEN,
+                                              FILE_SEQUENTIAL_ONLY, nullptr, 0);
                 if(NT_SUCCESS(Status)) {
                     this->hFile = hFile;
                     bFileExists = true;
@@ -218,7 +219,8 @@ namespace FileSystem {
                 bReadAccess = false;
             }
         } else {
-            hFile = CreateFileW(FilePath.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+            hFile = CreateFileW(FilePath.c_str(), GENERIC_READ | GENERIC_WRITE,
+                                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
                                 FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
             if(!hFile && GetLastError() == ERROR_FILE_NOT_FOUND) {
                 LOG_VERBOSE(2, "Couldn't open file, file doesn't exist " << FilePath << ".");
@@ -227,7 +229,8 @@ namespace FileSystem {
                 bReadAccess = false;
             } else if(!hFile && (GetLastError() == ERROR_ACCESS_DENIED || GetLastError() == ERROR_SHARING_VIOLATION)) {
                 bWriteAccess = false;
-                hFile = CreateFileW(FilePath.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+                hFile = CreateFileW(FilePath.c_str(), GENERIC_READ,
+                                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
                                     FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, nullptr);
                 if(!hFile && GetLastError() == ERROR_SHARING_VIOLATION) {
                     LOG_VERBOSE(2, "Couldn't open file, sharing violation " << FilePath << ".");
@@ -271,7 +274,7 @@ namespace FileSystem {
 
     bool File::HasReadAccess() const { return bReadAccess; }
 
-    bool File::Write(IN const LPVOID value,
+    bool File::Write(IN const LPCVOID value,
                      IN const long offset,
                      IN const unsigned long length,
                      IN const bool truncate OPTIONAL,
@@ -487,7 +490,7 @@ namespace FileSystem {
                 LOG_ERROR("Failed to query signature for " << FilePath << ": " << SYSTEM_ERROR);
                 return std::nullopt;
             }
-            GenericWrapper<HCERTSTORE> hStore{ store, [](HCERTSTORE store){ CertCloseStore(store, 0); },
+            GenericWrapper<HCERTSTORE> hStore{ store, [](HCERTSTORE store) { CertCloseStore(store, 0); },
                                                INVALID_HANDLE_VALUE };
             GenericWrapper<HCRYPTMSG> hMsg{ msg, CryptMsgClose, INVALID_HANDLE_VALUE };
 
@@ -753,16 +756,33 @@ namespace FileSystem {
         std::wstring searchName = FolderPath;
         searchName += L"\\*";
         bFolderExists = true;
+        bFolderWrite = false;
         auto f = FindFirstFileW(searchName.c_str(), &ffd);
         hCurFile = { f };
         if(hCurFile == INVALID_HANDLE_VALUE) {
             LOG_VERBOSE(2, "Couldn't find folder " << FolderPath);
             bFolderExists = false;
         }
-        if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-            bIsFile = false;
-        } else {
-            bIsFile = true;
+        else{
+            if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
+                bIsFile = false;
+                PSECURITY_DESCRIPTOR pDesc{ nullptr };
+                PACL paDACL{ NULL };
+                auto status = GetNamedSecurityInfoW(reinterpret_cast<LPCWSTR>(FolderPath.c_str()), SE_FILE_OBJECT,
+                                                    DACL_SECURITY_INFORMATION, nullptr, nullptr, &paDACL, nullptr, &pDesc);
+                if(status == ERROR_SUCCESS){
+                    auto owner = Permissions::GetProcessOwner();
+                    Permissions::SecurityDescriptor secDesc = Permissions::SecurityDescriptor::CreateDACL(paDACL->AclSize);
+                    memcpy(secDesc.GetDACL(), paDACL, paDACL->AclSize);
+                    LocalFree(pDesc);
+                    ACCESS_MASK mask = Permissions::GetOwnerRightsFromACL(owner.value(), secDesc);
+                    if(Permissions::AccessIncludesWrite(mask)){
+                        bFolderWrite = true;
+                    }
+                }
+            } else{
+                bIsFile = true;
+            }
         }
     }
 
@@ -799,6 +819,8 @@ namespace FileSystem {
     bool Folder::GetFolderExists() const { return bFolderExists; }
 
     bool Folder::GetCurIsFile() const { return bIsFile; }
+
+    bool Folder::GetFolderWrite() const { return bFolderWrite; }
 
     std::optional<File> Folder::Open() const {
         if(bIsFile) {

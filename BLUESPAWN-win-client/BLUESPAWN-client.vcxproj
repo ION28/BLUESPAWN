@@ -37,10 +37,13 @@
     <ClInclude Include="headers\hunt\hunts\HuntT1553.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1562.h" />
     <ClInclude Include="headers\hunt\hunts\HuntT1569.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateM1028-WFW.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateM1054-WSC.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV71769.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV73511.h" />
+    <ClInclude Include="headers\mitigation\policy\CombinePolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\EventLogPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\MitigationPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\RegistryPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\SubkeyPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\ValuePolicy.h" />
+    <ClInclude Include="headers\mitigation\Software.h" />
     <ClInclude Include="headers\monitor\EventListener.h" />
     <ClInclude Include="headers\reaction\CarveMemory.h" />
     <ClInclude Include="headers\reaction\DeleteFile.h" />
@@ -52,29 +55,6 @@
     <ClInclude Include="headers\hunt\Scope.h" />
     <ClInclude Include="headers\mitigation\Mitigation.h" />
     <ClInclude Include="headers\mitigation\MitigationRegister.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateM1025.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateM1035-RDP.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-LLMNR.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-NBT.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateM1042-WSH.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateM1047.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateM1054-RDP.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV1093.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV1153.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV3338.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV3340.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV3344.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV3379.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV3479.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV63597.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV63687.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV63753.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV63817.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV63825.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV63829.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV72753.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV73519.h" />
-    <ClInclude Include="headers\mitigation\mitigations\MitigateV73585.h" />
     <ClInclude Include="headers\monitor\ETW_Wrapper.h">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClInclude>
@@ -95,6 +75,7 @@
     <ClInclude Include="headers\user\iobase.h" />
     <ClInclude Include="headers\util\DynamicLinker.h" />
     <ClInclude Include="headers\util\Internals.h" />
+    <ClInclude Include="headers\util\log\JSONSink.h" />
     <ClInclude Include="headers\util\Promise.h" />
     <ClInclude Include="headers\util\StringUtils.h" />
     <ClInclude Include="headers\util\ThreadPool.h" />
@@ -117,7 +98,6 @@
     <ClInclude Include="headers\util\log\Loggable.h" />
     <ClInclude Include="headers\util\log\LogLevel.h" />
     <ClInclude Include="headers\util\log\LogSink.h" />
-    <ClInclude Include="headers\util\log\ServerSink.h" />
     <ClInclude Include="headers\util\log\XMLSink.h" />
     <ClInclude Include="headers\util\permissions\Permissions.h" />
     <ClInclude Include="headers\util\pe\Export_Section.h">
@@ -164,13 +144,15 @@
     <ClCompile Include="src\hunt\hunts\HuntT1543.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1546.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1547.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1548.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1553.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1562.cpp" />
     <ClCompile Include="src\hunt\hunts\HuntT1569.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateM1028-WFW.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateM1054-WSC.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV71769.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV73511.cpp" />
+    <ClCompile Include="src\mitigation\policy\CombinePolicy.cpp" />
+    <ClCompile Include="src\mitigation\policy\EventLogPolicy.cpp" />
+    <ClCompile Include="src\mitigation\policy\MitigationPolicy.cpp" />
+    <ClCompile Include="src\mitigation\policy\RegistryPolicy.cpp" />
+    <ClCompile Include="src\mitigation\Software.cpp" />
     <ClCompile Include="src\monitor\EventListener.cpp" />
     <ClCompile Include="src\reaction\CarveMemory.cpp" />
     <ClCompile Include="src\scan\Detection.cpp" />
@@ -182,29 +164,6 @@
     <ClCompile Include="src\hunt\Scope.cpp" />
     <ClCompile Include="src\mitigation\Mitigation.cpp" />
     <ClCompile Include="src\mitigation\MitigationRegister.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateM1025.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateM1035-RDP.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateM1042-LLMNR.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateM1042-NBT.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateM1042-WSH.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateM1047.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateM1054-RDP.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV1093.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV1153.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV3338.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV3340.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV3344.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV3379.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV3479.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV63597.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV63687.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV63753.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV63817.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV63825.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV63829.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV72753.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV73519.cpp" />
-    <ClCompile Include="src\mitigation\mitigations\MitigateV73585.cpp" />
     <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -233,9 +192,9 @@
     <ClCompile Include="src\scan\YaraScanner.cpp" />
     <ClCompile Include="src\util\log\CLISink.cpp" />
     <ClCompile Include="src\util\log\DebugSink.cpp" />
+    <ClCompile Include="src\util\log\JSONSink.cpp" />
     <ClCompile Include="src\util\log\Log.cpp" />
     <ClCompile Include="src\util\log\LogLevel.cpp" />
-    <ClCompile Include="src\util\log\ServerSink.cpp" />
     <ClCompile Include="src\util\log\XMLSink.cpp" />
     <ClCompile Include="src\util\permissions\Permissions.cpp" />
     <ClCompile Include="src\util\pe\Export_Section.cpp">
@@ -267,6 +226,7 @@
     <ClCompile Include="src\util\StringUtils.cpp" />
     <ClCompile Include="src\util\ThreadPool.cpp" />
     <ClCompile Include="src\util\Utils.cpp" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1548.h" />
     <ClInclude Include="resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -280,6 +240,7 @@
   <ItemGroup>
     <None Include=".clang-format" />
     <None Include="resources\indicators" />
+    <None Include="resources\mitigations.json" />
     <None Include="resources\severe" />
     <None Include="resources\severe2" />
     <None Include="resources\SIP" />
@@ -306,7 +267,7 @@
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>mt.exe -manifest "$(ProjectDir)$(TargetName).exe.manifest" -outputresource:"$(TargetDir)$(TargetName).exe;1"</Command>

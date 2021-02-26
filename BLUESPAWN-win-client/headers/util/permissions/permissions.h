@@ -5,6 +5,15 @@
 #include <AclAPI.h>
 #include <sddl.h>
 #include <string>
+#define PSTRING __PSTRING
+#define STRING __STRING
+#define UNICODE_STRING __UNICODE_STRING
+#define PUNICODE_STRING __PUNICODE_STRING
+#include <NTSecAPI.h>
+#undef PSTRING
+#undef STRING
+#undef UNICODE_STRING
+#undef PUNICODE_STRING
 
 #include "util/log/Loggable.h"
 #include "util/wrappers.hpp"
@@ -110,7 +119,34 @@ namespace Permissions{
 		NONE, USER, GROUP
 	};
 
+	class LsaHandleWrapper : public GenericWrapper<LSA_HANDLE> {
+	public:
+		LsaHandleWrapper(LSA_HANDLE handle);
+		LsaHandleWrapper(LSA_HANDLE handle, std::function<void(LSA_HANDLE)> fSafeClose);
+		static void SafeCloseLsaHandle(LSA_HANDLE handle);
+	};
+
 	class Owner : public Loggable {
+		//Policy Handler for User Rights Assignment Tracking
+		static LsaHandleWrapper lPolicyHandle;
+
+		//Boolean to track if the handle wrapper is initialized
+		static bool bPolicyInitialized;
+
+		//List of super user privileges
+		static const std::vector<std::wstring> vSuperUserPrivs;
+
+		/**
+		* Function to initialize lPolicyHandle and set bPolicyInitialized
+		* to true if initialization succeeded.
+		*/
+		static void InitializePolicy();
+
+		/**
+		* Function de-initialize lPolicyHandle
+		* param handle - the handle to de initialize
+		*/
+		static void DeinitializePolicy(LSA_HANDLE handle);
 	protected:
 		//Whether or not this owner is on the system
 		bool bExists;
@@ -127,21 +163,23 @@ namespace Permissions{
 		//The type of the owner
 		OwnerType otType;
 
-	public:
 		/**
-		* Constructor for an owner object based off name
+		* Function to convert a wstring to an LSA_UNICODE_STRING
+		* 
+		* @param str the wstring to convert
 		*
-		* @param name A wstring containing the name of an object. Other fields will
-		*	be filled in if an owner of that name exists.
+		* @return an LSA_UNICODE_STRING corresponding to the given wstring
 		*/
-		Owner(IN const std::wstring& name);
+		static std::shared_ptr<LSA_UNICODE_STRING> Owner::WStringToLsaUnicodeString(IN const std::wstring& str);
+
 		/**
 		* Constructor for an owner object based off sid
 		*
 		* @param sid A SecurityDescriptor with lpUserSID set to the sid of the owner. Other
 		*	fields will be filled in if an owner of that sid exists.
 		*/
-		Owner(IN const SecurityDescriptor& sid);
+		static std::wstring Owner::LsaUnicodeStringToWString(IN const LSA_UNICODE_STRING& str);
+
 		/**
 		* Constructor for an owner object that sets wName, bExists, and otOwnerType, but no other fields
 		*
@@ -149,7 +187,8 @@ namespace Permissions{
 		* @param exists A boolean containing value to be copied ot bExists
 		* @param t An OwnerType containing value to be copied to otOwnerType
 		*/
-		Owner(IN const std::wstring& name, IN const bool& exists, IN const OwnerType& t);
+		Owner(IN const std::wstring& name, IN bool exists, IN OwnerType t);
+
 		/**
 		* Constructor for an owner object that sets sdSID, bExists, and otOwnerType, but no other fields
 		*
@@ -158,7 +197,8 @@ namespace Permissions{
 		* @param exists A boolean containing value to be copied ot bExists
 		* @param t An OwnerType containing value to be copied to otOwnerType
 		*/
-		Owner(IN const SecurityDescriptor& sid, IN const bool& exists, IN const OwnerType& t);
+		Owner(IN const SecurityDescriptor& sid, IN bool exists, IN OwnerType t);
+
 		/**
 		* Constructor for an owner object that sets all fields to given values. Performs no checking
 		* that given name and sid line up.
@@ -170,7 +210,26 @@ namespace Permissions{
 		* @param exists A boolean containing value to be copied ot bExists
 		* @param t An OwnerType containing value to be copied to otOwnerType
 		*/
-		Owner(IN const std::wstring& name, IN const std::wstring& domain, IN const SecurityDescriptor& sid, IN const bool& exists, IN const OwnerType& t);
+		Owner(IN const std::wstring& name, IN const std::wstring& domain, IN const SecurityDescriptor& sid, IN bool exists, IN OwnerType t);
+
+
+	public:
+		/**
+		* Constructor for an owner object based off name
+		*
+		* @param name A wstring containing the name of an object. Other fields will
+		*	be filled in if an owner of that name exists.
+		*/
+		Owner(IN const std::wstring& name);
+		
+		/**
+		* Constructor for an owner object based off sid
+		* 
+		* @param sid A SecurityDescriptor with lpUserSID set to the sid of the owner. Other
+		*	fields will be filled in if an owner of that sid exists. 
+		*/
+		Owner(IN const SecurityDescriptor& sid);
+		
 		/**
 		* Function to get whether or not the owner exists on the system
 		*
@@ -212,6 +271,70 @@ namespace Permissions{
 		 * @return The name of the owner
 		 */
 		virtual std::wstring ToString() const;
+
+		/**
+		* Function to get a list of privileges the owner has
+		*
+		* @return the list of privileges an owner explicity has, and if they 
+		*     are a user, includes the privileges granted to them by the
+		*     groups they're in.
+		*/
+		std::vector<std::wstring> GetPrivileges();
+
+		/**
+		* Function to check if the owner has a certain privilege
+		*
+		* @param wPriv the name of the privilege to check for. Names should
+		*    be given as constants listed here: https://docs.microsoft.com/en-us/windows/win32/secauthz/privilege-constants
+		* 
+		* @return true if the owner has the privilege, false otherwise
+		*/
+		bool HasPrivilege(IN const std::wstring& wPriv);
+
+		/**
+		* Function to enumerate all owners with a given privilege
+		* 
+		* @param wPriv a wstring containing the privilege to check for.
+		*     Names should be from: https://docs.microsoft.com/en-us/windows/win32/secauthz/privilege-constants
+		*
+		* @return a vector of Owner objects containing all owners with the given privilege.
+		*     If the function fails, the vector will be empty and GetLastError() will contain
+		*     the failure reason. If GetLastError() returns ERROR_SUCCESS, the function succeeded
+		*     but there were no Owners with the given privilege. 
+		*/
+		static std::vector<Owner> GetOwnersWithPrivilege(IN const std::wstring& wPriv);
+
+		/**
+		* Function to remove a privilege from an owner object
+		* 
+		* @param wPriv a wstring containing the name of the privilege to remove
+		*
+		* @return true if the function succeeded, false otherwise. If the function fails,
+		*     GetLastError() will return the reason for failure.
+		*/
+		bool RemovePrivilege(IN const std::wstring& wPriv);
+
+		/**
+		* Function to check if an owner has a superuser privilege.
+		*
+		* @return true if the user has any of these privileges, false otherwise
+		*/
+		bool HasSuperUserPrivs();
+
+		/**
+		* Function to remove all super user privileges from an owner
+		*
+		* @return true if function succeeds, false otherwise. If the function
+		*     fails, GetLastError() will contain the reason for failure
+		*/
+		bool RemoveSuperUserPrivs();
+
+		/**
+		* Function to delete an owner from the system
+		*
+		* @return true if the user was deleted, false otherwise
+		*/
+		bool Delete();
 	};
 
 	class User : public Owner {
@@ -276,9 +399,9 @@ namespace Permissions{
 	* @param seObjectType An SE_OBJECT_TYPE desciribing the type of the object for which to update permissions
 	* @param oOwner An Owner object representing the owner for whom to update permissions
 	* @param amDesiredAccess An ACCESS_MASK containing the permissions to grant or deny to oOwner
-	* @param bDeny If false grant access to amDesiredAccess, if true deny access. Defaults to false
+	* @param bDeny If false, grant access to amDesiredAccess, if true deny access. Defaults to false
 	*
 	* @return true if the objects ACL was updated. False otherwise. If false, GetLastError will contain the error.
 	*/
-	bool UpdateObjectACL(const std::wstring& wsObjectName, const SE_OBJECT_TYPE& seObjectType, const Owner& oOwner, const ACCESS_MASK& amDesiredAccess, const bool& bDeny = false);
+	bool UpdateObjectACL(const std::wstring& wsObjectName, SE_OBJECT_TYPE seObjectType, const Owner& oOwner, ACCESS_MASK amDesiredAccess, bool bDeny = false);
 }
