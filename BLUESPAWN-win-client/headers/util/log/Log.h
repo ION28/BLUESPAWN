@@ -17,7 +17,7 @@
 
 // A macro to log an error in the set of sinks specified by AddSink and RemoveSink
 #define LOG_ERROR(...) \
-   LOG(Log::LogLevel::LogError, __VA_ARGS__ << Log::endlog)
+   LOG(Log::LogLevel::LogError.get(), __VA_ARGS__ << Log::endlog)
 
 // A macro to log an LSTATUS and/or HRESULT error
 #define LOG_SYSTEM_ERROR(ERROR_ID) \
@@ -29,22 +29,22 @@
 
 // A macro to log a warning in the set of sinks specified by AddSink and RemoveSink
 #define LOG_WARNING(...) \
-   LOG(Log::LogLevel::LogWarn, __VA_ARGS__ << Log::endlog)
+   LOG(Log::LogLevel::LogWarn.get(), __VA_ARGS__ << Log::endlog)
 
 // A macro to log information in the set of sinks specified by AddSink and RemoveSink
 #define LOG_INFO(VERBOSITY, ...) \
-   LOG(Log::LogLevel::LogInfo##VERBOSITY, __VA_ARGS__ << Log::endlog)
+   LOG(Log::LogLevel::LogInfo##VERBOSITY##.get(), __VA_ARGS__ << Log::endlog)
 
 // A macro to log verbose information in the set of sinks specified by AddSink and RemoveSink
 // at a specified verbosity. Under current configurations, this should be between 1 and 3 inclusive.
 #define LOG_VERBOSE(VERBOSITY, ...) \
-   LOG(Log::LogLevel::LogVerbose##VERBOSITY, __VA_ARGS__ << Log::endlog)
+   LOG(Log::LogLevel::LogVerbose##VERBOSITY##.get(), __VA_ARGS__ << Log::endlog)
 
 namespace Log {
 
 	// A vector containing the set of sinks to be used when LOG_ERROR, LOG_WARNING, etc are used.
 	// This vector is updated by the AddSink and RemoveSink functions.
-	extern std::vector<std::shared_ptr<LogSink>> _LogSinks;
+	extern std::vector<LogSink*> _LogSinks;
 
 	// A dummy class to indicate the termination of a log message.
 	class LogTerminator {};
@@ -62,7 +62,7 @@ namespace Log {
 		std::wstringstream stream{};
 		
 		// The level at which the log message is being logged.
-		LogLevel level;
+		LogLevel* level;
 
 		/**
 		 * An internal constructor used create a log message based off of an already existing
@@ -72,7 +72,7 @@ namespace Log {
 		 * @param message The pre-existing contents of the message
 		 */
 		LogMessage(
-			IN CONST LogLevel& level,
+			IN LogLevel* level,
 			IN CONST std::wstringstream& message
 		);
 
@@ -116,7 +116,7 @@ namespace Log {
 		 * @param level The log level at which this message is logged.
 		 */
 		LogMessage(
-			IN CONST LogLevel& level
+			IN LogLevel* level
 		);
 
 		/**
@@ -157,8 +157,8 @@ namespace Log {
 	 * @param levels A vector of the log levels that will be logged to the sink
 	 */
 	void AddSink(
-		IN CONST std::shared_ptr<LogSink>& sink,
-		IN CONST std::vector<std::reference_wrapper<LogLevel>>& levels
+		IN LogSink* sink,
+		IN CONST std::vector<LogLevel*>& levels
 	);
 
 	/**

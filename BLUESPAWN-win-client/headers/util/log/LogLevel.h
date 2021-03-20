@@ -5,6 +5,7 @@
 #include <string>
 #include <optional>
 #include <vector>
+#include <memory>
 
 namespace Log {
 	/**
@@ -53,7 +54,7 @@ namespace Log {
 		const std::optional<Detail> detail;
 
 		/// Default logging levels available, though custom ones can be created
-		static LogLevel
+		static std::unique_ptr<LogLevel>
 			LogError,    // Intended for logging errors
 			LogWarn,     // Intended for logging warnings
 			LogInfo1,    // Intended for logging high level operational information

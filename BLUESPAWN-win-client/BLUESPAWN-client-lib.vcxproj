@@ -1,0 +1,333 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\hunt\Hunt.h" />
+    <ClInclude Include="headers\hunt\HuntInfo.h" />
+    <ClInclude Include="headers\hunt\HuntRegister.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1036.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1037.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1053.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1055.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1068.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1070.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1136.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1484.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1505.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1543.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1546.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1547.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1553.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1562.h" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1569.h" />
+    <ClInclude Include="headers\mitigation\policy\CombinePolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\EventLogPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\MitigationPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\RegistryPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\SubkeyPolicy.h" />
+    <ClInclude Include="headers\mitigation\policy\ValuePolicy.h" />
+    <ClInclude Include="headers\mitigation\Software.h" />
+    <ClInclude Include="headers\monitor\EventListener.h" />
+    <ClInclude Include="headers\reaction\CarveMemory.h" />
+    <ClInclude Include="headers\reaction\DeleteFile.h" />
+    <ClInclude Include="headers\reaction\QuarantineFile.h" />
+    <ClInclude Include="headers\reaction\Reaction.h" />
+    <ClInclude Include="headers\reaction\RemoveValue.h" />
+    <ClInclude Include="headers\reaction\SuspendProcess.h" />
+    <ClInclude Include="headers\hunt\RegistryHunt.h" />
+    <ClInclude Include="headers\hunt\Scope.h" />
+    <ClInclude Include="headers\mitigation\Mitigation.h" />
+    <ClInclude Include="headers\mitigation\MitigationRegister.h" />
+    <ClInclude Include="headers\monitor\ETW_Wrapper.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="headers\monitor\Event.h" />
+    <ClInclude Include="headers\monitor\EventManager.h" />
+    <ClInclude Include="headers\scan\DetectionRegister.h" />
+    <ClInclude Include="headers\scan\Detections.h" />
+    <ClInclude Include="headers\scan\FileScanner.h" />
+    <ClInclude Include="headers\scan\MemoryScanner.h" />
+    <ClInclude Include="headers\scan\ProcessScanner.h" />
+    <ClInclude Include="headers\scan\RegistryScanner.h" />
+    <ClInclude Include="headers\scan\Scanner.h" />
+    <ClInclude Include="headers\scan\ScanInfo.h" />
+    <ClInclude Include="headers\scan\ServiceScanner.h" />
+    <ClInclude Include="headers\user\banners.h" />
+    <ClInclude Include="headers\user\bluespawn.h" />
+    <ClInclude Include="headers\user\CLI.h" />
+    <ClInclude Include="headers\user\iobase.h" />
+    <ClInclude Include="headers\user\PyIO.h" />
+    <ClInclude Include="headers\util\DynamicLinker.h" />
+    <ClInclude Include="headers\util\Internals.h" />
+    <ClInclude Include="headers\util\log\JSONSink.h" />
+    <ClInclude Include="headers\util\Promise.h" />
+    <ClInclude Include="headers\util\StringUtils.h" />
+    <ClInclude Include="headers\util\ThreadPool.h" />
+    <ClInclude Include="headers\util\Utils.h" />
+    <ClInclude Include="headers\util\wrappers.hpp" />
+    <ClInclude Include="headers\util\configurations\CollectInfo.h" />
+    <ClInclude Include="headers\util\configurations\Registry.h" />
+    <ClInclude Include="headers\util\configurations\RegistryValue.h" />
+    <ClInclude Include="headers\util\configurations\ScheduledTasks.h" />
+    <ClInclude Include="headers\util\eventlogs\EventLogItem.h" />
+    <ClInclude Include="headers\util\eventlogs\EventLogs.h" />
+    <ClInclude Include="headers\util\eventlogs\EventSubscription.h" />
+    <ClInclude Include="headers\util\eventlogs\XpathQuery.h" />
+    <ClInclude Include="headers\util\filesystem\FileSystem.h" />
+    <ClInclude Include="headers\scan\YaraScanner.h" />
+    <ClInclude Include="headers\util\log\CLISink.h" />
+    <ClInclude Include="headers\util\log\DebugSink.h" />
+    <ClInclude Include="headers\util\log\DetectionSink.h" />
+    <ClInclude Include="headers\util\log\Log.h" />
+    <ClInclude Include="headers\util\log\Loggable.h" />
+    <ClInclude Include="headers\util\log\LogLevel.h" />
+    <ClInclude Include="headers\util\log\LogSink.h" />
+    <ClInclude Include="headers\util\log\XMLSink.h" />
+    <ClInclude Include="headers\util\permissions\Permissions.h" />
+    <ClInclude Include="headers\util\pe\Export_Section.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Image_Loader.h" />
+    <ClInclude Include="headers\util\pe\Import_Section.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\PE_Image.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\PE_Section.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Relocation_Section.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="headers\util\pe\Resource_Section.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="headers\util\processes\Analyzer.h" />
+    <ClInclude Include="headers\reaction\ReactionManager.h" />
+    <ClInclude Include="headers\util\processes\ParseCobalt.h" />
+    <ClInclude Include="headers\util\processes\CheckLolbin.h" />
+    <ClInclude Include="headers\util\processes\CommandParser.h" />
+    <ClInclude Include="headers\util\processes\PERemover.h" />
+    <ClInclude Include="headers\util\processes\ProcessChecker.h" />
+    <ClInclude Include="headers\util\processes\ProcessUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="external\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="src\hunt\Hunt.cpp" />
+    <ClCompile Include="src\hunt\HuntRegister.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1036.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1037.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1053.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1055.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1068.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1070.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1136.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1484.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1505.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1543.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1546.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1547.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1548.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1553.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1562.cpp" />
+    <ClCompile Include="src\hunt\hunts\HuntT1569.cpp" />
+    <ClCompile Include="src\mitigation\policy\CombinePolicy.cpp" />
+    <ClCompile Include="src\mitigation\policy\EventLogPolicy.cpp" />
+    <ClCompile Include="src\mitigation\policy\MitigationPolicy.cpp" />
+    <ClCompile Include="src\mitigation\policy\RegistryPolicy.cpp" />
+    <ClCompile Include="src\mitigation\Software.cpp" />
+    <ClCompile Include="src\monitor\EventListener.cpp" />
+    <ClCompile Include="src\reaction\CarveMemory.cpp" />
+    <ClCompile Include="src\scan\Detection.cpp" />
+    <ClCompile Include="src\reaction\DeleteFile.cpp" />
+    <ClCompile Include="src\reaction\QuarantineFile.cpp" />
+    <ClCompile Include="src\reaction\RemoveValue.cpp" />
+    <ClCompile Include="src\reaction\SuspendProcess.cpp" />
+    <ClCompile Include="src\hunt\RegistryHunt.cpp" />
+    <ClCompile Include="src\hunt\Scope.cpp" />
+    <ClCompile Include="src\mitigation\Mitigation.cpp" />
+    <ClCompile Include="src\mitigation\MitigationRegister.cpp" />
+    <ClCompile Include="src\monitor\etw\ETW_Wrapper.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\monitor\Event.cpp" />
+    <ClCompile Include="src\monitor\EventManager.cpp" />
+    <ClCompile Include="src\scan\DetectionRegister.cpp" />
+    <ClCompile Include="src\scan\FileScanner.cpp" />
+    <ClCompile Include="src\scan\MemoryScanner.cpp" />
+    <ClCompile Include="src\scan\ProcessScanner.cpp" />
+    <ClCompile Include="src\scan\RegistryScanner.cpp" />
+    <ClCompile Include="src\scan\Scanner.cpp" />
+    <ClCompile Include="src\scan\ScanInfo.cpp" />
+    <ClCompile Include="src\scan\ServiceScanner.cpp" />
+    <ClCompile Include="src\user\banners.cpp" />
+    <ClCompile Include="src\user\bluespawn.cpp" />
+    <ClCompile Include="src\user\CLI.cpp" />
+    <ClCompile Include="src\user\python\PyIO.cpp" />
+    <ClCompile Include="src\user\python\PythonInterface.cpp" />
+    <ClCompile Include="src\util\configurations\CollectInfo.cpp" />
+    <ClCompile Include="src\util\DynamicLinker.cpp" />
+    <ClCompile Include="src\util\eventlogs\EventLogItem.cpp" />
+    <ClCompile Include="src\util\eventlogs\EventLogs.cpp" />
+    <ClCompile Include="src\util\configurations\RegistryKey.cpp" />
+    <ClCompile Include="src\util\configurations\RegistryValue.cpp" />
+    <ClCompile Include="src\util\eventlogs\EventSubscription.cpp" />
+    <ClCompile Include="src\util\eventlogs\XpathQuery.cpp" />
+    <ClCompile Include="src\util\filesystem\FileSystem.cpp" />
+    <ClCompile Include="src\scan\YaraScanner.cpp" />
+    <ClCompile Include="src\util\log\CLISink.cpp" />
+    <ClCompile Include="src\util\log\DebugSink.cpp" />
+    <ClCompile Include="src\util\log\JSONSink.cpp" />
+    <ClCompile Include="src\util\log\Log.cpp" />
+    <ClCompile Include="src\util\log\LogLevel.cpp" />
+    <ClCompile Include="src\util\log\XMLSink.cpp" />
+    <ClCompile Include="src\util\permissions\Permissions.cpp" />
+    <ClCompile Include="src\util\pe\Export_Section.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Image_Loader.cpp" />
+    <ClCompile Include="src\util\pe\Import_Section.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\PE_Image.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\PE_Section.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Relocation_Section.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\util\pe\Resource_Section.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\util\processes\Analyzer.cpp" />
+    <ClCompile Include="src\util\processes\ParseCobalt.cpp" />
+    <ClCompile Include="src\util\processes\CheckLolbin.cpp" />
+    <ClCompile Include="src\util\processes\CommandParser.cpp" />
+    <ClCompile Include="src\reaction\ReactionManager.cpp" />
+    <ClCompile Include="src\util\processes\PERemover.cpp" />
+    <ClCompile Include="src\util\processes\ProcessUtils.cpp" />
+    <ClCompile Include="src\util\StringUtils.cpp" />
+    <ClCompile Include="src\util\ThreadPool.cpp" />
+    <ClCompile Include="src\util\Utils.cpp" />
+    <ClInclude Include="headers\hunt\hunts\HuntT1548.h" />
+    <ClInclude Include="resources\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="pe-sieve.vcxproj">
+      <Project>{bec01f8e-5892-3f6f-a741-5bbd1d0f4ef9}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\BLUESPAWN-client.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".clang-format" />
+    <None Include="resources\indicators" />
+    <None Include="resources\mitigations.json" />
+    <None Include="resources\severe" />
+    <None Include="resources\severe2" />
+    <None Include="resources\SIP" />
+    <None Include="resources\TrustProviders" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="BLUESPAWN-client.exe.manifest" />
+  </ItemGroup>
+  <PropertyGroup>
+    <TargetName>BLUESPAWN-client-lib</TargetName>
+    <GenerateManifest>false</GenerateManifest>
+    <EmbedManifest>
+    </EmbedManifest>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetExt>.pyd</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetExt>.pyd</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetExt>.pyd</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetExt>.pyd</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <BuildLog>
+      <Path>$(SolutionDir)build\$(PlatformTarget)\$(Configuration)\$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\libpeconv\libpeconv\include;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\;$(SolutionDir)BLUESPAWN-win-client\external\pe-sieve\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreaded</RuntimeLibrary>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>bz2.lib;zlib.lib;libyara.lib;python39.lib;zip.lib;libcrypto.lib;jansson.lib;Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>mt.exe -manifest "$(ProjectDir)BLUESPAWN-client.exe.manifest" -outputresource:"$(TargetDir)$(TargetName)$(TargetExt);1"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Adding manifest to BLUESPAWN-client.exe</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{a28b9f38-5cef-4117-a5e8-db72063900db}</ProjectGuid>
+    <RootNamespace>CommonLib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <VcpkgTriplet Condition="'$(Platform)'=='Win32'">x86-windows-static</VcpkgTriplet>
+    <VcpkgTriplet Condition="'$(Platform)'=='x64'">x64-windows-static</VcpkgTriplet>
+    <ProjectName>BLUESPAWN-win-client-lib</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgConfiguration>Debug</VcpkgConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgConfiguration>Release</VcpkgConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgConfiguration>Debug</VcpkgConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgConfiguration>Release</VcpkgConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgAutoLink>false</VcpkgAutoLink>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\config\buildsettings.props" />
+    <Import Project="..\config\buildstructure.props" />
+  </ImportGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

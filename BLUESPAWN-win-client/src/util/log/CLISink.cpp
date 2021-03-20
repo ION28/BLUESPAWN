@@ -7,23 +7,31 @@
 #include "util/Utils.h"
 
 #include "user/bluespawn.h"
+#include "user/PyIO.h"
 
 namespace Log {
+
+#define PRINT_STREAM(...) \
+    if(pyBuffer){ pyMessageBuffer.emplace_back((std::wstringstream{} << __VA_ARGS__).str()); } \
+    else { std::wcout << __VA_ARGS__; }
+
+#define ENDL L"\n"
 
     void CLISink::SetConsoleColor(CLISink::MessageColor color) {
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         SetConsoleTextAttribute(hConsole, static_cast<WORD>(color));
     }
 
-    CLISink::CLISink() : hMutex{ CreateMutexW(nullptr, false, L"Local\\CLI-Mutex") } {}
+    CLISink::CLISink() : pyBuffer{ dynamic_cast<const PyIO*>(&Bluespawn::io) != nullptr },
+        hMutex{ CreateMutexW(nullptr, false, pyBuffer ? L"Local\\CLI-Mutex" : L"Local\\PyBuffer-Mutex") } {}
 
     void CLISink::LogMessage(IN CONST LogLevel& level, IN CONST std::wstring& message) {
         AcquireMutex mutex{ hMutex };
         if(level.Enabled()) {
             SetConsoleColor(CLISink::PrependColors[static_cast<WORD>(level.severity)]);
-            std::wcout << CLISink::MessagePrepends[static_cast<WORD>(level.severity)] << " ";
+            PRINT_STREAM(CLISink::MessagePrepends[static_cast<WORD>(level.severity)] << " ");
             SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
-            std::wcout << message << std::endl;
+            PRINT_STREAM(message << ENDL);
         }
     }
 
@@ -36,57 +44,53 @@ namespace Log {
             AcquireMutex mutex{ hMutex };
 
             SetConsoleColor(CLISink::PrependColors[4]);
-            std::wcout << CLISink::MessagePrepends[4] << (type == RecordType::PreScan ? L"[Pre-Scan] " : L" ");
+            PRINT_STREAM(CLISink::MessagePrepends[4] << (type == RecordType::PreScan ? L"[Pre-Scan] " : L" "));
             SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
 
-            std::wcout << L"Detection ID: " << detection->dwID << std::endl;
+            PRINT_STREAM(L"Detection ID: " << detection->dwID << ENDL);
 
-            std::wcout << L"\tDetection Recorded at " << FormatWindowsTime(detection->context.DetectionCreatedTime)
-                       << std::endl;
+            PRINT_STREAM(L"\tDetection Recorded at " << FormatWindowsTime(detection->context.DetectionCreatedTime)
+                       << ENDL);
             if(detection->context.note) {
-                std::wcout << L"\tNote: " << *detection->context.note << std::endl;
+                PRINT_STREAM(L"\tNote: " << *detection->context.note << ENDL);
             }
             if(detection->context.FirstEvidenceTime) {
-                std::wcout << L"\tFirst Evidence at " << FormatWindowsTime(*detection->context.FirstEvidenceTime)
-                           << std::endl;
+                PRINT_STREAM(L"\tFirst Evidence at " << FormatWindowsTime(*detection->context.FirstEvidenceTime)
+                           << ENDL);
             }
 
             if(detection->context.hunts.size()) {
-                std::wcout << L"\tDetected by: ";
+                PRINT_STREAM(L"\tDetected by: ");
                 short cnt = detection->context.hunts.size();
                 for(auto& hunt : detection->context.hunts) {
                     cnt--;
-                    std::wcout << hunt;
+                    PRINT_STREAM(hunt);
                     if(cnt > 0) {
-                        std::wcout << L", ";
+                        PRINT_STREAM(L", ");
                     }
                 }
-                std::wcout << std::endl;
+                PRINT_STREAM(ENDL);
             }
 
             if(detection->DetectionStale) {
-                std::wcout << L"\tDetection is stale" << std::endl;
+                PRINT_STREAM(L"\tDetection is stale" << ENDL);
             }
 
-            std::wcout << L"\tDetection Type: "
+            PRINT_STREAM(L"\tDetection Type: "
                        << (detection->type == DetectionType::FileDetection ?
-                               L"File" :
-                               detection->type == DetectionType::ProcessDetection ?
-                               L"Process" :
-                               detection->type == DetectionType::RegistryDetection ?
-                               L"Registry" :
-                               detection->type == DetectionType::ServiceDetection ?
-                               L"Service" :
-                               std::get<OtherDetectionData>(detection->data).DetectionType)
-                       << std::endl;
+                               L"File" : detection->type == DetectionType::ProcessDetection ?
+                               L"Process" : detection->type == DetectionType::RegistryDetection ?
+                               L"Registry" : detection->type == DetectionType::ServiceDetection ?
+                               L"Service" : std::get<OtherDetectionData>(detection->data).DetectionType)
+                       << ENDL);
 
-            std::wcout << L"\tDetection Certainty: " << static_cast<double>(detection->info.GetCertainty())
-                       << std::endl;
-            std::wcout << L"\tDetection Data: " << std::endl;
+            PRINT_STREAM(L"\tDetection Certainty: " << static_cast<double>(detection->info.GetCertainty())
+                       << ENDL);
+            PRINT_STREAM(L"\tDetection Data: " << ENDL);
 
             auto properties{ detection->Serialize() };
             for(auto& pair : properties) {
-                std::wcout << L"\t\t" << pair.first << ": " << pair.second << std::endl;
+                PRINT_STREAM(L"\t\t" << pair.first << ": " << pair.second << ENDL);
             }
         }
     }
@@ -97,10 +101,10 @@ namespace Log {
         AcquireMutex mutex{ hMutex };
 
         SetConsoleColor(CLISink::PrependColors[2]);
-        std::wcout << CLISink::MessagePrepends[2];
+        PRINT_STREAM(CLISink::MessagePrepends[2]);
         SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
-        std::wcout << L" Detections with IDs " << first->dwID << L" and " << second->dwID << L" now are associated"
-                   << L" with strength " << static_cast<double>(a) << std::endl;
+        PRINT_STREAM(L" Detections with IDs " << first->dwID << L" and " << second->dwID << L" now are associated"
+                   << L" with strength " << static_cast<double>(a) << ENDL);
     }
 
     void CLISink::UpdateCertainty(IN CONST std::shared_ptr<Detection>& detection) {
@@ -108,9 +112,9 @@ namespace Log {
         AcquireMutex mutex{ hMutex };
 
         SetConsoleColor(CLISink::PrependColors[2]);
-        std::wcout << CLISink::MessagePrepends[2];
+        PRINT_STREAM(CLISink::MessagePrepends[2]);
         SetConsoleColor(CLISink::MessageColor::LIGHTGREY);
-        std::wcout << L" Detection with ID " << detection->dwID << L" now has certainty "
-                   << static_cast<double>(detection->info.GetCertainty()) << std::endl;
+        PRINT_STREAM(L" Detection with ID " << detection->dwID << L" now has certainty "
+                   << static_cast<double>(detection->info.GetCertainty()) << ENDL);
     }
 }   // namespace Log

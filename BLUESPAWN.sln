@@ -14,6 +14,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpeconv", "BLUESPAWN-win-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yarac", "BLUESPAWN-win-client\yarac.vcxproj", "{7C72350B-AA5B-41AD-8957-CE3924A7F11B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BLUESPAWN-win-client-lib", "BLUESPAWN-win-client\BLUESPAWN-client-lib.vcxproj", "{A28B9F38-5CEF-4117-A5E8-DB72063900DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -54,6 +56,14 @@ Global
 		{7C72350B-AA5B-41AD-8957-CE3924A7F11B}.Release|x64.Build.0 = Release|x64
 		{7C72350B-AA5B-41AD-8957-CE3924A7F11B}.Release|x86.ActiveCfg = Release|Win32
 		{7C72350B-AA5B-41AD-8957-CE3924A7F11B}.Release|x86.Build.0 = Release|Win32
+		{A28B9F38-5CEF-4117-A5E8-DB72063900DB}.Debug|x64.ActiveCfg = Debug|x64
+		{A28B9F38-5CEF-4117-A5E8-DB72063900DB}.Debug|x64.Build.0 = Debug|x64
+		{A28B9F38-5CEF-4117-A5E8-DB72063900DB}.Debug|x86.ActiveCfg = Debug|Win32
+		{A28B9F38-5CEF-4117-A5E8-DB72063900DB}.Debug|x86.Build.0 = Debug|Win32
+		{A28B9F38-5CEF-4117-A5E8-DB72063900DB}.Release|x64.ActiveCfg = Release|x64
+		{A28B9F38-5CEF-4117-A5E8-DB72063900DB}.Release|x64.Build.0 = Release|x64
+		{A28B9F38-5CEF-4117-A5E8-DB72063900DB}.Release|x86.ActiveCfg = Release|Win32
+		{A28B9F38-5CEF-4117-A5E8-DB72063900DB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

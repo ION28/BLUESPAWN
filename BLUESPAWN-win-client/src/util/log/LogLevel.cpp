@@ -15,21 +15,14 @@ namespace Log {
 		severity{ severity },
 		detail{ detail }{}
 
-	LogLevel LogLevel::LogError{Severity::LogError, true };
-
-	LogLevel LogLevel::LogWarn{Severity::LogWarn, true };
-
-	LogLevel LogLevel::LogInfo1{ Severity::LogInfo, true, Detail::Low };
-
-	LogLevel LogLevel::LogInfo2{ Severity::LogInfo, false, Detail::Moderate };
-
-	LogLevel LogLevel::LogInfo3{ Severity::LogInfo, false, Detail::High };
-
-	LogLevel LogLevel::LogVerbose1{ Severity::LogVerbose, false, Detail::Low };
-
-	LogLevel LogLevel::LogVerbose2{ Severity::LogVerbose, false, Detail::Moderate };
-
-	LogLevel LogLevel::LogVerbose3{ Severity::LogVerbose, false, Detail::High };
+	std::unique_ptr<LogLevel> LogLevel::LogError = std::make_unique<LogLevel>(Severity::LogError, true);
+	std::unique_ptr<LogLevel> LogLevel::LogWarn = std::make_unique<LogLevel>(Severity::LogWarn, true);
+	std::unique_ptr<LogLevel> LogLevel::LogInfo1 = std::make_unique<LogLevel>(Severity::LogInfo, true, Detail::Low);
+	std::unique_ptr<LogLevel> LogLevel::LogInfo2 = std::make_unique<LogLevel>(Severity::LogInfo, false, Detail::Moderate);
+	std::unique_ptr<LogLevel> LogLevel::LogInfo3 = std::make_unique<LogLevel>(Severity::LogInfo, false, Detail::High);
+	std::unique_ptr<LogLevel> LogLevel::LogVerbose1 = std::make_unique<LogLevel>(Severity::LogVerbose, false, Detail::Low);
+	std::unique_ptr<LogLevel> LogLevel::LogVerbose2 = std::make_unique<LogLevel>(Severity::LogVerbose, false, Detail::Moderate);
+	std::unique_ptr<LogLevel> LogLevel::LogVerbose3 = std::make_unique<LogLevel>(Severity::LogVerbose, false, Detail::High);
 
 	void LogLevel::Enable(){ enabled = true; }
 	void LogLevel::Disable(){ enabled = false; }

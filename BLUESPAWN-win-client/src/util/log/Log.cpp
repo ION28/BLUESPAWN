@@ -5,14 +5,14 @@
 #include "util/StringUtils.h"
 
 namespace Log {
-    std::vector<std::shared_ptr<Log::LogSink>> _LogSinks;
+    std::vector<Log::LogSink*> _LogSinks;
     LogTerminator endlog{};
 
     LogMessage& LogMessage::operator<<(IN CONST LogTerminator& terminator) {
         auto message{ stream.str() };
 
         stream = std::wstringstream{};
-        level.LogMessage(message);
+        level->LogMessage(message);
 
         return *this;
     }
@@ -33,19 +33,17 @@ namespace Log {
         return *this;
     }
 
-    LogMessage::LogMessage(IN CONST LogLevel& level) : level{ level } {}
-    LogMessage::LogMessage(IN CONST LogLevel& level, IN CONST std::wstringstream& message) : level{ level }, stream{} {
+    LogMessage::LogMessage(IN LogLevel* level) : level{ level } {}
+    LogMessage::LogMessage(IN LogLevel* level, IN CONST std::wstringstream& message) : level{ level }, stream{} {
         stream << message.str();
     }
 
-    void AddSink(IN CONST std::shared_ptr<LogSink>& sink,
-                 IN CONST std::vector<std::reference_wrapper<LogLevel>>& levels) {
-        LogSink* pointer{ sink.get() };
+    void AddSink(IN LogSink* sink,
+                 IN CONST std::vector<LogLevel*>& levels) {
         bool exists{ false };
 
         for(auto& existing : _LogSinks) {
-            if(*existing == *sink) {
-                pointer = existing.get();
+            if(existing == sink) {
                 exists = true;
             }
         }
@@ -55,7 +53,7 @@ namespace Log {
         }
 
         for(auto level : levels) {
-            level.get().AddSink(pointer);
+            level->AddSink(sink);
         }
     }
 

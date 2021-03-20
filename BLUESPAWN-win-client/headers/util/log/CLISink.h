@@ -47,6 +47,9 @@ namespace Log {
 		/// Mutex guarding accesses to the console
 		HandleWrapper hMutex;
 
+		/// Indicates whether a python buffer is taking the place of the console
+		bool pyBuffer;
+
 		/**
 		 * Sets the color of text written to the console. The low order nibble is the color of the text, and the high 
 		 * order nibble is the color of the background. Colors are defined in the MessageColor enum. Note that this 

@@ -26,7 +26,6 @@ bool HuntRegister::HuntShouldRun(IN Hunt* hunt,
                 return false;
             }
         }
-        return true;
     }
     if(vIncludedHunts.size() != 0) {
         for(auto name : vIncludedHunts) {
