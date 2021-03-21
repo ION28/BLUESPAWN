@@ -9,7 +9,7 @@ PyDoc_STRVAR(SetLogSinks_doc,
              "Tells bluespawn to send logs to the specified sinks. For sinks that write to files, "
              "logdir can be used to specify the directory to which the logs are saved. Available sinks: console, "
              "xml, debug, and json. For v0.1, this adds sinks rather than setting the ones to be used.\n"
-             "Arguments:\n\tsinks: List of strings. Optional, defaults to [\"cursory\"]\n\toutdir: String specifity "
+             "Arguments:\n\tsinks: List of strings. Optional, defaults to [\"console\"]\n\toutdir: String specifying "
              "the path of the directory to which xml and json sinks should save log files.");
 PyDoc_STRVAR(AddDetectionSink_doc,
              "Will be used to specify a new place that reactions should be sent to."
