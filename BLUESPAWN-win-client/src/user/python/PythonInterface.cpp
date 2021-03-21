@@ -37,7 +37,7 @@ PyDoc_STRVAR(Monitor_doc,
 PyDoc_STRVAR(SetReactions_doc,
              "Adds reactions bluespawn should take upon finding a detection. Note that in v0.1, "
              "all reactions will be taken without user confirmation. Given that bluespawn will detect many false "
-             "positives, it is recommended that no detections be added. Available reactions are: carve-memory, "
+             "positives, it is recommended that no reactions be added. Available reactions are: carve-memory, "
              "suspend, delete-file, quarantine-file, and remove-value.\n"
              "Arguments:\n\reactions: List of strings, where is the name of a reaction. Required.");
 PyDoc_STRVAR(AddMitigations_doc,
