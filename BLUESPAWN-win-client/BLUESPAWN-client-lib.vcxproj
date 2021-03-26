@@ -181,6 +181,12 @@
     <ClCompile Include="src\user\banners.cpp" />
     <ClCompile Include="src\user\bluespawn.cpp" />
     <ClCompile Include="src\user\CLI.cpp" />
+    <ClCompile Include="src\user\python\bs_shims.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\user\python\PyIO.cpp" />
     <ClCompile Include="src\user\python\PythonInterface.cpp" />
     <ClCompile Include="src\util\configurations\CollectInfo.cpp" />
@@ -252,6 +258,14 @@
   <ItemGroup>
     <Manifest Include="BLUESPAWN-client.exe.manifest" />
   </ItemGroup>
+  <ItemGroup>
+    <Xsd Include="src\user\python\setup.py">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Xsd>
+  </ItemGroup>
   <PropertyGroup>
     <TargetName>BLUESPAWN-client-lib</TargetName>
     <GenerateManifest>false</GenerateManifest>
@@ -261,15 +275,19 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.pyd</TargetExt>
+    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.pyd</TargetExt>
+    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.pyd</TargetExt>
+    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.pyd</TargetExt>
+    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <BuildLog>
@@ -280,9 +298,14 @@
       <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreaded</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreaded</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BLUESPAWN_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BLUESPAWN_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BLUESPAWN_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">BLUESPAWN_LIB</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>bz2.lib;zlib.lib;libyara.lib;python39.lib;zip.lib;libcrypto.lib;jansson.lib;Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">bz2d.lib;zlibd.lib;libyara.lib;python39_d.lib;zip.lib;libcrypto.lib;jansson_d.lib;Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Release'">bz2.lib;zlib.lib;libyara.lib;python39.lib;zip.lib;libcrypto.lib;jansson.lib;Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>mt.exe -manifest "$(ProjectDir)BLUESPAWN-client.exe.manifest" -outputresource:"$(TargetDir)$(TargetName)$(TargetExt);1"</Command>
@@ -290,6 +313,18 @@
     <PostBuildEvent>
       <Message>Adding manifest to BLUESPAWN-client.exe</Message>
     </PostBuildEvent>
+    <PreLinkEvent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy $(ProjectDir)src\user\python\setup.py $(OutDir)setup.py &amp; copy $(ProjectDir)src\user\python\bs_shims.c $(OutDir)bs_shims.c</Command>
+    </PreLinkEvent>
+    <PreLinkEvent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy $(ProjectDir)src\user\python\setup.py $(OutDir)setup.py &amp; copy $(ProjectDir)src\user\python\bs_shims.c $(OutDir)bs_shims.c</Command>
+    </PreLinkEvent>
+    <PreLinkEvent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy $(ProjectDir)src\user\python\setup.py $(OutDir)setup.py &amp; copy $(ProjectDir)src\user\python\bs_shims.c $(OutDir)bs_shims.c</Command>
+    </PreLinkEvent>
+    <PreLinkEvent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy $(ProjectDir)src\user\python\setup.py $(OutDir)setup.py &amp; copy $(ProjectDir)src\user\python\bs_shims.c $(OutDir)bs_shims.c</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{a28b9f38-5cef-4117-a5e8-db72063900db}</ProjectGuid>

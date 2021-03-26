@@ -13,18 +13,24 @@
 const YaraScanner YaraScanner::instance{};
 
 AllocationWrapper GetResourceRule(DWORD identifier) {
-    auto hRsrcInfo = FindResourceW(nullptr, MAKEINTRESOURCE(identifier), L"yararule");
+#ifdef BLUESPAWN_LIB
+    auto mod{ GetModuleHandleW(L"BLUESPAWN-client-lib.dll") };
+#else
+    auto mod{ nullptr };
+#endif
+
+    auto hRsrcInfo = FindResourceW(mod, MAKEINTRESOURCE(identifier), L"yararule");
     if(!hRsrcInfo) {
         return { nullptr, 0 };
     }
 
-    auto hRsrc = LoadResource(nullptr, hRsrcInfo);
+    auto hRsrc = LoadResource(mod, hRsrcInfo);
     if(!hRsrc) {
         return { nullptr, 0 };
     }
 
     zip_error_t err{};
-    auto lpZipSource = zip_source_buffer_create(LockResource(hRsrc), SizeofResource(nullptr, hRsrcInfo), 0, &err);
+    auto lpZipSource = zip_source_buffer_create(LockResource(hRsrc), SizeofResource(mod, hRsrcInfo), 0, &err);
     if(lpZipSource) {
         auto zip = zip_open_from_source(lpZipSource, 0, &err);
         if(zip) {

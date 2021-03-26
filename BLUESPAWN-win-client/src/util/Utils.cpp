@@ -20,7 +20,7 @@ std::wstring FormatWindowsTime(const SYSTEMTIME& st){
 	std::wostringstream w;
 	w << std::setfill(L'0') << st.wYear << "-" << std::setw(2) << st.wMonth << "-" << std::setw(2) << st.wDay << " " <<
 		std::setw(2) << st.wHour << ":" << std::setw(2) << st.wMinute << ":" << std::setw(2) << st.wSecond << "." <<
-		((st.wMilliseconds % 10000000) * 100) << "Z";
+		std::setw(3) << ((st.wMilliseconds % 10000000) * 100) << "Z";
 	return w.str();
 }
 
@@ -31,8 +31,8 @@ std::wstring FormatWindowsTime(const FILETIME& ft){
 
 	std::wostringstream w;
 	w << std::setfill(L'0') << st.wYear << "-" << std::setw(2) << st.wMonth << "-" << std::setw(2) << st.wDay << " " <<
-		std::setw(2) << st.wHour << ":" << std::setw(2) << st.wMinute << ":" << std::setw(2) << st.wSecond << "." <<
-		st.wMilliseconds << "Z";
+		std::setw(2) << st.wHour << ":" << std::setw(2) << st.wMinute << ":" << std::setw(2) << st.wSecond << "." << 
+		std::setw(3) << st.wMilliseconds << "Z";
 	return w.str();
 }
 
@@ -48,11 +48,6 @@ std::wstring FormatWindowsTime(const std::wstring& windowsTime){
 	ft.dwLowDateTime = (DWORD) (time & 0xFFFFFFFF);
 
 	FileTimeToSystemTime(&ft, &st);
-	nano = (time % 10000000) * 100; // Display nanoseconds instead of milliseconds for higher resolution
 
-	std::wostringstream w;
-	w << std::setfill(L'0') << st.wYear << "-" << std::setw(2) << st.wMonth << "-" << std::setw(2) << st.wDay << " " <<
-		std::setw(2) << st.wHour << ":" << std::setw(2) << st.wMinute << ":" << std::setw(2) << st.wSecond << "." <<
-		nano << "Z";
-	return w.str();
+	return FormatWindowsTime(st);
 }

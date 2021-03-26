@@ -77,11 +77,6 @@ Bluespawn::Bluespawn() {
     availableReactions.emplace(L"quarantine-file", std::make_unique<Reactions::QuarantineFileReaction>());
     availableReactions.emplace(L"remove-value", std::make_unique<Reactions::RemoveValueReaction>());
     availableReactions.emplace(L"suspend", std::make_unique<Reactions::SuspendProcessReaction>());
-
-    sinkMap.emplace(L"console", std::make_unique<Log::CLISink>());
-    sinkMap.emplace(L"xml", std::make_unique<Log::XMLSink>());
-    sinkMap.emplace(L"json", std::make_unique<Log::JSONSink>());
-    sinkMap.emplace(L"debug", std::make_unique<Log::DebugSink>());
 }
 
 void Bluespawn::CheckArch(){
@@ -124,8 +119,23 @@ void Bluespawn::SetLogSinks(const std::vector<std::wstring>& sinks, const std::w
     };
 
     for(auto& sinkName : sinks) {
-        if(sinkMap.find(sinkName) != sinkMap.end()) {
-            auto sink = sinkMap.at(sinkName).get();
+        Log::LogSink* sink{ nullptr };
+        if(sinkMap.find(sinkName) != sinkMap.end()){
+            sink = sinkMap.at(sinkName).get();
+        } else if(sinkName == L"console"){
+            sinkMap.emplace(L"console", std::make_unique<Log::CLISink>());
+            sink = sinkMap.at(sinkName).get();
+        } else if(sinkName == L"xml"){
+            sinkMap.emplace(L"xml", std::make_unique<Log::XMLSink>(outputFolderPath));
+            sink = sinkMap.at(sinkName).get();
+        } else if(sinkName == L"json"){
+            sinkMap.emplace(L"json", std::make_unique<Log::JSONSink>(outputFolderPath));
+            sink = sinkMap.at(sinkName).get();
+        } else if(sinkName == L"debug"){
+            sinkMap.emplace(L"debug", std::make_unique<Log::DebugSink>());
+            sink = sinkMap.at(sinkName).get();
+        }
+        if(sink){
             Log::AddSink(sink, levels);
             if(auto detectionSink = dynamic_cast<DetectionSink*>(sink)){
                 Bluespawn::detectionSinks.emplace_back(detectionSink);
@@ -191,11 +201,6 @@ void Bluespawn::AddMitigations(std::string mitigationJson){
 
 std::map<Mitigation*, MitigationReport> Bluespawn::RunMitigations(const MitigationsConfiguration& config, 
                                                                   bool enforce){
-    if(!loadedMitigations){
-        mitigationRecord.Initialize();
-        loadedMitigations = true;
-    }
-
     if(enforce){
         return Bluespawn::mitigationRecord.EnforceMitigations(config);
     } else{

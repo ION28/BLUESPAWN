@@ -30,18 +30,23 @@ namespace Hunts {
     }
 
     std::wstring GetResource(DWORD identifier) {
-        auto hRsrcInfo = FindResourceW(nullptr, MAKEINTRESOURCE(identifier), L"textfile");
+#ifdef BLUESPAWN_LIB
+        auto mod{ GetModuleHandleW(L"BLUESPAWN-client-lib.dll") };
+#else
+        auto mod{ nullptr };
+#endif
+        auto hRsrcInfo = FindResourceW(mod, MAKEINTRESOURCE(identifier), L"textfile");
         if(!hRsrcInfo) {
             return { nullptr, 0 };
         }
 
-        auto hRsrc = LoadResource(nullptr, hRsrcInfo);
+        auto hRsrc = LoadResource(mod, hRsrcInfo);
         if(!hRsrc) {
             return { nullptr, 0 };
         }
 
         return StringToWidestring(
-            { reinterpret_cast<LPCSTR>(LockResource(hRsrc)), SizeofResource(nullptr, hRsrcInfo) });
+            { reinterpret_cast<LPCSTR>(LockResource(hRsrc)), SizeofResource(mod, hRsrcInfo) });
     }
 
     std::unordered_map<std::wstring, std::unordered_map<std::wstring, std::pair<std::wstring, std::wstring>>>

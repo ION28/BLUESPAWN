@@ -34,7 +34,7 @@ public:
 
     Bluespawn();
     void CheckArch();
-    void SetLogSinks(const std::vector<std::wstring>& sinks, const std::wstring& logdir);
+    void SetLogSinks(const std::vector<std::wstring>& sinks, const std::wstring& logdir= L".");
     void AddDetectionSink(DetectionSink* sink);
     void SetAggressiveness(Aggressiveness level);
     void RunHunts(const std::vector<std::wstring>& included, const std::vector<std::wstring>& excluded);

@@ -112,20 +112,25 @@ MitigationsConfiguration::MitigationsConfiguration(EnforcementLevel level) {
 MitigationRegister::MitigationRegister() {}
 
 void MitigationRegister::Initialize() {
-    auto hRsrcInfo = FindResourceW(nullptr, MAKEINTRESOURCE(DefaultMitigations), L"textfile");
+#ifdef BLUESPAWN_LIB
+    auto mod{ GetModuleHandleW(L"BLUESPAWN-client-lib.dll") };
+#else
+    auto mod{ nullptr };
+#endif
+    auto hRsrcInfo = FindResourceW(mod, MAKEINTRESOURCE(DefaultMitigations), L"textfile");
     if(!hRsrcInfo) {
         LOG_ERROR("Unable to load default mitigations");
         throw std::exception("Unable to load default mitigations");
     }
 
-    auto hRsrc = LoadResource(nullptr, hRsrcInfo);
+    auto hRsrc = LoadResource(mod, hRsrcInfo);
     if(!hRsrc) {
         Bluespawn::io.AlertUser(L"Unable to load default mitigations!", -1, ImportanceLevel::HIGH);
         LOG_ERROR("Unable to load default mitigations");
         throw std::exception("Unable to load default mitigations");
     }
 
-    ParseMitigationsJSON(AllocationWrapper{ LockResource(hRsrc), SizeofResource(nullptr, hRsrcInfo) });
+    ParseMitigationsJSON(AllocationWrapper{ LockResource(hRsrc), SizeofResource(mod, hRsrcInfo) });
 }
 
 std::map<Mitigation*, MitigationReport>
