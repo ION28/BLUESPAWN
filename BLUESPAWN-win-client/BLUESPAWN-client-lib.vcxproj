@@ -248,6 +248,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
+    <None Include="packages.config" />
     <None Include="resources\indicators" />
     <None Include="resources\mitigations.json" />
     <None Include="resources\severe" />
@@ -259,12 +260,9 @@
     <Manifest Include="BLUESPAWN-client.exe.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <Xsd Include="src\user\python\setup.py">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </Xsd>
+    <None Include="src\user\python\setup.py">
+      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <PropertyGroup>
     <TargetName>BLUESPAWN-client-lib</TargetName>
@@ -273,19 +271,7 @@
     </EmbedManifest>
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetExt>.pyd</TargetExt>
-    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetExt>.pyd</TargetExt>
-    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetExt>.pyd</TargetExt>
-    <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <TargetExt>.pyd</TargetExt>
     <PreLinkEventUseInBuild>true</PreLinkEventUseInBuild>
   </PropertyGroup>
@@ -298,15 +284,8 @@
       <RuntimeLibrary Condition="'$(Configuration)'=='Release'">MultiThreaded</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)'=='Debug'">MultiThreaded</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BLUESPAWN_LIB</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BLUESPAWN_LIB</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BLUESPAWN_LIB</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">BLUESPAWN_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BLUESPAWN_LIB</PreprocessorDefinitions>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">bz2d.lib;zlibd.lib;libyara.lib;python39_d.lib;zip.lib;libcrypto.lib;jansson_d.lib;Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)'=='Release'">bz2.lib;zlib.lib;libyara.lib;python39.lib;zip.lib;libcrypto.lib;jansson.lib;Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
     <PostBuildEvent>
       <Command>mt.exe -manifest "$(ProjectDir)BLUESPAWN-client.exe.manifest" -outputresource:"$(TargetDir)$(TargetName)$(TargetExt);1"</Command>
     </PostBuildEvent>
@@ -314,17 +293,20 @@
       <Message>Adding manifest to BLUESPAWN-client.exe</Message>
     </PostBuildEvent>
     <PreLinkEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy $(ProjectDir)src\user\python\setup.py $(OutDir)setup.py &amp; copy $(ProjectDir)src\user\python\bs_shims.c $(OutDir)bs_shims.c</Command>
+      <Command>copy $(ProjectDir)src\user\python\setup.py $(OutDir)setup.py &amp; copy $(ProjectDir)src\user\python\bs_shims.c $(OutDir)bs_shims.c</Command>
     </PreLinkEvent>
-    <PreLinkEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy $(ProjectDir)src\user\python\setup.py $(OutDir)setup.py &amp; copy $(ProjectDir)src\user\python\bs_shims.c $(OutDir)bs_shims.c</Command>
-    </PreLinkEvent>
-    <PreLinkEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy $(ProjectDir)src\user\python\setup.py $(OutDir)setup.py &amp; copy $(ProjectDir)src\user\python\bs_shims.c $(OutDir)bs_shims.c</Command>
-    </PreLinkEvent>
-    <PreLinkEvent>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy $(ProjectDir)src\user\python\setup.py $(OutDir)setup.py &amp; copy $(ProjectDir)src\user\python\bs_shims.c $(OutDir)bs_shims.c</Command>
-    </PreLinkEvent>
+    <Link>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Secur32.lib;DbgHelp.lib;Wintrust.lib;ws2_32.lib;Crypt32.lib;Shlwapi.lib;NetApi32.lib;wldap32.lib%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{a28b9f38-5cef-4117-a5e8-db72063900db}</ProjectGuid>
@@ -339,30 +321,34 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)'=='Debug'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
     <VcpkgConfiguration>Debug</VcpkgConfiguration>
   </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <VcpkgUseStatic>true</VcpkgUseStatic>
-    <VcpkgConfiguration>Release</VcpkgConfiguration>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <VcpkgUseStatic>true</VcpkgUseStatic>
-    <VcpkgConfiguration>Debug</VcpkgConfiguration>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)'=='Release'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
     <VcpkgConfiguration>Release</VcpkgConfiguration>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
-    <VcpkgAutoLink>false</VcpkgAutoLink>
+    <VcpkgAutoLink>true</VcpkgAutoLink>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Platform)'=='x64'">
+    <Import Project="..\packages\python.3.9.2\build\native\python.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Platform)'=='Win32'">
+    <Import Project="..\packages\pythonx86.3.9.2\build\native\python.props" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\config\buildsettings.props" />
     <Import Project="..\config\buildstructure.props" />
   </ImportGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\python.3.9.2\build\native\python.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\python.3.9.2\build\native\python.props'))" />
+  </Target>
 </Project>

@@ -146,14 +146,7 @@ PyMODINIT_FUNC PyInit_bluespawn() {
             return NULL;
         }
 
-        ((void (*)(LPVOID, LPVOID, LPVOID, LPVOID, LPVOID, LPVOID, LPVOID, LPVOID, LPVOID, LPVOID, LPVOID, LPVOID,
-                   LPVOID, LPVOID, LPVOID, LPVOID)) GetProcAddress(bluespawnLibrary, "Initialize"))(
-            PASS_PY_FUNC(PyArg_ParseTupleAndKeywords), PASS_PY_FUNC(PyDict_New), PASS_PY_FUNC(PyDict_SetItem),
-            PASS_PY_FUNC(PyErr_SetString), PASS_PY_FUNC(PyFloat_FromDouble), PASS_PY_FUNC(PyList_GetItem),
-            PASS_PY_FUNC(PyList_New), PASS_PY_FUNC(PyList_SetItem), PASS_PY_FUNC(PyList_Size),
-            PASS_PY_FUNC(PyLong_FromLong), PASS_PY_FUNC(PyMem_Free), PASS_PY_FUNC(PyTuple_New),
-            PASS_PY_FUNC(PyTuple_SetItem), PASS_PY_FUNC(PyUnicode_AsWideCharString),
-            PASS_PY_FUNC(PyUnicode_FromString), PASS_PY_FUNC(PyUnicode_FromWideChar));
+        ((void (*)()) GetProcAddress(bluespawnLibrary, "Initialize"))();
     }
     return PyModule_Create(&bsModule);
 }
