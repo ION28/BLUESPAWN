@@ -1,4 +1,5 @@
 #pragma once
+#include "os.h"
 
 enum class Tactic {
 	InitialAccess = 1,

@@ -1,6 +1,8 @@
 #pragma once
-
+#include "os.h"
+#ifdef BLUESPAWN_WINDOWS
 #include <windows.h>
+#endif
 
 #include <optional>
 #include <functional>

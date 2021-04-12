@@ -1,21 +1,24 @@
 #pragma once
+#include "os.h"
+#ifdef BLUESPAWN_WINDOWS
 #include <Windows.h>
+#include <lm.h>
+#undef PSTRING
+#undef STRING
+#undef UNICODE_STRING
+#undef PUNICODE_STRING
+#define PSTRING __PSTRING
+#define STRING __STRING
+#define UNICODE_STRING __UNICODE_STRING
+#define PUNICODE_STRING __PUNICODE_STRING
+#include <NTSecAPI.h>
+#endif
 
 #include <map>
 #include <string>
 #include <memory>
 #include <optional>
 #include <functional>
-#include <lm.h>
-#define PSTRING __PSTRING
-#define STRING __STRING
-#define UNICODE_STRING __UNICODE_STRING
-#define PUNICODE_STRING __PUNICODE_STRING
-#include <NTSecAPI.h>
-#undef PSTRING
-#undef STRING
-#undef UNICODE_STRING
-#undef PUNICODE_STRING
 
 template<class T>
 class GenericWrapper {

@@ -1,5 +1,9 @@
 #pragma once
+
+#include "os.h"
+#ifdef BLUESPAWN_WINDOWS
 #include <Windows.h>
+#endif
 
 #include <chrono>
 #include <iomanip>

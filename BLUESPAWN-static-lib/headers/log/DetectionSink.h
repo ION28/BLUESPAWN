@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Windows.h>
-
 #include "scan/Detections.h"
 
 enum class RecordType {
