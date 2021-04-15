@@ -5,6 +5,7 @@ Project Organization
 --------------------
 
 Encourage more people to get involved in the development
+
 - :strike:`Wiki pages`
 - :strike:`Make docs easy to find`
 - [in progress] More Discord development sessions
