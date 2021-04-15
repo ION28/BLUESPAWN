@@ -41,16 +41,12 @@ We've created and open-sourced this for a number of reasons which include the fo
 - **Demonstrate Features of Operating System APIs**: We combed through a ton of Microsoft Documentation, StackOverflow Answers, and more to create this. Hopefully others may find some of the code useful.
 
 .. toctree::
-   :titlesonly:
-   :maxdepth: 1
    :hidden:
-   :caption: Home
 
-   Home <index>
+   Home <self>
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
    :caption: BLUESPAWN Information
 
    bluespawn_information/contact_us
@@ -61,7 +57,6 @@ We've created and open-sourced this for a number of reasons which include the fo
 
 .. toctree::
    :maxdepth: 3
-   :hidden:
    :caption: BLUESPAWN Features
 
    bluespawn_features/hunts
@@ -73,7 +68,6 @@ We've created and open-sourced this for a number of reasons which include the fo
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
    :caption: Using BLUESPAWN
 
    using_bluespawn/getting_started
@@ -82,7 +76,6 @@ We've created and open-sourced this for a number of reasons which include the fo
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
    :caption: BLUESPAWN Development
 
    bluespawn_development/getting_involved
