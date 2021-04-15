@@ -41,8 +41,9 @@ We've created and open-sourced this for a number of reasons which include the fo
 - **Demonstrate Features of Operating System APIs**: We combed through a ton of Microsoft Documentation, StackOverflow Answers, and more to create this. Hopefully others may find some of the code useful.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 0
    :hidden:
+   :caption: Home
 
    Home <index>
 
