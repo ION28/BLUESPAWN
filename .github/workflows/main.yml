@@ -26,7 +26,7 @@ jobs:
       run: git submodule update --init --recursive
 
     - name: Restore from cache, and install vcpkg and project dependencies
-      uses: lukka/run-vcpkg@v6
+      uses: lukka/run-vcpkg@v7
       with:
         vcpkgArguments: '@../vcpkg_response_file.txt'
         vcpkgDirectory: 'vcpkg'
