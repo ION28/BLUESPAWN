@@ -1,0 +1,398 @@
+{
+    "name": "BLUESPAWN Mitigations",
+    "version": "3.0",
+    "domain": "mitre-enterprise",
+    "description": "Current Coverage of Mitigations in BLUESPAWN",
+	"filters": {
+		"stages": [
+			"act"
+		],
+		"platforms": [
+			"windows"
+		]
+	},
+	"sorting": 0,
+	"layout": {
+		"layout": "flat",
+		"showID": false,
+		"showName": true
+	},
+	"hideDisabled": false,
+    "techniques": [
+		{
+			"techniqueID": "T1562",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Checks a variety of firewall/Windows Security Notification Center settings (M1028-WFW, M1054-WSC, V-73511)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1562.001",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Checks a variety of firewall/Windows Security Notification Center settings (M1028-WFW, M1054-WSC, V-73511)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1547.002",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.005",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.008",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1547.002",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.005",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.008",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1556",
+			"tactic": "credential-access",
+			"color": "#5AADFF",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025). DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1556.001",
+			"tactic": "credential-access",
+			"color": "#5AADFF",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025). DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1556",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025). DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1556.001",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025). DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1003",
+			"tactic": "credential-access",
+			"color": "#FCF26B",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025), DLL Safe Search mode is enabled (V-3479), Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1003.001",
+			"tactic": "credential-access",
+			"color": "#5AADFF",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025), DLL Safe Search mode is enabled (V-3479), Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1557",
+			"tactic": "credential-access",
+			"color": "#5AADFF",
+			"comment": "Disables LLMNR and NBT-NS to prevent against LLMNR/NBT-NS spoofing attacks (M1042-LLMNR, M1042-NBT)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1557.001",
+			"tactic": "credential-access",
+			"color": "#5AADFF",
+			"comment": "Disables LLMNR and NBT-NS to prevent against LLMNR/NBT-NS spoofing attacks (M1042-LLMNR, M1042-NBT)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1557",
+			"tactic": "collection",
+			"color": "#5AADFF",
+			"comment": "Disables LLMNR and NBT-NS to prevent against LLMNR/NBT-NS spoofing attacks (M1042-LLMNR, M1042-NBT)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1557.001",
+			"tactic": "collection",
+			"color": "#5AADFF",
+			"comment": "Disables LLMNR and NBT-NS to prevent against LLMNR/NBT-NS spoofing attacks (M1042-LLMNR, M1042-NBT)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1059",
+			"tactic": "execution",
+			"color": "#FCF26B",
+			"comment": "Disables Windows Script Hosts which prevents some scripts from executing (M1042-WSH)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1059.005",
+			"tactic": "execution",
+			"color": "#FCF26B",
+			"comment": "Disables Windows Script Hosts which prevents some scripts from executing (M1042-WSH)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1135",
+			"tactic": "discovery",
+			"color": "#FCF26B",
+			"comment": "Limits anonymous access to shares (V-1093)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1021",
+			"tactic": "lateral-movement",
+			"color": "#FCF26B",
+			"comment": "Limits anonymous access to shares (V-1093)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1021.002",
+			"tactic": "lateral-movement",
+			"color": "#FCF26B",
+			"comment": "Limits anonymous access to shares (V-1093)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1550",
+			"tactic": "lateral-movement",
+			"color": "#FCF26B",
+			"comment": "Filters Admin tokens over the network (V-63597)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1550.002",
+			"tactic": "lateral-movement",
+			"color": "#FCF26B",
+			"comment": "Filters Admin tokens over the network (V-63597)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1550",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Filters Admin tokens over the network (V-63597)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1550.002",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Filters Admin tokens over the network (V-63597)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1548",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "A number of settings to strengthen UAC are applied (V-63817)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1548.002",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "A number of settings to strengthen UAC are applied (V-63817)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1548",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "A number of settings to strengthen UAC are applied (V-63817)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1548.002",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "A number of settings to strengthen UAC are applied (V-63817)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1574",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1574.001",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1574",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1574.001",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1574",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1574.001",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		}
+    ],
+	"gradient": {
+		"colors": [
+			"#ff6666",
+			"#ffe766",
+			"#8ec843"
+		],
+		"minValue": 0,
+		"maxValue": 100
+	},
+    "legendItems": [
+        {
+            "label": "Strong BLUESPAWN Coverage",
+            "color": "#5AADFF"
+        },
+        {
+            "label": "Partial BLUESPAWN Coverage",
+            "color": "#FCF26B"
+        }
+    ],
+	"metadata": [],
+	"showTacticRowBackground": false,
+	"tacticRowBackground": "#dddddd",
+	"selectTechniquesAcrossTactics": true,
+	"selectSubtechniquesWithParent": false
+}

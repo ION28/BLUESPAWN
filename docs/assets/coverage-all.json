@@ -1,0 +1,1055 @@
+{
+    "name": "BLUESPAWN Overall",
+    "version": "3.0",
+    "domain": "mitre-enterprise",
+    "description": "Current Coverage of BLUESPAWN",
+	"filters": {
+		"stages": [
+			"act"
+		],
+		"platforms": [
+			"windows"
+		]
+	},
+	"sorting": 0,
+	"layout": {
+		"layout": "flat",
+		"showID": false,
+		"showName": true
+	},
+	"hideDisabled": false,
+    "techniques": [
+		{
+			"techniqueID": "T1003",
+			"tactic": "credential-access",
+			"color": "#FCF26B",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025), DLL Safe Search mode is enabled (V-3479), Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1003.001",
+			"tactic": "credential-access",
+			"color": "#5AADFF",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025), DLL Safe Search mode is enabled (V-3479), Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1021",
+			"tactic": "lateral-movement",
+			"color": "#FCF26B",
+			"comment": "Limits anonymous access to shares (V-1093)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1021.002",
+			"tactic": "lateral-movement",
+			"color": "#FCF26B",
+			"comment": "Limits anonymous access to shares (V-1093)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1036",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Covered by checking for bad files in user writable folders in %WINDIR%",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1036.005",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Covered by checking for bad files in user writable folders in %WINDIR%",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1037",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking HKCU\\Environment\\UserInitMprLogonScript",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1037.001",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking HKCU\\Environment\\UserInitMprLogonScript",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1037",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking HKCU\\Environment\\UserInitMprLogonScript",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1037.001",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking HKCU\\Environment\\UserInitMprLogonScript",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1053",
+			"tactic": "execution",
+			"color": "#FCF26B",
+			"comment": "Covered by checking EventLogs for Security/4698, Task-Scheduler/106 events and monitoring for these events",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1053.005",
+			"tactic": "execution",
+			"color": "#FCF26B",
+			"comment": "Covered by checking EventLogs for Security/4698, Task-Scheduler/106 events and monitoring for these events",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1053",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "Covered by checking EventLogs for Security/4698, Task-Scheduler/106 events and monitoring for these events",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1053.005",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "Covered by checking EventLogs for Security/4698, Task-Scheduler/106 events and monitoring for these events",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1053",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "Covered by checking EventLogs for Security/4698, Task-Scheduler/106 events and monitoring for these events",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1053.005",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "Covered by checking EventLogs for Security/4698, Task-Scheduler/106 events and monitoring for these events",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.001",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.002",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.003",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.004",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.005",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.011",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.012",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.013",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.001",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.002",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.003",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.004",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.005",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.011",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.012",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1055.013",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by scanning all running processes for indicators of process injection with pe-sieve and various other checks.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1059",
+			"tactic": "execution",
+			"color": "#FCF26B",
+			"comment": "Disables Windows Script Hosts which prevents some scripts from executing (M1042-WSH)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1059.005",
+			"tactic": "execution",
+			"color": "#FCF26B",
+			"comment": "Disables Windows Script Hosts which prevents some scripts from executing (M1042-WSH)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1068",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "Covered by checking for printer ports that reference a file (CVE-2020-1048)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1070",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Covered by checking Sysmon Logs for EID 2 events, YARA scanning those files, and monitoring for these events",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1070.006",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Covered by checking Sysmon Logs for EID 2 events, YARA scanning those files, and monitoring for these events",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1135",
+			"tactic": "discovery",
+			"color": "#FCF26B",
+			"comment": "Limits anonymous access to shares (V-1093)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1136",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "Covered by checking EventLogs for Security/4720 events and monitoring for these events",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1136.001",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "Covered by checking EventLogs for Security/4720 events and monitoring for these events",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1484",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Covered by checking for ntuser.man files in all user directories and monitoring for these files",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1484",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "Covered by checking for ntuser.man files in all user directories and monitoring for these files",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1505",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by analyzing files in web locations for bad functions/strings",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1505.003",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by analyzing files in web locations for bad functions/strings",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1543",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by notifying a user when event logs are created for new service creation and by checking Services in the registry for things like FailureCommands that are suspicious.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1543.003",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by notifying a user when event logs are created for new service creation and by checking Services in the registry for things like FailureCommands that are suspicious.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1543",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by notifying a user when event logs are created for new service creation and by checking Services in the registry for things like FailureCommands that are suspicious.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1543.003",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by notifying a user when event logs are created for new service creation and by checking Services in the registry for things like FailureCommands that are suspicious.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by checking for bad Netsh Helper Dlls, Accessibility Features tampering, AppCert Dlls, Appinit Dlls, Application Shimming, Image File Execution Options backdooring, and COM Hijacking",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1546.002",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by checking the screensaver executable and registry entries that control the screensaver",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.007",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by checking all Netsh Helper Dlls and monitoring for them",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.008",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking looking for Debuggers and YARA scanning Accessibility Files",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.009",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking AppCert DLLs",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.010",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking AppInit_DLLs and LoadAppInit_DLLs keys",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.011",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking for Application Shimming and Custom DBs",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.012",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by checking Registry keys for Image File Execution Options.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.015",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by checking all configured CLSIDs and their associated files",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by checking for bad Netsh Helper Dlls, Accessibility Features tampering, AppCert Dlls, Appinit Dlls, Application Shimming, Image File Execution Options backdooring, and COM Hijacking",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1546.002",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by checking the screensaver executable and registry entries that control the screensaver",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.007",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by checking all Netsh Helper Dlls and monitoring for them",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.008",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking looking for Debuggers and YARA scanning Accessibility Files",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.009",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking AppCert DLLs",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.010",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking AppInit_DLLs and LoadAppInit_DLLs keys",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.011",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking for Application Shimming and Custom DBs",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.012",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by checking Registry keys for Image File Execution Options.",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1546.015",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by checking all configured CLSIDs and their associated files",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by checking for bad registry run keys, startup files, authentication packages, winlogon helper Dlls, security support providers, and port monitors. Mitigation to disable Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1547.001",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Coverd by checking most Run* keys. Future coverage will be obtained through checking files in Startup folders",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.002",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking for any additional Auth/Notif Packages. Mitigation to disable Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.003",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by examining all registered time providers on the system",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.004",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking the Notify, Userinit, and Shell values",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.005",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking for any additional SSPs. Mitigation to disable Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.008",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.010",
+			"tactic": "persistence",
+			"color": "#5AADFF",
+			"comment": "Covered by checking the port monitors on the system and their associated drivers",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by checking for bad registry run keys, startup files, authentication packages, winlogon helper Dlls, security support providers, and port monitors. Mitigation to disable Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1547.001",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Coverd by checking most Run* keys. Future coverage will be obtained through checking files in Startup folders",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.002",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking for any additional Auth/Notif Packages. Mitigation to disable Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.003",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by examining all registered time providers on the system",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.004",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking the Notify, Userinit, and Shell values",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.005",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by registry checking for any additional SSPs. Mitigation to disable Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.008",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "Disables Wdigest which limits effectiveness of Credential Dumping (V-72753)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1547.010",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "Covered by checking the port monitors on the system and their associated drivers",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1548",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "A number of settings to strengthen UAC are applied (V-63817)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1548.002",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "A number of settings to strengthen UAC are applied (V-63817)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1548",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "A number of settings to strengthen UAC are applied (V-63817)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1548.002",
+			"tactic": "privilege-escalation",
+			"color": "#5AADFF",
+			"comment": "A number of settings to strengthen UAC are applied (V-63817)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1550",
+			"tactic": "lateral-movement",
+			"color": "#FCF26B",
+			"comment": "Filters Admin tokens over the network (V-63597)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1550.002",
+			"tactic": "lateral-movement",
+			"color": "#FCF26B",
+			"comment": "Filters Admin tokens over the network (V-63597)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1550",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Filters Admin tokens over the network (V-63597)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1550.002",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Filters Admin tokens over the network (V-63597)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1553",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Covered by checking all of the SIP and Trust Providers on the system",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1553.003",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Covered by checking all of the SIP and Trust Providers on the system",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1556",
+			"tactic": "credential-access",
+			"color": "#5AADFF",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025). DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1556.001",
+			"tactic": "credential-access",
+			"color": "#5AADFF",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025). DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1556",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025). DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1556.001",
+			"tactic": "defense-evasion",
+			"color": "#5AADFF",
+			"comment": "Runs LSASS as a PPL and requires drivers loaded into LSASS to be signed by Microsoft (M1025). DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1557",
+			"tactic": "credential-access",
+			"color": "#5AADFF",
+			"comment": "Disables LLMNR and NBT-NS to prevent against LLMNR/NBT-NS spoofing attacks (M1042-LLMNR, M1042-NBT)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1557.001",
+			"tactic": "credential-access",
+			"color": "#5AADFF",
+			"comment": "Disables LLMNR and NBT-NS to prevent against LLMNR/NBT-NS spoofing attacks (M1042-LLMNR, M1042-NBT)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1557",
+			"tactic": "collection",
+			"color": "#5AADFF",
+			"comment": "Disables LLMNR and NBT-NS to prevent against LLMNR/NBT-NS spoofing attacks (M1042-LLMNR, M1042-NBT)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1557.001",
+			"tactic": "collection",
+			"color": "#5AADFF",
+			"comment": "Disables LLMNR and NBT-NS to prevent against LLMNR/NBT-NS spoofing attacks (M1042-LLMNR, M1042-NBT)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1562",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Covered by checking for bypasses to Windows Firewall in the Registry through AuthorizedApplications and GloballyAccessiblePorts. Mitigation to check a variety of firewall/Windows Security Notification Center settings (M1028-WFW, M1054-WSC, V-73511)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1562.004",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "Covered by checking for bypasses to Windows Firewall in the Registry through AuthorizedApplications and GloballyAccessiblePorts. Mitigation to check a variety of firewall/Windows Security Notification Center settings (M1028-WFW, M1054-WSC, V-73511)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1569",
+			"tactic": "execution",
+			"color": "#5AADFF",
+			"comment": "Covered by checking Services key/subkeys and analyzing each of the binaries",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1569.002",
+			"tactic": "execution",
+			"color": "#5AADFF",
+			"comment": "Covered by checking Services key/subkeys and analyzing each of the binaries",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1574",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1574.001",
+			"tactic": "persistence",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1574",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1574.001",
+			"tactic": "privilege-escalation",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "T1574",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": true
+		},
+		{
+			"techniqueID": "T1574.001",
+			"tactic": "defense-evasion",
+			"color": "#FCF26B",
+			"comment": "DLL Safe Search mode is enabled (V-3479)",
+			"enabled": true,
+			"metadata": [],
+			"showSubtechniques": false
+		}
+    ],
+	"gradient": {
+		"colors": [
+			"#ff6666",
+			"#ffe766",
+			"#8ec843"
+		],
+		"minValue": 0,
+		"maxValue": 100
+	},
+    "legendItems": [
+        {
+            "label": "Strong BLUESPAWN Coverage",
+            "color": "#5AADFF"
+        },
+        {
+            "label": "Partial BLUESPAWN Coverage",
+            "color": "#FCF26B"
+        }
+    ],
+	"metadata": [],
+	"showTacticRowBackground": false,
+	"tacticRowBackground": "#dddddd",
+	"selectTechniquesAcrossTactics": true,
+	"selectSubtechniquesWithParent": false
+}

@@ -66,7 +66,7 @@ Long Term (6+ months)
 [BELOW ROADMAP IS SIGNIFICANTLY OUT OF DATE] Server
 ---------------------------------------------------
 
-### Short Term (~1 month)
+Short Term (~1 month)
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Meet to discuss ELK vs other options with Wasabi and David
