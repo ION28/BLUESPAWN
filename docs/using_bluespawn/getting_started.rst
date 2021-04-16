@@ -19,16 +19,19 @@ Modifiers / Additional Arguments
 --------------------------------
 
 You can pass some additional arguments to extend or change how BLUESPAWN operates in Hunt mode.
+
 - ``--hunts=TXXX,TXXX`` : pass a comma separated list of MITRE ATT&CK Techniques to only hunt for specific techniques
 - ``--exclude-hunts=TXXX,TXXX`` : pass a comma separated list of MITRE ATT&CK Techniques to EXCLUDE from a hunt. This runs every implemented hunt except the ones you specify
 - ``-a Normal, --aggressiveness=Normal`` : pass either Cursory, Normal, or Intensive to specify how invasive to check. Generally hunts take longer & generate more false positives as the level increases.
 - ``-r log,carve-memory, --react=log,carve-memory`` : pass a comma separated list of the available reactions listed below to customize how BLUESPAWN can respond to detected threats
+
   - ``log`` : default, records the detection
   - ``remove-value`` : removes a detected registry value
   - ``suspend`` : suspends a detected process
   - ``carve-memory`` : temporarily suspends the process and effectively removes all malicious threads before resuming the process. Useful for responding to process injection (T1055) as this only removes the malware without killing the entire process
   - ``delete-file`` : deletes any detected malware files
   - ``quarantine-file`` : denies ``Everyone`` access to the file
+
 - ``--log=console,xml`` : pass a comma separated list of available sinks to log results to. Options are ``console`` (writes to screen) and ``xml`` (writes to an xml file in the current directory)
 
 
