@@ -25,6 +25,9 @@ jobs:
     - name: Update submodules
       run: git submodule update --init --recursive
 
+    - name: Install latest CMake.
+      uses: lukka/get-cmake@latest
+
     - name: Restore from cache, and install vcpkg and project dependencies
       uses: lukka/run-vcpkg@v7
       with:
