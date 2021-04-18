@@ -36,7 +36,7 @@ jobs:
 #        appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
     
     - name: Install vcpkg packages
-      shell: powershell
+      shell: cmd
       run: |
         cd vcpkg
         .\bootstrap-vcpkg.bat
