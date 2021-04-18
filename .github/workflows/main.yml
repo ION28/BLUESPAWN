@@ -25,15 +25,23 @@ jobs:
     - name: Update submodules
       run: git submodule update --init --recursive
 
-    - name: Install latest CMake.
-      uses: lukka/get-cmake@latest
+#    - name: Install latest CMake.
+#      uses: lukka/get-cmake@latest
 
-    - name: Restore from cache, and install vcpkg and project dependencies
-      uses: lukka/run-vcpkg@v7
-      with:
-        vcpkgArguments: '@../vcpkg_response_file.txt'
-        vcpkgDirectory: 'vcpkg'
-        appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
+#    - name: Restore from cache, and install vcpkg and project dependencies
+#      uses: lukka/run-vcpkg@v7
+#      with:
+#        vcpkgArguments: '@../vcpkg_response_file.txt'
+#        vcpkgDirectory: 'vcpkg'
+#        appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
+    
+    - name: Install vcpkg packages
+      shell: powershell
+      run: |
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+        .\vcpkg.exe install @../vcpkg_response_file.txt
+        cd ..
 
     - name: Integrate vcpkg packages
       shell: powershell
