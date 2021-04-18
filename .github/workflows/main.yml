@@ -37,7 +37,7 @@ jobs:
     
     - name: Install vcpkg packages
       shell: cmd
-      run: "cd vcpkg && .\bootstrap-vcpkg.bat && .\vcpkg.exe install @../vcpkg_response_file.txt && cd .."
+      run: "cd vcpkg && .\\bootstrap-vcpkg.bat && .\\vcpkg.exe install @../vcpkg_response_file.txt && cd .."
 
     - name: Integrate vcpkg packages
       shell: powershell
