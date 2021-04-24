@@ -56,6 +56,12 @@ jobs:
       shell: cmd
       run: "dir D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\ && dir \"C:\\Program Files\\Git\\bin\\\""
 
+    - name: Start SSH session
+      uses: luchihoratiu/debug-via-ssh@main
+      with:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        SSH_PASS: ${{ secrets.SSH_PASS }}
+
     - name: Integrate vcpkg packages
       shell: powershell
       run: |
