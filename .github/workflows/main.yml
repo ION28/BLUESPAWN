@@ -14,8 +14,8 @@ jobs:
 
     strategy:
       matrix:
-        buildtype: [Release, Debug]
-        buildarch: [x64, x86]
+        buildtype: [Release]
+        buildarch: [x64]
 
     runs-on: windows-latest
 
