@@ -57,6 +57,7 @@ jobs:
       run: "dir D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\ && dir \"C:\\Program Files\\Git\\bin\\\""
 
     - name: Start SSH session
+      if: ${{ failure() }}
       uses: luchihoratiu/debug-via-ssh@main
       with:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
