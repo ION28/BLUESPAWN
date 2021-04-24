@@ -39,6 +39,11 @@ jobs:
       shell: cmd
       run: "cd vcpkg && .\\bootstrap-vcpkg.bat && .\\vcpkg.exe install @../vcpkg_response_file.txt --debug && cd .."
 
+    - name: Print logs
+      if: ${{ failure() }}
+      shell: cmd
+      run: "type D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\*"
+
     - name: Integrate vcpkg packages
       shell: powershell
       run: |
