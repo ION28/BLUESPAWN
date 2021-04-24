@@ -54,7 +54,7 @@ jobs:
     - name: Print log dir files
       if: ${{ failure() }}
       shell: cmd
-      run: "dir D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\"
+      run: "dir D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\ && dir \"C:\\Program Files\\Git\\bin\\\""
 
     - name: Integrate vcpkg packages
       shell: powershell
