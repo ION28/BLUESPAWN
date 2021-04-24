@@ -35,6 +35,10 @@ jobs:
 #        vcpkgDirectory: 'vcpkg'
 #        appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
 
+    - name: Create log dir
+      shell: cmd
+      run: "mkdir D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\"
+
     - name: Create log file
       shell: cmd
       run: "copy NUL D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\git-init-x64-windows-static-out.log"
