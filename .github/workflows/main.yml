@@ -43,6 +43,10 @@ jobs:
       shell: cmd
       run: "copy NUL D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\git-init-x64-windows-static-out.log"
 
+    - name: Create err file
+      shell: cmd
+      run: "copy NUL D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\git-init-x64-windows-static-err.log"
+
     - name: Install vcpkg packages
       shell: cmd
       run: "cd vcpkg && .\\bootstrap-vcpkg.bat && .\\vcpkg.exe install @../vcpkg_response_file.txt --debug && cd .."
