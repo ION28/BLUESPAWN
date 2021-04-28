@@ -23,3 +23,7 @@ docs/db.sqlite3
 __pycache__/
 docs/media/scans/
 docs/*/migrations/
+
+# Documentation
+docs/_build/
+

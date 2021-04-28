@@ -1,5 +1,2 @@
-gunicorn
-django
-django-bootstrap4
-python-docx
-lxml
+sphinx-rtd-theme
+sphinxemoji

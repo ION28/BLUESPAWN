@@ -224,7 +224,7 @@ namespace EventLogs {
 
         // Open the channel config
         EventWrapper hChannel{ EvtOpenChannelConfig(NULL, channel.c_str(), 0) };
-        if(NULL == hChannel) {
+        if(!hChannel) {
             LOG_ERROR(L"EventLogs::IsChannelOpen: EvtOpenChannelConfig failed with " + std::to_wstring(GetLastError()) +
                       L" for channel " + channel);
             return false;

@@ -25,8 +25,24 @@ jobs:
     - name: Update submodules
       run: git submodule update --init --recursive
 
+    - name: Create download dir
+      shell: cmd
+      run: "mkdir D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\downloads\\"
+
+    - name: Create log dir
+      shell: cmd
+      run: "mkdir D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\"
+
+    - name: Create log file
+      shell: cmd
+      run: "copy NUL D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\git-init-x64-windows-static-out.log"
+
+    - name: Create err file
+      shell: cmd
+      run: "copy NUL D:\\a\\BLUESPAWN\\BLUESPAWN\\vcpkg\\buildtrees\\bzip2\\git-init-x64-windows-static-err.log"
+
     - name: Restore from cache, and install vcpkg and project dependencies
-      uses: lukka/run-vcpkg@v6
+      uses: lukka/run-vcpkg@v7
       with:
         vcpkgArguments: '@../vcpkg_response_file.txt'
         vcpkgDirectory: 'vcpkg'
