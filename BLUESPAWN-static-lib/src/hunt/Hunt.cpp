@@ -1,21 +1,21 @@
 #include "hunt/Hunt.h"
 #include "hunt/HuntRegister.h"
 
-HuntInfo::HuntInfo(const std::wstring& HuntName, DWORD HuntTactics, DWORD HuntCategories, DWORD HuntDatasources, long HuntStartTime) :
+HuntInfo::HuntInfo(const bstring& HuntName, DWORD HuntTactics, DWORD HuntCategories, DWORD HuntDatasources, long HuntStartTime) :
 	HuntName{ HuntName },
 	HuntTactics{ HuntTactics },
 	HuntCategories{ HuntCategories },
 	HuntDatasources{ HuntDatasources }, 
 	HuntStartTime{ HuntStartTime }{}
 
-Hunt::Hunt(IN CONST std::wstring& name) : 
+Hunt::Hunt(IN CONST bstring& name) : 
 	name{ name }{
 	dwTacticsUsed = 0;
 	dwSourcesInvolved = 0;
 	dwCategoriesAffected = 0;
 }
 
-std::wstring Hunt::GetName() {
+bstring Hunt::GetName() {
 	return name;
 }
 

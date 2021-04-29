@@ -17,7 +17,7 @@ namespace Log {
 
     CLISink::CLISink() : hMutex{ CreateMutexW(nullptr, false, L"Local\\CLI-Mutex") } {}
 
-    void CLISink::LogMessage(IN CONST LogLevel& level, IN CONST std::wstring& message) {
+    void CLISink::LogMessage(IN CONST LogLevel& level, IN CONST bstring& message) {
         AcquireMutex mutex{ hMutex };
         if(level.Enabled()) {
             SetConsoleColor(CLISink::PrependColors[static_cast<WORD>(level.severity)]);

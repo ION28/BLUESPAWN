@@ -68,13 +68,13 @@ struct ProcessDetectionData {
 	std::optional<HandleWrapper> ProcessHandle;
 
 	/// The name of the process
-	std::optional<std::wstring> ProcessName;
+	std::optional<bstring> ProcessName;
 
 	/// The path to the executable image of the process
-	std::optional<std::wstring> ProcessPath;
+	std::optional<bstring> ProcessPath;
 
 	/// The command used to spawn the process
-	std::optional<std::wstring> ProcessCommand;
+	std::optional<bstring> ProcessCommand;
 
 	/// The parent of the process
 	std::optional<std::shared_ptr<ProcessDetectionData>> ParentProcess;
@@ -86,7 +86,7 @@ struct ProcessDetectionData {
 	std::optional<DWORD> MemorySize;
 
 	/// The name of the image in memory being referenced by the detection. 
-	std::optional<std::wstring> ImageName;
+	std::optional<bstring> ImageName;
 
 	/**
 	 * Instantiates a ProcessDetectionData object representing a malicious image loaded in
@@ -108,12 +108,12 @@ struct ProcessDetectionData {
 	 */
 	static ProcessDetectionData CreateImageDetectionData(
 		IN DWORD PID,
-		IN CONST std::wstring& ProcessName,
-		IN CONST std::wstring& ImageName,
+		IN CONST bstring& ProcessName,
+		IN CONST bstring& ImageName,
 		IN CONST std::optional<PVOID64>& BaseAddress = std::nullopt OPTIONAL,
 		IN CONST std::optional<DWORD>& MemorySize = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ProcessCommand = std::nullopt OPTIONAL,
 		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
 	);
 
@@ -141,12 +141,12 @@ struct ProcessDetectionData {
 	 */
 	static ProcessDetectionData CreateImageDetectionData(
 		IN CONST HandleWrapper& ProcessHandle,
-		IN CONST std::wstring& ProcessName,
-		IN CONST std::wstring& ImageName,
+		IN CONST bstring& ProcessName,
+		IN CONST bstring& ImageName,
 		IN CONST std::optional<PVOID64>& BaseAddress = std::nullopt OPTIONAL,
 		IN CONST std::optional<DWORD>& MemorySize = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ProcessCommand = std::nullopt OPTIONAL,
 		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
 	);
 
@@ -166,9 +166,9 @@ struct ProcessDetectionData {
 	 */
 	static ProcessDetectionData CreateProcessDetectionData(
 		IN DWORD PID,
-		IN CONST std::wstring& ProcessName,
-		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN CONST bstring& ProcessName,
+		IN CONST std::optional<bstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ProcessCommand = std::nullopt OPTIONAL,
 		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
 	);
 
@@ -191,9 +191,9 @@ struct ProcessDetectionData {
 	 */
 	static ProcessDetectionData CreateProcessDetectionData(
 		IN CONST HandleWrapper& ProcessHandle,
-		IN CONST std::wstring& ProcessName,
-		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN CONST bstring& ProcessName,
+		IN CONST std::optional<bstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ProcessCommand = std::nullopt OPTIONAL,
 		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
 	);
 
@@ -215,12 +215,12 @@ struct ProcessDetectionData {
 	 */
 	static ProcessDetectionData CreateMemoryDetectionData(
 		IN DWORD PID,
-		IN CONST std::wstring& ProcessName,
+		IN CONST bstring& ProcessName,
 		IN PVOID64 BaseAddress,
 		IN DWORD MemorySize,
-		IN CONST std::optional<std::wstring>& ImageName = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ImageName = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ProcessCommand = std::nullopt OPTIONAL,
 		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
 	);
 
@@ -245,12 +245,12 @@ struct ProcessDetectionData {
 	 */
 	static ProcessDetectionData CreateMemoryDetectionData(
 		IN CONST HandleWrapper& ProcessHandle,
-		IN CONST std::wstring& ProcessName,
+		IN CONST bstring& ProcessName,
 		IN PVOID64 BaseAddress,
 		IN DWORD MemorySize,
-		IN CONST std::optional<std::wstring>& ImageName = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& ProcessPath = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& ProcessCommand = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ImageName = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ProcessPath = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& ProcessCommand = std::nullopt OPTIONAL,
 		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess = nullptr OPTIONAL
 	);
 
@@ -260,7 +260,7 @@ struct ProcessDetectionData {
 	 * @param ProcessCommand The command used to spawn a process
 	 */
 	static ProcessDetectionData CreateCommandDetectionData(
-		IN CONST std::wstring& ProcessCommand
+		IN CONST bstring& ProcessCommand
 	);
 
 	/**
@@ -269,7 +269,7 @@ struct ProcessDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::map<std::wstring, std::wstring>& Serialize() CONST;
+	const std::map<bstring, bstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -293,7 +293,7 @@ private:
 	size_t hash = 0;
 
 	/// Record the serialization of the data
-	std::map<std::wstring, std::wstring> serialization = {};
+	std::map<bstring, bstring> serialization = {};
 
 	/// Raw constructor for a ProcessDetectionData
 	ProcessDetectionData(
@@ -301,13 +301,13 @@ private:
 		IN CONST std::optional<DWORD> PID,
 		IN CONST std::optional<DWORD> & TID,
 		IN CONST std::optional<HandleWrapper>& ProcessHandle,
-		IN CONST std::optional<std::wstring> & ProcessName,
-		IN CONST std::optional<std::wstring>& ProcessPath,
-		IN CONST std::optional<std::wstring>& ProcessCommand,
+		IN CONST std::optional<bstring> & ProcessName,
+		IN CONST std::optional<bstring>& ProcessPath,
+		IN CONST std::optional<bstring>& ProcessCommand,
 		IN std::unique_ptr<ProcessDetectionData>&& ParentProcess,
 		IN CONST std::optional<PVOID64>& BaseAddress,
 		IN CONST std::optional<DWORD>& MemorySize,
-		IN CONST std::optional<std::wstring>& ImageName
+		IN CONST std::optional<bstring>& ImageName
 	);
 };
 
@@ -320,24 +320,24 @@ struct FileDetectionData {
 	bool FileFound;
 
 	/// Information about the directory listing for the file
-	std::wstring FilePath;
-	std::wstring FileName;
-	std::optional<std::wstring> FileExtension;
+	bstring FilePath;
+	bstring FileName;
+	std::optional<bstring> FileExtension;
 
 	/// The type of the file. This differs from extensions in that mutliple different
 	/// file extensions may correspond to the same filetype. 
-	std::optional<std::wstring> FileType;
+	std::optional<bstring> FileType;
 
 	/// Command run to open the file. Stored in HKCR\<File Type>\shell\open\command
-	std::optional<std::wstring> Executor;
+	std::optional<bstring> Executor;
 
 	/// A handle for the file
 	std::optional<FileSystem::File> FileHandle;
 
 	/// Hashes of the file
-	std::optional<std::wstring> MD5;
-	std::optional<std::wstring> SHA1;
-	std::optional<std::wstring> SHA256;
+	std::optional<bstring> MD5;
+	std::optional<bstring> SHA1;
+	std::optional<bstring> SHA256;
 
 	/// Timestamps associated with the file
 	std::optional<FILETIME> LastOpened;
@@ -350,7 +350,7 @@ struct FileDetectionData {
 	std::optional<bool> FileSigned;
 
 	/// The title of the signer of this file, given that the file is signed
-	std::optional<std::wstring> Signer;
+	std::optional<bstring> Signer;
 
 	/**
 	 * Creates a FileDetectionData using an open handle to the file. This works under the assumption that the 
@@ -375,7 +375,7 @@ struct FileDetectionData {
 	 * @param FilePath The path of the file
 	 */
 	FileDetectionData(
-		IN CONST std::wstring& FilePath
+		IN CONST bstring& FilePath
 	);
 
 	/**
@@ -384,7 +384,7 @@ struct FileDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::map<std::wstring, std::wstring>& Serialize() CONST;
+	const std::map<bstring, bstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -408,7 +408,7 @@ private:
 	size_t hash = 0;
 
 	/// Record the serialization of the data
-	std::map<std::wstring, std::wstring> serialization = {};
+	std::map<bstring, bstring> serialization = {};
 };
 
 /**
@@ -421,7 +421,7 @@ private:
 struct RegistryDetectionData {
 
 	/// The path of the registry key associated with the registry entry
-	std::wstring KeyPath;
+	bstring KeyPath;
 
 	/// The key associated with the registry entry.
 	Registry::RegistryKey key;
@@ -472,7 +472,7 @@ struct RegistryDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::map<std::wstring, std::wstring>& Serialize() CONST;
+	const std::map<bstring, bstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -496,7 +496,7 @@ private:
 	size_t hash = 0;
 
 	/// Record the serialization of the data
-	std::map<std::wstring, std::wstring> serialization = {};
+	std::map<bstring, bstring> serialization = {};
 };
 
 /**
@@ -507,16 +507,16 @@ private:
 struct ServiceDetectionData {
 
 	/// The name of the service
-	std::optional<std::wstring> ServiceName;
+	std::optional<bstring> ServiceName;
 
 	/// The display name of the service
-	std::optional<std::wstring> DisplayName;
+	std::optional<bstring> DisplayName;
 
 	/// The description of the service
-	std::optional<std::wstring> Description;
+	std::optional<bstring> Description;
 
 	/// The service path
-	std::optional<std::wstring> FilePath;
+	std::optional<bstring> FilePath;
 
 	/**
 	 * Creates a ServiceDetectionData object, referencing a windows service that may be malicious. Either DisplayName
@@ -528,10 +528,10 @@ struct ServiceDetectionData {
 	 * @param Description The description of the service
 	 */
 	ServiceDetectionData(
-		IN CONST std::optional<std::wstring>& ServiceName = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& DisplayName = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& FilePath = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& Description = std::nullopt OPTIONAL
+		IN CONST std::optional<bstring>& ServiceName = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& DisplayName = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& FilePath = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& Description = std::nullopt OPTIONAL
 	);
 
 	/**
@@ -540,7 +540,7 @@ struct ServiceDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::map<std::wstring, std::wstring>& Serialize() CONST;
+	const std::map<bstring, bstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -564,7 +564,7 @@ private:
 	size_t hash = 0;
 
 	/// Record the serialization of the data
-	std::map<std::wstring, std::wstring> serialization = {};
+	std::map<bstring, bstring> serialization = {};
 };
 
 /**
@@ -574,10 +574,10 @@ private:
 struct OtherDetectionData {
 	
 	/// A string describing the type of detection associated with this object.
-	std::wstring DetectionType;
+	bstring DetectionType;
 
 	/// Stores data about the detection
-	std::map<std::wstring, std::wstring> DetectionProperties;
+	std::map<bstring, bstring> DetectionProperties;
 
 	/**
 	 * Creates an OtherDetectionData object, referencing something on the system identified as possibly malicious. 
@@ -587,8 +587,8 @@ struct OtherDetectionData {
 	 * @param DetectionProperties A mapping of property to value describing what's being referenced by this.
 	 */
 	OtherDetectionData(
-		IN CONST std::wstring& DetectionType,
-		IN CONST std::map<std::wstring, std::wstring>& DetectionProperties
+		IN CONST bstring& DetectionType,
+		IN CONST std::map<bstring, bstring>& DetectionProperties
 	);
 
 	/**
@@ -597,7 +597,7 @@ struct OtherDetectionData {
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::map<std::wstring, std::wstring>& Serialize() CONST;
+	const std::map<bstring, bstring>& Serialize() CONST;
 
 	/**
 	 * Compute a hash for this detection data
@@ -621,14 +621,14 @@ private:
 	size_t hash = 0;
 
 	/// Record the serialization of the data
-	std::map<std::wstring, std::wstring> serialization = {};
+	std::map<bstring, bstring> serialization = {};
 };
 
 /// Stores contextual information around a detection
 struct DetectionContext {
 	
 	/// A set of the hunts that identified the detection
-	std::set<std::wstring> hunts;
+	std::set<bstring> hunts;
 	
 	/// The time at which the first evidence of the detection was created
 	std::optional<FILETIME> FirstEvidenceTime;
@@ -637,7 +637,7 @@ struct DetectionContext {
 	FILETIME DetectionCreatedTime;
 
 	/// An optional note describing why this detection was marked as potentially malicious
-	std::optional<std::wstring> note;
+	std::optional<bstring> note;
 
 	/**
 	 * Creates a DetectionContext for a detection. 
@@ -647,9 +647,9 @@ struct DetectionContext {
 	 * @param FirstEvidenceTime The time at which the first evidence of this detection was created
 	 */
 	DetectionContext(
-		IN CONST std::optional<std::wstring>& hunt = std::nullopt OPTIONAL,
+		IN CONST std::optional<bstring>& hunt = std::nullopt OPTIONAL,
 		IN CONST std::optional<FILETIME>& FirstEvidenceTime = std::nullopt OPTIONAL,
-		IN CONST std::optional<std::wstring>& note = std::nullopt OPTIONAL
+		IN CONST std::optional<bstring>& note = std::nullopt OPTIONAL
 	);
 };
 
@@ -678,7 +678,7 @@ private:
 	size_t hash;
 
 	/// Record the serialization of the data
-	std::map<std::wstring, std::wstring> serialization;
+	std::map<bstring, bstring> serialization;
 
 	/// A shared counter to keep track of detection IDs and ensure each new detection gets assigned
 	/// a unique identifier.
@@ -686,19 +686,19 @@ private:
 
 	/// A struct used to serialize detection data
 	static struct {
-		std::map<std::wstring, std::wstring> operator()(ProcessDetectionData data){
+		std::map<bstring, bstring> operator()(ProcessDetectionData data){
 			return data.Serialize();
 		}
-		std::map<std::wstring, std::wstring> operator()(FileDetectionData data){
+		std::map<bstring, bstring> operator()(FileDetectionData data){
 			return data.Serialize(); 
 		}
-		std::map<std::wstring, std::wstring> operator()(RegistryDetectionData data){
+		std::map<bstring, bstring> operator()(RegistryDetectionData data){
 			return data.Serialize();
 		}
-		std::map<std::wstring, std::wstring> operator()(ServiceDetectionData data){
+		std::map<bstring, bstring> operator()(ServiceDetectionData data){
 			return data.Serialize();
 		}
-		std::map<std::wstring, std::wstring> operator()(OtherDetectionData data){
+		std::map<bstring, bstring> operator()(OtherDetectionData data){
 			return data.Serialize(); 
 		}
 	} serializer;
@@ -790,7 +790,7 @@ public:
 	 *
 	 * @return A mapping of properties to human-readable values
 	 */
-	const std::map<std::wstring, std::wstring>& Serialize() const;
+	const std::map<bstring, bstring>& Serialize() const;
 
 	/**
 	 * Implicit cast to a CRITICAL_SECTION pointer for use in synchronization functions

@@ -18,11 +18,11 @@ void HuntRegister::RegisterHunt(std::unique_ptr<Hunt>&& hunt) {
 }
 
 bool HuntRegister::HuntShouldRun(IN Hunt* hunt,
-                                 IN CONST std::vector<std::wstring> vIncludedHunts,
-                                 IN CONST std::vector<std::wstring> vExcludedHunts) {
+                                 IN CONST std::vector<bstring> vIncludedHunts,
+                                 IN CONST std::vector<bstring> vExcludedHunts) {
     if(vExcludedHunts.size() != 0) {
         for(auto name : vExcludedHunts) {
-            if(hunt->GetName().find(name) != std::wstring::npos) {
+            if(hunt->GetName().find(name) != bstring::npos) {
                 return false;
             }
         }
@@ -30,7 +30,7 @@ bool HuntRegister::HuntShouldRun(IN Hunt* hunt,
     }
     if(vIncludedHunts.size() != 0) {
         for(auto name : vIncludedHunts) {
-            if(hunt->GetName().find(name) != std::wstring::npos) {
+            if(hunt->GetName().find(name) != bstring::npos) {
                 return true;
             }
         }
@@ -40,8 +40,8 @@ bool HuntRegister::HuntShouldRun(IN Hunt* hunt,
 }
 
 std::vector<Promise<std::vector<std::shared_ptr<Detection>>>>
-HuntRegister::RunHunts(IN CONST std::vector<std::wstring> vIncludedHunts,
-                       IN CONST std::vector<std::wstring> vExcludedHunts,
+HuntRegister::RunHunts(IN CONST std::vector<bstring> vIncludedHunts,
+                       IN CONST std::vector<bstring> vExcludedHunts,
                        IN CONST Scope& scope OPTIONAL,
                        IN CONST bool async OPTIONAL) {
     if(vExcludedHunts.size() != 0) {
@@ -89,8 +89,8 @@ Promise<std::vector<std::shared_ptr<Detection>>> HuntRegister::RunHunt(IN Hunt* 
         [hunt, scope]() mutable { return hunt->RunHunt(scope); });
 }
 
-void HuntRegister::SetupMonitoring(IN CONST std::vector<std::wstring> vIncludedHunts,
-                                   IN CONST std::vector<std::wstring> vExcludedHunts) {
+void HuntRegister::SetupMonitoring(IN CONST std::vector<bstring> vIncludedHunts,
+                                   IN CONST std::vector<bstring> vExcludedHunts) {
     auto& EvtManager{ EventManager::GetInstance() };
     for(auto& hunt : vRegisteredHunts) {
         if(HuntShouldRun(hunt.get(), vIncludedHunts, vExcludedHunts)) {

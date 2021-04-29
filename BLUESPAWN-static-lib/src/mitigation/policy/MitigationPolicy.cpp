@@ -4,7 +4,7 @@
 
 bool MitigationPolicy::IsEnforced() const{ return isEnforced; }
 
-std::wstring MitigationPolicy::GetPolicyName() const{ return name; }
+bstring MitigationPolicy::GetPolicyName() const{ return name; }
 
 EnforcementLevel MitigationPolicy::GetEnforcementLevel() const{ return level; }
 
@@ -12,10 +12,10 @@ void MitigationPolicy::SetEnforced(bool enforce){ isEnforced = enforce; }
 
 void MitigationPolicy::SetEnforced(EnforcementLevel level){ isEnforced = level >= this->level; }
 
-std::optional<std::wstring> MitigationPolicy::GetDescription() const{ return this->description; }
+std::optional<bstring> MitigationPolicy::GetDescription() const{ return this->description; }
 
-MitigationPolicy::MitigationPolicy(const std::wstring& name, EnforcementLevel level, 
-								   const std::optional<std::wstring>& description,
+MitigationPolicy::MitigationPolicy(const bstring& name, EnforcementLevel level, 
+								   const std::optional<bstring>& description,
 								   const std::optional<Version>& min, const std::optional<Version>& max) : 
 	name{ name }, level{ level }, description{ description }, minVersion{ min }, maxVersion{ max }{}
 
@@ -25,7 +25,7 @@ MitigationPolicy::MitigationPolicy(json policy){
 
     name = StringToWidestring(policy["name"].get<std::string>());
     description = policy.find("description") != policy.end() ?
-        std::optional<std::wstring>(StringToWidestring(policy["description"].get<std::string>())) : std::nullopt;
+        std::optional<bstring>(StringToWidestring(policy["description"].get<std::string>())) : std::nullopt;
 
     auto levelString{ ToLowerCaseA(policy["enforcement-level"].get<std::string>()) };
     if(levelString == "low"){ level = EnforcementLevel::Low; } 

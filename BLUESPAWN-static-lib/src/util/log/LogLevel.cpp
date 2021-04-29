@@ -46,7 +46,7 @@ namespace Log {
 		sinks.emplace_back(sink);
 	}
 
-	void LogLevel::LogMessage(IN CONST std::wstring& message){
+	void LogLevel::LogMessage(IN CONST bstring& message){
 		if(enabled){
 			for(auto sink : sinks){
 				sink->LogMessage(*this, message);

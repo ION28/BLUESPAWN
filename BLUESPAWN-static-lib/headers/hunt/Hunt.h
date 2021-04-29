@@ -75,7 +75,7 @@ class Hunt {
     DWORD dwCategoriesAffected;
 
     /// The name of the hunt
-    std::wstring name;
+    bstring name;
 
     public:
     /**
@@ -84,14 +84,14 @@ class Hunt {
      *
      * @param name The name of the hunt
      */
-    Hunt(IN CONST std::wstring& name);
+    Hunt(IN CONST bstring& name);
 
     /**
      * Retrieves the name of the hunt
      *
      * @return The name of the hunt
      */
-    std::wstring GetName();
+    bstring GetName();
 
     /**
      * Indicate whether the hunt uses all specified tactics from the Tactic enum.

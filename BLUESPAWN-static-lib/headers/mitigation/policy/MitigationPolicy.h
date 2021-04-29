@@ -34,11 +34,11 @@ class MitigationPolicy {
 
     /// The name of the policy. This should attempt to very briefly describe what it does (i.e. "Disable Anonymously
     /// Accessible Named Pipes")
-    std::wstring name;
+    bstring name;
 
     /// An optional explanation for the policy (i.e. "Anonymously accessible named pipes can be used in X, Y and Z attacks
     /// and should be disabled. See abc.com/xyz for more info [v-123]")
-    std::optional<std::wstring> description;
+    std::optional<bstring> description;
 
     /// The level at which this mitigaiton policy should begin to be enforced. This should be Low, Moderate, or High
     EnforcementLevel level;
@@ -62,9 +62,9 @@ class MitigationPolicy {
 	 * \param min The minimum version of the associated software where this policy applies
 	 * \param max The maximum version of the associated software where this policy applies
 	 */
-    MitigationPolicy(const std::wstring& name,
+    MitigationPolicy(const bstring& name,
                      EnforcementLevel level,
-                     const std::optional<std::wstring>& description = std::nullopt,
+                     const std::optional<bstring>& description = std::nullopt,
                      const std::optional<Version>& min = std::nullopt,
                      const std::optional<Version>& max = std::nullopt);
 
@@ -91,14 +91,14 @@ class MitigationPolicy {
 	 *
 	 * \return The name of the policy
 	 */
-	std::wstring GetPolicyName() const;
+	bstring GetPolicyName() const;
 
 	/**
 	 * \brief Retrieves the description of the mitigation policy
 	 *
 	 * \return The description of the policy
 	 */
-	std::optional<std::wstring> GetDescription() const;
+	std::optional<bstring> GetDescription() const;
 
     /**
 	 * \brief Returns whether or not the mitigation policy is set to be enforced

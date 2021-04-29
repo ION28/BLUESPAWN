@@ -64,11 +64,11 @@ struct MitigationReport {
 class Mitigation {
     /// The name of the mitigation. This should be either the MITRE mitigation technique or specify the name of the
     /// software to which the mitigation applies (i.e. "Apply M1047 - Audit" or "Mitigations for FileZilla 3.52")
-    std::wstring name;
+    bstring name;
 
     /// Describes the changes made by the mitigation at a high level (i.e. "Enforce binary and application integrity
     /// with digital signature verification to prevent untrusted code from executing.")
-    std::wstring description;
+    bstring description;
 
     /// The software package targetted by this mitigation. If the mitigation targets the operating system, this should
     /// be "Windows"
@@ -88,8 +88,8 @@ class Mitigation {
 	 * \param software The software package targetted by this mitigation
 	 * \param policies The mitigation policies to be enforced by this mitigation
 	 */
-    Mitigation(const std::wstring& name,
-               const std::wstring& description,
+    Mitigation(const bstring& name,
+               const bstring& description,
                const Software& software,
                std::vector<std::unique_ptr<MitigationPolicy>> policies);
 
@@ -128,14 +128,14 @@ class Mitigation {
      * 
      * \return The name of the mitigation
      */
-    std::wstring GetName() const;
+    bstring GetName() const;
 
     /**
      * \brief Retrieves the description of the mitigation
      *
      * \return The description of the mitigation
      */
-    std::wstring GetDescription() const;
+    bstring GetDescription() const;
 
     /**
      * \brief Retrieves a vector of non-owning pointers to all mitigation policies in this mitigation

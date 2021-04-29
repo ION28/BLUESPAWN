@@ -32,7 +32,7 @@ namespace Log {
         ResumeThread(thread);
     }
 
-    XMLSink::XMLSink(const std::wstring& wOutputDir) :
+    XMLSink::XMLSink(const bstring& wOutputDir) :
         Root{ XMLDoc.NewElement("bluespawn") }, LogRoot{ XMLDoc.NewElement("log-messages") }, thread{
             CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr)
         } {
@@ -44,7 +44,7 @@ namespace Log {
         XMLDoc.InsertEndChild(Root);
     }
 
-    XMLSink::XMLSink(const std::wstring& wOutputDir, const std::wstring& wFileName) :
+    XMLSink::XMLSink(const bstring& wOutputDir, const bstring& wFileName) :
         Root{ XMLDoc.NewElement("bluespawn") }, wFileName{ wOutputDir + L"\\" + wFileName }, LogRoot{ XMLDoc.NewElement(
                                                                                                  "log-messages") },
         thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr) } {
@@ -59,7 +59,7 @@ namespace Log {
     void InsertElement(IN tinyxml2::XMLDocument& XMLDoc,
                        IN tinyxml2::XMLElement* parent,
                        IN CONST std::string& name,
-                       IN CONST std::wstring& value) {
+                       IN CONST bstring& value) {
         auto elem{ XMLDoc.NewElement(name.c_str()) };
         elem->SetText(WidestringToString(value).c_str());
         parent->InsertEndChild(elem);
@@ -206,7 +206,7 @@ namespace Log {
         }
     }
 
-    void XMLSink::LogMessage(const LogLevel& level, const std::wstring& message) {
+    void XMLSink::LogMessage(const LogLevel& level, const bstring& message) {
         BeginCriticalSection _{ hGuard };
 
         if(level.Enabled()) {

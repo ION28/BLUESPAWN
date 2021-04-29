@@ -169,7 +169,7 @@ namespace Log {
 	*
 	* @param DWORD returned from GetLastError()
 	*
-	* @return A std::wstring containing the System Error Message Description
+	* @return A bstring containing the System Error Message Description
 	*/
-	std::wstring FormatErrorMessage(DWORD dwNum);
+	bstring FormatErrorMessage(DWORD dwNum);
 }

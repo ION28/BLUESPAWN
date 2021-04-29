@@ -38,7 +38,7 @@ namespace Log {
 		};
 
 		/// Prepends for messages
-		std::wstring MessagePrepends[5] = { L"[ERROR]", L"[WARNING]", L"[INFO]", L"[VERBOSE]", L"[DETECTION]" };
+		bstring MessagePrepends[5] = { L"[ERROR]", L"[WARNING]", L"[INFO]", L"[VERBOSE]", L"[DETECTION]" };
 
 		/// Colors for the message prepends
 		MessageColor PrependColors[5] = { MessageColor::RED, MessageColor::YELLOW, MessageColor::BLUE, 
@@ -69,7 +69,7 @@ namespace Log {
 		 */
 		virtual void LogMessage(
 			IN CONST LogLevel& level, 
-			IN CONST std::wstring& message
+			IN CONST bstring& message
 		) override;
 
 		/**

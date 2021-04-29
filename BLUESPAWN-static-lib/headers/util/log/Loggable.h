@@ -13,6 +13,6 @@ public:
 	 *
 	 *  @return A string representation of the class.
 	 */
-	virtual std::wstring ToString() const = 0;
+	virtual bstring ToString() const = 0;
 };
 

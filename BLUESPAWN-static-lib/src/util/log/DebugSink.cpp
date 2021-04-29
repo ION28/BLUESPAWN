@@ -15,7 +15,7 @@
 
 namespace Log{
 
-	void DebugSink::LogMessage(IN CONST LogLevel& level, IN CONST std::wstring& message){
+	void DebugSink::LogMessage(IN CONST LogLevel& level, IN CONST bstring& message){
 		BeginCriticalSection _{ hGuard };
 
 		if(level.Enabled()){

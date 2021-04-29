@@ -8,8 +8,8 @@
 
 #include "util/StringUtils.h"
 
-Mitigation::Mitigation(const std::wstring& name,
-                       const std::wstring& description,
+Mitigation::Mitigation(const bstring& name,
+                       const bstring& description,
                        const Software& software,
                        std::vector<std::unique_ptr<MitigationPolicy>> policies) :
     name{ name },
@@ -51,11 +51,11 @@ Mitigation::Mitigation(json mitigation) : software(L"", L""){
     }
 }
 
-std::wstring Mitigation::GetName() const {
+bstring Mitigation::GetName() const {
     return this->name;
 }
 
-std::wstring Mitigation::GetDescription() const {
+bstring Mitigation::GetDescription() const {
     return this->description;
 }
 

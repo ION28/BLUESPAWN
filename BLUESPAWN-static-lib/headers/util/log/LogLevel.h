@@ -125,7 +125,7 @@ namespace Log {
 		 * @param message The message to log
 		 */
 		void LogMessage(
-			IN CONST std::wstring& message
+			IN CONST bstring& message
 		);
 	};
 }

@@ -26,7 +26,7 @@ namespace Log {
         json LogRoot;
 
         /// The name of the file to which the JSON will be written
-        std::wstring wFileName;
+        bstring wFileName;
 
         /// Tags for messages sent at different levels
         std::string MessageTags[4] = { "error", "warning", "info", "other" };
@@ -46,7 +46,7 @@ namespace Log {
         void JSONSink::InsertElement(IN json JSONDoc,
                                      IN json parent,
                                      IN CONST std::string& name,
-                                     IN CONST std::wstring& value);
+                                     IN CONST bstring& value);
 
         public:
         /**
@@ -60,7 +60,7 @@ namespace Log {
 		 *
 		 * @param wOutputDir The folder to save the log to.
 		 */
-        JSONSink(const std::wstring& wOutputDir);
+        JSONSink(const bstring& wOutputDir);
 
         /**
 		 * Constructor for JSONSink. The log will be saved to the folder\name passed as the arguments
@@ -68,7 +68,7 @@ namespace Log {
 		 * @param wOutputDir The folder to save the log to.
 		 * @param wFileName The name of the file to save the log as.
 		 */
-        JSONSink(const std::wstring& wOutputDir, const std::wstring& wFileName);
+        JSONSink(const bstring& wOutputDir, const bstring& wFileName);
 
         /// Delete copy and move constructors and assignment operators
         JSONSink operator=(const JSONSink&) = delete;
@@ -85,7 +85,7 @@ namespace Log {
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
 		 */
-        virtual void LogMessage(const LogLevel& level, const std::wstring& message);
+        virtual void LogMessage(const LogLevel& level, const bstring& message);
 
         /**
 		 * Compares this JSONSink to another LogSink. All LogSink objects referring to the same file are considered 

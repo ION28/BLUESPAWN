@@ -31,8 +31,8 @@ class HuntRegister {
 	 * @return A boolean whether or not the hunt should be included
 	 */
     static bool HuntRegister::HuntShouldRun(IN Hunt* hunt,
-                                            IN CONST std::vector<std::wstring> vIncludedHunts,
-                                            IN CONST std::vector<std::wstring> vExcludedHunts);
+                                            IN CONST std::vector<bstring> vIncludedHunts,
+                                            IN CONST std::vector<bstring> vExcludedHunts);
 
     public:
     /**
@@ -48,8 +48,8 @@ class HuntRegister {
 	 * @return A vector of possibly malicious items. 
 	 */
     static std::vector<Promise<std::vector<std::shared_ptr<Detection>>>> RunHunts(
-        IN CONST std::vector<std::wstring> vIncludedHunts,
-        IN CONST std::vector<std::wstring> vExcludedHunts,
+        IN CONST std::vector<bstring> vIncludedHunts,
+        IN CONST std::vector<bstring> vExcludedHunts,
         IN CONST Scope& scope = {} OPTIONAL,
         IN CONST bool async = false OPTIONAL);
 
@@ -67,8 +67,8 @@ class HuntRegister {
 	 * vRegisteredHunts. Note that in earlier versions of Windows, the thread that calls
 	 * this function being terminated will result in the event subscriptions ending.
 	 */
-    static void SetupMonitoring(IN CONST std::vector<std::wstring> vIncludedHunts,
-                                IN CONST std::vector<std::wstring> vExcludedHunts);
+    static void SetupMonitoring(IN CONST std::vector<bstring> vIncludedHunts,
+                                IN CONST std::vector<bstring> vExcludedHunts);
 
     /**
 	 * Registers a hunt. This must be called prior to SetupMonitoring or RunHunts in

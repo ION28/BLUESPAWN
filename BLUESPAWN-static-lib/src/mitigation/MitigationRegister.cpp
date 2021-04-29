@@ -147,7 +147,7 @@ MitigationRegister::AuditMitigations(const MitigationsConfiguration& config) con
 }
 
 void MitigationRegister::PrintMitigationReports(const std::map<Mitigation*, MitigationReport>& reports) const {
-    std::wstring output{ L"Mitigation Report:\n" };
+    bstring output{ L"Mitigation Report:\n" };
     for(auto& pair : reports) {
         output += L"Report for mitigation \"" + pair.first->GetName() + L"\":\n";
         for(auto& policy : pair.second.results) {

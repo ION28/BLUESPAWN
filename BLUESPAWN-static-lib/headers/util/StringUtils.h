@@ -16,7 +16,7 @@
 *
 * @return A double storing the Shannon Entropy of the string
 */
-double GetShannonEntropy(const std::wstring& in);
+double GetShannonEntropy(const bstring& in);
 
 /**
  * Converts a wide-string to a UTF-8 encoded string
@@ -25,7 +25,7 @@ double GetShannonEntropy(const std::wstring& in);
  *
  * @return The given wide-string converted to a UTF-8 encoded string
  */
-std::string WidestringToString(const std::wstring& in);
+std::string WidestringToString(const bstring& in);
 
 /**
  * Converts a UTF-8 encoded string to a wide-string
@@ -34,7 +34,7 @@ std::string WidestringToString(const std::wstring& in);
  *
  * @return The string converted to a wide-string
  */
-std::wstring StringToWidestring(const std::string& in);
+bstring StringToWidestring(const std::string& in);
 
 /**
  * Expands all enviroment strings present in the input
@@ -43,7 +43,7 @@ std::wstring StringToWidestring(const std::string& in);
  *
  * @return The string with all environment strings expanded.
  */
-std::wstring ExpandEnvStringsW(const std::wstring& in);
+bstring ExpandEnvStringsW(const bstring& in);
 
 /**
  * Expands all enviroment strings present in the input
@@ -62,11 +62,11 @@ std::string ExpandEnvStringsA(const std::string& in);
 *
 * @return A wstring with the number zeropadded to the requested width
 */
-std::wstring ToWstringPad(DWORD value, size_t length = 2);
+bstring ToWstringPad(DWORD value, size_t length = 2);
 
 /**
  * Convert a string or wstring to uppercase. Note that the only
- * allowable template classes are std::string and std::wstring.
+ * allowable template classes are std::string and bstring.
  *
  * @param in The string/wstring to convert to uppercase.
  *
@@ -75,11 +75,11 @@ std::wstring ToWstringPad(DWORD value, size_t length = 2);
 template<class T>
 T ToUpperCase(const T& in);
 #define ToUpperCaseA ToUpperCase<std::string>
-#define ToUpperCaseW ToUpperCase<std::wstring>
+#define ToUpperCaseW ToUpperCase<bstring>
 
 /**
  * Convert a string or wstring to lowercase. Note that the only
- * allowable template classes are std::string and std::wstring.
+ * allowable template classes are std::string and bstring.
  *
  * @param in The string/wstring to convert to lowercase.
  *
@@ -88,11 +88,11 @@ T ToUpperCase(const T& in);
 template<class T>
 T ToLowerCase(const T& in);
 #define ToLowerCaseA ToLowerCase<std::string>
-#define ToLowerCaseW ToLowerCase<std::wstring>
+#define ToLowerCaseW ToLowerCase<bstring>
 
 /**
  * Compares two strings, ignoring case. Note that the only allowable
- * template classes are std::string and std::wstring.
+ * template classes are std::string and bstring.
  *
  * @param in1 The first string to compare
  * @param in2 The second string to compare.
@@ -102,7 +102,7 @@ T ToLowerCase(const T& in);
 template<class T>
 bool CompareIgnoreCase(const T& in1, const T& in2);
 #define CompareIgnoreCaseA CompareIgnoreCase<std::string>
-#define CompareIgnoreCaseW CompareIgnoreCase<std::wstring>
+#define CompareIgnoreCaseW CompareIgnoreCase<bstring>
 
 /**
  * Replaces all instances of a substring found inside of a string
@@ -116,8 +116,8 @@ bool CompareIgnoreCase(const T& in1, const T& in2);
 template<class T>
 T StringReplace(const T& string, const T& search, const T& replacement);
 #define StringReplaceA StringReplace<std::string>
-#define StringReplaceW StringReplace<std::wstring>
-#define CompareIgnoreCaseW CompareIgnoreCase<std::wstring>
+#define StringReplaceW StringReplace<bstring>
+#define CompareIgnoreCaseW CompareIgnoreCase<bstring>
 
 /**
  * Split a string into substrings based on a delimter. This currently

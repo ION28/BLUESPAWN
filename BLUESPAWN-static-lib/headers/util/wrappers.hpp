@@ -184,13 +184,13 @@ public:
 		}
 	}
 
-	std::optional<std::wstring> ReadWString() const{
+	std::optional<bstring> ReadWString() const{
 		if(Memory.has_value()){
 			SIZE_T size = wcsnlen(reinterpret_cast<PWCHAR>(pointer), AllocationSize / 2);
 			PWCHAR buffer = new WCHAR[size + 1];
 			CopyMemory(buffer, pointer, size * 2);
 			buffer[size] = 0;
-			auto str = std::wstring{ buffer };
+			auto str = bstring{ buffer };
 			delete[] buffer;
 			return str;
 		} else return std::nullopt;
@@ -341,9 +341,9 @@ public:
 		}
 	}
 
-	std::wstring ReadWstring(){
+	bstring ReadWstring(){
 		if(!process){
-			return std::wstring{ reinterpret_cast<WCHAR*>(address) };
+			return bstring{ reinterpret_cast<WCHAR*>(address) };
 		} else{
 			int idx = 0;
 			int maxIdx = 10;
@@ -360,9 +360,9 @@ public:
 				memory = new wchar_t[maxIdx * 2];
 			}
 			if(valid){
-				return std::wstring{ memory };
+				return bstring{ memory };
 			} else{
-				return std::wstring{};
+				return bstring{};
 			}
 		}
 	}

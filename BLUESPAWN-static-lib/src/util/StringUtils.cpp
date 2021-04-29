@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-double GetShannonEntropy(const std::wstring& str) {
+double GetShannonEntropy(const bstring& str) {
     // Code from https://rosettacode.org/wiki/Entropy#C.2B.2B
     std::map<char, int> frequencies;
     for(char c : str)
@@ -22,17 +22,17 @@ double GetShannonEntropy(const std::wstring& str) {
     return infocontent;
 }
 
-std::wstring StringToWidestring(const std::string& str) {
-    std::wstring s = { str.begin(), str.end() };
+bstring StringToWidestring(const std::string& str) {
+    bstring s = { str.begin(), str.end() };
     return s;
 }
 
-std::string WidestringToString(const std::wstring& wstr) {
+std::string WidestringToString(const bstring& wstr) {
     std::string s = { wstr.begin(), wstr.end() };
     return s;
 }
 
-std::wstring ExpandEnvStringsW(const std::wstring& in) {
+bstring ExpandEnvStringsW(const bstring& in) {
     WCHAR* expanded = new WCHAR[MAX_PATH];
     auto result = ExpandEnvironmentStringsW(in.c_str(), expanded, MAX_PATH);
     if(result > MAX_PATH) {
@@ -41,7 +41,7 @@ std::wstring ExpandEnvStringsW(const std::wstring& in) {
         result = ExpandEnvironmentStringsW(in.c_str(), expanded, result);
     }
 
-    std::wstring str{ expanded };
+    bstring str{ expanded };
 
     delete[] expanded;
 
@@ -64,10 +64,10 @@ std::string ExpandEnvStringsA(const std::string& in){
     return str;
 }
 
-std::wstring ToWstringPad(DWORD value, size_t length) {
+bstring ToWstringPad(DWORD value, size_t length) {
     wchar_t* buf = new wchar_t[length + 1];
     swprintf(buf, (L"%0" + std::to_wstring(length) + L"d").c_str(), value);
-    std::wstring str = buf;
+    bstring str = buf;
     delete[] buf;
     return str;
 }
@@ -79,7 +79,7 @@ T ToUpperCase(const T& in) {
     return copy;
 }
 
-template std::wstring ToUpperCase(const std::wstring& in);
+template bstring ToUpperCase(const bstring& in);
 template std::string ToUpperCase(const std::string& in);
 
 template<class T>
@@ -89,7 +89,7 @@ T ToLowerCase(const T& in) {
     return copy;
 }
 
-template std::wstring ToLowerCase(const std::wstring& in);
+template bstring ToLowerCase(const bstring& in);
 template std::string ToLowerCase(const std::string& in);
 
 template<class T>
@@ -97,7 +97,7 @@ bool CompareIgnoreCase(const T& in1, const T& in2) {
     return ToLowerCase(in1) == ToLowerCase(in2);
 }
 
-template bool CompareIgnoreCase(const std::wstring& in1, const std::wstring& in2);
+template bool CompareIgnoreCase(const bstring& in1, const bstring& in2);
 template bool CompareIgnoreCase(const std::string& in, const std::string& in2);
 
 template<class T>
@@ -110,8 +110,8 @@ T StringReplace(const T& string, const T& search, const T& replacement) {
     return copy;
 }
 
-template std::wstring
-StringReplace(const std::wstring& string, const std::wstring& search, const std::wstring& replacement);
+template bstring
+StringReplace(const bstring& string, const bstring& search, const bstring& replacement);
 template std::string
 StringReplace(const std::string& string, const std::string& search, const std::string& replacement);
 template bool CompareIgnoreCase(const std::string& in, const std::string& in2);
@@ -130,5 +130,5 @@ std::vector<std::basic_string<T>> SplitString(const std::basic_string<T>& in, co
     return substrs;
 }
 
-template std::vector<std::wstring> SplitString(const std::wstring& in, const std::wstring& delimiter);
+template std::vector<bstring> SplitString(const bstring& in, const bstring& delimiter);
 template std::vector<std::string> SplitString(const std::string& in, const std::string& delimiter);

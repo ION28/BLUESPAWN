@@ -33,7 +33,7 @@ namespace Log {
         ResumeThread(thread);
     }
 
-    JSONSink::JSONSink(const std::wstring& wOutputDir) :
+    JSONSink::JSONSink(const bstring& wOutputDir) :
         thread{ CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr) } {
         SYSTEMTIME time{};
         GetLocalTime(&time);
@@ -45,7 +45,7 @@ namespace Log {
         JSONDoc["bluespawn"]["log-messages"] = json::array();
     }
 
-    JSONSink::JSONSink(const std::wstring& wOutputDir, const std::wstring& wFileName) :
+    JSONSink::JSONSink(const bstring& wOutputDir, const bstring& wFileName) :
         wFileName{ wOutputDir + L"\\" + wFileName }, thread{
             CreateThread(nullptr, 0, PTHREAD_START_ROUTINE(UpdateLog), this, 0, nullptr)
         } {
@@ -61,7 +61,7 @@ namespace Log {
     }
 
     void
-    JSONSink::InsertElement(IN json JSONDoc, IN json parent, IN CONST std::string& name, IN CONST std::wstring& value) {
+    JSONSink::InsertElement(IN json JSONDoc, IN json parent, IN CONST std::string& name, IN CONST bstring& value) {
         parent[name] = WidestringToString(value).c_str();
     }
 
@@ -212,7 +212,7 @@ namespace Log {
         }
     }
 
-    void JSONSink::LogMessage(const LogLevel& level, const std::wstring& message) {
+    void JSONSink::LogMessage(const LogLevel& level, const bstring& message) {
         BeginCriticalSection _{ hGuard };
 
         if(level.Enabled()) {

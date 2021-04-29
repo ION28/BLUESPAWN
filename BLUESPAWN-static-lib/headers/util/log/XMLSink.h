@@ -24,7 +24,7 @@ namespace Log {
         tinyxml2::XMLElement* LogRoot;
 
         /// The name of the file to which the XML will be written
-        std::wstring wFileName;
+        bstring wFileName;
 
         /// Tags for messages sent at different levels
         std::string MessageTags[4] = { "error", "warning", "info", "other" };
@@ -47,7 +47,7 @@ namespace Log {
 		 *
 		 * @param wOutputDir The name of the folder to save the logs to.
 		 */
-        XMLSink(const std::wstring& wOutputDir);
+        XMLSink(const bstring& wOutputDir);
 
         /**
 		 * Constructor for XMLSink. The log will be saved with the folder path and name passed as the arguments
@@ -55,7 +55,7 @@ namespace Log {
 		 * @param wOutputDir The name of the folder to save the logs to.
 		 * @param wFileName The name of the file to save the log as.
 		 */
-        XMLSink(const std::wstring& wOutputDir, const std::wstring& wFileName);
+        XMLSink(const bstring& wOutputDir, const bstring& wFileName);
 
         /// Delete copy and move constructors and assignment operators
         XMLSink operator=(const XMLSink&) = delete;
@@ -72,7 +72,7 @@ namespace Log {
 		 * @param level The level at which the message is being logged
 		 * @param message The message to log
 		 */
-        virtual void LogMessage(const LogLevel& level, const std::wstring& message);
+        virtual void LogMessage(const LogLevel& level, const bstring& message);
 
         /**
 		 * Compares this XMLSink to another LogSink. All LogSink objects referring to the same file are considered 
