@@ -3,7 +3,7 @@
 #Run BLUESPAWN args[0] is path to BLUESPAWN
 $yes = "y`n"*1000
 $job = Start-Job -Init ([ScriptBlock]::Create("Set-Location '$pwd'")) -ScriptBlock {
-    &$args[0] --hunt --log=json -a Intensive --hunts "T1037,T1068,T1136,T1543,T1547,T1553,T1562,T1569" -r "remove-value,delete-file"
+    &$args[0] --hunt --log=json -a Intensive --hunts "T1037,T1068,T1136,T1543,T1547,T1553,T1562" -r "remove-value,delete-file"
 } -ArgumentList $args[0] -InputObject $yes
 #&$args[0] --hunt --log=xml -a Intensive --hunts T1546 -r "remove-value,delete-file"
 Wait-Job $job -Timeout 120
