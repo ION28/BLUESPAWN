@@ -1,0 +1,12 @@
+{
+	"detections": [
+		{
+			"type": "File",
+			"hunt": "T1505 - Server Software Component Subtechnique 003: Web Shell",
+			"Name": "C:\\inetpub\\wwwroot\\T1505003001.php",
+			"Malicious Yara Rules": "*",
+			"Fail Message": "HuntT1505-sub003-test001 Failed! File not found!",
+			"Pass Message": "HuntT1505-sub003-test001 Passed!"
+		}
+	]
+}
