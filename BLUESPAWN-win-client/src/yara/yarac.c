@@ -301,10 +301,8 @@ int main(
                 goto _exit;
             }
 
-            char last = 0xfc;
             for(UINT i = 0; i < size; i += 1){
-                buffer[i] ^= (char) ("BLUESPAWN YARA RULES"[i % 20] + last * (i + 1) + i);
-                last = buffer[i];
+                buffer[i] ^= (char) ("BLUESPAWN YARA RULES"[i % 20]);
             }
             CloseHandle(hFile);
             hFile = CreateFileA(

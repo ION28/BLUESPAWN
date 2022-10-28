@@ -51,9 +51,7 @@ AllocationWrapper GetResourceRule(DWORD identifier) {
                             char last = 0xfc;
                             char oldLast = 0;
                             for(UINT i = 0; i < data.GetSize(); i += 1){
-                                oldLast = data[i];
-                                data[i] ^= static_cast<byte>("BLUESPAWN YARA RULES"[i % 20] + last * (i + 1) + i);
-                                last = oldLast;
+                                data[i] ^= static_cast<byte>("BLUESPAWN YARA RULES"[i % 20]);
                             }
 
                             return data;
