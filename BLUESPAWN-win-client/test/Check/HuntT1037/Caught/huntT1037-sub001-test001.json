@@ -6,7 +6,7 @@
 			"Key Path": "*",
 			"Key Value Data": "C:\\Windows\\Temp\\T1037001001.dll",
 			"Key Value Name": "UserInitMprLogonScript",
-			"Registry Entry Type": "*",
+			"Registry Entry Type": "File",
 			"Fail Message": "HuntT1037-sub001-test001 Failed! Registry key not found!",
 			"Pass Message": "HuntT1037-sub001-test001 Passed!"
 		},

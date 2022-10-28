@@ -24,7 +24,8 @@ namespace Hunts {
         for(auto detection : CheckValues(HKEY_CURRENT_USER, L"Environment",
                                          { { L"UserInitMprLogonScript", L"", false, CheckSzEmpty } }, true, true)) {
             // Moderate contextual certainty due to the infequency of use for this registry value in legitimate cases
-            CREATE_DETECTION(Certainty::Moderate, RegistryDetectionData{ detection });
+            CREATE_DETECTION(Certainty::Moderate, 
+                RegistryDetectionData{ detection, RegistryDetectionType::FileReference });
         }
         SUBSECTION_END();
 
