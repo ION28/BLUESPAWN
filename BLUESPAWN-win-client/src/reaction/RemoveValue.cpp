@@ -16,32 +16,30 @@ namespace Reactions{
 											"malicious value `" + data.value->wValueName + L"` with data `" + 
 											data.value->ToString() + L"`. Remove this value?") == 1){
 				auto type{ data.key.GetValueType(data.value->wValueName) };
-				if(data.key.GetValueType(data.value->wValueName) == data.value->GetType()){
-					if(!data.key.RemoveValue(data.value->wValueName)){
-						LOG_ERROR("Unable to remove registry value `" << data.value->ToString() << "`: `" <<
-								  data.value->wValueName << "` (Error " << GetLastError() << ")");
-					} else{
-						detection.DetectionStale = true;
-					}
-				} else{
-					if(type == RegistryType::REG_MULTI_SZ_T){
-						auto val{ *data.key.GetValue<std::vector<std::wstring>>(data.value->wValueName) };
-						for(size_t idx{ 0 }; idx < val.size(); idx++){
-							if(val[idx] == std::get<std::wstring>(data.value->data)){
-								val.erase(val.begin() + idx);
-								idx--;
-							}
-						}
-						if(!data.key.SetValue<std::vector<std::wstring>>(data.value->wValueName, val)){
-							LOG_ERROR("Unable to remove registry value `" << data.value->ToString() << "`: `" <<
-									  data.value->wValueName << "` (Error " << GetLastError() << ")");
-						} else{
-							detection.DetectionStale = true;
-						}
-					} else{
-						LOG_ERROR("Unable to remove registry value `" << data.value->ToString() << "` from `" <<
-								  data.value->wValueName << "` (Error " << GetLastError() << ")");
-					}
+
+				if(type == RegistryType::REG_MULTI_SZ_T) {
+                    auto val{ *data.key.GetValue<std::vector<std::wstring>>(data.value->wValueName) };
+                    for(size_t idx{ 0 }; idx < val.size(); idx++) {
+                        if(val[idx] == std::get<std::wstring>(data.value->data)) {
+                            val.erase(val.begin() + idx);
+                            idx--;
+                        }
+                    }
+                    if(!data.key.SetValue<std::vector<std::wstring>>(data.value->wValueName, val)) {
+                        LOG_ERROR("Unable to remove registry value `" << data.value->ToString() << "`: `"
+                                                                      << data.value->wValueName << "` (Error "
+                                                                      << GetLastError() << ")");
+                    } else {
+                        detection.DetectionStale = true;
+                    }
+                } else {
+                    if(!data.key.RemoveValue(data.value->wValueName)) {
+                        LOG_ERROR("Unable to remove registry value `" << data.value->ToString() << "`: `"
+                                                                      << data.value->wValueName << "` (Error "
+                                                                      << GetLastError() << ")");
+                    } else {
+                        detection.DetectionStale = true;
+                    }
 				}
 			}
 		}

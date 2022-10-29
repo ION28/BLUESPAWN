@@ -210,7 +210,8 @@ namespace Hunts {
             if(auto value{ RegistryValue::Create(subkey, L"DllName") }){
                 auto path{ FileSystem::SearchPathExecutable(std::get<std::wstring>(value->data)) };
                 if(path && FileScanner::PerformQuickScan(*path)){
-                    CREATE_DETECTION(Certainty::Moderate, RegistryDetectionData{ *value });
+                    CREATE_DETECTION(Certainty::Moderate, 
+                        RegistryDetectionData{ *value, RegistryDetectionType::FileReference });
                 }
             }
         }
