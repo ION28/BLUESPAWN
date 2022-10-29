@@ -12,7 +12,7 @@
 		},
 		{
 			"type": "File",
-			"hunt": "T1547 - Boot or Logon Autostart Execution Subtechnique 003: Time Providers",
+			"hunt": "*",
 			"Name": "C:\\Windows\\Temp\\T1547003001.dll",
 			"Malicious Yara Rules": "*",
 			"Fail Message": "HuntT1547-sub003-test001 Failed! File not found!",
