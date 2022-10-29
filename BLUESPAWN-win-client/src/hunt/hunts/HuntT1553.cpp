@@ -71,7 +71,7 @@ namespace Hunts {
     }
 
     void HuntT1553::Subtechnique003(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
-        SUBTECHNIQUE_INIT(3, SIP and Trust Provider Hijacking);
+        SUBTECHNIQUE_INIT(003, SIP and Trust Provider Hijacking);
 
         std::unordered_map<std::wstring, std::vector<std::pair<RegistryValue, std::wstring>>> files{};
 
