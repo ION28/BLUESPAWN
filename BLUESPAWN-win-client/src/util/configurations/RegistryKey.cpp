@@ -370,8 +370,10 @@ namespace Registry {
 	std::optional<std::vector<std::wstring>> RegistryKey::GetValue(const std::wstring& wsValueName) const {
 		if(ValueExists(wsValueName)){
 			std::vector<std::wstring> strings{};
+			
+			auto rawValue = GetRawValue(wsValueName);
 
-			LPCWSTR data = reinterpret_cast<LPCWSTR>((LPVOID) GetRawValue(wsValueName));
+			LPCWSTR data = reinterpret_cast<LPCWSTR>((LPVOID) rawValue);
 
 			while(*data){
 				std::wstring str = data;
