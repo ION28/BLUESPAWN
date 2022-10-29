@@ -162,14 +162,15 @@ namespace Hunts {
                                     DetectionContext{ __name },
                                     [GUIDInfo, pair](){ GUIDInfo.SetValue(L"$Function", pair.second); });
                             }
-
-                            if(files.find(dll->ToString()) == files.end()) {
-                                files.emplace(dll->ToString(),
-                                              std::vector<std::pair<RegistryValue, std::wstring>>{
-                                                  std::pair<RegistryValue, std::wstring>{ *dll, pair.first } });
-                            } else {
-                                files.at(dll->ToString())
-                                    .emplace_back(std::pair<RegistryValue, std::wstring>{ *dll, pair.first });
+                            if(dll) {
+                                if(files.find(dll->ToString()) == files.end()) {
+                                    files.emplace(dll->ToString(),
+                                                  std::vector<std::pair<RegistryValue, std::wstring>>{
+                                                      std::pair<RegistryValue, std::wstring>{ *dll, pair.first } });
+                                } else {
+                                    files.at(dll->ToString())
+                                        .emplace_back(std::pair<RegistryValue, std::wstring>{ *dll, pair.first });
+                                }
                             }
                         } else {
                             auto message{ L"Nonstandard trust provider GUID " + GUID + L" for " + subkey + L" (DLL: " +
@@ -219,7 +220,7 @@ namespace Hunts {
                         auto message{ L"Path for dll " + *dllpath + L" does not match " + value.second +
                                       L" and may have been hijacked" };
                         CREATE_DETECTION_WITH_CONTEXT(
-                            Certainty::Weak, RegistryDetectionData{ value.first, RegistryDetectionType::FileReference },
+                            Certainty::Moderate, RegistryDetectionData{ value.first, RegistryDetectionType::FileReference },
                             DetectionContext{ __name, std::nullopt, message });
                     }
                 }
