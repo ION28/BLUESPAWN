@@ -12,7 +12,7 @@
 		},
 		{
 			"type": "File",
-			"hunt": "T1547 - Boot or Logon Autostart Execution Subtechnique 002: Authentication Package",
+			"hunt": "*",
 			"Name": "C:\\Windows\\System32\\T1547002002.dll",
 			"Malicious Yara Rules": "*",
 			"Fail Message": "HuntT1547-sub002-test002 Failed! File not found!",
