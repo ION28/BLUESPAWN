@@ -538,9 +538,9 @@ int main(int argc, char* argv[]) {
         }
 
         bluespawn.Run();
-    } catch(cxxopts::OptionParseException e1) {
+    } catch(const std::exception& e) {
         Bluespawn::io.InformUser(StringToWidestring(options.help()));
-        LOG_ERROR(e1.what());
+        LOG_ERROR(e.what());
     }
     return 0;
 }

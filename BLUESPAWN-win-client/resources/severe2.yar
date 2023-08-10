@@ -7,7 +7,7 @@ Please remove the below lines and recompile the project to use in a commercial s
 
 */
 
-
+/*
 include "../external/signature-base/yara/apt_cobaltstrike.yar"
 include "../external/signature-base/yara/apt_cobaltstrike_evasive.yar"
 include "../external/signature-base/yara/crime_emotet.yar"
@@ -68,7 +68,7 @@ include "../external/signature-base/yara/generic_exe2hex_payload.yar"
 include "../external/signature-base/yara/thor-webshells.yar"
 include "../external/signature-base/vendor/yara/airbnb_binaryalert.yar"
 
-
+*/
 
 
 /* Excluded due to syntax errors:

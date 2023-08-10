@@ -54,6 +54,7 @@ Visit [this map](https://bluespawn.cloud/coverage/) to see current coverage capa
 
 ### Hunt Mode
 5. Run BLUESPAWN from the Administrative Command Prompt to hunt for malicious activity on the system
+6. .\BLUESPAWN-client.exe -h -a intensive --log=console,xml -r carve-memory -v 10
 ```cmd
 .\BLUESPAWN-client-x64.exe --hunt -a Cursory --log=console,xml
 ```

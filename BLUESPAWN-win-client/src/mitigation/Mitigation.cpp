@@ -18,22 +18,35 @@ Mitigation::Mitigation(const std::wstring& name,
         this->policies.emplace_back(std::move(policy));
     }
 }
+std::wstring Mitigation::GetName() const {
+    return this->name; // or whatever your internal variable is
+}
+
+std::wstring Mitigation::GetDescription() const {
+    return this->description; // or whatever your internal variable is
+}
 
 Mitigation::Mitigation(json mitigation) : software(L"", L""){
-    assert(mitigation.find("name") != mitigation.end());
-    assert(mitigation.find("description") != mitigation.end());
-    assert(mitigation.find("software") != mitigation.end());
-    assert(mitigation.find("policies") != mitigation.end());
-
-    name = StringToWidestring(mitigation["name"].get<std::string>());
-    description = StringToWidestring(mitigation["description"].get<std::string>());
-    if(mitigation["software"].get<std::string>() == "Windows"){
-        software = WindowsOS();
-    } else{
-        software = Software(StringToWidestring(mitigation["software"].get<std::string>()), 
-                            StringToWidestring(mitigation["software-description"].get<std::string>()));
+    if(mitigation.find("name") != mitigation.end())
+    {
+        name = StringToWidestring(mitigation["name"].get<std::string>());
     }
-    for(auto& policy : mitigation["policies"]){
+    if(mitigation.find("description") != mitigation.end())
+    {
+        description = StringToWidestring(mitigation["description"].get<std::string>());
+    }
+    if(mitigation.find("software") != mitigation.end())
+    {
+        if(mitigation["software"].get<std::string>() == "Windows"){
+            software = WindowsOS();
+        } else{
+            software = Software(StringToWidestring(mitigation["software"].get<std::string>()), 
+                                StringToWidestring(mitigation["software-description"].get<std::string>()));
+        }
+    }
+    if(mitigation.find("policies") != mitigation.end())
+    {
+        for(auto& policy : mitigation["policies"]){
         assert(policy.find("policy-type") != policy.end());
 
         auto type{ policy["policy-type"].get<std::string>() };
@@ -50,13 +63,6 @@ Mitigation::Mitigation(json mitigation) : software(L"", L""){
         }
     }
 }
-
-std::wstring Mitigation::GetName() const {
-    return this->name;
-}
-
-std::wstring Mitigation::GetDescription() const {
-    return this->description;
 }
 
 bool Mitigation::MitigationApplies() const {
