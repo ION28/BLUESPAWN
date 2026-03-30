@@ -17,7 +17,7 @@ using namespace Registry;
 #define REGISTRY_SERVICES 0
 
 namespace Hunts {
-    HuntT1569::HuntT1569() : Hunt(L"T1569 - Service Execution") {
+    HuntT1569::HuntT1569() : Hunt(L"T1569 - System Services") {
         dwCategoriesAffected = (DWORD) Category::Configurations | (DWORD) Category::Files | (DWORD) Category::Processes;
         dwSourcesInvolved = (DWORD) DataSource::Registry | (DWORD) DataSource::FileSystem;
         dwTacticsUsed = (DWORD) Tactic::Execution;

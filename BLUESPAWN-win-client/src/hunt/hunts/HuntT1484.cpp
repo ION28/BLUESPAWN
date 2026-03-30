@@ -9,15 +9,15 @@
 
 namespace Hunts {
 
-    HuntT1484::HuntT1484() : Hunt(L"T1484 - Group Policy Modification") {
+    HuntT1484::HuntT1484() : Hunt(L"T1484 - Domain or Tenant Policy Modification") {
         dwCategoriesAffected = (DWORD) Category::Files;
         dwSourcesInvolved = (DWORD) DataSource::FileSystem | (DWORD) DataSource::GPO;
         dwTacticsUsed = (DWORD) Tactic::DefenseEvasion;
     }
 
-    std::vector<std::shared_ptr<Detection>> HuntT1484::RunHunt(const Scope& scope) {
-        HUNT_INIT();
-
+    void HuntT1484::Subtechnique001(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
+        SUBTECHNIQUE_INIT(001, Group Policy Modification);
+        
         SUBSECTION_INIT(NTUSER_MAN, Normal)
         auto userFolders = FileSystem::Folder(L"C:\\Users").GetSubdirectories(1);
         for(auto userFolder : userFolders) {
@@ -27,6 +27,14 @@ namespace Hunts {
             }
         }
         SUBSECTION_END();
+
+        SUBTECHNIQUE_END();
+    }
+
+    std::vector<std::shared_ptr<Detection>> HuntT1484::RunHunt(const Scope& scope) {
+        HUNT_INIT();
+
+        Subtechnique001(scope, detections);
 
         HUNT_END();
     }
