@@ -31,7 +31,7 @@ jobs:
         vcpkgDirectory: '${{ github.workspace }}/vcpkg'
 
     - name: Install vcpkg dependencies
-      shell: powershell
+      shell: cmd
       run: |
         cd vcpkg
         .\vcpkg.exe install @../vcpkg_response_file.txt
