@@ -25,12 +25,17 @@ jobs:
     - name: Update submodules
       run: git submodule update --init --recursive
 
-    - name: Restore from cache, and install vcpkg and project dependencies
+    - name: Setup vcpkg environment
       uses: lukka/run-vcpkg@v11
       with:
-        vcpkgArguments: '@../vcpkg_response_file.txt'
         vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-        appendedCacheKey: ${{ hashFiles('vcpkg_response_file.txt') }}
+
+    - name: Install vcpkg dependencies
+      shell: powershell
+      run: |
+        cd vcpkg
+        .\vcpkg.exe install @../vcpkg_response_file.txt
+        cd ..
 
     - name: Integrate vcpkg packages
       shell: powershell
