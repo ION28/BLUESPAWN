@@ -1,0 +1,10 @@
+{
+  "name": "bluespawn",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "cxxopts",
+    "yara",
+    "libzip",
+    "nlohmann-json"
+  ]
+}
