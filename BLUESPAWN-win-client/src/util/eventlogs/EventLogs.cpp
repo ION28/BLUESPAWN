@@ -224,7 +224,7 @@ namespace EventLogs {
 
         // Open the channel config
         EventWrapper hChannel{ EvtOpenChannelConfig(NULL, channel.c_str(), 0) };
-        if(NULL == hChannel) {
+        if(hChannel == nullptr) {
             LOG_ERROR(L"EventLogs::IsChannelOpen: EvtOpenChannelConfig failed with " + std::to_wstring(GetLastError()) +
                       L" for channel " + channel);
             return false;
@@ -257,10 +257,13 @@ namespace EventLogs {
                 return false;
             }
         }
-        if(pProperty)
+        bool isEnabled = false;
+        if(pProperty) {
+            isEnabled = pProperty->BooleanVal;
             free(pProperty);
+        }
 
-        return pProperty->BooleanVal;
+        return isEnabled;
     }
 
     bool OpenChannel(const std::wstring& channel) {

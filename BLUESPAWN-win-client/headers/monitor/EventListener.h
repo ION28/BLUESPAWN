@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <thread>
+#include <algorithm>
 
 #include "util/wrappers.hpp"
 
