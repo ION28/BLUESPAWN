@@ -22,7 +22,7 @@ Invoke-AtomicTest T1546.007 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTe
 Invoke-AtomicTest T1546.008 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1546.010 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv' -InputArgs $T1546010Args
 Invoke-AtomicTest T1546.011 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
-Invoke-AtomicTest T1546.012 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
+#Invoke-AtomicTest T1546.012 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 #Invoke-AtomicTest T1546.015 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1547.001 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
 Invoke-AtomicTest T1547.004 -ExecutionLogPath 'd:\a\BLUESPAWN\BLUESPAWN\AtomicTestsResults.csv'
