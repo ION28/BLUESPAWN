@@ -12,7 +12,7 @@
 
 namespace Hunts {
 
-    HuntT1070::HuntT1070() : Hunt(L"T1070 - Indicator Removal on Host") {
+    HuntT1070::HuntT1070() : Hunt(L"T1070 - Indicator Removal") {
         dwCategoriesAffected = (DWORD) Category::Files | (DWORD) Category::Processes;
         dwSourcesInvolved = (DWORD) DataSource::EventLogs;
         dwTacticsUsed = (DWORD) Tactic::DefenseEvasion;

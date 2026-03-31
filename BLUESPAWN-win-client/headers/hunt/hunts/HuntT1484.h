@@ -12,6 +12,8 @@ namespace Hunts {
 	public:
 		HuntT1484();
 
+		void Subtechnique001(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections);
+
 		virtual std::vector<std::shared_ptr<Detection>> RunHunt(const Scope& scope) override;
 		virtual std::vector<std::pair<std::unique_ptr<Event>, Scope>> GetMonitoringEvents() override;
 	};

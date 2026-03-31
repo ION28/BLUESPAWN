@@ -17,7 +17,7 @@ namespace Hunts {
     }
 
     void HuntT1036::Subtechnique005(IN CONST Scope& scope, OUT std::vector<std::shared_ptr<Detection>>& detections) {
-        SUBTECHNIQUE_INIT(005, Match Legitimate Name or Location);
+        SUBTECHNIQUE_INIT(005, Match Legitimate Resource Name or Location);
 
         SUBSECTION_INIT(SEARCH_WRITABLE, Intensive);
         for(auto folder : writableFolders) {
