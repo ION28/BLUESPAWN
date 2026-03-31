@@ -42,7 +42,7 @@ jobs:
 
     - name: Build BLUESPAWN-client
       shell: cmd
-      run: msbuild BLUESPAWN.sln /p:Configuration=${{ matrix.buildtype }} /p:Platform=${{ matrix.buildarch }}
+      run: msbuild BLUESPAWN.sln /p:Configuration=${{ matrix.buildtype }} /p:Platform=${{ matrix.buildarch }} /p:VcpkgEnableManifest=true /p:VcpkgManifestDir=${{ github.workspace }}
 
     - name: Set PowerShell Execution Policy
       run: powershell set-executionpolicy Unrestricted
