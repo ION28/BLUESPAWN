@@ -30,20 +30,6 @@ jobs:
       with:
         vcpkgDirectory: '${{ github.workspace }}/vcpkg'
 
-    - name: Install vcpkg dependencies
-      shell: cmd
-      run: |
-        cd vcpkg
-        .\vcpkg.exe install @../vcpkg_response_file.txt
-        cd ..
-
-    - name: Integrate vcpkg packages
-      shell: powershell
-      run: |
-        cd vcpkg
-        .\vcpkg.exe integrate install
-        cd ..
-
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
